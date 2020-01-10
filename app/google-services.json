@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "770782711846",
+    "firebase_url": "https://dishi-food.firebaseio.com",
+    "project_id": "dishi-food",
+    "storage_bucket": "dishi-food.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770782711846:android:912985cbb27c8d694816e7",
+        "android_client_info": {
+          "package_name": "com.malcolmmaima.dishi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "770782711846-9lpa13tibvi99rhd9l025h28os6tjp2s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.malcolmmaima.dishi",
+            "certificate_hash": "883a091735e47c114f24dedf642f9637083502e9"
+          }
+        },
+        {
+          "client_id": "770782711846-kjvufnn866csr9rkv0sm1p4bg0c9trs1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFsnBFwyZFuo-dG3zJf6pkZa6JanPYY_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "770782711846-kjvufnn866csr9rkv0sm1p4bg0c9trs1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
