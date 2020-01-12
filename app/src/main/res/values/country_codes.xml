@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="code_prompt">+254</string>
+
+    <string-array name="country">
+        <item>+254</item>
+    </string-array>
+</resources>

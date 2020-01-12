@@ -11,4 +11,16 @@
     <string name="slide_2_desc">Have it delivered to you in real-time</string>
     <string name="slide_3_title">Share</string>
     <string name="slide_3_desc">Congratulations, you are now a Dishi foodie. Share your food journey.</string>
+
+    <!-- Phone Verification-->
+    <string name="verify">Verifying your number!</string>
+    <string name="sent">We have sent an OTP on your number</string>
+    <string name="resend">Resend Code?</string>
+    <string name="need">We need to text you a verification code</string>
+    <string name="auth">to authenticate your account</string>
+    <string name="phone">Your mobile number</string>
+    <string name="ok">OK</string>
+    <string name="tracking_enabled_notif">Tracking is currently enabled. Tap to cancel.</string>
+    <string name="tag_send">send</string>
+    <string name="tag_verify">verify</string>
 </resources>

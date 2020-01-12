@@ -1,18 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<ScrollView
     android:layout_height="match_parent"
-    tools:context="com.malcolmmaima.dishi.View.MainActivity">
+    android:layout_width="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/gradient2">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/parentlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:src="@drawable/logo"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/need"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:layout_marginTop="15dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/auth"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:background="@drawable/round"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp">
+
+                <Spinner
+                    android:entries="@array/country"
+                    android:prompt="@string/code_prompt"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/countryCode"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:padding="10dp"
+                    android:layout_marginLeft="-20dp"
+                    android:layout_weight="1"/>
+
+                <EditText
+                    android:id="@+id/numbered"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="712345678"
+                    android:padding="10dp"
+                    android:inputType="phone"
+                    android:layout_toRightOf="@id/countryCode"
+                    />
+
+                <ImageView
+                    android:id="@+id/verifiedsign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_check_circle_black_24dp"
+                    android:visibility="invisible"
+                    android:layout_toRightOf="@id/numbered"/>
+
+            </RelativeLayout>
+
+            <com.chaos.view.PinView
+                android:id="@+id/verificationed"
+                style="@style/PinWidget.PinView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textColor="#fff"
+                android:textSize="20sp"
+                android:cursorVisible="true"
+                android:layout_marginTop="10dp"
+                app:cursorColor="@android:color/black"
+                app:cursorWidth="1dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                app:itemCount="6"
+                app:itemHeight="40dp"
+                app:itemRadius="3dp"
+                app:itemSpacing="0dp"
+                app:itemWidth="30dp"
+                android:layout_gravity="center"
+                app:lineColor="@android:color/white"
+                app:lineWidth="0dp"
+                app:viewType="rectangle"
+                android:visibility="invisible"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/sendverifybt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:src="@drawable/ic_send_white_24dp"
+                android:tag="@string/tag_send"
+                app:backgroundTint="@color/dot_inactive_screen1" />
+
+            <TextView
+                android:textColor="#fff"
+                android:id="@+id/timertv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="15sp"
+                android:clickable="true"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
