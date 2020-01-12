@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.View.Activities;
+package com.malcolmmaima.dishi.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.malcolmmaima.dishi.R;
 
-public class SplashActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_main);
     }
 }

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Dishi</string>
+
+    <!-- Welcome Slide screen -->
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">GOT IT</string>
+    <string name="slide_1_title">Dishi</string>
+    <string name="slide_1_desc">Order food that\'s in close proximity to you</string>
+    <string name="slide_2_title">Delivery</string>
+    <string name="slide_2_desc">Have it delivered to you in real-time</string>
+    <string name="slide_3_title">Share</string>
+    <string name="slide_3_desc">Congratulations, you are now a Dishi foodie. Share your food journey.</string>
 </resources>
