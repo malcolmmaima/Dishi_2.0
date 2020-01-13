@@ -76,7 +76,7 @@ public class SplashActivity extends AppCompatActivity {
                 myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                 FirebaseDatabase db = FirebaseDatabase.getInstance();
-                final DatabaseReference dbRef = db.getReference(myPhone);
+                final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                 //Check whether user is verified, if true send them directly to MyAccountRestaurant
                 dbRef.child("verified").addValueEventListener(new ValueEventListener() {

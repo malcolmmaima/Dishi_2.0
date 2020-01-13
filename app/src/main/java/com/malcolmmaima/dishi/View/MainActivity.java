@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                         FirebaseDatabase db = FirebaseDatabase.getInstance();
-                        DatabaseReference dbRef = db.getReference(myPhone);
+                        DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                         dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -280,13 +280,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onResume();
         checkConnection();
         try {
-            if (mAuth.getInstance().getCurrentUser() != null) {
+           /* if (mAuth.getInstance().getCurrentUser() != null) {
 
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                 FirebaseDatabase db = FirebaseDatabase.getInstance();
-                final DatabaseReference dbRef = db.getReference(myPhone);
+                final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                 //Check whether user is verified, if true send them directly to MyAccountRestaurant
                 dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         checkConnection();
                     }
                 });
-            }
+            } */
 
         } catch (Exception e){
 
@@ -376,7 +376,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser user = task.getResult().getUser();
                             mVerified = true;
-                            timer.cancel();
+                            try {
+                                timer.cancel();
+                            } catch (Exception e){
+
+                            }
                             verifiedimg.setVisibility(View.VISIBLE);
                             timertext.setVisibility(View.INVISIBLE);
                             phoneed.setEnabled(false);
@@ -389,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                             FirebaseDatabase db = FirebaseDatabase.getInstance();
-                            final DatabaseReference dbRef = db.getReference(myPhone);
+                            final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                             //Check whether user is verified, if true send them directly to MyAccount_(n)
                             dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
