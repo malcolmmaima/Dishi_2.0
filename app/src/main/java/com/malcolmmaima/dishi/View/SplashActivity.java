@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -46,18 +47,6 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
-
-        new CountDownTimer(60000, 10000) { //Check connection status every 10 seconds and prompt user if not connected
-            public void onTick(long millisUntilFinished) {
-                //Toast.makeText(getContext(), "seconds remaining: " + millisUntilFinished / 1000, Toast.LENGTH_SHORT).show();
-                checkConnection();
-            }
-
-            public void onFinish() {
-                //Toast.makeText(getContext(), "done!", Toast.LENGTH_SHORT).show();
-            }
-        }.start();
-
         mAuth = FirebaseAuth.getInstance();
 
         // Checking for first time launch
@@ -95,8 +84,6 @@ public class SplashActivity extends AppCompatActivity {
                                     Intent mainActivity = new Intent(SplashActivity.this, SetupProfile.class);
                                     mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//Load Main Activity and clear activity stack
                                     startActivity(mainActivity);
-
-
                                 }
                             })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -110,69 +97,96 @@ public class SplashActivity extends AppCompatActivity {
 
                         }
 
-                        else if (verified.toString().equals("true")) { //Will need to check account type as well, then redirect to account type
+                        else if (verified.equals("true")) { //Will need to check account type as well, then redirect to account type
 
                             //User is verified, so we need to check their account type and redirect accordingly
                             dbRef.child("account_type").addValueEventListener(new ValueEventListener() {
                                 @Override public void onDataChange(DataSnapshot dataSnapshot) {
-                                    String account_type = dataSnapshot.getValue(String.class);
+                                    final String account_type = dataSnapshot.getValue(String.class);
                                     //String account_type = Integer.toString(acc_type);
 
-                                    if(account_type.equals("1")){ //Customer account
-                                        try {
-                                            progressBar.setVisibility(View.GONE);
-                                            Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                    if(account_type == null){
+                                        Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
+                                        //Set account type to 0 if setting up no complete
+                                        dbRef.child("account_type").setValue("0").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+
+                                                    //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+
+                                                    Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                    getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                            }
+                                        });
+                                    }
+
+                                    else {
+                                        if(account_type.equals("1")){ //Customer account
+                                            try {
+                                                Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
 //                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountCustomer.class)
 //                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                            Bundle bndlanimation =
 //                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
 //                                            startActivity(slideactivity, bndlanimation);
-                                        } catch (Exception e){
+                                            } catch (Exception e){
 
+                                            }
                                         }
-                                    }
 
-                                    else if (account_type.equals("2")){ //Provider Restaurant account
-                                        try {
-                                            progressBar.setVisibility(View.GONE);
-                                            Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
+                                        else if (account_type.equals("2")){ //Provider Restaurant account
+                                            try {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
 //                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountRestaurant.class)
 //                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                            Bundle bndlanimation =
 //                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
 //                                            startActivity(slideactivity, bndlanimation);
-                                        } catch (Exception e){
+                                            } catch (Exception e){
 
+                                            }
                                         }
-                                    }
 
-                                    else if (account_type.equals("3")){ //Nduthi account
-                                        try {
-                                            progressBar.setVisibility(View.GONE);
-                                            //Slide to new activity
-                                            Toast.makeText(SplashActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
+                                        else if (account_type.equals("3")){ //Nduthi account
+                                            try {
+                                                progressBar.setVisibility(View.GONE);
+                                                //Slide to new activity
+                                                Toast.makeText(SplashActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
 //                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountNduthi.class)
 //                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                            Bundle bndlanimation =
 //                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
 //                                            startActivity(slideactivity, bndlanimation);
-                                        } catch (Exception e){
+                                            } catch (Exception e){
+
+                                            }
 
                                         }
 
+                                        else if (account_type.equals("0")){
+                                            Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+
+                                            Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            Bundle bndlanimation =
+                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                            getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                        }
+
+                                        else if (account_type.equals("X")){
+                                            Toast.makeText(SplashActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
+
+                                        }
+
+                                        else { // Others
+                                            Toast.makeText(SplashActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
+                                        }
                                     }
 
-                                    else if (account_type.equals("X")){
-                                        Toast.makeText(SplashActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
-
-                                    }
-
-                                    else { // Others
-                                        Toast.makeText(SplashActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
-                                    }
-
-                                    //Debugging purposes
-                                    //Toast.makeText(SplashActivity.this, "Account type: " + account_type, Toast.LENGTH_LONG).show();
                                 }
 
                                 @Override
@@ -205,27 +219,5 @@ public class SplashActivity extends AppCompatActivity {
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         }
 
-
-
     }
-
-    protected boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    public void checkConnection(){
-        if(isOnline()){
-            //Toast.makeText(SplashActivity.this, "You are connected to Internet", Toast.LENGTH_SHORT).show();
-            progressBar.setVisibility(View.VISIBLE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-            Toast.makeText(SplashActivity.this, "You are not connected to the Internet", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 }
