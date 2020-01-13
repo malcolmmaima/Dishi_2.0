@@ -356,7 +356,12 @@ public class SetupProfile extends AppCompatActivity {
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             valid[0] = true;
-                            myRef.child(myPhone).child("profilePic").setValue(defaultProfile);
+                            //Set default profile picture in database
+                            try {
+                                myRef.child(myPhone).child("profilePic").setValue(defaultProfile);
+                            } catch (Exception e){
+
+                            }
                         }
                     })
                     .setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -377,13 +382,13 @@ public class SetupProfile extends AppCompatActivity {
             valid[0] =false;
         }
 
-        if(mEmail.equals(emailPattern)){
-            mEmail.setError("Invalid Email");
+        if(mEmail.getText().toString().equals("")){
+            mEmail.setError("Cant't be empty");
             valid[0] =false;
         }
 
-        if(mEmail.getText().toString().equals("")){
-            mEmail.setError("Cant't be empty");
+        if(mEmail.equals(emailPattern)){
+            mEmail.setError("Invalid Email");
             valid[0] =false;
         }
 

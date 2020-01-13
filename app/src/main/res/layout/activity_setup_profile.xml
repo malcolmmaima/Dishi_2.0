@@ -14,7 +14,7 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SETUP NEW ACCOUNT"
+        android:text="SETUP PROFILE"
         android:layout_marginTop="30dp"
         android:textSize="20sp"
         android:textColor="#000000"
