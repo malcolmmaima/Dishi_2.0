@@ -165,7 +165,11 @@ public class SetupProfile extends AppCompatActivity {
                                                             bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                                                         }
                                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                                            startActivity(slideactivity, bndlanimation);
+                                                            try {
+                                                                startActivity(slideactivity, bndlanimation);
+                                                            } catch (Exception e){
+
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -254,52 +258,60 @@ public class SetupProfile extends AppCompatActivity {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-            // Creating second StorageReference.
-            final StorageReference storageReference2nd = storageReference.child(Storage_Path + "/" + myPhone + "/" + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
+            try {
+                // Creating second StorageReference.
+                final StorageReference storageReference2nd = storageReference.child(Storage_Path + "/" + myPhone + "/" + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
 
-            // Adding addOnSuccessListener to second StorageReference.
-            storageReference2nd.putFile(FilePathUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Adding addOnSuccessListener to second StorageReference.
+                storageReference2nd.putFile(FilePathUri)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                            //Get image URL: //Here we get the image url from the firebase storage
-                            storageReference2nd.getDownloadUrl().addOnSuccessListener(new OnSuccessListener() {
+                                //Get image URL: //Here we get the image url from the firebase storage
+                                storageReference2nd.getDownloadUrl().addOnSuccessListener(new OnSuccessListener() {
 
-                                @Override
-                                public void onSuccess(Object o) {
-                                    myRef.child(myPhone).child("profilePic").setValue(o.toString());
+                                    @Override
+                                    public void onSuccess(Object o) {
+                                        myRef.child(myPhone).child("profilePic").setValue(o.toString());
+                                    }
+
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle any errors
+                                    }
+                                });
+
+                            }
+                        })
+                        // If something goes wrong .
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+
+                                // Showing exception erro message.
+                                Toast.makeText(mContext, exception.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        })
+
+                        // On progress change upload time.
+                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                try {
+                                    progressDialog.setTitle("Uploading...");
+                                    progressDialog.setCancelable(false);
+                                    progressDialog.show();
+                                } catch (Exception e){
+
                                 }
 
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle any errors
-                                }
-                            });
+                            }
+                        });
+            } catch (Exception e){
 
-                        }
-                    })
-                    // If something goes wrong .
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-
-                            // Showing exception erro message.
-                            Toast.makeText(mContext, exception.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    })
-
-                    // On progress change upload time.
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.setTitle("Uploading...");
-                            progressDialog.setCancelable(false);
-                            progressDialog.show();
-
-                        }
-                    });
+            }
         }
 
     }
