@@ -68,7 +68,7 @@ public class SplashActivity extends AppCompatActivity {
                 final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                 //Check whether user is verified, if true send them directly to MyAccountRestaurant
-                dbRef.child("verified").addValueEventListener(new ValueEventListener() {
+                dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String verified = dataSnapshot.getValue(String.class);
@@ -100,7 +100,7 @@ public class SplashActivity extends AppCompatActivity {
                         else if (verified.equals("true")) { //Will need to check account type as well, then redirect to account type
 
                             //User is verified, so we need to check their account type and redirect accordingly
-                            dbRef.child("account_type").addValueEventListener(new ValueEventListener() {
+                            dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override public void onDataChange(DataSnapshot dataSnapshot) {
                                     final String account_type = dataSnapshot.getValue(String.class);
                                     //String account_type = Integer.toString(acc_type);

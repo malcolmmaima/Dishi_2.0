@@ -7,6 +7,7 @@ public class UserModel {
     String verified;
     String bio;
     String gender;
+    String profilePic;
 
     public String getEmail() {
         return email;
@@ -54,5 +55,13 @@ public class UserModel {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
     }
 }
