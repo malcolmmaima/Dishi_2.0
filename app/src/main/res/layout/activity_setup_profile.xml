@@ -3,30 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:card_view="http://schemas.android.com/tools">
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackroundWhite">
 
+    <!-- Activity Title -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SETUP NEW ACCOUNT"
+        android:layout_marginTop="30dp"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:gravity="center_horizontal"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_below="@id/title"
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        card_view:cardCornerRadius="5dp"
+        android:focusableInTouchMode="false"
+        card_view:view_shadowDx="2dp"
+        card_view:view_shadowDy="0dp"
+        card_view:view_borderWidth="2dp"
+        card_view:view_borderColor="#cccccc"
+        android:foreground="?android:attr/selectableItemBackground" >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="45dp"
+        android:paddingTop="20dp"
         android:paddingLeft="25dp"
         android:paddingRight="25dp"
         >
-
-        <!-- Activity Title -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SETUP NEW ACCOUNT"
-            android:textSize="20sp"
-            android:textColor="#000000"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="40dp"/>
 
         <com.alexzh.circleimageview.CircleImageView
             android:id="@+id/profilePic"
@@ -120,6 +136,7 @@
                 android:gravity="center"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
                 >
 
                 <RadioButton
@@ -143,20 +160,26 @@
             </RadioGroup>
         </RelativeLayout>
 
-
-        <!-- Finish Button -->
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="25dp"
-            android:layout_marginTop="25dp"
-            android:text="Finish"
-            android:textColor="@color/colorBackroundWhite"
-            android:id="@+id/btn_register"
-            android:padding="12dp"
-            android:background="@drawable/login_button"/>
-
     </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+    <!-- Finish Button -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_below="@id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Finish"
+        android:textColor="@color/colorBackroundWhite"
+        android:id="@+id/btn_register"
+        android:padding="12dp"
+        android:background="@drawable/login_button"/>
 
     <ProgressBar
         android:layout_width="100dp"
