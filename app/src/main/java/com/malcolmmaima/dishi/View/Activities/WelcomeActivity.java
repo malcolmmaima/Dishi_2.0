@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.View;
+package com.malcolmmaima.dishi.View.Activities;
 
 import android.content.Context;
 import android.content.Intent;

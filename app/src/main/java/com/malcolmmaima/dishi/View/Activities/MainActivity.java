@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.View;
+package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;

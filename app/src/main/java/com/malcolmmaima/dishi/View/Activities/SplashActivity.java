@@ -1,11 +1,7 @@
-package com.malcolmmaima.dishi.View;
+package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.CountDownTimer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;

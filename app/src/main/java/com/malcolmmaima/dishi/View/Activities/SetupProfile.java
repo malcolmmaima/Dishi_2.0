@@ -1,11 +1,10 @@
-package com.malcolmmaima.dishi.View;
+package com.malcolmmaima.dishi.View.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -61,7 +60,6 @@ public class SetupProfile extends AppCompatActivity {
     /**
      * Firebase
      */
-    // Creating StorageReference and DatabaseReference object.
     StorageReference storageReference;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
