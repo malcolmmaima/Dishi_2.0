@@ -427,6 +427,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                             @Override public void onDataChange(DataSnapshot dataSnapshot) {
                                                 String account_type = dataSnapshot.getValue(String.class);
 
+                                                //User has not finished setting up account
+                                                if(account_type.equals("0")){
+                                                    Intent slideactivity = new Intent(MainActivity.this, SetupAccountType.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                    startActivity(slideactivity, bndlanimation);
+                                                }
+
                                                 if(account_type.equals("1")){ //Customer account
                                                     if(progressDialog.isShowing()){
                                                         progressDialog.dismiss();

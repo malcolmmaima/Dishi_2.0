@@ -87,7 +87,7 @@ public class SetupProfile extends AppCompatActivity {
 
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(SetupProfile.this);
-        defaultProfile = "https://firebasestorage.googleapis.com/v0/b/dishi-food.appspot.com/o/defaults%2Fprofile_setup.png?alt=media&token=0fa07d5c-5dc0-44e2-b0ae-d9593aca433c";
+        defaultProfile = "https://firebasestorage.googleapis.com/v0/b/dishi-food.appspot.com/o/defaults%2Fdefault_profile.png?alt=media&token=af43783d-4432-4218-8dea-9f66b66c8f9e";
 
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
         mAuth = FirebaseAuth.getInstance();
@@ -148,12 +148,12 @@ public class SetupProfile extends AppCompatActivity {
                                     public void onSuccess(Void aVoid) {
                                         mProgressBar.setVisibility(View.INVISIBLE);
                                         //Toast.makeText(mContext, "Details saved!", Toast.LENGTH_LONG).show();
-
+                                        UploadImage();
                                         //Check if profile picture has been set
                                         myRef.child(myPhone).addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                UploadImage();
+                                                //UploadImage();
                                                 for(DataSnapshot data : dataSnapshot.getChildren()){
                                                     if(data.getKey().equals("profilePic")){
                                                         //Slide to new activity

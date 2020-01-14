@@ -32,7 +32,7 @@
         card_view:view_shadowDx="2dp"
         card_view:view_shadowDy="0dp"
         card_view:view_borderWidth="2dp"
-        card_view:view_borderColor="#cccccc"
+        card_view:view_borderColor="#ffffff"
         android:foreground="?android:attr/selectableItemBackground" >
 
     <LinearLayout
@@ -46,21 +46,22 @@
 
         <com.alexzh.circleimageview.CircleImageView
             android:id="@+id/profilePic"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="@drawable/profile_circular_border_imageview"
-            android:elevation="5dp"
+            android:elevation="3dp"
             android:padding="5dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/profile_setup"
+            android:src="@drawable/default_profile"
             android:layout_gravity="center_horizontal"
             app:view_borderColor="#cccccc"
             app:view_borderWidth="2dp"
-            app:view_shadowDx="2dp"
+            app:view_shadowDx="0dp"
             app:view_shadowDy="0dp"
-            app:view_shadowRadius="2dp" />
+            app:view_shadowRadius="1dp" />
+
 
         <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
@@ -172,14 +173,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="25dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="0dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:text="Finish"
+        android:text="NEXT"
         android:textColor="@color/colorBackroundWhite"
         android:id="@+id/btn_register"
         android:padding="12dp"
-        android:background="@drawable/login_button"/>
+        android:background="@drawable/login_button"
+        />
 
     <ProgressBar
         android:layout_width="100dp"
