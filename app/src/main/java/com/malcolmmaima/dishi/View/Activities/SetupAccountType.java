@@ -41,6 +41,7 @@ public class SetupAccountType extends AppCompatActivity {
 
         TAG = "SetupAccountType";
         accountType = "0";
+        progressDialog = new ProgressDialog(SetupAccountType.this);
 
         initWidgets();
 
@@ -63,16 +64,44 @@ public class SetupAccountType extends AppCompatActivity {
                     //Toast.makeText(SetupAccountType.this, "Customer account", Toast.LENGTH_SHORT).show();
                     accountType = "1";
 
+                    try {
+                        progressDialog.setTitle("Saving...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    } catch (Exception e){
+
+                    }
                     //Set account type in database under logged in user's node
                     myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            try {
+                                progressDialog.dismiss();
+                            } catch (Exception e){
+
+                            }
                             //Load customer account
+                            Intent slideactivity = new Intent(SetupAccountType.this, CustomerActivity.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            Bundle bndlanimation =
+                                    null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                try {
+                                    startActivity(slideactivity, bndlanimation);
+                                } catch (Exception e){
+
+                                }
+                            }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             //error
+                            Toast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         }
                     });
                 }

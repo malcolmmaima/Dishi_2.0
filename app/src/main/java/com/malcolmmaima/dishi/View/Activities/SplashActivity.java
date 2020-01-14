@@ -122,12 +122,12 @@ public class SplashActivity extends AppCompatActivity {
                                     else {
                                         if(account_type.equals("1")){ //Customer account
                                             try {
-                                                Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-//                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountCustomer.class)
-//                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                            Bundle bndlanimation =
-//                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-//                                            startActivity(slideactivity, bndlanimation);
+                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                Bundle bndlanimation =
+                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                startActivity(slideactivity, bndlanimation);
                                             } catch (Exception e){
 
                                             }
@@ -151,7 +151,7 @@ public class SplashActivity extends AppCompatActivity {
                                             try {
                                                 progressBar.setVisibility(View.GONE);
                                                 //Slide to new activity
-                                                Toast.makeText(SplashActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
 //                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountNduthi.class)
 //                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                            Bundle bndlanimation =

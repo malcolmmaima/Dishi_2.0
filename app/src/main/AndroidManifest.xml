@@ -18,7 +18,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.SetupAccountType"></activity>
+        <activity
+            android:name=".View.Activities.CustomerActivity"
+            android:label="@string/title_activity_customer"></activity>
+        <activity android:name=".View.Activities.SetupAccountType" />
         <activity android:name=".View.Activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

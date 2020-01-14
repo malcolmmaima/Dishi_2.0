@@ -23,4 +23,8 @@
     <string name="tracking_enabled_notif">Tracking is currently enabled. Tap to cancel.</string>
     <string name="tag_send">send</string>
     <string name="tag_verify">verify</string>
+    <string name="title_activity_customer">CustomerActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
