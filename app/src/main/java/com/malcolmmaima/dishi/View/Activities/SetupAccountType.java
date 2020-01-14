@@ -21,6 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.malcolmmaima.dishi.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class SetupAccountType extends AppCompatActivity {
 
     private String TAG;
@@ -80,21 +86,29 @@ public class SetupAccountType extends AppCompatActivity {
                             } catch (Exception e){
 
                             }
-                            //Load customer account
-                            Intent slideactivity = new Intent(SetupAccountType.this, CustomerActivity.class)
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            Bundle bndlanimation =
-                                    null;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                            }
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                try {
-                                    startActivity(slideactivity, bndlanimation);
-                                } catch (Exception e){
 
+                            //Set signup date and make sure it is posted to the database before loading customer account
+                            String date = getDate();
+                            myRef.child(myPhone).child("signupDate").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //Load customer account
+                                    Intent slideactivity = new Intent(SetupAccountType.this, CustomerActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    Bundle bndlanimation =
+                                            null;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                    }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        try {
+                                            startActivity(slideactivity, bndlanimation);
+                                        } catch (Exception e){
+
+                                        }
+                                    }
                                 }
-                            }
+                            });
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -104,6 +118,19 @@ public class SetupAccountType extends AppCompatActivity {
                             progressDialog.dismiss();
                         }
                     });
+                }
+
+                private String getDate() {
+                    String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                    TimeZone timeZone = TimeZone.getTimeZone("GMT+03:00");
+                    Calendar calendar = Calendar.getInstance(timeZone);
+                    String time = date+ ":" +
+                            String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
+                            String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
+                            String.format("%02d" , calendar.get(Calendar.SECOND)); //+":"+
+                    //String.format("%03d" , calendar.get(Calendar.MILLISECOND));
+
+                    return time;
                 }
             });
 
