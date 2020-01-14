@@ -168,7 +168,7 @@ public class SplashActivity extends AppCompatActivity {
                                         }
 
                                         else if (account_type.equals("0")){
-                                            Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+                                            //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
 
                                             Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
