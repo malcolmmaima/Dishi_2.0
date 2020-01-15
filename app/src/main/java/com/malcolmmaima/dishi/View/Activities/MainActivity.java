@@ -228,21 +228,122 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                         FirebaseDatabase db = FirebaseDatabase.getInstance();
-                        DatabaseReference dbRef = db.getReference("users/" + myPhone);
+                        final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
-                        dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
+                        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+                        //Check whether user is verified, if true send them directly to MyAccount_(n)
+                        dbRef.child("verified").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Boolean verified = dataSnapshot.getValue(Boolean.class);
+                                String verified = dataSnapshot.getValue(String.class);
 
-                                Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                if(verified == null) {
+                                    verified = "false";
 
+                                    dbRef.child("verified").setValue(verified).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            //First time signup
+                                        }
+                                    })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    // Write failed
+                                                    Toast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            });
+                                }
+
+                                //Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                if(verified.toString().equals("true")){
+                                    //User is verified, so we need to check their account type and redirect accordingly
+                                    dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override public void onDataChange(DataSnapshot dataSnapshot) {
+                                            String account_type = dataSnapshot.getValue(String.class);
+
+                                            //User has not finished setting up account
+                                            if(account_type.equals("0")){
+                                                Intent slideactivity = new Intent(MainActivity.this, SetupAccountType.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                Bundle bndlanimation =
+                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                startActivity(slideactivity, bndlanimation);
+                                            }
+
+                                            if(account_type.equals("1")){ //Customer account
+                                                if(progressDialog.isShowing()){
+                                                    progressDialog.dismiss();
+                                                }
+                                                //Toast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountCustomer.class)
+//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                                    Bundle bndlanimation =
+//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+//                                                    startActivity(slideactivity, bndlanimation);
+                                            }
+
+                                            else if (account_type.equals("2")){ //Provider Restaurant account
+                                                if(progressDialog.isShowing()){
+                                                    progressDialog.dismiss();
+                                                }
+                                                //Toast.makeText(MainActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
+//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountRestaurant.class)
+//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                                    Bundle bndlanimation =
+//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+//                                                    startActivity(slideactivity, bndlanimation);
+                                            }
+
+                                            else if (account_type.equals("3")){ //Nduthi account
+                                                if(progressDialog.isShowing()){
+                                                    progressDialog.dismiss();
+                                                }
+                                                //Slide to new activity
+                                                //Toast.makeText(MainActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
+//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountNduthi.class)
+//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                                    Bundle bndlanimation =
+//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+//                                                    startActivity(slideactivity, bndlanimation);
+                                            }
+
+                                            else if (account_type.equals("X")){
+                                                Toast.makeText(MainActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
+
+                                            }
+
+                                            else { // Others
+                                                if(progressDialog.isShowing()){
+                                                    progressDialog.dismiss();
+                                                }
+                                                Toast.makeText(MainActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
+                                            }
+
+                                            //Debugging purposes
+                                            //Toast.makeText(SplashActivity.this, "Account type: " + account_type, Toast.LENGTH_LONG).show();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            //DB error, try again...if fails login again
+                                        }
+                                    });
+                                } else {
+                                    if(progressDialog.isShowing()){
+                                        progressDialog.dismiss();
+                                    }
+                                    Intent slideactivity = new Intent(MainActivity.this, SetupProfile.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    Bundle bndlanimation =
+                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                    startActivity(slideactivity, bndlanimation);
+                                }
                             }
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                if(progressDialog.isShowing()){
-                                    progressDialog.dismiss();
-                                }
                             }
                         });
                     }
@@ -316,11 +417,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                             //Check whether user is verified, if true send them directly to MyAccount_(n)
-                            dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
+                            dbRef.child("verified").addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     String verified = dataSnapshot.getValue(String.class);
-
+                                    //Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_SHORT).show();
                                     if(verified == null) {
                                         verified = "false";
 
@@ -341,12 +442,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     }
 
                                     //Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
-                                    if(verified.toString().equals("true")){
+                                    if(verified.equals("true")){
                                         //User is verified, so we need to check their account type and redirect accordingly
                                         dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override public void onDataChange(DataSnapshot dataSnapshot) {
                                                 String account_type = dataSnapshot.getValue(String.class);
-
+                                                //Toast.makeText(MainActivity.this, "accType: " + account_type, Toast.LENGTH_SHORT).show();
                                                 //User has not finished setting up account
                                                 if(account_type.equals("0")){
                                                     Intent slideactivity = new Intent(MainActivity.this, SetupAccountType.class)
@@ -361,18 +462,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                         progressDialog.dismiss();
                                                     }
                                                     //Toast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountCustomer.class)
-//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                                    Bundle bndlanimation =
-//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                                    startActivity(slideactivity, bndlanimation);
+                                                    Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                    startActivity(slideactivity, bndlanimation);
                                                 }
 
                                                 else if (account_type.equals("2")){ //Provider Restaurant account
                                                     if(progressDialog.isShowing()){
                                                         progressDialog.dismiss();
                                                     }
-                                                    //Toast.makeText(MainActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(MainActivity.this, "Restaurant Account", Toast.LENGTH_LONG).show();
 //                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountRestaurant.class)
 //                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                                    Bundle bndlanimation =
@@ -385,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                         progressDialog.dismiss();
                                                     }
                                                     //Slide to new activity
-                                                    //Toast.makeText(MainActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(MainActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
 //                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountNduthi.class)
 //                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                                    Bundle bndlanimation =
