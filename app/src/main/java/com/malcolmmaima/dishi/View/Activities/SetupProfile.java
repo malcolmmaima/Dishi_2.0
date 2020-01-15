@@ -56,6 +56,7 @@ public class SetupProfile extends AppCompatActivity {
     RadioButton maleRd, femaleRd;
     RadioGroup mGender;
     private ImageView profile_pic;
+    private boolean complete;
 
     /**
      * Firebase
@@ -82,6 +83,7 @@ public class SetupProfile extends AppCompatActivity {
         setContentView(R.layout.activity_setup_profile);
 
         initWidgets();
+        complete = false;
 
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(SetupProfile.this);
@@ -148,37 +150,6 @@ public class SetupProfile extends AppCompatActivity {
                                         //Toast.makeText(mContext, "Details saved!", Toast.LENGTH_LONG).show();
                                         UploadImage();
                                         //Check if profile picture has been set
-                                        myRef.child(myPhone).addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                //UploadImage();
-                                                for(DataSnapshot data : dataSnapshot.getChildren()){
-                                                    if(data.getKey().equals("profilePic")){
-                                                        //Slide to new activity
-                                                        Intent slideactivity = new Intent(SetupProfile.this, SetupAccountType.class)
-                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                        Bundle bndlanimation =
-                                                                null;
-                                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                                            bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                                        }
-                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                                            try {
-                                                                startActivity(slideactivity, bndlanimation);
-                                                            } catch (Exception e){
-
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
                                     }
                                 });
 
@@ -271,7 +242,25 @@ public class SetupProfile extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(Object o) {
-                                        myRef.child(myPhone).child("profilePic").setValue(o.toString());
+                                        myRef.child(myPhone).child("profilePic").setValue(o.toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Intent slideactivity = new Intent(SetupProfile.this, SetupAccountType.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                Bundle bndlanimation =
+                                                        null;
+                                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                    bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                }
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                    try {
+                                                        startActivity(slideactivity, bndlanimation);
+                                                    } catch (Exception e){
+
+                                                    }
+                                                }
+                                            }
+                                        });
                                     }
 
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -356,7 +345,25 @@ public class SetupProfile extends AppCompatActivity {
                             valid[0] = true;
                             //Set default profile picture in database
                             try {
-                                myRef.child(myPhone).child("profilePic").setValue(defaultProfile);
+                                myRef.child(myPhone).child("profilePic").setValue(defaultProfile).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Intent slideactivity = new Intent(SetupProfile.this, SetupAccountType.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        Bundle bndlanimation =
+                                                null;
+                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                        }
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            try {
+                                                startActivity(slideactivity, bndlanimation);
+                                            } catch (Exception e){
+
+                                            }
+                                        }
+                                    }
+                                });
                             } catch (Exception e){
 
                             }

@@ -102,7 +102,7 @@ public class SplashActivity extends AppCompatActivity {
                                     //String account_type = Integer.toString(acc_type);
 
                                     if(account_type == null){
-                                        Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
                                         //Set account type to 0 if setting up no complete
                                         dbRef.child("account_type").setValue("0").addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override

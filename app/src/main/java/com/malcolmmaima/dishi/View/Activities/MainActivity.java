@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                         //Check whether user is verified, if true send them directly to MyAccount_(n)
-                        dbRef.child("verified").addValueEventListener(new ValueEventListener() {
+                        dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 String verified = dataSnapshot.getValue(String.class);
@@ -420,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                             //Check whether user is verified, if true send them directly to MyAccount_(n)
-                            dbRef.child("verified").addValueEventListener(new ValueEventListener() {
+                            dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     String verified = dataSnapshot.getValue(String.class);
