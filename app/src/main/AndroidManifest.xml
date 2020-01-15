@@ -19,8 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".View.Activities.RestaurantActivity"
+            android:label="@string/title_activity_restaurant"></activity>
+        <activity
             android:name=".View.Activities.CustomerActivity"
-            android:label="@string/title_activity_customer"></activity>
+            android:label="@string/title_activity_customer" />
         <activity android:name=".View.Activities.SetupAccountType" />
         <activity android:name=".View.Activities.SplashActivity">
             <intent-filter>

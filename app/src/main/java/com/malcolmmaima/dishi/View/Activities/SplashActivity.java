@@ -136,12 +136,12 @@ public class SplashActivity extends AppCompatActivity {
                                         else if (account_type.equals("2")){ //Provider Restaurant account
                                             try {
                                                 progressBar.setVisibility(View.GONE);
-                                                Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
-//                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountRestaurant.class)
-//                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                            Bundle bndlanimation =
-//                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                            startActivity(slideactivity, bndlanimation);
+                                                //Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
+                                            Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            Bundle bndlanimation =
+                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                            startActivity(slideactivity, bndlanimation);
                                             } catch (Exception e){
 
                                             }

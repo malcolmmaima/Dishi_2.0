@@ -120,18 +120,6 @@ public class SetupAccountType extends AppCompatActivity {
                     });
                 }
 
-                private String getDate() {
-                    String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-                    TimeZone timeZone = TimeZone.getTimeZone("GMT+03:00");
-                    Calendar calendar = Calendar.getInstance(timeZone);
-                    String time = date+ ":" +
-                            String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
-                            String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
-                            String.format("%02d" , calendar.get(Calendar.SECOND)); //+":"+
-                    //String.format("%03d" , calendar.get(Calendar.MILLISECOND));
-
-                    return time;
-                }
             });
 
 
@@ -141,19 +129,55 @@ public class SetupAccountType extends AppCompatActivity {
             restaurant.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(SetupAccountType.this, "Restaurant account", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SetupAccountType.this, "Restaurant account", Toast.LENGTH_SHORT).show();
                     accountType = "2";
 
+                    try {
+                        progressDialog.setTitle("Saving...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    } catch (Exception e){
+
+                    }
                     //Set account type in database under logged in user's node
                     myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            //Load customer account
+                            try {
+                                progressDialog.dismiss();
+                            } catch (Exception e){
+
+                            }
+
+                            //Set signup date and make sure it is posted to the database before loading customer account
+                            String date = getDate();
+                            myRef.child(myPhone).child("signupDate").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //Load customer account
+                                    Intent slideactivity = new Intent(SetupAccountType.this, RestaurantActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    Bundle bndlanimation =
+                                            null;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                    }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        try {
+                                            startActivity(slideactivity, bndlanimation);
+                                        } catch (Exception e){
+
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             //error
+                            Toast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         }
                     });
                 }
@@ -216,5 +240,18 @@ public class SetupAccountType extends AppCompatActivity {
         restaurant = findViewById(R.id.restaurantAccountCard);
         rider = findViewById(R.id.riderCard);
 
+    }
+
+    private String getDate() {
+        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        TimeZone timeZone = TimeZone.getTimeZone("GMT+03:00");
+        Calendar calendar = Calendar.getInstance(timeZone);
+        String time = date+ ":" +
+                String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
+                String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
+                String.format("%02d" , calendar.get(Calendar.SECOND)); //+":"+
+        //String.format("%03d" , calendar.get(Calendar.MILLISECOND));
+
+        return time;
     }
 }

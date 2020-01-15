@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -292,11 +293,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                     progressDialog.dismiss();
                                                 }
                                                 //Toast.makeText(MainActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
-//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountRestaurant.class)
-//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                                    Bundle bndlanimation =
-//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                                    startActivity(slideactivity, bndlanimation);
+                                                    Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                    startActivity(slideactivity, bndlanimation);
                                             }
 
                                             else if (account_type.equals("3")){ //Nduthi account
@@ -475,12 +476,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                         if (progressDialog.isShowing()) {
                                                             progressDialog.dismiss();
                                                         }
-                                                        Toast.makeText(MainActivity.this, "Restaurant Account", Toast.LENGTH_LONG).show();
-//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountRestaurant.class)
-//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                                    Bundle bndlanimation =
-//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                                    startActivity(slideactivity, bndlanimation);
+                                                        //Toast.makeText(MainActivity.this, "Restaurant Account", Toast.LENGTH_LONG).show();
+                                                        Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        Bundle bndlanimation =
+                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                        startActivity(slideactivity, bndlanimation);
                                                     } else if (account_type.equals("3")) { //Nduthi account
                                                         if (progressDialog.isShowing()) {
                                                             progressDialog.dismiss();

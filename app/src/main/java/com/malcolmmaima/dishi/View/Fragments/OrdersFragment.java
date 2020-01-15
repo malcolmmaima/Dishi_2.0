@@ -15,7 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.malcolmmaima.dishi.R;
 
-public class UserProfileFragment extends Fragment {
+public class OrdersFragment extends Fragment {
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -25,8 +25,8 @@ public class UserProfileFragment extends Fragment {
     FirebaseUser user;
 
 
-    public static UserProfileFragment newInstance() {
-        UserProfileFragment fragment = new UserProfileFragment();
+    public static OrdersFragment newInstance() {
+        OrdersFragment fragment = new OrdersFragment();
         return fragment;
     }
 
@@ -39,7 +39,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        final View v = inflater.inflate(R.layout.fragment_orders, container, false);
         progressDialog = new ProgressDialog(getContext());
 
         user = FirebaseAuth.getInstance().getCurrentUser();
