@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String myPhone, countrycode;
 
     ProgressDialog progressDialog ;
+    private String TAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
         //getSupportActionBar().setTitle("Dishi");
 
+        TAG = "MainActivity";
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(MainActivity.this);
 
@@ -319,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 if(progressDialog.isShowing()){
                                                     progressDialog.dismiss();
                                                 }
-                                                Toast.makeText(MainActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
+                                                //Toast.makeText(MainActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
                                             }
 
                                             //Debugging purposes
@@ -446,64 +448,61 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         //User is verified, so we need to check their account type and redirect accordingly
                                         dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override public void onDataChange(DataSnapshot dataSnapshot) {
-                                                String account_type = dataSnapshot.getValue(String.class);
-                                                //Toast.makeText(MainActivity.this, "accType: " + account_type, Toast.LENGTH_SHORT).show();
-                                                //User has not finished setting up account
-                                                if(account_type.equals("0")){
-                                                    Intent slideactivity = new Intent(MainActivity.this, SetupAccountType.class)
-                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                    Bundle bndlanimation =
-                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                    startActivity(slideactivity, bndlanimation);
-                                                }
 
-                                                if(account_type.equals("1")){ //Customer account
-                                                    if(progressDialog.isShowing()){
-                                                        progressDialog.dismiss();
+                                                try {
+                                                    String account_type = dataSnapshot.getValue(String.class);
+                                                    //Toast.makeText(MainActivity.this, "accType: " + account_type, Toast.LENGTH_SHORT).show();
+                                                    //User has not finished setting up account
+                                                    if (account_type.equals("0")) {
+                                                        Intent slideactivity = new Intent(MainActivity.this, SetupAccountType.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        Bundle bndlanimation =
+                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                        startActivity(slideactivity, bndlanimation);
                                                     }
-                                                    //Toast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                    Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
-                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                    Bundle bndlanimation =
-                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                    startActivity(slideactivity, bndlanimation);
-                                                }
 
-                                                else if (account_type.equals("2")){ //Provider Restaurant account
-                                                    if(progressDialog.isShowing()){
-                                                        progressDialog.dismiss();
-                                                    }
-                                                    Toast.makeText(MainActivity.this, "Restaurant Account", Toast.LENGTH_LONG).show();
+                                                    if (account_type.equals("1")) { //Customer account
+                                                        if (progressDialog.isShowing()) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                        //Toast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                        Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        Bundle bndlanimation =
+                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                        startActivity(slideactivity, bndlanimation);
+                                                    } else if (account_type.equals("2")) { //Provider Restaurant account
+                                                        if (progressDialog.isShowing()) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                        Toast.makeText(MainActivity.this, "Restaurant Account", Toast.LENGTH_LONG).show();
 //                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountRestaurant.class)
 //                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                                    Bundle bndlanimation =
 //                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
 //                                                    startActivity(slideactivity, bndlanimation);
-                                                }
-
-                                                else if (account_type.equals("3")){ //Nduthi account
-                                                    if(progressDialog.isShowing()){
-                                                        progressDialog.dismiss();
-                                                    }
-                                                    //Slide to new activity
-                                                    Toast.makeText(MainActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
+                                                    } else if (account_type.equals("3")) { //Nduthi account
+                                                        if (progressDialog.isShowing()) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                        //Slide to new activity
+                                                        Toast.makeText(MainActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
 //                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountNduthi.class)
 //                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                                    Bundle bndlanimation =
 //                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
 //                                                    startActivity(slideactivity, bndlanimation);
-                                                }
+                                                    } else if (account_type.equals("X")) {
+                                                        Toast.makeText(MainActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
 
-                                                else if (account_type.equals("X")){
-                                                    Toast.makeText(MainActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
-
-                                                }
-
-                                                else { // Others
-                                                    if(progressDialog.isShowing()){
-                                                        progressDialog.dismiss();
+                                                    } else { // Others
+                                                        if (progressDialog.isShowing()) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                        Toast.makeText(MainActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
                                                     }
-                                                    Toast.makeText(MainActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
+                                                } catch(Exception e){
+                                                    Log.e(TAG, "onDataChange: "+ e );
                                                 }
 
                                                 //Debugging purposes
