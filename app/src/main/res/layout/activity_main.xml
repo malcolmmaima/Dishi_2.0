@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:layout_width="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@drawable/gradient2">
+    android:background="@color/pureWhite">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/parentlayout"
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/need"
-            android:textColor="@android:color/white"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="15sp"
             android:layout_marginTop="15dp"/>
         <TextView
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/auth"
-            android:textColor="@android:color/white"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="15sp"/>
 
 
@@ -46,43 +46,49 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:gravity="center"
                 android:paddingLeft="25dp"
                 android:paddingRight="25dp"
-                android:background="@drawable/round"
+                android:background="@color/pureWhite"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp">
 
-                <Spinner
+                <androidx.appcompat.widget.AppCompatSpinner
                     android:entries="@array/country"
                     android:prompt="@string/code_prompt"
                     android:layout_width="wrap_content"
                     android:id="@+id/countryCode"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:padding="10dp"
-                    android:layout_marginLeft="-20dp"
-                    android:layout_weight="1"/>
+                    android:padding="10dp"/>
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/numbered"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="712345678"
-                    android:padding="10dp"
+                    android:layout_alignStart="@+id/countryCode"
+                    android:layout_alignLeft="@+id/countryCode"
+                    android:layout_alignEnd="@+id/verifiedsign"
+                    android:layout_alignRight="@+id/verifiedsign"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginRight="0dp"
                     android:inputType="phone"
-                    android:layout_toRightOf="@id/countryCode"
-                    />
+                    android:padding="10dp"
+                    android:paddingStart="90dp"
+                    android:paddingLeft="90dp" />
 
                 <ImageView
                     android:id="@+id/verifiedsign"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
                     app:srcCompat="@drawable/ic_check_circle_black_24dp"
                     android:visibility="invisible"
-                    android:layout_toRightOf="@id/numbered"/>
+                    android:layout_alignParentRight="true"
+                    android:contentDescription="TODO" />
 
             </RelativeLayout>
 
@@ -92,7 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textColor="#fff"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="20sp"
                 android:cursorVisible="true"
                 android:layout_marginTop="10dp"
@@ -103,13 +109,14 @@
                 app:itemCount="6"
                 app:itemHeight="40dp"
                 app:itemRadius="3dp"
-                app:itemSpacing="0dp"
+                app:itemSpacing="10dp"
                 app:itemWidth="30dp"
                 android:layout_gravity="center"
-                app:lineColor="@android:color/white"
-                app:lineWidth="0dp"
+                app:lineColor="@color/pureWhite"
+                android:background="@color/colorBackroundWhite"
+                app:lineWidth="1dp"
                 app:viewType="rectangle"
-                android:visibility="invisible"/>
+                android:visibility="visible"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/sendverifybt"
@@ -121,8 +128,8 @@
                 android:tag="@string/tag_send"
                 app:backgroundTint="@color/dot_inactive_screen1" />
 
-            <TextView
-                android:textColor="#fff"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:textColor="@color/black"
                 android:id="@+id/timertv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
