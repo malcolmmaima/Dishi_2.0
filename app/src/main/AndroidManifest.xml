@@ -18,9 +18,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".View.Activities.AddMenu"></activity>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
+
         <activity
             android:name=".View.Activities.RiderActivity"
-            android:label="@string/title_activity_rider"></activity>
+            android:label="@string/title_activity_rider" />
         <activity
             android:name=".View.Activities.RestaurantActivity"
             android:label="@string/title_activity_restaurant" />

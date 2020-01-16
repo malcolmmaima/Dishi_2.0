@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -25,14 +26,14 @@ import com.malcolmmaima.dishi.R;
 
 import com.malcolmmaima.dishi.Controller.PreferenceManager;
 
+import io.fabric.sdk.android.Fabric;
+
 public class SplashActivity extends AppCompatActivity {
 
     private PreferenceManager prefManager;
     String myPhone;
     private FirebaseAuth mAuth;
     ProgressBar progressBar;
-
-    private static final int PERMISSIONS_REQUEST = 100;
 
     @Override
     protected void onStart() {
@@ -46,6 +47,8 @@ public class SplashActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         mAuth = FirebaseAuth.getInstance();
+
+        Fabric.with(this, new Crashlytics());
 
         // Checking for first time launch
         prefManager = new PreferenceManager(this);
