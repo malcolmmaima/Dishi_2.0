@@ -19,8 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".View.Activities.RiderActivity"
+            android:label="@string/title_activity_rider"></activity>
+        <activity
             android:name=".View.Activities.RestaurantActivity"
-            android:label="@string/title_activity_restaurant"></activity>
+            android:label="@string/title_activity_restaurant" />
         <activity
             android:name=".View.Activities.CustomerActivity"
             android:label="@string/title_activity_customer" />

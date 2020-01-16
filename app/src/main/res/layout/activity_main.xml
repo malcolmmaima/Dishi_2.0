@@ -116,7 +116,7 @@
                 android:background="@color/colorBackroundWhite"
                 app:lineWidth="1dp"
                 app:viewType="rectangle"
-                android:visibility="visible"/>
+                android:visibility="invisible"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/sendverifybt"

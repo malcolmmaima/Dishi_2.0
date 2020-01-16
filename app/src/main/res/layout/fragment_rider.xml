@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Fragments.ProfileFragment">
+    tools:context=".View.Fragments.OrdersFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Profile Fragment"
+        android:text="Rider Fragment"
         android:textSize="30sp"
         android:gravity="center"/>
 

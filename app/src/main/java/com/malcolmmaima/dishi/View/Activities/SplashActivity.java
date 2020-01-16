@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -151,12 +153,12 @@ public class SplashActivity extends AppCompatActivity {
                                             try {
                                                 progressBar.setVisibility(View.GONE);
                                                 //Slide to new activity
-                                                Toast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
-//                                            Intent slideactivity = new Intent(SplashActivity.this, MyAccountNduthi.class)
-//                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                            Bundle bndlanimation =
-//                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                            startActivity(slideactivity, bndlanimation);
+                                                //Toast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
+                                            Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            Bundle bndlanimation =
+                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                            startActivity(slideactivity, bndlanimation);
                                             } catch (Exception e){
 
                                             }
@@ -174,8 +176,10 @@ public class SplashActivity extends AppCompatActivity {
                                         }
 
                                         else if (account_type.equals("X")){
-                                            Toast.makeText(SplashActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
+                                            Snackbar snackbar = Snackbar
+                                                    .make((LinearLayout) findViewById(R.id.parentlayout), "Your account has been disabled", Snackbar.LENGTH_LONG);
 
+                                            snackbar.show();
                                         }
 
                                         else { // Others

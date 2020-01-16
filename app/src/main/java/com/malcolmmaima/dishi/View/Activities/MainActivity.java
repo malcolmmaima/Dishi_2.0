@@ -282,11 +282,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                     progressDialog.dismiss();
                                                 }
                                                 //Toast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountCustomer.class)
-//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                                    Bundle bndlanimation =
-//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                                    startActivity(slideactivity, bndlanimation);
+                                                    Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                    startActivity(slideactivity, bndlanimation);
                                             }
 
                                             else if (account_type.equals("2")){ //Provider Restaurant account
@@ -307,16 +307,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 }
                                                 //Slide to new activity
                                                 //Toast.makeText(MainActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
-//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountNduthi.class)
-//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                                    Bundle bndlanimation =
-//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                                    startActivity(slideactivity, bndlanimation);
+                                                    Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                    startActivity(slideactivity, bndlanimation);
                                             }
 
                                             else if (account_type.equals("X")){
-                                                Toast.makeText(MainActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
+                                                //Toast.makeText(MainActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
 
+                                                Snackbar snackbar = Snackbar
+                                                        .make((LinearLayout) findViewById(R.id.parentlayout), "Your account has been disabled", Snackbar.LENGTH_LONG);
+
+                                                snackbar.show();
                                             }
 
                                             else { // Others
@@ -488,14 +492,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                             progressDialog.dismiss();
                                                         }
                                                         //Slide to new activity
-                                                        Toast.makeText(MainActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
-//                                                    Intent slideactivity = new Intent(MainActivity.this, MyAccountNduthi.class)
-//                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                                    Bundle bndlanimation =
-//                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-//                                                    startActivity(slideactivity, bndlanimation);
+                                                        //Toast.makeText(MainActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
+                                                        Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        Bundle bndlanimation =
+                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                        startActivity(slideactivity, bndlanimation);
                                                     } else if (account_type.equals("X")) {
-                                                        Toast.makeText(MainActivity.this, "Your account has been disabled", Toast.LENGTH_LONG).show();
+                                                        Snackbar snackbar = Snackbar
+                                                                .make((LinearLayout) findViewById(R.id.parentlayout), "Your account has been disabled", Snackbar.LENGTH_LONG);
+
+                                                        snackbar.show();
 
                                                     } else { // Others
                                                         if (progressDialog.isShowing()) {
