@@ -155,11 +155,9 @@ public class RestaurantActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         final CircleImageView profilePic = headerView.findViewById(R.id.profilePic);
         final TextView navUsername = headerView.findViewById(R.id.userName);
-        final TextView emailAddress = headerView.findViewById(R.id.emailaddress);
 
         //Set header data
         navUsername.setText("");
-        emailAddress.setText("");
 
         //User is logged in
         if(mAuth.getInstance().getCurrentUser() != null) {
@@ -227,11 +225,42 @@ public class RestaurantActivity extends AppCompatActivity
         //fragmentClass[0] = FragmentFour.class;
         //}
 
-        else if (id == R.id.nav_share) {
-            Toast.makeText(RestaurantActivity.this, "Clicked!", Toast.LENGTH_LONG).show();
+        else if (id == R.id.nav_settings) {
 
-        } else if (id == R.id.nav_send) {
-            Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            Intent slideactivity = new Intent(RestaurantActivity.this, SettingsActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Bundle bndlanimation =
+                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+            startActivity(slideactivity, bndlanimation);
+
+        }
+
+        else if (id == R.id.logOut) {
+            final AlertDialog logout = new AlertDialog.Builder(RestaurantActivity.this)
+                    .setMessage("Logout?")
+                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                    .setCancelable(false)
+                    //set three option buttons
+                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            //Log out
+                            //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                            FirebaseAuth.getInstance().signOut();
+                            startActivity(new Intent(RestaurantActivity.this,SplashActivity.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                            finish();
+                        }
+                    })//setPositiveButton
+
+                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //Do nothing
+                        }
+                    })
+
+                    .create();
+            logout.show();
         }
 
         try {
