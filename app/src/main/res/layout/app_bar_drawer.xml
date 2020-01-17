@@ -19,7 +19,7 @@
         app:view_borderColor="@color/colorPrimaryDark">
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- This frame layout houses our content -->
+    <!-- This frame layout houses our selected fragments -->
     <FrameLayout
         android:id="@+id/flContent"
         android:layout_width="match_parent"
@@ -27,8 +27,9 @@
         android:background="@color/colorBackroundWhite"
         android:layout_marginTop="?attr/actionBarSize">
 
-        <include layout="@layout/content_drawer" />
+
     </FrameLayout>
 
+    <include layout="@layout/content_drawer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

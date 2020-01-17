@@ -55,9 +55,11 @@ public class RestaurantActivity extends AppCompatActivity
                     break;
             }
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.frame_layout, selectedFragment);
+            transaction.replace(R.id.flContent, selectedFragment);
             transaction.commit();
             return true;
+
+
         }
     };
 
@@ -101,11 +103,11 @@ public class RestaurantActivity extends AppCompatActivity
          * Manually displaying the first fragment - one time only
          */
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_layout, CustomerOrderFragment.newInstance());
+        transaction.replace(R.id.flContent, HomeFragment.newInstance());
         transaction.commit();
 
         //Used to select an item programmatically
-        navView.getMenu().getItem(2).setChecked(true);
+        navView.getMenu().getItem(0).setChecked(true);
 
         /**
          * Navigation drawer
@@ -149,7 +151,8 @@ public class RestaurantActivity extends AppCompatActivity
         final Class[] fragmentClass = {null};
 
         if (id == R.id.menu1) {
-            Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            fragmentClass[0] = OrdersFragment.class;
+            //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu2) {

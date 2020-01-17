@@ -9,12 +9,7 @@
     tools:showIn="@layout/app_bar_drawer">
 
     <!-- Our fragments on bottom nav select are populated here -->
-    <FrameLayout
-            android:id="@+id/frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true">
-        </FrameLayout>
+
 
     <!-- Floating action bar -->
     <LinearLayout
@@ -49,7 +44,7 @@
         android:layout_marginEnd="0dp"
         app:elevation="5dp"
         android:background="@color/pureWhite"
-        app:layout_constraintBottom_toBottomOf="@id/frame_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/restaurant_bottom_nav_menu" />
