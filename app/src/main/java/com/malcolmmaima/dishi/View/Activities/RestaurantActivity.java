@@ -7,15 +7,25 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.OrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
+import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,8 +37,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +49,11 @@ public class RestaurantActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     FloatingActionButton addMenu;
+
+    String myPhone;
+    private DatabaseReference myRef;
+    private FirebaseAuth mAuth;
+    private String TAG;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -67,6 +85,9 @@ public class RestaurantActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
+
+        TAG = "RestaurantActivity";
+
         addMenu = findViewById(R.id.button_add_menu);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -75,6 +96,14 @@ public class RestaurantActivity extends AppCompatActivity
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //get auth state
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        //Set fb database reference
+        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
         /**
          * Load add menu activity
@@ -124,12 +153,45 @@ public class RestaurantActivity extends AppCompatActivity
 
         //Drawer header
         View headerView = navigationView.getHeaderView(0);
+        final CircleImageView profilePic = headerView.findViewById(R.id.profilePic);
         final TextView navUsername = headerView.findViewById(R.id.userName);
         final TextView emailAddress = headerView.findViewById(R.id.emailaddress);
 
         //Set header data
-        navUsername.setText("Malcolm Maima");
-        emailAddress.setText("malcolmmaima@gmail.com");
+        navUsername.setText("");
+        emailAddress.setText("");
+
+        //User is logged in
+        if(mAuth.getInstance().getCurrentUser() != null) {
+
+            /**
+             * Get logged in user details
+             */
+            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                        //Set username on drawer header
+                        navUsername.setText(user.getFirstname() + " " + user.getLastname());
+
+                        Picasso.with(RestaurantActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: " + e);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
 
     }
 

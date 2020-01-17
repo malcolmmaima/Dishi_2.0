@@ -1,13 +1,31 @@
 package com.malcolmmaima.dishi.Model;
 
 public class UserModel {
+    String account_type;
+    String bio;
     String email;
     String firstname;
-    String lastname;
-    String verified;
-    String bio;
     String gender;
+    String lastname;
     String profilePic;
+    String signupDate;
+    String verified;
+
+    public String getAccount_type() {
+        return account_type;
+    }
+
+    public void setAccount_type(String account_type) {
+        this.account_type = account_type;
+    }
+
+    public String getBio(){
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
     public String getEmail() {
         return email;
@@ -25,12 +43,36 @@ public class UserModel {
         this.firstname = firstname;
     }
 
+    public String getGender(){
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getLastname() {
         return lastname;
     }
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public String getSignupDate() {
+        return signupDate;
+    }
+
+    public void setSignupDate(String signupDate) {
+        this.signupDate = signupDate;
     }
 
     public String getVerified() {
@@ -41,27 +83,5 @@ public class UserModel {
         this.verified = verified;
     }
 
-    public String getBio(){
-        return bio;
-    }
 
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public String getGender(){
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public void setProfilePic(String profilePic) {
-        this.profilePic = profilePic;
-    }
-
-    public String getProfilePic() {
-        return profilePic;
-    }
 }

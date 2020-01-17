@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="176dp"
+    android:layout_height="170dp"
     android:background="@color/colorPrimary"
     android:gravity="bottom"
     android:orientation="vertical"
@@ -12,26 +12,31 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:contentDescription="@string/nav_header_desc"
-        android:paddingTop="8dp"
-        app:srcCompat="@drawable/default_profile" />
+    <com.alexzh.circleimageview.CircleImageView
+        android:id="@+id/profilePic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/profile_circular_border_imageview"
+        android:elevation="3dp"
+        android:padding="5dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/default_profile"
+        android:layout_gravity="center_vertical"
+        app:view_borderColor="#cccccc"
+        app:view_borderWidth="2dp"
+        app:view_shadowDx="0dp"
+        app:view_shadowDy="0dp"
+        app:view_shadowRadius="1dp" />
 
     <TextView
         android:id="@+id/userName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
+        android:gravity="center_vertical"
         android:text="@string/nav_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    <TextView
-        android:id="@+id/emailaddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nav_header_subtitle" />
 
 </LinearLayout>
