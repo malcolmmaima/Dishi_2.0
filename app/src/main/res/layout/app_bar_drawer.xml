@@ -16,7 +16,8 @@
         app:view_shadowDx="10dp"
         app:view_shadowDy="0dp"
         app:view_borderWidth="2dp"
-        app:view_borderColor="@color/colorPrimaryDark">
+        app:view_borderColor="@color/colorPrimaryDark"
+        tools:ignore="MissingConstraints">
     </androidx.appcompat.widget.Toolbar>
 
     <!-- This frame layout houses our selected fragments -->

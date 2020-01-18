@@ -8,8 +8,6 @@
     tools:context=".View.Activities.RestaurantActivity"
     tools:showIn="@layout/app_bar_drawer">
 
-    <!-- Our fragments on bottom nav select are populated here -->
-
 
     <!-- Floating action bar -->
     <LinearLayout
