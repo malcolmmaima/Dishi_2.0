@@ -36,6 +36,7 @@
         android:paddingTop="8dp"
         android:gravity="center_vertical"
         android:text="@string/nav_header_title"
+        android:fontFamily="sans-serif-medium"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 

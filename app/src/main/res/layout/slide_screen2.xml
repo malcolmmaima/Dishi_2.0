@@ -17,6 +17,7 @@
             android:textColor="@android:color/white"
             android:layout_marginBottom="@dimen/slide_title"
             android:textSize="@dimen/slide_title"
+            android:fontFamily="sans-serif-black"
             android:textStyle="bold" />
         <ImageView
             android:layout_width="@dimen/img_width_height"
@@ -31,6 +32,7 @@
             android:text="@string/slide_2_desc"
             android:textAlignment="center"
             android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-medium"
             android:textSize="@dimen/slide_desc" />
     </LinearLayout>
 </RelativeLayout>

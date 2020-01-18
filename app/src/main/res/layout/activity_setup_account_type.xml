@@ -20,7 +20,8 @@
         android:text="SELECT ACCOUNT TYPE"
         android:layout_marginTop="30dp"
         android:textSize="20sp"
-        android:textColor="#000000"
+        android:textColor="@color/colorPrimaryDark"
+        android:fontFamily="sans-serif-black"
         android:gravity="center_horizontal"/>
 
     <!-- Customer -->
@@ -64,6 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:fontFamily="sans-serif-black"
                 android:text="Customer"
                 />
         </androidx.cardview.widget.CardView>
@@ -112,6 +114,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="Restaurant"
+                android:fontFamily="sans-serif-black"
                 />
 
         </androidx.cardview.widget.CardView>
@@ -160,6 +163,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="Rider"
+                android:fontFamily="sans-serif-black"
                 />
         </androidx.cardview.widget.CardView>
     </LinearLayout>

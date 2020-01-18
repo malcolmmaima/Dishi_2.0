@@ -26,6 +26,7 @@
             android:text="@string/need"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
             android:layout_marginTop="15dp"/>
         <TextView
             android:layout_width="wrap_content"
@@ -33,6 +34,7 @@
             android:layout_gravity="center"
             android:text="@string/auth"
             android:textColor="@color/colorPrimaryDark"
+            android:fontFamily="sans-serif-medium"
             android:textSize="15sp"/>
 
 
