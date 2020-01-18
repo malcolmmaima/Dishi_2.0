@@ -87,7 +87,7 @@
                     android:layout_marginRight="10dp"
                     android:text="Dishi User"
                     android:textColor="@color/colorPrimaryDark"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="sans-serif-medium"
                     android:layout_marginStart="120dp"
                     android:layout_marginEnd="10dp" />
 

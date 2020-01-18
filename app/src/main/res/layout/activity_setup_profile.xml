@@ -19,7 +19,8 @@
         android:layout_marginTop="30dp"
         android:textSize="20sp"
         android:textColor="@color/colorPrimaryDark"
-        android:fontFamily="sans-serif-black"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
         android:gravity="center_horizontal"/>
 
     <androidx.cardview.widget.CardView
@@ -178,7 +179,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:text="NEXT"
-        android:fontFamily="sans-serif-black"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
         android:textColor="@color/colorBackroundWhite"
         android:id="@+id/btn_register"
         android:padding="12dp"
