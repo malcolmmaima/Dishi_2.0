@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@color/colorBackroundWhite"
+    tools:context=".View.Activities.PersonalDetails"
+    android:id="@+id/parentlayout">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:maxHeight="@dimen/actionBarSize"
+        android:background="@color/pureWhite"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/actionBarSize"
+        android:elevation="5dp"
+        app:view_shadowDx="10dp"
+        app:view_shadowDy="0dp"
+        app:view_borderWidth="2dp"
+        app:view_borderColor="@color/colorPrimaryDark">
+    </androidx.appcompat.widget.Toolbar>
+    <ScrollView
+        android:layout_below="@id/toolbar"
+        android:layout_height="match_parent"
+        android:layout_width="fill_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_view"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingBottom="40dp"
+                    >
+
+                    <com.alexzh.circleimageview.CircleImageView
+                        android:id="@+id/profilePic"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:background="@drawable/profile_circular_border_imageview"
+                        android:elevation="3dp"
+                        android:padding="5dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/default_profile"
+                        android:layout_gravity="center_horizontal"
+                        app:view_borderColor="#cccccc"
+                        app:view_borderWidth="2dp"
+                        app:view_shadowDx="0dp"
+                        app:view_shadowDy="0dp"
+                        app:view_shadowRadius="1dp" />
+
+
+                    <!-- Email -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textEmailAddress"
+                            android:hint="Email"
+                            android:id="@+id/input_email"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- First Name -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:hint="First name"
+                            android:id="@+id/input_first_name"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Last Name -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:hint="Last name"
+                            android:id="@+id/input_surname"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Bio -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:hint="Bio"
+                            android:id="@+id/input_bio"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center"
+                        android:background="@color/pureWhite">
+
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/numbered"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignStart="@+id/countryCode"
+                            android:layout_alignLeft="@+id/countryCode"
+                            android:layout_alignEnd="@+id/verifiedsign"
+                            android:layout_alignRight="@+id/verifiedsign"
+                            android:layout_marginLeft="0dp"
+                            android:layout_marginEnd="0dp"
+                            android:layout_marginRight="0dp"
+                            android:inputType="phone"
+                            android:padding="10dp"
+                            android:enabled="false"
+                            android:focusable="false"
+                            android:paddingStart="90dp"
+                            android:paddingLeft="90dp" />
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:entries="@array/country"
+                            android:prompt="@string/code_prompt"
+                            android:layout_width="wrap_content"
+                            android:id="@+id/countryCode"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentStart="true"
+                            android:clickable="false"
+                            enab
+                            android:padding="10dp"/>
+
+                        <ImageView
+                            android:id="@+id/verifiedsign"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            app:srcCompat="@drawable/ic_check_circle_black_24dp"
+                            android:visibility="invisible"
+                            android:layout_alignParentRight="true"
+                            android:contentDescription="TODO" />
+
+                    </RelativeLayout>
+
+                    <!-- Radio buttons under RelativeLayout
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        >
+
+                        <RadioGroup
+                            android:id="@+id/gender"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="15dp"
+                            android:layout_marginBottom="30dp"
+                            >
+
+                            <RadioButton
+                                android:text="Male"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/maleRd"
+                                android:checked="false"
+                                android:layout_marginRight="20dp"
+                                android:backgroundTint="@color/colorAccent"/>
+
+                            <RadioButton
+                                android:text="Female"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/femaleRd"
+                                android:checked="false"
+                                android:backgroundTint="@color/colorAccent"
+                                />
+
+                        </RadioGroup>
+                    </RelativeLayout>
+                    -->
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+
+            <!-- Finish Button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_below="@id/card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="SAVE"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/colorBackroundWhite"
+                android:id="@+id/btn_register"
+                android:padding="12dp"
+                android:background="@drawable/login_button"
+                />
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>

@@ -1,19 +1,50 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.squareup.picasso.Picasso;
 
 public class SettingsActivity extends AppCompatActivity {
+
+    String myPhone;
+    private DatabaseReference myRef;
+    private FirebaseAuth mAuth;
+    private String TAG;
+    AppCompatTextView userName, phoneNumber;
+    CircleImageView profilePic;
+    CardView personalDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        TAG = "SettingsActivity";
+
+        //Initialize widgets
+        initWidgets();
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -23,6 +54,57 @@ public class SettingsActivity extends AppCompatActivity {
 
         setTitle("Settings");
 
+        //get auth state
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        //Set fb database reference
+        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+
+        //User is logged in
+        if(mAuth.getInstance().getCurrentUser() != null) {
+
+            /**
+             * Get logged in user details
+             */
+            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                        //Set username on drawer header
+                        userName.setText(user.getFirstname() + " " + user.getLastname());
+                        phoneNumber.setText(myPhone);
+
+                        Picasso.with(SettingsActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: " + e);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        personalDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(SettingsActivity.this, PersonalDetails.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+            }
+        });
+
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,5 +112,15 @@ public class SettingsActivity extends AppCompatActivity {
                 finish(); //Go back to previous activity
             }
         });
+    }
+
+    private void initWidgets() {
+        personalDetails = findViewById(R.id.personalDetails);
+        userName = findViewById(R.id.userName);
+        phoneNumber = findViewById(R.id.phoneNumber);
+        profilePic = findViewById(R.id.profilePic);
+
+        userName.setText("Loading...");
+        phoneNumber.setText("Loading...");
     }
 }
