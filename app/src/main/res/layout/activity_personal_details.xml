@@ -133,58 +133,20 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <RelativeLayout
+                    <!-- Bio -->
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:gravity="center"
-                        android:background="@color/pureWhite">
-
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/numbered"
+                        android:layout_marginBottom="8dp">
+                        <EditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignStart="@+id/countryCode"
-                            android:layout_alignLeft="@+id/countryCode"
-                            android:layout_alignEnd="@+id/verifiedsign"
-                            android:layout_alignRight="@+id/verifiedsign"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginEnd="0dp"
-                            android:layout_marginRight="0dp"
-                            android:inputType="phone"
-                            android:padding="10dp"
-                            android:enabled="false"
-                            android:focusable="false"
-                            android:paddingStart="90dp"
-                            android:paddingLeft="90dp" />
+                            android:inputType="text"
+                            android:hint="Phone"
+                            android:id="@+id/numbered"/>
 
-                        <androidx.appcompat.widget.AppCompatSpinner
-                            android:entries="@array/country"
-                            android:prompt="@string/code_prompt"
-                            android:layout_width="wrap_content"
-                            android:id="@+id/countryCode"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentStart="true"
-                            android:clickable="false"
-                            android:padding="10dp"/>
-
-                        <ImageView
-                            android:id="@+id/verifiedsign"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="10dp"
-                            app:srcCompat="@drawable/ic_check_circle_black_24dp"
-                            android:visibility="invisible"
-                            android:layout_alignParentRight="true"
-                            android:contentDescription="TODO" />
-
-                    </RelativeLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Radio buttons under RelativeLayout
                     <RelativeLayout
@@ -232,6 +194,7 @@
 
             <!-- Finish Button -->
             <androidx.appcompat.widget.AppCompatButton
+                android:tag="edit"
                 android:layout_below="@id/card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -242,7 +205,7 @@
                 android:text="SAVE"
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/colorBackroundWhite"
-                android:id="@+id/btn_register"
+                android:id="@+id/saveDetails"
                 android:padding="12dp"
                 android:background="@drawable/login_button"
                 />
