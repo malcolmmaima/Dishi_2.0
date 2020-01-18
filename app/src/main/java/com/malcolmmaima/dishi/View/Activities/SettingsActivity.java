@@ -68,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
             /**
              * Get logged in user details
              */
-            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            myRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {

@@ -13,14 +13,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -73,6 +77,10 @@ public class PersonalDetails extends AppCompatActivity {
 
         setTitle("Personal Details");
 
+        //Hide keyboard on activity load
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        //Initialize strings
         email = "";
         firstname = "";
         lastname = "";
@@ -236,16 +244,29 @@ public class PersonalDetails extends AppCompatActivity {
                 }
 
                 if(saveDetails.getTag().equals("save")){
-                    Toast.makeText(PersonalDetails.this, "send data to DB", Toast.LENGTH_SHORT).show();
+                    //Save data to specific nodes
+                    myRef.child("email").setValue(mEmail.getText().toString());
+                    myRef.child("firstname").setValue(mFirstName.getText().toString());
+                    myRef.child("lastname").setValue(mLastName.getText().toString());
+                    myRef.child("bio").setValue(mBio.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            saveDetails.setTag("edit");
+                            saveDetails.setText("EDIT");
+
+                            mEmail.setEnabled(false);
+                            mFirstName.setEnabled(false);
+                            mLastName.setEnabled(false);
+                            mBio.setEnabled(false);
+
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                        }
+                    });
                 }
 
-                Toast.makeText(PersonalDetails.this, "Tag: " + saveDetails.getTag().toString(), Toast.LENGTH_SHORT).show();
-
-//                Toast.makeText(PersonalDetails.this, "Email: " + mEmail.getText().toString()
-//                                                                + " FirstName: \n" +mFirstName.getText().toString()
-//                                                                + " LastName: \n" + mLastName.getText().toString()
-//                                                                + " Bio: \n" + mBio.getText().toString()
-//                                                                + " Phone: \n" + mPhone.getText().toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }

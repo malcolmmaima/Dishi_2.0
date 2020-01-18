@@ -72,7 +72,6 @@
                         app:view_shadowDy="0dp"
                         app:view_shadowRadius="1dp" />
 
-
                     <!-- Email -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"

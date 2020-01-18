@@ -28,7 +28,6 @@
         android:layout_width="fill_parent">
 
         <LinearLayout
-            android:layout_margin="10dp"
             android:id="@+id/Customer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,31 +37,22 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/personalDetails"
+                android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:elevation="8dp"
-                android:clipToPadding="false"
-                android:clipChildren="false"
-                app:cardBackgroundColor="@color/pureWhite"
-                card_view:cardCornerRadius="10dp"
+                android:layout_margin="15dp"
+                card_view:cardCornerRadius="5dp"
                 android:focusableInTouchMode="false"
-                card_view:view_shadowDx="4dp"
-                card_view:view_shadowDy="4dp"
-                card_view:view_borderWidth="5dp"
-                card_view:fadingEdge="horizontal"
-                card_view:cardElevation="10dp"
-                card_view:view_borderColor="@color/colorPrimaryDark"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:focusable="true">
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff">
 
                 <com.alexzh.circleimageview.CircleImageView
                     android:id="@+id/profilePic"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_margin="15dp"
                     android:background="@drawable/profile_circular_border_imageview"
                     android:elevation="3dp"
                     android:padding="5dp"
@@ -73,8 +63,7 @@
                     app:view_borderWidth="2dp"
                     app:view_shadowDx="0dp"
                     app:view_shadowDy="0dp"
-                    app:view_shadowRadius="1dp"
-                    android:layout_marginStart="10dp" />
+                    app:view_shadowRadius="1dp" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/userName"
@@ -109,10 +98,64 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="end"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="40dp"
                     android:tint="@color/colorBackroundWhite"
                     android:src="@drawable/ic_chevron_right_black_48dp"
                     />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_view"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_margin="15dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff" >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="20dp"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="40dp"
+                    android:src="@drawable/ic_account_circle_black_24dp"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="Account"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginStart="60dp"
+                    android:layout_marginEnd="10dp" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="10dp"
+                    android:tint="@color/colorBackroundWhite"
+                    android:src="@drawable/ic_chevron_right_black_48dp"
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:layout_marginTop="65dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="#ACACAC"/>
 
             </androidx.cardview.widget.CardView>
 
