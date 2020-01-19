@@ -211,8 +211,8 @@ public class RestaurantActivity extends AppCompatActivity
         final Class[] fragmentClass = {null};
 
         if (id == R.id.menu1) {
-            fragmentClass[0] = OrdersFragment.class;
-            //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            //fragmentClass[0] = OrdersFragment.class;
+            Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu2) {

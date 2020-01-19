@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Order Fragment"
+        android:text="Food Fragment"
         android:textSize="30sp"
         android:gravity="center"/>
 

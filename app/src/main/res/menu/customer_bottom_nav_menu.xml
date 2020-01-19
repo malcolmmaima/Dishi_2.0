@@ -12,7 +12,7 @@
         android:title="@string/title_profile" />
 
     <item
-        android:id="@+id/navigation_order"
+        android:id="@+id/navigation_order_food"
         android:icon="@drawable/ic_meal_circle"
         android:title="@string/title_order" />
 
