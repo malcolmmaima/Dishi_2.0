@@ -11,10 +11,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
     AppCompatTextView userName, phoneNumber;
     CircleImageView profilePic;
     CardView personalDetails;
+    RelativeLayout accountSettings, notificationSettings, help, about;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +115,38 @@ public class SettingsActivity extends AppCompatActivity {
                 finish(); //Go back to previous activity
             }
         });
+
+        accountSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
+
+        notificationSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
+
+        help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
+
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
     }
 
     private void initWidgets() {
@@ -122,5 +157,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         userName.setText("Loading...");
         phoneNumber.setText("Loading...");
+
+        accountSettings = findViewById(R.id.account);
+        notificationSettings = findViewById(R.id.notifications);
+        help = findViewById(R.id.help);
+        about = findViewById(R.id.about);
     }
 }
