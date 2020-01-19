@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.icu.text.LocaleDisplayNames;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -169,14 +170,12 @@ public class PersonalDetails extends AppCompatActivity {
         mEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
@@ -189,14 +188,12 @@ public class PersonalDetails extends AppCompatActivity {
         mFirstName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
@@ -209,14 +206,12 @@ public class PersonalDetails extends AppCompatActivity {
         mLastName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
@@ -229,14 +224,12 @@ public class PersonalDetails extends AppCompatActivity {
         mBio.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //If data hasn't changed
-                dataStatus();
+
             }
 
             @Override
@@ -283,9 +276,6 @@ public class PersonalDetails extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //If data hasn't changed
-                dataStatus();
-
                 if(saveDetails.getTag().equals("edit")){
                     mEmail.setEnabled(true);
                     mFirstName.setEnabled(true);
@@ -294,6 +284,12 @@ public class PersonalDetails extends AppCompatActivity {
                 }
 
                 if(saveDetails.getTag().equals("save")){
+
+                    mEmail.setEnabled(false);
+                    mFirstName.setEnabled(false);
+                    mLastName.setEnabled(false);
+                    mBio.setEnabled(false);
+
                     progressDialog.setMessage("Saving...");
                     progressDialog.setCancelable(false);
                     progressDialog.show();
@@ -319,14 +315,17 @@ public class PersonalDetails extends AppCompatActivity {
                                     .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
 
                             snackbar.show();
-                            if(FilePathUri == null){
+
+                            if(progressDialog.isShowing()){
                                 progressDialog.dismiss();
-                                saveDetails.setTag("edit");
-                                saveDetails.setText("EDIT");
                             }
                         }
                     });
                 }
+                //If data hasn't changed
+                dataStatus();
+
+
 
             }
         });
@@ -340,6 +339,7 @@ public class PersonalDetails extends AppCompatActivity {
         if (requestCode == Image_Request_Code && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             FilePathUri = data.getData();
+            dataStatus();
 
             try {
 
@@ -359,6 +359,7 @@ public class PersonalDetails extends AppCompatActivity {
 
     public void saveprofilePhoto() {
         progressDialog.setTitle("Uploading...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         //Check if user has selected new profile pic
@@ -392,9 +393,14 @@ public class PersonalDetails extends AppCompatActivity {
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception exception) {
+                                    saveDetails.setTag("save");
+                                    saveDetails.setText("SAVE");
                                     if (progressDialog.isShowing()) {
                                         progressDialog.dismiss();
                                     }
+
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
 
                                 }
                             });
@@ -416,6 +422,8 @@ public class PersonalDetails extends AppCompatActivity {
     }
 
     private void dataStatus() {
+
+
         //If data hasn't changed
         if(mEmail.getText().toString().equals(email)
                 && mFirstName.getText().toString().equals(firstname)
