@@ -1,19 +1,26 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.ActivityOptions;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -33,10 +41,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.io.IOException;
 
 public class PersonalDetails extends AppCompatActivity {
 
@@ -45,6 +58,8 @@ public class PersonalDetails extends AppCompatActivity {
     private EditText mEmail, mFirstName, mLastName, mBio, mPhone;
     CircleImageView profilePic;
     private Button saveDetails;
+    private String [] profilePicActions = {"Open Gallery","Open Camera"};
+    ProgressDialog progressDialog;
 
     /**
      * Firebase
@@ -77,6 +92,8 @@ public class PersonalDetails extends AppCompatActivity {
 
         setTitle("Personal Details");
 
+        progressDialog = new ProgressDialog(PersonalDetails.this);
+
         //Hide keyboard on activity load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -93,6 +110,9 @@ public class PersonalDetails extends AppCompatActivity {
 
         //Set fb database reference
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+
+        // Assign FirebaseStorage instance to storageReference.
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         //User is logged in
         if(mAuth.getInstance().getCurrentUser() != null) {
@@ -227,6 +247,36 @@ public class PersonalDetails extends AppCompatActivity {
         });
 
         /**
+         * Profile picture
+         */
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PersonalDetails.this);
+                builder.setItems(profilePicActions, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0){
+                            // Open Gallery.
+                            Intent intent = new Intent();
+                            // Setting intent type as image to select image from phone storage.
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                        }
+                        if(which == 1){
+                            //Open Camera
+                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        /**
          * Save details
          */
         saveDetails.setOnClickListener(new View.OnClickListener() {
@@ -244,6 +294,12 @@ public class PersonalDetails extends AppCompatActivity {
                 }
 
                 if(saveDetails.getTag().equals("save")){
+                    progressDialog.setMessage("Saving...");
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+
+                    saveprofilePhoto();
+
                     //Save data to specific nodes
                     myRef.child("email").setValue(mEmail.getText().toString());
                     myRef.child("firstname").setValue(mFirstName.getText().toString());
@@ -263,6 +319,11 @@ public class PersonalDetails extends AppCompatActivity {
                                     .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
 
                             snackbar.show();
+                            if(FilePathUri == null){
+                                progressDialog.dismiss();
+                                saveDetails.setTag("edit");
+                                saveDetails.setText("EDIT");
+                            }
                         }
                     });
                 }
@@ -271,12 +332,95 @@ public class PersonalDetails extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Image_Request_Code && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            FilePathUri = data.getData();
+
+            try {
+
+                // Getting selected image into Bitmap.
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), FilePathUri);
+
+                // Setting up bitmap selected image into ImageView.
+                profilePic.setImageBitmap(bitmap);
+
+            }
+            catch (IOException e) {
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void saveprofilePhoto() {
+        progressDialog.setTitle("Uploading...");
+        progressDialog.show();
+
+        //Check if user has selected new profile pic
+        if (FilePathUri != null) {
+
+            //user has selected new pic
+
+            final StorageReference storageReference2nd = storageReference.child(Storage_Path + "/" + myPhone + "/" + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
+
+            // Adding addOnSuccessListener to second StorageReference.
+            storageReference2nd.putFile(FilePathUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //Get image URL: //Here we get the image url from the firebase storage
+                            storageReference2nd.getDownloadUrl().addOnSuccessListener(new OnSuccessListener() {
+
+                                @Override
+                                public void onSuccess(Object o) {
+                                    myRef.child("profilePic").setValue(o.toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            saveDetails.setTag("edit");
+                                            saveDetails.setText("EDIT");
+                                            if (progressDialog.isShowing()) {
+                                                progressDialog.dismiss();
+                                            }
+                                        }
+                                    });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    if (progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+
+                                }
+                            });
+                        }
+                    });
+        }
+    }
+
+    // Creating Method to get the selected image file Extension from File Path URI.
+    public String GetFileExtension(Uri uri) {
+
+        ContentResolver contentResolver = getContentResolver();
+
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
+        // Returning the file Extension.
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri)) ;
+
+    }
+
     private void dataStatus() {
         //If data hasn't changed
         if(mEmail.getText().toString().equals(email)
                 && mFirstName.getText().toString().equals(firstname)
                 && mLastName.getText().toString().equals(lastname)
-                && mBio.getText().toString().equals(bio)){
+                && mBio.getText().toString().equals(bio) && FilePathUri == null){
 
             saveDetails.setTag("edit");
             saveDetails.setText("EDIT");
@@ -302,6 +446,11 @@ public class PersonalDetails extends AppCompatActivity {
             saveDetails.setText("SAVE");
         }
 
+        //Check if new profile pic set
+        if(FilePathUri != null){
+            saveDetails.setTag("save");
+            saveDetails.setText("SAVE");
+        }
     }
 
     private void intiWidgets() {
