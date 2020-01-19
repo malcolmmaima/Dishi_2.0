@@ -132,11 +132,11 @@ public class RestaurantActivity extends AppCompatActivity
          * Manually displaying the first fragment - one time only
          */
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flContent, HomeFragment.newInstance());
+        transaction.replace(R.id.flContent, OrdersFragment.newInstance());
         transaction.commit();
 
         //Used to select an item programmatically
-        navView.getMenu().getItem(0).setChecked(true);
+        navView.getMenu().getItem(2).setChecked(true);
 
         /**
          * Navigation drawer
