@@ -26,7 +26,7 @@
 
     <!-- Customer -->
     <LinearLayout
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="0dp"
         android:layout_below="@id/title"
         android:id="@+id/Customer"
         android:layout_width="match_parent"
@@ -36,20 +36,16 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/customerAccountCard"
-            android:layout_width="wrap_content"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="3"
             android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_margin="10dp"
             card_view:cardCornerRadius="5dp"
             android:focusableInTouchMode="false"
             card_view:view_shadowDx="2dp"
             card_view:view_shadowDy="0dp"
             card_view:view_borderWidth="2dp"
-            card_view:view_borderColor="#ffffff"
-            android:foreground="?android:attr/selectableItemBackground">
+            card_view:view_borderColor="#ffffff">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_marginTop="20dp"
@@ -76,7 +72,7 @@
     <!-- Restaurant -->
     <LinearLayout
         android:id="@+id/Restaurant"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="0dp"
         android:layout_below="@id/Customer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,20 +81,16 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/restaurantAccountCard"
-            android:layout_width="wrap_content"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="3"
             android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_margin="10dp"
             card_view:cardCornerRadius="5dp"
             android:focusableInTouchMode="false"
             card_view:view_shadowDx="2dp"
             card_view:view_shadowDy="0dp"
             card_view:view_borderWidth="2dp"
             card_view:view_borderColor="#ffffff"
-            android:foreground="?android:attr/selectableItemBackground"
             >
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -126,7 +118,7 @@
     <!-- Rider Card -->
     <LinearLayout
         android:id="@+id/rider"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="0dp"
         android:layout_below="@id/Restaurant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -135,20 +127,16 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/riderCard"
-            android:layout_width="wrap_content"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="3"
             android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_margin="10dp"
             card_view:cardCornerRadius="5dp"
             android:focusableInTouchMode="false"
             card_view:view_shadowDx="2dp"
             card_view:view_shadowDy="0dp"
             card_view:view_borderWidth="2dp"
-            card_view:view_borderColor="#ffffff"
-            android:foreground="?android:attr/selectableItemBackground">
+            card_view:view_borderColor="#ffffff">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_marginTop="20dp"
@@ -171,5 +159,32 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
+    <!-- logout Button -->
+    <LinearLayout
+        android:layout_below="@id/rider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:weightSum="3" >
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="200dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Logout"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/colorBackroundWhite"
+        android:id="@+id/btn_logout"
+        android:padding="12dp"
+        android:background="@drawable/login_button"
+        />
+    </LinearLayout>
 </RelativeLayout>
 </ScrollView>

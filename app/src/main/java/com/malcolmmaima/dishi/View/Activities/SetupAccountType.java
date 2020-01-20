@@ -2,15 +2,19 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.cardview.widget.CardView;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -32,6 +36,7 @@ public class SetupAccountType extends AppCompatActivity {
     private String TAG;
     CardView customer, restaurant, rider;
     String accountType, myPhone;
+    Button logout;
 
     /**
      * Firebase
@@ -238,6 +243,37 @@ public class SetupAccountType extends AppCompatActivity {
                     });
                 }
             });
+
+            logout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final AlertDialog logout = new AlertDialog.Builder(SetupAccountType.this)
+                            .setMessage("Logout?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //Log out
+                                    //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                                    FirebaseAuth.getInstance().signOut();
+                                    startActivity(new Intent(SetupAccountType.this,SplashActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                    finish();
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
+
+                            .create();
+                    logout.show();
+                }
+            });
         }
 
         //You're not logged in
@@ -271,6 +307,7 @@ public class SetupAccountType extends AppCompatActivity {
         customer = findViewById(R.id.customerAccountCard);
         restaurant = findViewById(R.id.restaurantAccountCard);
         rider = findViewById(R.id.riderCard);
+        logout = findViewById(R.id.btn_logout);
 
     }
 
