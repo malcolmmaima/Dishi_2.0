@@ -282,7 +282,7 @@ public class SetupAccountType extends AppCompatActivity {
                 String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
                 String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
                 String.format("%02d" , calendar.get(Calendar.SECOND)) +":"+
-                String.format("%03d" , calendar.get(Calendar.MILLISECOND));
+                timeZone.getDisplayName(false, TimeZone.SHORT);
 
         return time;
     }
