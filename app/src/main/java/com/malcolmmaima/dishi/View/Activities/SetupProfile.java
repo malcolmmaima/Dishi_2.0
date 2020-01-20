@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -87,13 +88,38 @@ public class SetupProfile extends AppCompatActivity {
 
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(SetupProfile.this);
-        defaultProfile = "https://firebasestorage.googleapis.com/v0/b/dishi-food.appspot.com/o/defaults%2Fdefault_profile.png?alt=media&token=af43783d-4432-4218-8dea-9f66b66c8f9e";
+        defaultProfile = "";
 
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
         mAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference("users");
         // Assign FirebaseStorage instance to storageReference.
         storageReference = FirebaseStorage.getInstance().getReference();
+
+        //Fetch default profile pic
+        myRef.child("defaults").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot defaults : dataSnapshot.getChildren()) {
+
+                        try {
+                            if (defaults.getKey().equals("profilePic")) {
+                                defaultProfile = defaults.getValue(String.class);
+
+                            }
+                        } catch (Exception e){
+
+                        }
+                    }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -276,9 +302,8 @@ public class SetupProfile extends AppCompatActivity {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {
-
-                                // Showing exception erro message.
-                                Toast.makeText(mContext, exception.getMessage(), Toast.LENGTH_LONG).show();
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                snackbar.show();
                             }
                         })
 
@@ -343,30 +368,40 @@ public class SetupProfile extends AppCompatActivity {
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             valid[0] = true;
-                            //Set default profile picture in database
-                            try {
-                                myRef.child(myPhone).child("profilePic").setValue(defaultProfile).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Intent slideactivity = new Intent(SetupProfile.this, SetupAccountType.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        Bundle bndlanimation =
-                                                null;
-                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                            bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                        }
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                            try {
-                                                startActivity(slideactivity, bndlanimation);
-                                            } catch (Exception e){
 
+                            if(!defaultProfile.equals("")){
+                                //Set default profile picture in database
+                                try {
+                                    myRef.child(myPhone).child("profilePic").setValue(defaultProfile).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Intent slideactivity = new Intent(SetupProfile.this, SetupAccountType.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            Bundle bndlanimation =
+                                                    null;
+                                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                try {
+                                                    startActivity(slideactivity, bndlanimation);
+                                                } catch (Exception e){
+
+                                                }
                                             }
                                         }
-                                    }
-                                });
-                            } catch (Exception e){
-
+                                    });
+                                } catch (Exception e){
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
                             }
+
+                            else if(defaultProfile.equals("")){
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                            }
+
                         }
                     })
                     .setNegativeButton("NO", new DialogInterface.OnClickListener() {

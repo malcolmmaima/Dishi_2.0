@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/navigation_rider"
-        android:icon="@drawable/ic_meal_circle"
+        android:icon="@drawable/ic_delivery_scooter_24dp"
         android:title="@string/title_rider" />
 
 </menu>

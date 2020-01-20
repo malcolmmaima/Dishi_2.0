@@ -276,13 +276,13 @@ public class SetupAccountType extends AppCompatActivity {
 
     private String getDate() {
         String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        TimeZone timeZone = TimeZone.getTimeZone("GMT+03:00");
+        TimeZone timeZone = TimeZone.getDefault();
         Calendar calendar = Calendar.getInstance(timeZone);
         String time = date+ ":" +
                 String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
                 String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
-                String.format("%02d" , calendar.get(Calendar.SECOND)); //+":"+
-        //String.format("%03d" , calendar.get(Calendar.MILLISECOND));
+                String.format("%02d" , calendar.get(Calendar.SECOND)) +":"+
+                String.format("%03d" , calendar.get(Calendar.MILLISECOND));
 
         return time;
     }
