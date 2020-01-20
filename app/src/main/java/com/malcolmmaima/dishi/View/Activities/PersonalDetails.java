@@ -55,11 +55,11 @@ import java.io.IOException;
 public class PersonalDetails extends AppCompatActivity {
 
     private static final String TAG = "PersonalDetails";
-    private String myPhone, email, firstname, lastname, bio;
+    private String myPhone, email, firstname, lastname, bio, imageURL;
     private EditText mEmail, mFirstName, mLastName, mBio, mPhone;
     CircleImageView profilePic;
     private Button saveDetails;
-    private String [] profilePicActions = {"Open Gallery","Open Camera"};
+    private String [] profilePicActions = {"Open Gallery","Open Camera", "View Photo"};
     ProgressDialog progressDialog;
 
     /**
@@ -103,6 +103,7 @@ public class PersonalDetails extends AppCompatActivity {
         firstname = "";
         lastname = "";
         bio = "";
+        imageURL = "";
 
         //get auth state
         mAuth = FirebaseAuth.getInstance();
@@ -126,6 +127,8 @@ public class PersonalDetails extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                        imageURL = user.getProfilePic();
 
                         email = user.getEmail();
                         firstname = user.getFirstname();
@@ -261,6 +264,22 @@ public class PersonalDetails extends AppCompatActivity {
                             //Open Camera
                             Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
                             snackbar.show();
+                        }
+
+                        if(which == 2){
+                            //View current photo
+                            if(!imageURL.equals("")){
+                                Intent slideactivity = new Intent(PersonalDetails.this, ViewImage.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                slideactivity.putExtra("imageURL", imageURL);
+                                startActivity(slideactivity);
+                            }
+
+                            else {
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                            }
                         }
                     }
                 });

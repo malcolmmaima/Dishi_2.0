@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +47,7 @@ public class CustomerActivity extends AppCompatActivity
     String myPhone;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
-    private String TAG;
+    private String TAG, imageURL;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -78,6 +79,7 @@ public class CustomerActivity extends AppCompatActivity
         setContentView(R.layout.activity_customer);
 
         TAG = "CustomerActivity";
+        imageURL = "";
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -139,6 +141,7 @@ public class CustomerActivity extends AppCompatActivity
 
                         //Set username on drawer header
                         navUsername.setText(user.getFirstname() + " " + user.getLastname());
+                        imageURL = user.getProfilePic();
 
                         Picasso.with(CustomerActivity.this).load(user.getProfilePic()).fit().centerCrop()
                                 .placeholder(R.drawable.default_profile)
@@ -156,6 +159,25 @@ public class CustomerActivity extends AppCompatActivity
                 }
             });
         }
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Make sure image url is not empty
+                if(!imageURL.equals("")){
+                    Intent slideactivity = new Intent(CustomerActivity.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("imageURL", imageURL);
+                    startActivity(slideactivity);
+                }
+
+                else {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        });
     }
 
     @Override

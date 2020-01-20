@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -44,7 +45,7 @@ import android.widget.Toast;
 public class RiderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    String myPhone;
+    String myPhone, imageURL;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     private String TAG;
@@ -79,6 +80,7 @@ public class RiderActivity extends AppCompatActivity
         setContentView(R.layout.activity_rider);
 
         TAG = "RiderActivity";
+        imageURL = "";
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,7 +139,7 @@ public class RiderActivity extends AppCompatActivity
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         UserModel user = dataSnapshot.getValue(UserModel.class);
-
+                        imageURL = user.getProfilePic();
                         //Set username on drawer header
                         navUsername.setText(user.getFirstname() + " " + user.getLastname());
 
@@ -157,6 +159,25 @@ public class RiderActivity extends AppCompatActivity
                 }
             });
         }
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Make sure image url is not empty
+                if(!imageURL.equals("")){
+                    Intent slideactivity = new Intent(RiderActivity.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("imageURL", imageURL);
+                    startActivity(slideactivity);
+                }
+
+                else {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        });
     }
 
     @Override

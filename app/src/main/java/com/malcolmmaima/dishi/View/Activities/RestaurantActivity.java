@@ -50,7 +50,7 @@ public class RestaurantActivity extends AppCompatActivity
 
     FloatingActionButton addMenu;
 
-    String myPhone;
+    String myPhone, imageURL;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     private String TAG;
@@ -87,6 +87,8 @@ public class RestaurantActivity extends AppCompatActivity
         setContentView(R.layout.activity_restaurant);
 
         TAG = "RestaurantActivity";
+
+        imageURL = "";
 
         addMenu = findViewById(R.id.button_add_menu);
 
@@ -171,6 +173,8 @@ public class RestaurantActivity extends AppCompatActivity
                     try {
                         UserModel user = dataSnapshot.getValue(UserModel.class);
 
+                        imageURL = user.getProfilePic();
+
                         //Set username on drawer header
                         navUsername.setText(user.getFirstname() + " " + user.getLastname());
 
@@ -190,6 +194,25 @@ public class RestaurantActivity extends AppCompatActivity
                 }
             });
         }
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Make sure image url is not empty
+                if(!imageURL.equals("")){
+                    Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("imageURL", imageURL);
+                    startActivity(slideactivity);
+                }
+
+                else {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        });
 
     }
 

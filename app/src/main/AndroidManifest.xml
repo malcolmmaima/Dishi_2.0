@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.PersonalDetails"></activity>
+        <activity android:name=".View.Activities.ViewImage"></activity>
+        <activity android:name=".View.Activities.PersonalDetails" />
         <activity android:name=".View.Activities.SettingsActivity" />
         <activity android:name=".View.Activities.AddMenu" />
 
