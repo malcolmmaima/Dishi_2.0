@@ -48,6 +48,9 @@ public class SplashActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         mAuth = FirebaseAuth.getInstance();
 
+        //Enable disk persistence
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         Fabric.with(this, new Crashlytics());
 
         // Checking for first time launch
