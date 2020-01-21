@@ -393,7 +393,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetails.setPrice(price_);
                 productDetails.setDescription(description_);
                 productDetails.setImageURL(imageLink);
-                productDetails.setStorageLocation(imageLocation);
+                //productDetails.setStorageLocation(imageLocation);
                 productDetails.setUploadDate(getDate());
 
                 Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
@@ -444,7 +444,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetails.setPrice(price);
                                         productDetails.setDescription(description);
                                         productDetails.setImageURL(o.toString());
-                                        productDetails.setStorageLocation(storageReference2nd.getPath());
+                                        //productDetails.setStorageLocation(storageReference2nd.getPath());
                                         productDetails.setUploadDate(getDate());
 
                                         Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
@@ -602,7 +602,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetails.setPrice(price);
                                         productDetails.setDescription(description);
                                         productDetails.setImageURL(o.toString());
-                                        productDetails.setStorageLocation(storageReference2nd.getPath());
+                                        //productDetails.setStorageLocation(storageReference2nd.getPath());
                                         productDetails.setOwner(myPhone);
                                         productDetails.setUploadDate(getDate());
 
