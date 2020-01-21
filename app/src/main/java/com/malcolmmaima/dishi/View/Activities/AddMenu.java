@@ -193,27 +193,38 @@ public class AddMenu extends AppCompatActivity {
 
                     else {
                         //Toast.makeText(AddMenu.this, "Please Select Food Image", Toast.LENGTH_LONG).show();
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
-                        builder.setItems(foodImageOptions, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if(which == 0){
-                                    // Open Gallery.
-                                    Intent intent = new Intent();
-                                    // Setting intent type as image to select image from phone storage.
-                                    intent.setType("image/*");
-                                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                                    startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
-                                }
-                                if(which == 1){
-                                    FilePathUri = null;
-                                    uploadMenu();
-                                }
+                        if(FilePathUri != null){
+                            if(CheckFieldValidation()){
+                                uploadMenu();
                             }
-                        });
-                        builder.setCancelable(false);
-                        builder.create();
-                        builder.show();
+                        }
+
+                        else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
+                            builder.setItems(foodImageOptions, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(which == 0){
+                                        // Open Gallery.
+                                        Intent intent = new Intent();
+                                        // Setting intent type as image to select image from phone storage.
+                                        intent.setType("image/*");
+                                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                                        startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                                    }
+                                    if(which == 1){
+                                        FilePathUri = null;
+
+                                        if(CheckFieldValidation()){
+                                            uploadMenu();
+                                        }
+                                    }
+                                }
+                            });
+                            builder.setCancelable(false);
+                            builder.create();
+                            builder.show();
+                        }
+
                     }
                 }
             });
@@ -520,6 +531,7 @@ public class AddMenu extends AppCompatActivity {
                         // Hiding the progressDialog after done uploading.
                         progressDialog.dismiss();
 
+                        FilePathUri = null;
                         Snackbar snackbar = Snackbar
                                 .make((RelativeLayout) findViewById(R.id.parentlayout), "Added successfully!", Snackbar.LENGTH_LONG);
 
@@ -583,7 +595,7 @@ public class AddMenu extends AppCompatActivity {
                                                 // Write was successful!
                                                 // Hiding the progressDialog after done uploading.
                                                 progressDialog.dismiss();
-
+                                                FilePathUri = null;
                                                 Snackbar snackbar = Snackbar
                                                         .make((RelativeLayout) findViewById(R.id.parentlayout), "Added successfully!", Snackbar.LENGTH_LONG);
 
