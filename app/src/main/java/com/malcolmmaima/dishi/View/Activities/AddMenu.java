@@ -367,7 +367,7 @@ public class AddMenu extends AppCompatActivity {
         FirebaseDatabase db;
 
         db = FirebaseDatabase.getInstance();
-        menusRef = db.getReference("menus"); //Post to Menus node, phone number is reference ID
+        menusRef = db.getReference("menus/"+ myPhone); //Post to Menus node, phone number is reference ID
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
