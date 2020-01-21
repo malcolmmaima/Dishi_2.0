@@ -63,7 +63,7 @@ public class SetupProfile extends AppCompatActivity {
      * Firebase
      */
     StorageReference storageReference;
-    private DatabaseReference myRef;
+    private DatabaseReference myRef, defaultsRef;
     private FirebaseAuth mAuth;
 
     // Image request code for onActivityResult() .
@@ -93,11 +93,13 @@ public class SetupProfile extends AppCompatActivity {
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
         mAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference("users");
+        defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
+
         // Assign FirebaseStorage instance to storageReference.
         storageReference = FirebaseStorage.getInstance().getReference();
 
         //Fetch default profile pic
-        myRef.child("defaults").addListenerForSingleValueEvent(new ValueEventListener() {
+        defaultsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot defaults : dataSnapshot.getChildren()) {
