@@ -158,6 +158,8 @@ public class SetupProfile extends AppCompatActivity {
                     userModel.setVerified("true");
                     userModel.setBio(bio);
                     userModel.setGender(gender);
+                    userModel.setFollowers(0);
+                    userModel.setFollowing(0);
 
                     /**
                      * Check if user is logged in then fetch phone number

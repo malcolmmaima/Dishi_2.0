@@ -10,6 +10,24 @@ public class UserModel {
     String profilePic;
     String signupDate;
     String verified;
+    Integer followers;
+    Integer following;
+
+    public Integer getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Integer followers) {
+        this.followers = followers;
+    }
+
+    public Integer getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Integer following) {
+        this.following = following;
+    }
 
     public String getAccount_type() {
         return account_type;
