@@ -43,6 +43,11 @@ import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class AddMenu extends AppCompatActivity {
@@ -170,7 +175,7 @@ public class AddMenu extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    // Checking whether FilePathUri Is empty or not and passes validation check.
+                    // Checking whether FilePathUri Is not and passes validation check.
                     if (FilePathUri != null && CheckFieldValidation()) {
                         // Setting progressDialog Title.
                         progressDialog.setMessage("Adding...");
@@ -181,6 +186,8 @@ public class AddMenu extends AppCompatActivity {
                         uploadMenu();
 
                     }
+
+                    // Checking whether FilePathUri Is empty and passes validation check.
                     else if(FilePathUri == null && CheckFieldValidation() && key != null){
 
                         progressDialog.setMessage("Saving...");
@@ -191,10 +198,14 @@ public class AddMenu extends AppCompatActivity {
 
                     }
 
+                    //Handle other use cases
                     else {
-                        //Toast.makeText(AddMenu.this, "Please Select Food Image", Toast.LENGTH_LONG).show();
                         if(FilePathUri != null){
                             if(CheckFieldValidation()){
+                                progressDialog.setMessage("Saving...");
+                                // Showing progressDialog.
+                                progressDialog.show();
+                                progressDialog.setCancelable(false);
                                 uploadMenu();
                             }
                         }
@@ -215,6 +226,10 @@ public class AddMenu extends AppCompatActivity {
                                         FilePathUri = null;
 
                                         if(CheckFieldValidation()){
+                                            progressDialog.setMessage("Saving...");
+                                            // Showing progressDialog.
+                                            progressDialog.show();
+                                            progressDialog.setCancelable(false);
                                             uploadMenu();
                                         }
                                     }
@@ -379,6 +394,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetails.setDescription(description_);
                 productDetails.setImageURL(imageLink);
                 productDetails.setStorageLocation(imageLocation);
+                productDetails.setUploadDate(getDate());
 
                 Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
 
@@ -429,6 +445,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetails.setDescription(description);
                                         productDetails.setImageURL(o.toString());
                                         productDetails.setStorageLocation(storageReference2nd.getPath());
+                                        productDetails.setUploadDate(getDate());
 
                                         Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
 
@@ -521,6 +538,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetails.setDescription(description);
                 productDetails.setImageURL(defaultFood);
                 productDetails.setOwner(myPhone);
+                productDetails.setUploadDate(getDate());
 
                 Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
 
@@ -586,6 +604,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetails.setImageURL(o.toString());
                                         productDetails.setStorageLocation(storageReference2nd.getPath());
                                         productDetails.setOwner(myPhone);
+                                        productDetails.setUploadDate(getDate());
 
                                         Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
 
@@ -667,5 +686,18 @@ public class AddMenu extends AppCompatActivity {
 
         }
 
+    }
+
+    private String getDate() {
+        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        TimeZone timeZone = TimeZone.getDefault();
+        Calendar calendar = Calendar.getInstance(timeZone);
+        String time = date+ ":" +
+                String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
+                String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
+                String.format("%02d" , calendar.get(Calendar.SECOND)) +":"+
+                timeZone.getDisplayName(false, TimeZone.SHORT);
+
+        return time;
     }
 }

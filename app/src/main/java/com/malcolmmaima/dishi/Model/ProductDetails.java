@@ -9,6 +9,15 @@ public class ProductDetails {
     public  String storageLocation;
     public String key; //When deleting menu items from firebase, this key value will help delete individual items from the menu node
     public String owner;
+    String uploadDate;
+
+    public String getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(String uploadDate) {
+        this.uploadDate = uploadDate;
+    }
 
     public String getOwner() {
         return owner;
