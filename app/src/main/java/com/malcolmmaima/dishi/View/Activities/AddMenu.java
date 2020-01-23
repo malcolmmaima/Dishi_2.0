@@ -381,7 +381,6 @@ public class AddMenu extends AppCompatActivity {
 
         }
 
-
         if(key != null){
 
             //has not changed image
