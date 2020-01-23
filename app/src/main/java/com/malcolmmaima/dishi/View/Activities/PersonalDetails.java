@@ -316,9 +316,9 @@ public class PersonalDetails extends AppCompatActivity {
                     saveprofilePhoto();
 
                     //Save data to specific nodes
-                    myRef.child("email").setValue(mEmail.getText().toString());
-                    myRef.child("firstname").setValue(mFirstName.getText().toString());
-                    myRef.child("lastname").setValue(mLastName.getText().toString());
+                    myRef.child("email").setValue(mEmail.getText().toString().trim());
+                    myRef.child("firstname").setValue(mFirstName.getText().toString().trim());
+                    myRef.child("lastname").setValue(mLastName.getText().toString().trim());
                     myRef.child("bio").setValue(mBio.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

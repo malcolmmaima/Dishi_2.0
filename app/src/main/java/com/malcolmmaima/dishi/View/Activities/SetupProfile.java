@@ -126,10 +126,10 @@ public class SetupProfile extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                email = mEmail.getText().toString();
-                firstname = mFirstName.getText().toString();
-                lastname = mLastName.getText().toString();
-                bio = mBio.getText().toString();
+                email = mEmail.getText().toString().trim();
+                firstname = mFirstName.getText().toString().trim();
+                lastname = mLastName.getText().toString().trim();
+                bio = mBio.getText().toString().trim();
 
                 int userGender = mGender.getCheckedRadioButtonId();
                 // find the radio button by returned id

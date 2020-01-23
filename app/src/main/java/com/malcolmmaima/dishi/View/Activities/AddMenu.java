@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -96,6 +97,8 @@ public class AddMenu extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        //Hide keyboard on activity load
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // Assign FirebaseStorage instance to storageReference.
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -384,9 +387,9 @@ public class AddMenu extends AppCompatActivity {
             //has not changed image
             if(FilePathUri == null){
 
-                String name_ = productName.getText().toString();
-                String price_ = productPrice.getText().toString();
-                String description_ = productDescription.getText().toString();
+                String name_ = productName.getText().toString().trim();
+                String price_ = productPrice.getText().toString().trim();
+                String description_ = productDescription.getText().toString().trim();
 
                 ProductDetails productDetails = new ProductDetails();
                 productDetails.setName(name_);
@@ -526,9 +529,9 @@ public class AddMenu extends AppCompatActivity {
 
             //Check if user has set food photo, if not use default
             if(FilePathUri == null){
-                String name = productName.getText().toString();
-                String price = productPrice.getText().toString();
-                String description = productDescription.getText().toString();
+                String name = productName.getText().toString().trim();
+                String price = productPrice.getText().toString().trim();
+                String description = productDescription.getText().toString().trim();
 
                 String key = menusRef.push().getKey(); //The child node in mymenu for storing menu items
                 ProductDetails productDetails = new ProductDetails();
@@ -591,9 +594,9 @@ public class AddMenu extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Object o) {
 
-                                        String name = productName.getText().toString();
-                                        String price = productPrice.getText().toString();
-                                        String description = productDescription.getText().toString();
+                                        String name = productName.getText().toString().trim();
+                                        String price = productPrice.getText().toString().trim();
+                                        String description = productDescription.getText().toString().trim();
 
                                         String key = menusRef.push().getKey(); //The child node in mymenu for storing menu items
                                         ProductDetails productDetails = new ProductDetails();
