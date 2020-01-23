@@ -7,23 +7,19 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: circleci/android:api-26-alpha
+      - image: circleci/android:api-25-alpha
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
-      #- checkout
+      - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }} echo “Y” | /opt/android/sdk/tools/bin/sdkmanager “build-tools;29.0.2”
-#      - run:
-#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
-
-      - run:
-       name: Approve license for build tools
-       command: (echo y; echo y; echo y; echo y; echo y; echo y) | $ANDROID_HOME/tools/bin/sdkmanager --licenses
       - save_cache:
           paths:
             - ~/.gradle
