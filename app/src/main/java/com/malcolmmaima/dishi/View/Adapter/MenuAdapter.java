@@ -1,7 +1,9 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,11 +12,19 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
@@ -45,10 +55,6 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     public void onBindViewHolder(final MenuAdapter.MyHolder holder, final int position) {
         final ProductDetails productDetails = listdata.get(position);
-
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         /**
          * Set widget values
@@ -106,17 +112,16 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     }
 
+
     @Override
     public int getItemCount() {
         return listdata.size();
     }
 
-
     class MyHolder extends RecyclerView.ViewHolder{
         TextView foodPrice , foodDescription, foodName;
         ImageView foodPic;
         CardView cardView;
-        ImageButton editBtn;
 
         public MyHolder(View itemView) {
             super(itemView);
@@ -125,6 +130,48 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             foodDescription = itemView.findViewById(R.id.foodDescription);
             foodPic = itemView.findViewById(R.id.foodPic);
             cardView = itemView.findViewById(R.id.card_view);
+
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            final DatabaseReference menuRef = FirebaseDatabase.getInstance().getReference("menus/" + myPhone);
+
+            //Long Press
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    //Delete Menu item
+
+                    final AlertDialog deleteMenu = new AlertDialog.Builder(context)
+                            .setMessage("Delete " + foodName.getText().toString())
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    String key = listdata.remove(getAdapterPosition()).getKey();
+
+                                    menuRef.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            notifyItemRemoved(getAdapterPosition());
+                                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
+                            .create();
+                    deleteMenu.show();
+                    return false;
+                }
+            });
 
         }
     }

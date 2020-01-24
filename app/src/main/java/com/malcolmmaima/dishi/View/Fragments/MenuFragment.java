@@ -2,9 +2,11 @@ package com.malcolmmaima.dishi.View.Fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,8 +97,6 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
             }
         });
-
-
 
         return  v;
     }
