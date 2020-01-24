@@ -6,12 +6,20 @@
     android:background="@color/colorBackroundWhite"
     tools:context=".View.Fragments.HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/empty_tag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Menu Fragment"
+        android:text="EMPTY"
         android:textSize="30sp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:visibility="invisible"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rview">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </FrameLayout>
