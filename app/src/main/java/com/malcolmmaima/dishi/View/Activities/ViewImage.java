@@ -17,6 +17,7 @@ public class ViewImage extends AppCompatActivity {
 
     ZoomageView viewImage;
     ProgressBar loading;
+    Boolean clicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +27,9 @@ public class ViewImage extends AppCompatActivity {
         viewImage = findViewById(R.id.viewImage);
         loading = findViewById(R.id.progressBar);
         loading.setVisibility(View.VISIBLE);
+        clicked = false;
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
+        final Toolbar topToolBar = findViewById(R.id.toolbar);
         topToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         setSupportActionBar(topToolBar);
 
@@ -59,6 +61,21 @@ public class ViewImage extends AppCompatActivity {
                         }
                     }
                 });
+
+        viewImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(clicked){
+                    topToolBar.setVisibility(View.VISIBLE);
+                    clicked = false;
+                }
+
+                else {
+                    topToolBar.setVisibility(View.INVISIBLE);
+                    clicked = true;
+                }
+            }
+        });
 
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
