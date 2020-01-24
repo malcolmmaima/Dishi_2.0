@@ -66,15 +66,19 @@ public class RestaurantActivity extends AppCompatActivity
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_orders:
+                    setTitle("Orders");
                     selectedFragment = OrdersFragment.newInstance();
                     break;
                 case R.id.navigation_home:
+                    setTitle("Home");
                     selectedFragment = HomeFragment.newInstance();
                     break;
                 case R.id.navigation_profile:
+                    setTitle("Profile");
                     selectedFragment = ProfileFragment.newInstance();
                     break;
             }
+
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.flContent, selectedFragment);
             transaction.commit();
@@ -237,16 +241,19 @@ public class RestaurantActivity extends AppCompatActivity
         final Class[] fragmentClass = {null};
 
         if (id == R.id.menu1) {
+            setTitle("My Menu");
             fragmentClass[0] = MenuFragment.class;
             //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu2) {
+            setTitle("Reviews");
             fragmentClass[0] = ReviewsFragment.class;
             //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu3) {
+            setTitle("History");
             fragmentClass[0] = HistoryFragment.class;
             //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         } //else if (id == R.id.menu4) {

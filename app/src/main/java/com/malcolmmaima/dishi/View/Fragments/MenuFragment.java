@@ -6,12 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,14 +31,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MenuFragment extends Fragment {
+public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    ProgressDialog progressDialog ;
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone;
     TextView emptyTag;
     AppCompatImageView icon;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     DatabaseReference dbRef, menusRef;
     FirebaseDatabase db;
@@ -58,12 +60,6 @@ public class MenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_menu, container, false);
-        // Assigning Id to ProgressDialog.
-        progressDialog = new ProgressDialog(getContext());
-        // Setting progressDialog Title.
-        progressDialog.setMessage("Loading...");
-        // Showing progressDialog.
-        progressDialog.show();
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -75,7 +71,42 @@ public class MenuFragment extends Fragment {
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
 
-        //Loop through the mymenu child node and get menu items, assign values to our ProductDetails model
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                // Fetching data from server
+                fetchMenu();
+
+            }
+        });
+
+
+
+        return  v;
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchMenu();
+    }
+
+    private void fetchMenu() {
         menusRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -92,30 +123,29 @@ public class MenuFragment extends Fragment {
                 }
 
                 if(!list.isEmpty() && list.size() > listSize){
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+
+                    mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     MenuAdapter recycler = new MenuAdapter(getContext(),list);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
-                    emptyTag.setVisibility(v.INVISIBLE);
-                    icon.setVisibility(v.INVISIBLE);
+                    emptyTag.setVisibility(View.INVISIBLE);
+                    icon.setVisibility(View.INVISIBLE);
                 }
 
                 else {
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+
+                    mSwipeRefreshLayout.setRefreshing(false);
+
                     MenuAdapter recycler = new MenuAdapter(getContext(),list);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
-                    emptyTag.setVisibility(v.VISIBLE);
-                    icon.setVisibility(v.VISIBLE);
+                    emptyTag.setVisibility(View.VISIBLE);
+                    icon.setVisibility(View.VISIBLE);
 
                 }
 
@@ -128,7 +158,5 @@ public class MenuFragment extends Fragment {
 
             }
         });
-
-        return  v;
     }
 }
