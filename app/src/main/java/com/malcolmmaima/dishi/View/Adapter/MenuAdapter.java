@@ -1,6 +1,9 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -21,6 +24,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.AddMenu;
+import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
+import com.malcolmmaima.dishi.View.Activities.SettingsActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -80,7 +86,12 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Clicked " + position, Toast.LENGTH_SHORT).show();
+                Intent slideactivity = new Intent(context, AddMenu.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("key", productDetails.getKey());
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                context.startActivity(slideactivity, bndlanimation);
             }
         });
 

@@ -58,6 +58,7 @@ public class AddMenu extends AppCompatActivity {
     private ImageView foodPic;
     Button save;
     String myPhone;
+    private String [] foodPicActions = {"Open Gallery","Open Camera", "View Photo"};
 
     private String [] foodImageOptions = {"Upload Food Photo","Use Default Photo"};
 
@@ -178,7 +179,7 @@ public class AddMenu extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    // Checking whether FilePathUri Is not and passes validation check.
+                    // Checking whether FilePathUri Is not empty and passes validation check.
                     if (FilePathUri != null && CheckFieldValidation()) {
                         // Setting progressDialog Title.
                         progressDialog.setMessage("Adding...");
@@ -246,10 +247,11 @@ public class AddMenu extends AppCompatActivity {
                     }
                 }
             });
-        } else { //Editing existing item
+        } else { //Editing existing item (key != null)
 
             setTitle("Edit Item");
             //Toast.makeText(this, "key: " + key, Toast.LENGTH_SHORT).show();
+
             //Fetch item details from DB
             databaseReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -266,8 +268,8 @@ public class AddMenu extends AppCompatActivity {
                                 imageLink = menuDetails.getValue(String.class);
 
                                 Picasso.with(AddMenu.this).load(imageLink).fit().centerCrop()
-                                            .placeholder(R.drawable.dish)
-                                            .error(R.drawable.dish)
+                                            .placeholder(R.drawable.menu)
+                                            .error(R.drawable.menu)
                                             .into(foodPic);
 
                             }
@@ -294,6 +296,133 @@ public class AddMenu extends AppCompatActivity {
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                }
+            });
+
+            /**
+             * On image click, allow user to change or view current image
+             */
+            foodPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
+                    builder.setItems(foodPicActions, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(which == 0){
+                                // Open Gallery.
+                                Intent intent = new Intent();
+                                // Setting intent type as image to select image from phone storage.
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                            }
+                            if(which == 1){
+                                //Open Camera
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                            }
+
+                            if(which == 2){
+                                //View current photo
+                                if(!imageLink.equals("")){
+                                    Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    slideactivity.putExtra("imageURL", imageLink);
+                                    startActivity(slideactivity);
+                                }
+
+                                else {
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
+                            }
+                        }
+                    });
+                    builder.create();
+                    builder.show();
+                }
+            });
+
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    // Checking whether FilePathUri Is not empty and passes validation check.
+                    if (FilePathUri != null && CheckFieldValidation()) {
+                        // Setting progressDialog Title.
+                        progressDialog.setMessage("Adding...");
+
+                        // Showing progressDialog.
+                        progressDialog.show();
+                        progressDialog.setCancelable(false);
+                        uploadMenu();
+
+                    }
+
+                    // Checking whether FilePathUri Is empty and passes validation check.
+                    else if(FilePathUri == null && CheckFieldValidation() && key != null){
+
+                        progressDialog.setMessage("Saving...");
+                        // Showing progressDialog.
+                        progressDialog.show();
+                        progressDialog.setCancelable(false);
+                        uploadMenu();
+
+                    }
+
+                    //Handle other use cases
+                    else {
+                        if(FilePathUri != null){
+                            if(CheckFieldValidation()){
+                                progressDialog.setMessage("Saving...");
+                                // Showing progressDialog.
+                                progressDialog.show();
+                                progressDialog.setCancelable(false);
+                                uploadMenu();
+                            }
+                        }
+
+                        else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
+                            builder.setItems(foodPicActions, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(which == 0){
+                                        // Open Gallery.
+                                        Intent intent = new Intent();
+                                        // Setting intent type as image to select image from phone storage.
+                                        intent.setType("image/*");
+                                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                                        startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                                    }
+                                    if(which == 1){
+                                        //Open Camera
+                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+
+                                    if(which == 2){
+                                        //View current photo
+                                        if(!imageLink.equals("")){
+                                            Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                            slideactivity.putExtra("imageURL", imageLink);
+                                            startActivity(slideactivity);
+                                        }
+
+                                        else {
+                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                        }
+                                    }
+                                }
+                            });
+                            builder.create();
+                            builder.show();
+                        }
+
+                    }
                 }
             });
 
