@@ -63,6 +63,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             holder.foodDescription.setText(productDetails.getDescription());
         }
 
+        /**
+         * Click listener on our card
+         */
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +78,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             }
         });
 
+        /**
+         * View image click listener
+         */
         holder.foodPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,6 +91,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             }
         });
 
+        /**
+         * Load image url onto imageview
+         */
         try {
             //Load food image
             Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
