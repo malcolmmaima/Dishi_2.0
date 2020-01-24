@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
+import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -77,7 +78,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
         holder.foodPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, AddMenu.class)
+                Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("imageURL", productDetails.getImageURL());
                 context.startActivity(slideactivity);
@@ -94,91 +95,6 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
         }
 
-//        holder.editBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public  void onClick(final View view){
-//                if(productDetails.getKey() != null){
-//                    Intent slideactivity = new Intent(context, AddMenu.class)
-//                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//                    slideactivity.putExtra("phone", myPhone);
-//                    slideactivity.putExtra("key", productDetails.getKey());
-//                    Bundle bndlanimation =
-//                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-//                    context.startActivity(slideactivity, bndlanimation);
-//                }
-//            }
-//        });
-
-//        holder.deleteBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public  void onClick(final View view){
-//
-//                final AlertDialog myQuittingDialogBox = new AlertDialog.Builder(view.getContext())
-//                        //set message, title, and icon
-//                        .setTitle("Delete item")
-//                        .setMessage("Are you sure you want to delete "+ productDetails.getName() + "?")
-//                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-//                        //set three option buttons
-//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                /*
-//                                progressDialog = new ProgressDialog(context);
-//                                progressDialog.setCancelable(false);
-//                                progressDialog.setTitle("Processing...");
-//                                progressDialog.setMessage("Please wait...");
-//                                progressDialog.show();
-//                                */
-//                                menusRef.child(productDetails.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void aVoid) {
-//                                        storageReference2nd.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                            @Override
-//                                            public void onSuccess(Void aVoid) {
-//                                                // File deleted successfully
-//                                                Snackbar snackbar = Snackbar
-//                                                        .make(view, "Deleted!", Snackbar.LENGTH_LONG);
-//
-//                                                snackbar.show();
-//
-//                                            }
-//                                        }).addOnFailureListener(new OnFailureListener() {
-//                                            @Override
-//                                            public void onFailure(@NonNull Exception exception) {
-//                                                // Uh-oh, an error occurred!
-//                                                Snackbar snackbar = Snackbar
-//                                                        .make(view, "Error " + exception, Snackbar.LENGTH_LONG);
-//
-//                                                snackbar.show();
-//
-//                                            }
-//                                        });
-//
-//                                    }
-//                                }).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception exception) {
-//                                        // Uh-oh, an error occurred!
-//                                        Toast.makeText(context, "error", Toast.LENGTH_SHORT)
-//                                                .show();
-//                                    }
-//                                });
-//                            }
-//                        })//setPositiveButton
-//
-//
-//                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                //Do not delete
-//                                //Toast.makeText(context, "No", Toast.LENGTH_SHORT).show();
-//
-//                            }
-//                        })//setNegativeButton
-//
-//                        .create();
-//                myQuittingDialogBox.show();
-//            }
-//        });
     }
 
     @Override
