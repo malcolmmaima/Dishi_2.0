@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -38,6 +40,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     Context context;
     List<ProductDetails> listdata;
+    long DURATION = 500;
+    private boolean on_attach = true;
 
     public MenuAdapter(Context context, List<ProductDetails> listdata) {
         this.listdata = listdata;
@@ -55,6 +59,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     public void onBindViewHolder(final MenuAdapter.MyHolder holder, final int position) {
         final ProductDetails productDetails = listdata.get(position);
+
+        setAnimation(holder.itemView, position);
 
         /**
          * Set widget values
@@ -112,6 +118,24 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     }
 
+    /**
+     * @lhttps://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
+     */
+    private void setAnimation(View itemView, int i) {
+        if(!on_attach){
+            i = -1;
+        }
+        boolean isNotFirstItem = i == -1;
+        i++;
+        itemView.setAlpha(0.f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
+        ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
+        animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
+        animator.setDuration(500);
+        animatorSet.play(animator);
+        animator.start();
+    }
 
     @Override
     public int getItemCount() {
