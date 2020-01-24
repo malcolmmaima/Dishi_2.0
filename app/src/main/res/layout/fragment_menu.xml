@@ -6,14 +6,32 @@
     android:background="@color/colorBackroundWhite"
     tools:context=".View.Fragments.HomeFragment">
 
-    <TextView
-        android:id="@+id/empty_tag"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="EMPTY"
-        android:textSize="30sp"
-        android:gravity="center"
-        android:visibility="invisible"/>
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/menuIcon"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            android:src="@drawable/menu"/>
+
+        <TextView
+            android:id="@+id/empty_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EMPTY"
+            android:fontFamily="sans-serif"
+            android:textSize="30sp"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

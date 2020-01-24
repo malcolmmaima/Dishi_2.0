@@ -40,6 +40,7 @@
             app:view_borderWidth="2dp"
             app:view_borderColor="#cccccc"
             android:scaleType="fitXY"
+            android:foregroundGravity="center_vertical"
             />
 
         <TextView

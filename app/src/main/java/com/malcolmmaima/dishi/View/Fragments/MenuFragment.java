@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,6 +36,7 @@ public class MenuFragment extends Fragment {
     RecyclerView recyclerview;
     String myPhone;
     TextView emptyTag;
+    AppCompatImageView icon;
 
     DatabaseReference dbRef, menusRef;
     FirebaseDatabase db;
@@ -67,6 +70,8 @@ public class MenuFragment extends Fragment {
         db = FirebaseDatabase.getInstance();
         dbRef = db.getReference(myPhone);
         menusRef = db.getReference("menus/"+ myPhone);
+
+        icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
 
@@ -97,6 +102,7 @@ public class MenuFragment extends Fragment {
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
                     emptyTag.setVisibility(v.INVISIBLE);
+                    icon.setVisibility(v.INVISIBLE);
                 }
 
                 else {
@@ -109,6 +115,7 @@ public class MenuFragment extends Fragment {
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
                     emptyTag.setVisibility(v.VISIBLE);
+                    icon.setVisibility(v.VISIBLE);
 
                 }
 
