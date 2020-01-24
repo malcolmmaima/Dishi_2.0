@@ -57,7 +57,6 @@ public class SetupProfile extends AppCompatActivity {
     RadioButton maleRd, femaleRd;
     RadioGroup mGender;
     private ImageView profile_pic;
-    private boolean complete;
 
     /**
      * Firebase
@@ -84,7 +83,6 @@ public class SetupProfile extends AppCompatActivity {
         setContentView(R.layout.activity_setup_profile);
 
         initWidgets();
-        complete = false;
 
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(SetupProfile.this);

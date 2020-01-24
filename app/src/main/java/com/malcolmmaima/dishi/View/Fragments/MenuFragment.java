@@ -71,7 +71,7 @@ public class MenuFragment extends Fragment {
         emptyTag = v.findViewById(R.id.empty_tag);
 
         //Loop through the mymenu child node and get menu items, assign values to our ProductDetails model
-        menusRef.addValueEventListener(new ValueEventListener() {
+        menusRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 list = new ArrayList<>();

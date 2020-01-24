@@ -1,12 +1,8 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
-import android.app.ActivityOptions;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -15,10 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -27,7 +21,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -43,16 +36,16 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
         this.context = context;
     }
 
+
     @Override
-    public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MenuAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_menu,parent,false);
 
-        MyHolder myHolder = new MyHolder(view);
+        MenuAdapter.MyHolder myHolder = new MenuAdapter.MyHolder(view);
         return myHolder;
     }
 
-
-    public void onBindViewHolder(final MyHolder holder, int position) {
+    public void onBindViewHolder(final MenuAdapter.MyHolder holder, final int position) {
         final ProductDetails productDetails = listdata.get(position);
 
         final DatabaseReference menusRef;
@@ -69,11 +62,27 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
         //final StorageReference storageReference2nd = storageReference.child(productDetails.getStorageLocation());
 
         db = FirebaseDatabase.getInstance();
-        menusRef = db.getReference("menus/"+ myPhone); //Under the user's node, place their menu items
+        menusRef = db.getReference("menus/"+ myPhone);
+
+        /**
+         * Set widget values
+         **/
 
         holder.foodPrice.setText("Ksh "+productDetails.getPrice());
         holder.foodName.setText(productDetails.getName());
-        holder.foodDescription.setText(productDetails.getDescription());
+
+        if(productDetails.getDescription().length() > 89) {
+            holder.foodDescription.setText(productDetails.getDescription().substring(0, 80) + "...");
+        } else {
+            holder.foodDescription.setText(productDetails.getDescription());
+        }
+
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "Clicked " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         try {
             //Load food image
@@ -181,6 +190,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
     class MyHolder extends RecyclerView.ViewHolder{
         TextView foodPrice , foodDescription, foodName;
         ImageView foodPic;
+        CardView cardView;
         ImageButton editBtn;
 
         public MyHolder(View itemView) {
@@ -189,6 +199,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             foodName = itemView.findViewById(R.id.foodName);
             foodDescription = itemView.findViewById(R.id.foodDescription);
             foodPic = itemView.findViewById(R.id.foodPic);
+            cardView = itemView.findViewById(R.id.card_view);
 
         }
     }

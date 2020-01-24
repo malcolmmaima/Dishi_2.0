@@ -40,12 +40,14 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="10dp"
+            android:elevation="8dp"
             card_view:cardCornerRadius="5dp"
             android:focusableInTouchMode="false"
             card_view:view_shadowDx="2dp"
             card_view:view_shadowDy="0dp"
             card_view:view_borderWidth="2dp"
-            card_view:view_borderColor="#ffffff">
+            card_view:view_borderColor="#ffffff"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_marginTop="20dp"
@@ -85,12 +87,14 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="10dp"
+            android:elevation="8dp"
             card_view:cardCornerRadius="5dp"
             android:focusableInTouchMode="false"
             card_view:view_shadowDx="2dp"
             card_view:view_shadowDy="0dp"
             card_view:view_borderWidth="2dp"
             card_view:view_borderColor="#ffffff"
+            android:foreground="?android:attr/selectableItemBackground"
             >
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -131,12 +135,14 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="10dp"
+            android:elevation="8dp"
             card_view:cardCornerRadius="5dp"
             android:focusableInTouchMode="false"
             card_view:view_shadowDx="2dp"
             card_view:view_shadowDy="0dp"
             card_view:view_borderWidth="2dp"
-            card_view:view_borderColor="#ffffff">
+            card_view:view_borderColor="#ffffff"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_marginTop="20dp"
@@ -166,6 +172,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="20dp"
+        android:paddingTop="10dp"
         android:gravity="center"
         android:weightSum="3" >
 
