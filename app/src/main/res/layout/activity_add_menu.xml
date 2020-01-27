@@ -25,17 +25,18 @@
 
     <ScrollView
         android:layout_below="@id/toolbar"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
         android:layout_width="wrap_content">
 
         <RelativeLayout
             android:id="@+id/activity_main"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             tools:context=".View.Activities.AddMenu">
 
-        <LinearLayout
+            <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/lin"
@@ -144,12 +145,12 @@
 
             </androidx.cardview.widget.CardView>
 
-
             <LinearLayout
                 android:layout_below="@id/card_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginBottom="20dp"
                 android:gravity="center_horizontal" >
                 <!-- Finish Button -->
                 <androidx.appcompat.widget.AppCompatButton
@@ -161,6 +162,7 @@
                     android:background="@drawable/login_button"
                     android:fontFamily="sans-serif-medium"
                     android:text="SAVE"
+                    android:elevation="8dp"
                     android:textColor="@color/colorBackroundWhite"
                     android:textStyle="bold" />
 
