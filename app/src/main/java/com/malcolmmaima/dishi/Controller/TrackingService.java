@@ -73,6 +73,8 @@ public class TrackingService extends Service {
                 .setContentIntent(broadcastIntent)
                 .setSmallIcon(R.drawable.tracking_enabled);
 
+        stopTracking = false;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground();
         else

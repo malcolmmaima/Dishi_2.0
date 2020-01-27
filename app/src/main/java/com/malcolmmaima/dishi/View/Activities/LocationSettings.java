@@ -7,8 +7,10 @@ import androidx.core.content.ContextCompat;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +29,7 @@ public class LocationSettings extends AppCompatActivity {
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     Switch defaultLocSwitch, liveLocSwitch;
+    Button setLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,11 +99,14 @@ public class LocationSettings extends AppCompatActivity {
                 if(isChecked){
                     liveLocSwitch.setChecked(false);
                     myRef.child("locationType").setValue("default");
+
+                    checkStaticLocation();
                 }
 
                 else {
                     liveLocSwitch.setChecked(true);
                     myRef.child("locationType").setValue("live");
+                    setLocation.setVisibility(View.GONE);
                 }
 
 
@@ -115,12 +121,46 @@ public class LocationSettings extends AppCompatActivity {
                 if(isChecked){
                     defaultLocSwitch.setChecked(false);
                     myRef.child("locationType").setValue("live");
+                    setLocation.setVisibility(View.GONE);
                 }
 
                 else {
                     defaultLocSwitch.setChecked(true);
                     myRef.child("locationType").setValue("default");
+                    checkStaticLocation();
                 }
+
+            }
+        });
+
+        setLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(LocationSettings.this, "Load maps activity", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void checkStaticLocation() {
+        //Check if user has set default location
+        myRef.child("my_location").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChildren()){
+                    //my location data exists
+                    setLocation.setVisibility(View.VISIBLE);
+                    setLocation.setText("CHANGE LOCATION");
+                }
+
+                else {
+                    //User has not set static business location
+                    setLocation.setVisibility(View.VISIBLE);
+                    setLocation.setText("SET LOCATION");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
@@ -129,5 +169,6 @@ public class LocationSettings extends AppCompatActivity {
     private void initWidgets() {
         defaultLocSwitch = findViewById(R.id.defaultLocSwitch);
         liveLocSwitch = findViewById(R.id.liveLocSwitch);
+        setLocation = findViewById(R.id.setLocation);
     }
 }

@@ -74,7 +74,7 @@
                         android:layout_gravity="start"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:text="Set default location"
+                        android:text="Use default location"
                         android:fontFamily="sans-serif"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
@@ -120,7 +120,7 @@
                         android:layout_gravity="start"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:text="Use my live location"
+                        android:text="Use live location"
                         android:fontFamily="sans-serif"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
@@ -144,6 +144,22 @@
                     android:background="#ACACAC"/>
 
             </androidx.cardview.widget.CardView>
+
+            <!-- set location Button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/setLocation"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/login_button"
+                android:fontFamily="sans-serif-medium"
+                android:text="SET LOCATION"
+                android:elevation="8dp"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                android:textColor="@color/colorBackroundWhite"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
