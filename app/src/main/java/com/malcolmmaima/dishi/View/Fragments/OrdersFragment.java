@@ -112,11 +112,40 @@ public class OrdersFragment extends Fragment {
         });
 
         liveStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
                 // do something, the isChecked will be
                 // true if the switch is in the On position
 
-                dbRef.child("liveStatus").setValue(isChecked);
+                if(isChecked == true){
+                    final AlertDialog goLive = new AlertDialog.Builder(getContext())
+                            .setMessage("Restaurant Go Live?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    dbRef.child("liveStatus").setValue(true);
+                                    liveStatus.setChecked(true);
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dbRef.child("liveStatus").setValue(false);
+                                    liveStatus.setChecked(false);
+                                }
+                            })
+
+                            .create();
+                    goLive.show();
+                }
+
+
+                else {
+                    dbRef.child("liveStatus").setValue(isChecked);
+                }
+
             }
         });
 

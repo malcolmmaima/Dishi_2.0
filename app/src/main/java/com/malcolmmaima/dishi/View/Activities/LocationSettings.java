@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
 
 public class LocationSettings extends AppCompatActivity {
@@ -72,11 +74,13 @@ public class LocationSettings extends AppCompatActivity {
                     if(locationType.equals("live")){
                         liveLocSwitch.setChecked(true);
                         defaultLocSwitch.setChecked(false);
+                        startService(new Intent(LocationSettings.this, TrackingService.class));
                     }
 
                     if(locationType.equals("default")){
                         liveLocSwitch.setChecked(false);
                         defaultLocSwitch.setChecked(true);
+                        stopService(new Intent(LocationSettings.this, TrackingService.class));
                     }
 
                 } catch (Exception e){
@@ -99,7 +103,7 @@ public class LocationSettings extends AppCompatActivity {
                 if(isChecked){
                     liveLocSwitch.setChecked(false);
                     myRef.child("locationType").setValue("default");
-
+                    stopService(new Intent(LocationSettings.this, TrackingService.class));
                     checkStaticLocation();
                 }
 
@@ -107,6 +111,7 @@ public class LocationSettings extends AppCompatActivity {
                     liveLocSwitch.setChecked(true);
                     myRef.child("locationType").setValue("live");
                     setLocation.setVisibility(View.GONE);
+                    startService(new Intent(LocationSettings.this, TrackingService.class));
                 }
 
 
@@ -122,12 +127,14 @@ public class LocationSettings extends AppCompatActivity {
                     defaultLocSwitch.setChecked(false);
                     myRef.child("locationType").setValue("live");
                     setLocation.setVisibility(View.GONE);
+                    startService(new Intent(LocationSettings.this, TrackingService.class));
                 }
 
                 else {
                     defaultLocSwitch.setChecked(true);
                     myRef.child("locationType").setValue("default");
                     checkStaticLocation();
+                    stopService(new Intent(LocationSettings.this, TrackingService.class));
                 }
 
             }

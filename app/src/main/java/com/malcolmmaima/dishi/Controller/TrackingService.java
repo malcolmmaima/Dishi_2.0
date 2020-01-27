@@ -38,7 +38,7 @@ public class TrackingService extends Service {
 
     private static final String TAG = TrackingService.class.getSimpleName();
     FirebaseAuth mAuth;
-    Boolean stopTracking;
+    Boolean stopTracking = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -51,7 +51,6 @@ public class TrackingService extends Service {
         buildNotification();
         mAuth = FirebaseAuth.getInstance();
         requestLocationUpdates();
-        stopTracking = false;
     }
 
 //Create the persistent notification//
@@ -72,8 +71,6 @@ public class TrackingService extends Service {
                 .setOngoing(true)
                 .setContentIntent(broadcastIntent)
                 .setSmallIcon(R.drawable.tracking_enabled);
-
-        stopTracking = false;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground();
@@ -113,6 +110,8 @@ public class TrackingService extends Service {
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
         startForeground(2, notification);
+
+        stopTracking = false;
     }
 
     protected BroadcastReceiver stopReceiver = new BroadcastReceiver() {
@@ -140,7 +139,7 @@ public class TrackingService extends Service {
 
 //Specify how often your app should request the device’s location//
 
-            request.setInterval(100000); //every 10sec
+            request.setInterval(30000);
 
 //Get the most accurate location data available//
 
