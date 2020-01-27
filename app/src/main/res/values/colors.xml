@@ -8,6 +8,8 @@
     <color name="pureWhite">#ffffff</color>
     <color name="grey">#bfbfbf</color>
     <color name="black">#000000</color>
+    <color name="red">#ff0000</color>
+    <color name="green">#00ff00</color>
 
     <!-- Screens background color-->
     <color name="bg_slider_screen1">#f4b241</color>

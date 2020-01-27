@@ -25,13 +25,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".View.Activities.LocationSettings"></activity>
 
         <service
             android:name=".Controller.TrackingService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".View.Activities.ViewImage"></activity>
+        <activity android:name=".View.Activities.ViewImage" />
         <activity android:name=".View.Activities.PersonalDetails" />
         <activity android:name=".View.Activities.SettingsActivity" />
         <activity android:name=".View.Activities.AddMenu" />

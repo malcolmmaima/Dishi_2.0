@@ -7,6 +7,8 @@ public class UserModel {
     String firstname;
     String gender;
     String lastname;
+    Boolean liveStatus;
+    String locationType;
     String profilePic;
     String signupDate;
     String verified;
@@ -75,6 +77,22 @@ public class UserModel {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    public Boolean getLiveStatus() {
+        return liveStatus;
+    }
+
+    public void setLiveStatus(Boolean liveStatus) {
+        this.liveStatus = liveStatus;
+    }
+
+    public String getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(String locationType) {
+        this.locationType = locationType;
     }
 
     public void setProfilePic(String profilePic) {

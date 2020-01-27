@@ -3,15 +3,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorBackroundWhite"
     tools:context=".View.Fragments.OrdersFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:clickable="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Orders Fragment"
-        android:textSize="30sp"
-        android:gravity="center"/>
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="3dp"
+        android:elevation="8dp"
+        card_view:cardCornerRadius="5dp"
+        android:focusableInTouchMode="false"
+        card_view:view_shadowDx="5dp"
+        card_view:view_shadowDy="0dp"
+        card_view:view_borderWidth="2dp"
+        card_view:view_borderColor="#cccccc"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            >
+
+            <ImageView
+                android:layout_marginTop="7dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="5dp"
+                android:id="@+id/liveStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tracking_enabled"
+                android:tint="@color/grey"
+                android:scaleType="fitXY"
+                android:foregroundGravity="center_vertical"
+                />
+
+            <TextView
+                android:id="@+id/liveTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimaryDark"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Live"
+                android:fontFamily="sans-serif"
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/liveStatus"
+                android:layout_toLeftOf="@+id/foodPrice"/>
+
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_marginTop="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true" />
+
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
 
 </FrameLayout>

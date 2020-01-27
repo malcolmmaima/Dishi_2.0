@@ -158,6 +158,7 @@ public class SetupProfile extends AppCompatActivity {
                     userModel.setGender(gender);
                     userModel.setFollowers(0);
                     userModel.setFollowing(0);
+                    userModel.setLocationType("default");
 
                     /**
                      * Check if user is logged in then fetch phone number
