@@ -402,6 +402,7 @@ public class RestaurantActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int whichButton) {
                             //Log out
                             //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                            stopService(new Intent(RestaurantActivity.this, TrackingService.class));
                             FirebaseAuth.getInstance().signOut();
                             startActivity(new Intent(RestaurantActivity.this,SplashActivity.class)
                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
