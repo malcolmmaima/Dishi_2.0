@@ -11,13 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <meta-data
-        android:name="com.google.firebase.messaging.default_notification_icon"
-        android:resource="@drawable/logo_notification" />
-    <meta-data
-        android:name="com.google.firebase.messaging.default_notification_color"
-        android:resource="@color/colorPrimary" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,7 +18,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.LocationSettings"></activity>
 
         <service
             android:name=".Controller.TrackingService"
@@ -36,20 +28,6 @@
         <activity android:name=".View.Activities.PersonalDetails" />
         <activity android:name=".View.Activities.SettingsActivity" />
         <activity android:name=".View.Activities.AddMenu" />
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
-
-        <activity
-            android:name=".View.Activities.RiderActivity"
-            android:label="@string/title_activity_rider" />
-        <activity
-            android:name=".View.Activities.RestaurantActivity"
-            android:label="@string/title_activity_restaurant" />
-        <activity
-            android:name=".View.Activities.CustomerActivity"
-            android:label="@string/title_activity_customer" />
         <activity android:name=".View.Activities.SetupAccountType" />
         <activity android:name=".View.Activities.SplashActivity">
             <intent-filter>
@@ -61,7 +39,32 @@
         <activity android:name=".View.Activities.MainActivity" />
         <activity android:name=".View.Activities.WelcomeActivity" />
         <activity android:name=".View.Activities.SetupProfile" />
+        <activity android:name=".View.Activities.LocationSettings" />
+        <activity android:name=".View.Maps.SearchLocation"
+            android:label="@string/autocompletefromfragment">
+        </activity>
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/logo_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
+        <activity
+            android:name=".View.Activities.RiderActivity"
+            android:label="@string/title_activity_rider" />
+        <activity
+            android:name=".View.Activities.RestaurantActivity"
+            android:label="@string/title_activity_restaurant" />
+        <activity
+            android:name=".View.Activities.CustomerActivity"
+            android:label="@string/title_activity_customer" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />

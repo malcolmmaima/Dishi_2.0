@@ -3,7 +3,6 @@ package com.malcolmmaima.dishi.View.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
 public class LocationSettings extends AppCompatActivity {
 
@@ -143,7 +142,10 @@ public class LocationSettings extends AppCompatActivity {
         setLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LocationSettings.this, "Load maps activity", Toast.LENGTH_SHORT).show();
+                Intent slideactivity = new Intent(LocationSettings.this, SearchLocation.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                startActivity(slideactivity);
             }
         });
     }

@@ -13,7 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -21,7 +20,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,9 +29,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
-import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
-import com.malcolmmaima.dishi.View.Activities.SettingsActivity;
-import com.malcolmmaima.dishi.View.Activities.SplashActivity;
 
 public class OrdersFragment extends Fragment {
     ProgressDialog progressDialog ;
