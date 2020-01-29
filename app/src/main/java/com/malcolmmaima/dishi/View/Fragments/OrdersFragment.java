@@ -15,10 +15,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,7 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
 
-public class OrdersFragment extends Fragment {
+public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -42,6 +44,10 @@ public class OrdersFragment extends Fragment {
     DatabaseReference dbRef;
     FirebaseDatabase db;
     FirebaseUser user;
+
+    TextView emptyTag;
+    AppCompatImageView icon;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public static OrdersFragment newInstance() {
         OrdersFragment fragment = new OrdersFragment();
@@ -71,6 +77,34 @@ public class OrdersFragment extends Fragment {
         liveStatusIcon = v.findViewById(R.id.liveStatus);
         liveStatus = v.findViewById(R.id.switch1);
         live = v.findViewById(R.id.card_view);
+
+        icon = v.findViewById(R.id.menuIcon);
+        recyclerview = v.findViewById(R.id.rview);
+        emptyTag = v.findViewById(R.id.empty_tag);
+
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                // Fetching data from server
+
+            }
+        });
 
         liveTitle.setText("loading...");
         dbRef.child("liveStatus").addValueEventListener(new ValueEventListener() {
@@ -136,7 +170,6 @@ public class OrdersFragment extends Fragment {
                     goLive.show();
                 }
 
-
                 else {
                     dbRef.child("liveStatus").setValue(isChecked);
                 }
@@ -179,4 +212,8 @@ public class OrdersFragment extends Fragment {
         return  v;
     }
 
+    @Override
+    public void onRefresh() {
+
+    }
 }

@@ -363,7 +363,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
                                 latitude = currentLocation.getLatitude();
                                 longitude = currentLocation.getLongitude();
-                                placeName =  "My current Location";
+                                placeName =  "My current location";
 
                             } catch (Exception e){
 
