@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -37,11 +38,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -70,6 +73,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private ProgressBar progressBar;
+    AppCompatButton button_save;
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -154,6 +158,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         mGps = findViewById(R.id.ic_gps);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
+        button_save = findViewById(R.id.btn_save);
 
         getLocationPermission();
 
@@ -192,7 +197,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 placeName = place.getName();
 
                 moveCamera(place.getLatLng(),DEFAULT_ZOOM, place.getName());
-                Toast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -212,8 +217,49 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
             }
         });
         
-        
+        button_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkValidation()){
+                    progressBar.setVisibility(View.VISIBLE);
+                    myRef.child("my_location").child("latitude").setValue(latitude);
+                    myRef.child("my_location").child("longitude").setValue(longitude);
+                    myRef.child("my_location").child("place").setValue(placeName).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(SearchLocation.this, "Saved", Toast.LENGTH_LONG).show();
+                            progressBar.setVisibility(View.INVISIBLE);
+                            finish();
+                        }
+                    });
+                }
 
+                else {
+                    Toast.makeText(SearchLocation.this, "Location not changed", Toast.LENGTH_LONG).show();
+                    progressBar.setVisibility(View.INVISIBLE);
+                    finish();
+                }
+            }
+        });
+
+    }
+
+    private boolean checkValidation() {
+        boolean valid = true;
+
+        if(latitude == 0.0){
+            valid = false;
+        }
+
+        if(longitude == 0.0){
+            valid = false;
+        }
+
+        if(placeName.equals("")){
+            valid = false;
+        }
+
+        return valid;
     }
 
     private void moveCamera(LatLng latLng, float zoom, String title){
@@ -295,6 +341,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         latitude = 0.0;
         longitude = 0.0;
+        placeName = "";
 
         try{
             if(mLocationPermissionsGranted){
