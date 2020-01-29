@@ -76,12 +76,15 @@ public class CustomerActivity extends AppCompatActivity
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_order_food:
+                    setTitle("Order");
                     selectedFragment = CustomerOrderFragment.newInstance();
                     break;
                 case R.id.navigation_home:
+                    setTitle("Home");
                     selectedFragment = HomeFragment.newInstance();
                     break;
                 case R.id.navigation_profile:
+                    setTitle("Profile");
                     selectedFragment = ProfileFragment.newInstance();
                     break;
             }
@@ -118,6 +121,7 @@ public class CustomerActivity extends AppCompatActivity
         /**
          * Manually displaying the first fragment - one time only
          */
+        setTitle("Order");
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.flContent, CustomerOrderFragment.newInstance());
         transaction.commit();

@@ -100,7 +100,6 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
             public void run() {
 
                 mSwipeRefreshLayout.setRefreshing(true);
-
                 // Fetching data from server
 
             }
