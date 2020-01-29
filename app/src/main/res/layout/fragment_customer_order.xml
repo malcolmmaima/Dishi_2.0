@@ -19,13 +19,16 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/result_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabMaxWidth="0dp"
+                app:tabGravity="fill"
+                app:tabMode="fixed"
                 android:background="@color/colorBackroundWhite"
                 app:tabTextColor="@color/black"
                 app:tabSelectedTextColor="@color/colorPrimary"
                 app:tabIndicatorColor="@color/colorPrimary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabMode="scrollable"/>
+                />
 
         </com.google.android.material.appbar.AppBarLayout>
 
