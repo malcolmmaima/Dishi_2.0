@@ -10,6 +10,15 @@ public class ProductDetails {
     public String key; //When deleting menu items from firebase, this key value will help delete individual items from the menu node
     public String owner;
     String uploadDate;
+    Double distance;
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
 
     public String getUploadDate() {
         return uploadDate;
