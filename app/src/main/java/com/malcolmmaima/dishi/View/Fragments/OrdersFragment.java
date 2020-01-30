@@ -130,6 +130,13 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 } catch (Exception e){
                     //Node doesn't exist
                     liveTitle.setText("Go live...");
+
+                    /**
+                     * This exception means that this is a fresh account which translates to the user not having set location settings
+                     * thus lets set "live" as the default location type
+                     *
+                    */
+                    dbRef.child("locationType").setValue("live");
                 }
             }
 

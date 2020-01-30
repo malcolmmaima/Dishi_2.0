@@ -316,6 +316,10 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                     });
                                 }
 
+                                /**
+                                 * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
+                                 * and "live" which tracks the restaurant's live location under "location/phone"
+                                 */
                                 else {
                                     Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
                                 }
