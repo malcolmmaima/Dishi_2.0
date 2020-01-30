@@ -26,7 +26,7 @@
     <string name="title_activity_customer">CustomerActivity</string>
     <string name="title_home">Home</string>
     <string name="title_profile">Profile</string>
-    <string name="title_order">Food</string>
+    <string name="title_order">Order</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_orders">Orders</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>

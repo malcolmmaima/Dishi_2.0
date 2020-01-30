@@ -128,7 +128,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     }
 
                 } catch (Exception e){
-                    liveTitle.setText("error...");
+                    //Node doesn't exist
+                    liveTitle.setText("Go live...");
                 }
             }
 
