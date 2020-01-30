@@ -324,15 +324,18 @@ public class CustomerActivity extends AppCompatActivity
         final Class[] fragmentClass = {null};
 
         if (id == R.id.menu1) {
+            setTitle("Menu1");
             //fragmentClass[0] = OrdersFragment.class;
             Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu2) {
+            setTitle("Menu2");
             Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu3) {
+            setTitle("Menu3");
             Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         } //else if (id == R.id.menu4) {
         //fragmentClass[0] = FragmentFour.class;
@@ -358,6 +361,7 @@ public class CustomerActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int whichButton) {
                             //Log out
                             //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                            stopService(new Intent(CustomerActivity.this, TrackingService.class));
                             FirebaseAuth.getInstance().signOut();
                             startActivity(new Intent(CustomerActivity.this,SplashActivity.class)
                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));

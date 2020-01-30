@@ -159,6 +159,7 @@ public class RestaurantActivity extends AppCompatActivity
         /**
          * Manually displaying the first fragment - one time only
          */
+        setTitle("Orders");
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.flContent, OrdersFragment.newInstance());
         transaction.commit();
