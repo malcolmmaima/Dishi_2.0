@@ -112,10 +112,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("key", productDetails.getKey());
                 slideactivity.putExtra("restaurant", productDetails.getOwner());
+                slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
                 slideactivity.putExtra("product", productDetails.getName());
                 slideactivity.putExtra("description", productDetails.getDescription());
                 slideactivity.putExtra("price", productDetails.getPrice());
                 slideactivity.putExtra("imageUrl", productDetails.getImageURL());
+                slideactivity.putExtra("distance", productDetails.getDistance());
 
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();

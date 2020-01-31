@@ -33,9 +33,188 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            tools:context=".View.Activities.AddMenu">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lin"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:padding="10dp">
 
+                <com.alexzh.circleimageview.CircleImageView
+                    android:id="@+id/foodpic"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:src="@drawable/menu"
+                    app:view_borderColor="#cccccc"
+                    app:view_borderWidth="2dp"
+                    app:view_shadowDx="5dp"
+                    app:view_shadowDy="5dp"
+                    app:view_shadowRadius="6dp" />
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_view"
+                android:clickable="true"
+                android:layout_below="@id/lin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingBottom="20dp"
+                    >
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/productName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_marginRight="70dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Product Name"
+                        android:textStyle="bold"
+                        />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Ksh 0"
+                        android:textSize="25dp"
+                        android:id="@+id/productPrice"
+                        android:fontFamily="sans-serif"
+                        android:textColor="@color/colorAccent"
+                        android:layout_alignParentRight="true"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Food Descriptiond"
+                        android:fontFamily="sans-serif-light"
+                        android:id="@+id/productDescription"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/productName"
+                        android:textColor="#666"/>
+
+                    <LinearLayout
+                        android:layout_below="@id/productDescription"
+                        android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content">
+
+                        <ImageButton
+                            android:layout_below="@id/restaurantTag"
+                            android:layout_toRightOf="@id/foodPic"
+                            android:id="@+id/locationTag"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginTop="5dp"
+                            android:scaleType="centerCrop"
+                            android:background="@drawable/location_pin"
+                            />
+                        <TextView
+                            android:id="@+id/distanceAway"
+                            android:layout_below="@id/restaurantName"
+                            android:layout_toRightOf="@id/locationTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text=" 0 m away"
+                            android:layout_marginLeft="0dp"
+                            android:layout_marginRight="10dp"/>
+
+                        <ImageButton
+                            android:layout_below="@id/foodDescription"
+                            android:layout_toRightOf="@id/foodPic"
+                            android:id="@+id/restaurantTag"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginRight="5dp"
+                            android:scaleType="centerCrop"
+                            android:background="@drawable/online_store"
+                            />
+                        <TextView
+                            android:id="@+id/restaurantName"
+                            android:layout_below="@id/foodDescription"
+                            android:layout_toRightOf="@id/locationTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="Restaurant Name"
+                            android:layout_marginLeft="0dp"
+                            android:layout_marginRight="5dp"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="40dp"
+                android:layout_marginRight="15dp">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/addItem"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    app:fabCustomSize="40dp"
+                    android:layout_gravity="center_horizontal"
+                    android:clickable="true"
+                    android:tint="@color/pureWhite"
+                    app:backgroundTint="@color/colorPrimaryDark"
+                    app:srcCompat="@drawable/ic_add_white_36dp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/itemCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="0"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/minusItem"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    app:fabCustomSize="40dp"
+                    android:layout_gravity="center_horizontal"
+                    android:clickable="true"
+                    android:tint="@color/pureWhite"
+                    app:backgroundTint="@color/colorPrimaryDark"
+                    app:srcCompat="@drawable/ic_minus" />
+
+            </LinearLayout>
 
         </RelativeLayout>
 
@@ -48,5 +227,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_shopping_cart_white_48dp" />
+        app:srcCompat="@drawable/ic_add_shopping_cart_white_48dp"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>
