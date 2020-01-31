@@ -31,6 +31,7 @@ import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -81,13 +82,18 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent slideactivity = new Intent(context, AddMenu.class)
-//                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                slideactivity.putExtra("key", productDetails.getKey());
-//                Bundle bndlanimation =
-//                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-//                context.startActivity(slideactivity, bndlanimation);
-                Toast.makeText(context, "View product details", Toast.LENGTH_SHORT).show();
+                Intent slideactivity = new Intent(context, ViewProduct.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("key", productDetails.getKey());
+                slideactivity.putExtra("restaurant", productDetails.getOwner());
+                slideactivity.putExtra("product", productDetails.getName());
+                slideactivity.putExtra("description", productDetails.getDescription());
+                slideactivity.putExtra("price", productDetails.getPrice());
+                slideactivity.putExtra("imageUrl", productDetails.getImageURL());
+
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                context.startActivity(slideactivity, bndlanimation);
             }
         });
 
@@ -105,7 +111,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         });
 
         if(productDetails.getDistance() < 1.0){
-            holder.distanceAway.setText(productDetails.getDistance() + " m away");
+            holder.distanceAway.setText(productDetails.getDistance()*1000 + " m away");
         } else {
             holder.distanceAway.setText(productDetails.getDistance() + " km away");
 

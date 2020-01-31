@@ -24,6 +24,7 @@
             android:enabled="true"
             android:exported="true" />
 
+        <activity android:name=".View.Activities.ViewProduct"/>
         <activity android:name=".View.Activities.ViewImage" />
         <activity android:name=".View.Activities.PersonalDetails" />
         <activity android:name=".View.Activities.SettingsActivity" />
@@ -40,9 +41,9 @@
         <activity android:name=".View.Activities.WelcomeActivity" />
         <activity android:name=".View.Activities.SetupProfile" />
         <activity android:name=".View.Activities.LocationSettings" />
-        <activity android:name=".View.Maps.SearchLocation"
-            android:label="@string/autocompletefromfragment">
-        </activity>
+        <activity
+            android:name=".View.Maps.SearchLocation"
+            android:label="@string/autocompletefromfragment"></activity>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -53,6 +54,7 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
+
         <activity
             android:name=".View.Activities.RiderActivity"
             android:label="@string/title_activity_rider" />
@@ -62,6 +64,7 @@
         <activity
             android:name=".View.Activities.CustomerActivity"
             android:label="@string/title_activity_customer" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />

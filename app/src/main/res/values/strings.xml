@@ -52,4 +52,5 @@
     <string name="autocompletefromfragment">Autocomplete From Fragment</string>
     <string name="autocompletefromintent">Autocomplete From Intent</string>
     <string name="placepredictionprogrammatically">Place prediction Programmatically</string>
+    <string name="title_activity_view_product">ViewProduct</string>
 </resources>

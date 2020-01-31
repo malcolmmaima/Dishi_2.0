@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackroundWhite"
+    tools:context=".View.Activities.ViewProduct"
+    android:id="@+id/parentlayout">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:maxHeight="@dimen/actionBarSize"
+        android:background="@color/pureWhite"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/actionBarSize"
+        android:elevation="5dp"
+        app:view_shadowDx="10dp"
+        app:view_shadowDy="0dp"
+        app:view_borderWidth="2dp"
+        app:view_borderColor="@color/colorPrimaryDark">
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_below="@id/toolbar"
+        android:layout_height="fill_parent"
+        android:layout_width="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/activity_main"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_add_shopping_cart_white_48dp" />
+</RelativeLayout>

@@ -133,7 +133,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     /**
                      * This exception means that this is a fresh account which translates to the user not having set location settings
-                     * thus lets set "live" as the default location type
+                     * thus lets set "live" as the default location type "users/locationType"
                      *
                     */
                     dbRef.child("locationType").setValue("live");
