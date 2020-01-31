@@ -52,7 +52,7 @@ public class ViewProduct extends AppCompatActivity {
                 finish(); // Go back to previous activity
             }
         });
-        //topToolBar.setLogo(R.drawable.logo);
+        //topToolBar.setLogo(R.drawable.dish);
         //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
         FloatingActionButton fab = findViewById(R.id.fab);

@@ -24,10 +24,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
@@ -61,6 +64,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     public void onBindViewHolder(final ProductAdapter.MyHolder holder, final int position) {
         final ProductDetails productDetails = listdata.get(position);
 
+        /**
+         * Adapter animation
+         */
         setAnimation(holder.itemView, position);
 
         /**
@@ -69,6 +75,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
 
         holder.foodPrice.setText("Ksh "+productDetails.getPrice());
         holder.foodName.setText(productDetails.getName());
+
+        //Fetch restaurant user details
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+productDetails.getOwner());
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    UserModel user = dataSnapshot.getValue(UserModel.class);
+                    String fullName = user.getFirstname() + " " + user.getLastname();
+                    holder.restaurantName.setText(fullName);
+                } catch (Exception e){
+                    holder.restaurantName.setText("error fetching...");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         if(productDetails.getDescription().length() > 89) {
             holder.foodDescription.setText(productDetails.getDescription().substring(0, 80) + "...");
@@ -111,9 +137,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         });
 
         if(productDetails.getDistance() < 1.0){
-            holder.distanceAway.setText(productDetails.getDistance()*1000 + " m away");
+            holder.distanceAway.setText(productDetails.getDistance()*1000 + "m away");
         } else {
-            holder.distanceAway.setText(productDetails.getDistance() + " km away");
+            holder.distanceAway.setText(productDetails.getDistance() + "km away");
 
         }
 
@@ -157,7 +183,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodDescription, foodName, distanceAway;
+        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway;
         ImageView foodPic;
         CardView cardView;
 
@@ -168,6 +194,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             foodDescription = itemView.findViewById(R.id.foodDescription);
             foodPic = itemView.findViewById(R.id.foodPic);
             cardView = itemView.findViewById(R.id.card_view);
+            restaurantName = itemView.findViewById(R.id.restaurantName);
             distanceAway = itemView.findViewById(R.id.distanceAway);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -178,7 +205,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                 @Override
                 public boolean onLongClick(View v) {
                     //Do something
-                    Toast.makeText(context, "Do something", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Do something", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             });

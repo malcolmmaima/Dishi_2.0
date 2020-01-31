@@ -90,19 +90,41 @@
         <ImageButton
             android:layout_below="@id/foodDescription"
             android:layout_toRightOf="@id/foodPic"
+            android:id="@+id/restaurantTag"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/online_store"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/restaurantName"
+            android:layout_below="@id/foodDescription"
+            android:layout_toRightOf="@id/locationTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Restaurant Name"
+            android:layout_marginLeft="-10dp"
+            android:layout_marginRight="5dp"/>
+
+        <ImageButton
+            android:layout_below="@id/restaurantTag"
+            android:layout_toRightOf="@id/foodPic"
             android:id="@+id/locationTag"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="5dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/ic_place_white_36dp"
+            android:background="@drawable/location_pin"
             android:layout_marginRight="10dp"
-            android:backgroundTint="@color/grey"
             />
 
         <TextView
             android:id="@+id/distanceAway"
-            android:layout_below="@id/foodDescription"
+            android:layout_below="@id/restaurantName"
             android:layout_toRightOf="@id/locationTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
