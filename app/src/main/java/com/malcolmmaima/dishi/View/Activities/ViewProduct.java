@@ -38,12 +38,12 @@ public class ViewProduct extends AppCompatActivity {
 
         setTitle(product);
 
-        Toast.makeText(this, "phone: " + restaurant
-                                                    + "\nkey: " + key
-                                                    + "\nproduct: " + product
-                                                    + "\nprice: " + price
-                                                    + "\ndescription: " + description
-                                                    + "\nimage: " + imageUrl, Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "phone: " + restaurant
+//                                                    + "\nkey: " + key
+//                                                    + "\nproduct: " + product
+//                                                    + "\nprice: " + price
+//                                                    + "\ndescription: " + description
+//                                                    + "\nimage: " + imageUrl, Toast.LENGTH_LONG).show();
 
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {

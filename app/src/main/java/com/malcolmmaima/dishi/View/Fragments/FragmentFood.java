@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,14 +43,17 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag;
+    TextView emptyTag, distanceShow;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
     LiveLocation liveLocation;
+    SeekBar seekBar;
 
     DatabaseReference dbRef, menusRef, myLocationRef;
     FirebaseDatabase db;
     FirebaseUser user;
+
+    int location_filter;
 
 
     public static FragmentFood newInstance() {
@@ -66,6 +72,8 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                              Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_food, container, false);
 
+        location_filter = 0; // initialize distance filter
+
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         db = FirebaseDatabase.getInstance();
@@ -76,6 +84,67 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        seekBar = v.findViewById(R.id.seekBar);
+        distanceShow = v.findViewById(R.id.distanceShow);
+
+        //Fetch location filter value from database
+        dbRef.child("location-filter").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+
+                    location_filter = dataSnapshot.getValue(Integer.class);
+                    seekBar.setProgress(location_filter);
+                    distanceShow.setText("("+location_filter+"km)");
+
+                } catch (Exception e){
+
+                    //Doesn't exist in the database, lets set value in node
+                    dbRef.child("location-filter").setValue(0);
+                    location_filter = 0;
+                    seekBar.setProgress(location_filter);
+                    distanceShow.setText("("+location_filter+"km)");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //Distance filter seekbar
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
+                dbRef.child("location-filter").setValue(progress).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        location_filter = progress;
+                        distanceShow.setText("("+progress+"km)");
+                        //Toast.makeText(getContext(), "filter posted", Toast.LENGTH_SHORT).show();
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Write failed
+                                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mSwipeRefreshLayout.setRefreshing(true);
+                fetchFood();
+            }
+        });
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -178,7 +247,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                              * if distance meets parameters set fetch menu
                                              */
 
-                                            if(dist < 10.0){
+                                            if(dist < location_filter){
                                                 //Fetch menu items of restaurants that have passed distance parameter
 
                                                 for(DataSnapshot menu : restaurants.getChildren()){
@@ -260,7 +329,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                              * if distance meets parameters set then fetch menu
                                              */
 
-                                            if(dist < 10.0){
+                                            if(dist < location_filter){
                                                 //Fetch menu items of restaurants that have passed distance parameter
 
                                                 for(DataSnapshot menu : restaurants.getChildren()){

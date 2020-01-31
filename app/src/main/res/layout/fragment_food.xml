@@ -35,8 +35,41 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:id="@+id/filter"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/filterDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance"/>
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/filterDistance"
+            android:layout_toLeftOf="@id/distanceShow"
+            android:layout_marginRight="40dp"
+            android:max="10"
+            android:layout_toEndOf="@id/filterDistance" />
+
+        <TextView
+            android:id="@+id/distanceShow"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(km)"/>
+
+    </RelativeLayout>
+
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
+        android:layout_below="@id/filter"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
