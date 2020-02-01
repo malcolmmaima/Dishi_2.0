@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -11,9 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
 
@@ -54,8 +62,8 @@ public class ViewProduct extends AppCompatActivity {
         /**
          * Receive values from product adapter via intent
          */
-        restaurant = getIntent().getStringExtra("restaurant"); //From adapters
-        key = getIntent().getStringExtra("key"); //From adapters, to allow for editing
+        restaurant = getIntent().getStringExtra("restaurant"); //restaurant phone, our primary key
+        key = getIntent().getStringExtra("key"); //From adapters, to allow for indexing
         product = getIntent().getStringExtra("product");
         price = getIntent().getStringExtra("price");
         description = getIntent().getStringExtra("description");
@@ -144,8 +152,30 @@ public class ViewProduct extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Add to cart", Snackbar.LENGTH_LONG).show();
+            public void onClick(final View view) {
+
+                Snackbar.make(view, "Adding...", Snackbar.LENGTH_LONG).show();
+
+                String myPhone;
+                myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+                DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+
+                String key = myCartRef.push().getKey();
+                ProductDetails cartProduct = new ProductDetails();
+                cartProduct.setName(product);
+                cartProduct.setPrice(price);
+                cartProduct.setDescription(description);
+                cartProduct.setImageURL(imageUrl);
+                cartProduct.setOwner(restaurant);
+                cartProduct.setQuantity(count);
+
+                myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Snackbar.make(view, "Added to cart", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
             }
         });
     }
@@ -162,4 +192,21 @@ public class ViewProduct extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.view_product_menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
+        case R.id.myCart:
+            Toast.makeText(this, "view cart", Toast.LENGTH_SHORT).show();
+            return(true);
+    }
+        return(super.onOptionsItemSelected(item));
+    }
 }
