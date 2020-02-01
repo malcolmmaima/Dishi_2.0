@@ -33,7 +33,7 @@ import com.squareup.picasso.Picasso;
 
 public class ViewProduct extends AppCompatActivity {
 
-    String key, restaurant, restaurantName_,product, description, price, imageUrl;
+    String key, restaurant, restaurantName_,product, description, price, imageUrl, myPhone;
     Double distance;
     AppCompatTextView productName, productPrice, itemCount;
     TextView distanceAway, restaurantName, productDescription, subTotal;
@@ -51,38 +51,6 @@ public class ViewProduct extends AppCompatActivity {
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
-        String myPhone;
-        myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
-        myCart = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
-        myCart.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    try {
-                        myMenu.findItem(R.id.myCart).setVisible(true);
-                        myMenu.findItem(R.id.myCart).setEnabled(true);
-                    } catch (Exception e){
-
-                    }
-                }
-
-                else {
-                    try {
-                        myMenu.findItem(R.id.myCart).setVisible(false);
-                        myMenu.findItem(R.id.myCart).setEnabled(false);
-                    } catch (Exception e){
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         /**
          * UI Widgets
@@ -247,6 +215,44 @@ public class ViewProduct extends AppCompatActivity {
         if (item != null) {
             item.setVisible(true);
         }
+
+        else {
+            item.setVisible(false);
+        }
+
+        /**
+         * Hide / show cart icon if has items or not
+         */
+        myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+        myCart = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        myCart.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        myMenu.findItem(R.id.myCart).setVisible(true);
+                        myMenu.findItem(R.id.myCart).setEnabled(true);
+                    } catch (Exception e){
+
+                    }
+                }
+
+                else {
+                    try {
+                        myMenu.findItem(R.id.myCart).setVisible(false);
+                        myMenu.findItem(R.id.myCart).setEnabled(false);
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         return true;
     }
 

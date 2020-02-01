@@ -133,5 +133,25 @@
             android:layout_marginLeft="-10dp"
             android:layout_marginRight="5dp"/>
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/foodDescription">
+
+            <ImageButton
+                android:id="@+id/addToCart"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:scaleType="centerCrop"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:background="@drawable/ic_shopping_cart_white_48dp"
+                android:layout_marginRight="10dp"
+
+                />
+        </RelativeLayout>
+
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

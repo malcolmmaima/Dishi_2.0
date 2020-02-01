@@ -22,6 +22,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
@@ -162,7 +163,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onLongClick(View v) {
+                public boolean onLongClick(final View v) {
                     //Delete Menu item
 
                     final AlertDialog deleteMenu = new AlertDialog.Builder(context)
@@ -178,7 +179,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             notifyItemRemoved(getAdapterPosition());
-                                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                                            Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
                                         }
                                     });
 

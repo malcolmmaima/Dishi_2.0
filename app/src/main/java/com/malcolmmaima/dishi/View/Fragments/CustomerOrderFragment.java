@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -19,8 +21,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.R;
 
 import java.util.ArrayList;
@@ -31,7 +36,7 @@ public class CustomerOrderFragment extends Fragment {
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference dbRef;
+    DatabaseReference dbRef, myCartRef;
     FirebaseDatabase db;
     FirebaseUser user;
 
@@ -52,12 +57,14 @@ public class CustomerOrderFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_customer_order, container, false);
         progressDialog = new ProgressDialog(getContext());
+        final FloatingActionButton fab = v.findViewById(R.id.fab);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         db = FirebaseDatabase.getInstance();
 
         dbRef = db.getReference("users/"+myPhone);
+        myCartRef = db.getReference("cart/"+myPhone);
 
         // Setting ViewPager for each Tabs
         ViewPager viewPager = (ViewPager) v.findViewById(R.id.viewpager);
@@ -66,7 +73,34 @@ public class CustomerOrderFragment extends Fragment {
         TabLayout tabs = (TabLayout) v.findViewById(R.id.result_tabs);
         tabs.setupWithViewPager(viewPager);
 
-        FloatingActionButton fab = v.findViewById(R.id.fab);
+        myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        myCartRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        fab.setVisibility(View.VISIBLE);
+                    } catch (Exception e){
+
+                    }
+                }
+
+                else {
+                    try {
+                        fab.setVisibility(View.GONE);
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

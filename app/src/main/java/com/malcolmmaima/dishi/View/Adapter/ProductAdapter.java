@@ -22,6 +22,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -126,6 +128,41 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         });
 
         /**
+         * Add item to cart
+         */
+        holder.addToCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
+
+                String myPhone;
+                myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+                DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+
+                //Get current date
+                GetCurrentDate currentDate = new GetCurrentDate();
+                String cartDate = currentDate.getDate();
+
+                String key = myCartRef.push().getKey();
+                ProductDetails cartProduct = new ProductDetails();
+                cartProduct.setName(productDetails.getName());
+                cartProduct.setPrice(productDetails.getPrice());
+                cartProduct.setDescription(productDetails.getDescription());
+                cartProduct.setImageURL(productDetails.getImageURL());
+                cartProduct.setOwner(productDetails.getOwner());
+                cartProduct.setQuantity(1);
+                cartProduct.setUploadDate(cartDate);
+
+                myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+        /**
          * View image click listener
          */
         holder.foodPic.setOnClickListener(new View.OnClickListener() {
@@ -188,6 +225,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway;
         ImageView foodPic;
         CardView cardView;
+        ImageButton addToCart;
 
         public MyHolder(View itemView) {
             super(itemView);
@@ -198,6 +236,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             cardView = itemView.findViewById(R.id.card_view);
             restaurantName = itemView.findViewById(R.id.restaurantName);
             distanceAway = itemView.findViewById(R.id.distanceAway);
+            addToCart = itemView.findViewById(R.id.addToCart);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -206,8 +245,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    //Do something
-                    //Toast.makeText(context, "Do something", Toast.LENGTH_SHORT).show();
+
                     return false;
                 }
             });
