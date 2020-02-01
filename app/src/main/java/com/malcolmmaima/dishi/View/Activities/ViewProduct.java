@@ -8,19 +8,25 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
@@ -34,6 +40,8 @@ public class ViewProduct extends AppCompatActivity {
     CircleImageView foodPic;
     FloatingActionButton add, minus;
     int count;
+    Menu myMenu;
+    DatabaseReference myCart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +51,30 @@ public class ViewProduct extends AppCompatActivity {
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+        String myPhone;
+        myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+        myCart = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        myCart.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myMenu.findItem(R.id.myCart).setVisible(true);
+                    myMenu.findItem(R.id.myCart).setEnabled(true);
+                }
+
+                else {
+                    myMenu.findItem(R.id.myCart).setVisible(false);
+                    myMenu.findItem(R.id.myCart).setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         /**
          * UI Widgets
@@ -160,6 +192,10 @@ public class ViewProduct extends AppCompatActivity {
                 myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
                 DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
 
+                //Get current date
+                GetCurrentDate currentDate = new GetCurrentDate();
+                String cartDate = currentDate.getDate();
+
                 String key = myCartRef.push().getKey();
                 ProductDetails cartProduct = new ProductDetails();
                 cartProduct.setName(product);
@@ -168,6 +204,7 @@ public class ViewProduct extends AppCompatActivity {
                 cartProduct.setImageURL(imageUrl);
                 cartProduct.setOwner(restaurant);
                 cartProduct.setQuantity(count);
+                cartProduct.setUploadDate(cartDate);
 
                 myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -195,8 +232,13 @@ public class ViewProduct extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.view_product_menu, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.view_product_menu, menu);
+        myMenu = menu;
+        MenuItem item = menu.findItem(R.id.myCart);
+        if (item != null) {
+            item.setVisible(true);
+        }
         return true;
     }
 
