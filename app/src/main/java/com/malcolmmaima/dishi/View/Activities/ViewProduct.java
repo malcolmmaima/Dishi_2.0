@@ -80,6 +80,7 @@ public class ViewProduct extends AppCompatActivity {
         productPrice.setText("Ksh "+price);
         productDescription.setText(description);
         restaurantName.setText(restaurantName_);
+        itemCount.setText(""+count);
 
         if(distance < 1.0){
             distanceAway.setText(distance*1000 + "m away");
