@@ -60,13 +60,21 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    myMenu.findItem(R.id.myCart).setVisible(true);
-                    myMenu.findItem(R.id.myCart).setEnabled(true);
+                    try {
+                        myMenu.findItem(R.id.myCart).setVisible(true);
+                        myMenu.findItem(R.id.myCart).setEnabled(true);
+                    } catch (Exception e){
+
+                    }
                 }
 
                 else {
-                    myMenu.findItem(R.id.myCart).setVisible(false);
-                    myMenu.findItem(R.id.myCart).setEnabled(false);
+                    try {
+                        myMenu.findItem(R.id.myCart).setVisible(false);
+                        myMenu.findItem(R.id.myCart).setEnabled(false);
+                    } catch (Exception e){
+
+                    }
                 }
             }
 
