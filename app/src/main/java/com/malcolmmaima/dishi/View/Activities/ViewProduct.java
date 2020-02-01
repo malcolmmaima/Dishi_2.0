@@ -22,7 +22,7 @@ public class ViewProduct extends AppCompatActivity {
     String key, restaurant, restaurantName_,product, description, price, imageUrl;
     Double distance;
     AppCompatTextView productName, productPrice, itemCount;
-    TextView distanceAway, restaurantName, productDescription;
+    TextView distanceAway, restaurantName, productDescription, subTotal;
     CircleImageView foodPic;
     FloatingActionButton add, minus;
     int count;
@@ -49,6 +49,7 @@ public class ViewProduct extends AppCompatActivity {
         distanceAway = findViewById(R.id.distanceAway);
         restaurantName = findViewById(R.id.restaurantName);
         productDescription = findViewById(R.id.productDescription);
+        subTotal = findViewById(R.id.subTotal);
 
         /**
          * Receive values from product adapter via intent
@@ -83,7 +84,7 @@ public class ViewProduct extends AppCompatActivity {
         itemCount.setText(""+count);
 
         if(distance < 1.0){
-            distanceAway.setText(distance*1000 + "m away");
+            distanceAway.setText(distance*1000 + "m away"); //convert KM to meters
         } else {
             distanceAway.setText(distance + "km away");
 
@@ -97,6 +98,9 @@ public class ViewProduct extends AppCompatActivity {
             public void onClick(View v) {
                 count++;
                 itemCount.setText(""+count);
+
+                //Show subtotal in realtime
+                productSubTotal();
             }
         });
 
@@ -108,6 +112,9 @@ public class ViewProduct extends AppCompatActivity {
                     count--;
                     itemCount.setText(""+count);
                 }
+
+                //Show subtotal in realtime
+                productSubTotal();
 
             }
         });
@@ -141,6 +148,18 @@ public class ViewProduct extends AppCompatActivity {
                 Snackbar.make(view, "Add to cart", Snackbar.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void productSubTotal() {
+        if(count != 1){
+            int subtotal = Integer.parseInt(price) * count;
+            subTotal.setVisibility(View.VISIBLE);
+            subTotal.setText("Subtotal: " + subtotal);
+        }
+
+        else {
+            subTotal.setVisibility(View.GONE);
+        }
     }
 
 }

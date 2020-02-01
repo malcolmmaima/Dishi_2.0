@@ -59,10 +59,22 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/subTotal"
+                android:layout_below="@id/lin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="Subtotal: 0"
+                android:layout_marginRight="20dp"
+                android:textSize="20sp"
+                android:visibility="gone"
+                android:layout_alignParentRight="true" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_view"
                 android:clickable="true"
-                android:layout_below="@id/lin"
+                android:layout_below="@id/subTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
