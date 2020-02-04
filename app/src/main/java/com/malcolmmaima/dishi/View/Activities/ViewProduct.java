@@ -260,7 +260,11 @@ public class ViewProduct extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
         case R.id.myCart:
-            Toast.makeText(this, "view cart", Toast.LENGTH_SHORT).show();
+
+            Intent slideactivity = new Intent(ViewProduct.this, MyCart.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(slideactivity);
+
             return(true);
     }
         return(super.onOptionsItemSelected(item));

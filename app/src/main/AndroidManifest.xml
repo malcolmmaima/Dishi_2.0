@@ -18,13 +18,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".View.Activities.MyCart"
+            android:label="@string/title_activity_my_cart"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <service
             android:name=".Controller.TrackingService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".View.Activities.ViewProduct"/>
+        <activity android:name=".View.Activities.ViewProduct" />
         <activity android:name=".View.Activities.ViewImage" />
         <activity android:name=".View.Activities.PersonalDetails" />
         <activity android:name=".View.Activities.SettingsActivity" />
@@ -43,7 +47,7 @@
         <activity android:name=".View.Activities.LocationSettings" />
         <activity
             android:name=".View.Maps.SearchLocation"
-            android:label="@string/autocompletefromfragment"></activity>
+            android:label="@string/autocompletefromfragment" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

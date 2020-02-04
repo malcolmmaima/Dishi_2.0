@@ -10,4 +10,6 @@
     <dimen name="slide_desc">16dp</dimen>
     <dimen name="desc_padding">40dp</dimen>
     <dimen name="actionBarSize">60dp</dimen>
+    <dimen name="app_bar_height">220dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>
