@@ -75,7 +75,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
          * Set widget values
          **/
 
-        holder.foodPrice.setText("Ksh "+productDetails.getPrice());
+        int price = productDetails.getQuantity() * Integer.parseInt(productDetails.getPrice());
+        holder.foodPrice.setText("Ksh "+price);
         holder.foodName.setText(productDetails.getName());
 
         //Fetch restaurant user details
@@ -129,9 +130,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
                 myCartRef.child(productDetails.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        listdata.remove(holder.getAdapterPosition());
-                        notifyItemRemoved(holder.getAdapterPosition());
-                        Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
+                        try {
+                            listdata.remove(holder.getAdapterPosition());
+                            notifyItemRemoved(holder.getAdapterPosition());
+                            Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
+                        } catch(Exception e){
+                            Snackbar.make(v.getRootView(), "Something went wrong!", Snackbar.LENGTH_LONG).show();
+                        }
                     }
                 });
             }
@@ -150,12 +155,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             }
         });
 
-//        if(productDetails.getDistance() < 1.0){
-//            holder.distanceAway.setText(productDetails.getDistance()*1000 + "m away");
-//        } else {
-//            holder.distanceAway.setText(productDetails.getDistance() + "km away");
-//
-//        }
+        holder.quantity.setText("Quantity: "+productDetails.getQuantity() + " x Ksh "+productDetails.getPrice());
 
         /**
          * Load image url onto imageview
@@ -197,7 +197,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway;
+        TextView foodPrice, foodDescription, foodName, restaurantName,quantity;
         ImageView foodPic;
         CardView cardView;
         ImageButton removeCart;
@@ -210,7 +210,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             foodPic = itemView.findViewById(R.id.foodPic);
             cardView = itemView.findViewById(R.id.card_view);
             restaurantName = itemView.findViewById(R.id.restaurantName);
-            distanceAway = itemView.findViewById(R.id.distanceAway);
+            quantity = itemView.findViewById(R.id.quantity);
             removeCart = itemView.findViewById(R.id.removeCart);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

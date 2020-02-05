@@ -42,12 +42,14 @@ public class MyCart extends AppCompatActivity {
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag;
+    TextView emptyTag, cartTotal, subTotal, deliveryChrg;
     AppCompatImageView icon;
+    LiveLocation liveLocation;
 
-    DatabaseReference myCartRef;
+    DatabaseReference myCartRef, myLocationRef;
     FirebaseDatabase db;
     FirebaseUser user;
+    int deliveryCharge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +59,16 @@ public class MyCart extends AppCompatActivity {
         icon = findViewById(R.id.menuIcon);
         recyclerview = findViewById(R.id.rview);
         emptyTag = findViewById(R.id.empty_tag);
+        cartTotal = findViewById(R.id.cartTotal);
+        subTotal = findViewById(R.id.subTotal);
+        deliveryChrg = findViewById(R.id.deliveryCharge);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("");
+
+        deliveryCharge = 0;
+        deliveryChrg.setText("Ksh "+deliveryCharge);
 
         /**
          * Initialize firebase database
@@ -70,7 +78,59 @@ public class MyCart extends AppCompatActivity {
         db = FirebaseDatabase.getInstance();
         myCartRef = db.getReference("cart/"+myPhone);
 
+        /**
+         * On create view fetch my location coordinates
+         */
+
+        myLocationRef = db.getReference("location/"+myPhone);
+
+        liveLocation = null;
+        myLocationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         fetchCart();
+
+        /**
+         * Initialize cart items total and keep track of items
+         */
+        final int[] total = {0};
+
+        myCartRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                total[0] = 0;
+                for(DataSnapshot cart : dataSnapshot.getChildren()){
+                    ProductDetails prod = cart.getValue(ProductDetails.class);
+
+                    int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                    total[0] = total[0] + adapterTotal;
+                }
+
+                int finalTtl = deliveryCharge + total[0];
+                subTotal.setText("Ksh "+total[0]);
+                cartTotal.setText("Ksh "+ finalTtl);
+
+                if(finalTtl == 0){
+                    icon.setVisibility(View.VISIBLE);
+                    emptyTag.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,16 +142,22 @@ public class MyCart extends AppCompatActivity {
     }
 
     private void fetchCart() {
+
+
+        /**
+         * Loop through my cart items and add to list Array before passing to adapter
+         */
         myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 list = new ArrayList<>();
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
-                    ProductDetails product = cart.getValue(ProductDetails.class);
+                    final ProductDetails product = cart.getValue(ProductDetails.class);
                     product.setKey(cart.getKey());
                     list.add(product);
-                    //Toast.makeText(MyCart.this, "key: " +product.getKey(), Toast.LENGTH_SHORT).show();
+
+
                 }
 
                 if(!list.isEmpty()){
