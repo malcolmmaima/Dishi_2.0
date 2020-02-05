@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ public class MyCart extends AppCompatActivity {
     TextView emptyTag, cartTotal, subTotal, deliveryChrg;
     AppCompatImageView icon;
     LiveLocation liveLocation;
+    Button checkoutBtn;
 
     DatabaseReference myCartRef, myLocationRef;
     FirebaseDatabase db;
@@ -62,6 +64,7 @@ public class MyCart extends AppCompatActivity {
         cartTotal = findViewById(R.id.cartTotal);
         subTotal = findViewById(R.id.subTotal);
         deliveryChrg = findViewById(R.id.deliveryCharge);
+        checkoutBtn = findViewById(R.id.checkOut);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -123,6 +126,11 @@ public class MyCart extends AppCompatActivity {
                 if(finalTtl == 0){
                     icon.setVisibility(View.VISIBLE);
                     emptyTag.setVisibility(View.VISIBLE);
+                    checkoutBtn.setVisibility(View.GONE);
+                }
+
+                else {
+                    checkoutBtn.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -132,11 +140,25 @@ public class MyCart extends AppCompatActivity {
             }
         });
 
+        /**
+         * Exit activity
+         */
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        /**
+         * Checkout
+         */
+
+        checkoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(v.getRootView(), "Checkout", Snackbar.LENGTH_LONG).show();
             }
         });
     }
