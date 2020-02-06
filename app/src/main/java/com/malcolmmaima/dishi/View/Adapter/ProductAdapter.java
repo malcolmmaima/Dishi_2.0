@@ -151,6 +151,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                 cartProduct.setImageURL(productDetails.getImageURL());
                 cartProduct.setOwner(productDetails.getOwner());
                 cartProduct.setQuantity(1);
+                cartProduct.setDistance(productDetails.getDistance());
                 cartProduct.setUploadDate(cartDate);
 
                 myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {

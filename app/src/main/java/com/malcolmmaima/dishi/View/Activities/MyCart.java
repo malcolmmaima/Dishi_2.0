@@ -273,6 +273,8 @@ public class MyCart extends AppCompatActivity {
                      * Loop through list and find out if cart contains items from multiple providers
                      */
 
+                    final DatabaseReference restRef[] = new DatabaseReference[list.size()];
+
                     restaurantName = list.get(0).getOwner();
                     for(int i=0; i<list.size(); i++){
 
@@ -286,6 +288,7 @@ public class MyCart extends AppCompatActivity {
                             multipleRestaurants = false;
                         }
                     }
+
                 }
 
                 else {
