@@ -3,6 +3,10 @@ package com.malcolmmaima.dishi.Model;
 public class UserModel {
     String account_type;
     String bio;
+    int delivery_charge;
+
+
+
     String email;
     String firstname;
     String gender;
@@ -45,6 +49,14 @@ public class UserModel {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public int getDelivery_charge() {
+        return delivery_charge;
+    }
+
+    public void setDelivery_charge(int delivery_charge) {
+        this.delivery_charge = delivery_charge;
     }
 
     public String getEmail() {
