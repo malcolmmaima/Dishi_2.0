@@ -4,9 +4,6 @@ public class UserModel {
     String account_type;
     String bio;
     int delivery_charge;
-
-
-
     String email;
     String firstname;
     String gender;
