@@ -119,8 +119,10 @@ public class SettingsActivity extends AppCompatActivity {
         accountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                snackbar.show();
+                Intent slideactivity = new Intent(SettingsActivity.this, AccountSettings.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
             }
         });
 

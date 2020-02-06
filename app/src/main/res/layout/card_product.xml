@@ -147,7 +147,7 @@
                 android:layout_marginTop="10dp"
                 android:scaleType="centerCrop"
                 android:backgroundTint="@color/colorPrimaryDark"
-                android:background="@drawable/ic_shopping_cart_white_48dp"
+                android:background="@drawable/ic_add_shopping_cart_white_48dp"
                 android:layout_marginRight="10dp"
 
                 />

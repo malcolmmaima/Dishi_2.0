@@ -5,6 +5,6 @@
     tools:context=".Views.Activities.ViewProduct">
 
     <item
-        android:id="@+id/myCart" android:icon="@drawable/ic_shopping_cart_black_36dp" app:showAsAction="always"   android:title="My Cart"/>
+        android:id="@+id/myCart" android:icon="@drawable/cart" app:showAsAction="always"   android:title="My Cart"/>
 
 </menu>
