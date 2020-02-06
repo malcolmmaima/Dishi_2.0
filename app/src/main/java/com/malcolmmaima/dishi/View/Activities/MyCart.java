@@ -42,12 +42,12 @@ public class MyCart extends AppCompatActivity {
 
     List<ProductDetails> list;
     RecyclerView recyclerview;
-    String myPhone;
+    String myPhone, restaurantName;
     TextView emptyTag, cartTotal, subTotal, deliveryChrg;
     AppCompatImageView icon;
     LiveLocation liveLocation;
     Button checkoutBtn;
-
+    Boolean multipleRestaurants;
     DatabaseReference myCartRef, myLocationRef;
     FirebaseDatabase db;
     FirebaseUser user;
@@ -70,6 +70,15 @@ public class MyCart extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle("");
 
+        /**
+         * initialize variables that we'll use to track if multiple restaurants or nah
+         */
+        restaurantName = "";
+        multipleRestaurants = false;
+
+        /**
+         * delivery charge
+         */
         deliveryCharge = 0;
         deliveryChrg.setText("Ksh "+deliveryCharge);
 
@@ -157,8 +166,68 @@ public class MyCart extends AppCompatActivity {
 
         checkoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Snackbar.make(v.getRootView(), "Checkout", Snackbar.LENGTH_LONG).show();
+            public void onClick(final View v) {
+
+                /**
+                 * We need to fetch a fresh list on every checkout so as to ascertain if it contains multiple providers or not
+                 */
+                myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        list = new ArrayList<>();
+
+                        for(DataSnapshot cart : dataSnapshot.getChildren()){
+                            final ProductDetails product = cart.getValue(ProductDetails.class);
+                            product.setKey(cart.getKey());
+                            list.add(product);
+                        }
+
+                        if(!list.isEmpty()){
+                            checkoutBtn.setVisibility(View.VISIBLE);
+                            /**
+                             * Loop through list and find out if cart contains items from multiple providers
+                             */
+
+                            restaurantName = list.get(0).getOwner();
+                            for(int i=0; i<list.size(); i++){
+
+                                //Compare other providers in the list with the first index
+                                if(!restaurantName.equals(list.get(i).getOwner())){
+                                    //Toast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                                    multipleRestaurants = true;
+
+                                    //Perform action only once (if loop is complete)
+                                    if(i == list.size()-1){
+                                        Snackbar.make(v.getRootView(), "Multiple restaurants", Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+
+                                else {
+                                    multipleRestaurants = false;
+
+                                    //Perform action only once (if loop is complete)
+                                    if(i == list.size()-1){
+                                        Snackbar.make(v.getRootView(), "No Multiple restaurants", Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                        else {
+
+                            checkoutBtn.setVisibility(View.GONE);
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
     }
@@ -178,12 +247,10 @@ public class MyCart extends AppCompatActivity {
                     final ProductDetails product = cart.getValue(ProductDetails.class);
                     product.setKey(cart.getKey());
                     list.add(product);
-
-
                 }
 
                 if(!list.isEmpty()){
-
+                    checkoutBtn.setVisibility(View.VISIBLE);
                     //mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     CartAdapter recycler = new CartAdapter(MyCart.this,list);
@@ -201,12 +268,30 @@ public class MyCart extends AppCompatActivity {
                     recyclerview.setAdapter(recycler);
                     emptyTag.setVisibility(View.INVISIBLE);
                     icon.setVisibility(View.INVISIBLE);
+
+                    /**
+                     * Loop through list and find out if cart contains items from multiple providers
+                     */
+
+                    restaurantName = list.get(0).getOwner();
+                    for(int i=0; i<list.size(); i++){
+
+                        //Compare other providers in the list with the first index
+                        if(!restaurantName.equals(list.get(i).getOwner())){
+                            //Toast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                            multipleRestaurants = true;
+                        }
+
+                        else {
+                            multipleRestaurants = false;
+                        }
+                    }
                 }
 
                 else {
 
                     //mSwipeRefreshLayout.setRefreshing(false);
-
+                    checkoutBtn.setVisibility(View.GONE);
                     CartAdapter recycler = new CartAdapter(MyCart.this,list);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyCart.this);
                     recyclerview.setLayoutManager(layoutmanager);
