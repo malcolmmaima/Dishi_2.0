@@ -216,6 +216,8 @@ public class MyCart extends AppCompatActivity {
 
                                                             }
                                                         }
+
+                                                        finish(); //remove this activity from stack
                                                     }
                                                 })//setPositiveButton
 
@@ -254,6 +256,8 @@ public class MyCart extends AppCompatActivity {
 
                                             }
                                         }
+
+                                        finish();//clear this activity from stack
                                     }
                                 }
                             }

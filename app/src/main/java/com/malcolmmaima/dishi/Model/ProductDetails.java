@@ -13,6 +13,10 @@ public class ProductDetails {
     String uploadDate;
     Double distance;
 
+    //below values are for our cart and orders, values from customer to restaurant
+    public String paymentMethod;
+    public String remarks;
+    public String address;
 
     public Double getDistance() {
         return distance;
@@ -92,5 +96,29 @@ public class ProductDetails {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
