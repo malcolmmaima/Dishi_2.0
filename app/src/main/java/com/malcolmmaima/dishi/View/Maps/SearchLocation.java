@@ -225,7 +225,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 }
 
                 else {
-                    Toast.makeText(SearchLocation.this, "Location not changed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.INVISIBLE);
                     finish();
                 }

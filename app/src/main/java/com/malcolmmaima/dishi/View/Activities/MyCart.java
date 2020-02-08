@@ -241,6 +241,7 @@ public class MyCart extends AppCompatActivity {
                                         //Slide to new activity
                                         Intent slideactivity = new Intent(MyCart.this, CheckOut.class)
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("subTotal",total[0]);
                                         Bundle bndlanimation =
                                                 null;
                                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
