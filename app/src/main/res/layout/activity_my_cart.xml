@@ -66,13 +66,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Subtotal"
+                            android:text="Total"
                             android:textColor="@color/colorPrimary"
                             android:fontFamily="sans-serif-medium"
                             android:textSize="18sp" />
 
                         <TextView
-                            android:id="@+id/subTotal"
+                            android:id="@+id/total"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Ksh 0"
@@ -97,16 +97,16 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Delivery charge"
+                            android:text="Items"
                             android:textColor="@color/colorPrimary"
                             android:fontFamily="sans-serif-medium"
                             android:textSize="18sp" />
 
                         <TextView
-                            android:id="@+id/deliveryCharge"
+                            android:id="@+id/totalItems"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ksh 0"
+                            android:text="0"
                             android:textSize="18sp"
                             android:layout_alignParentEnd="true"
                             android:textColor="@color/pureWhite"
@@ -120,36 +120,6 @@
                     android:layout_height="0.1dp"
                     android:layout_marginTop="10dp"
                     android:background="#ACACAC"/>
-                <LinearLayout
-                    android:layout_marginTop="15dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Total"
-                            android:textColor="@color/colorPrimary"
-                            android:fontFamily="sans-serif-medium"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/cartTotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ksh 0"
-                            android:textSize="18sp"
-                            android:layout_alignParentEnd="true"
-                            android:textColor="@color/pureWhite"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                </LinearLayout>
             </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>

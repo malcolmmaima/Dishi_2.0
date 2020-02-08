@@ -43,7 +43,7 @@ public class MyCart extends AppCompatActivity {
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone, restaurantName;
-    TextView emptyTag, cartTotal, subTotal, deliveryChrg;
+    TextView emptyTag, totalPrice, totalItems;
     AppCompatImageView icon;
     LiveLocation liveLocation;
     Button checkoutBtn;
@@ -51,19 +51,20 @@ public class MyCart extends AppCompatActivity {
     DatabaseReference myCartRef, myLocationRef;
     FirebaseDatabase db;
     FirebaseUser user;
-    int deliveryCharge;
+    int itemCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_cart);
 
+        itemCount = 0;
+
         icon = findViewById(R.id.menuIcon);
         recyclerview = findViewById(R.id.rview);
         emptyTag = findViewById(R.id.empty_tag);
-        cartTotal = findViewById(R.id.cartTotal);
-        subTotal = findViewById(R.id.subTotal);
-        deliveryChrg = findViewById(R.id.deliveryCharge);
+        totalPrice = findViewById(R.id.total);
+        totalItems = findViewById(R.id.totalItems);
         checkoutBtn = findViewById(R.id.checkOut);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -76,11 +77,6 @@ public class MyCart extends AppCompatActivity {
         restaurantName = "";
         multipleRestaurants = false;
 
-        /**
-         * delivery charge
-         */
-        deliveryCharge = 0;
-        deliveryChrg.setText("Ksh "+deliveryCharge);
 
         /**
          * Initialize firebase database
@@ -127,20 +123,7 @@ public class MyCart extends AppCompatActivity {
                     int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
                     total[0] = total[0] + adapterTotal;
                 }
-
-                int finalTtl = deliveryCharge + total[0];
-                subTotal.setText("Ksh "+total[0]);
-                cartTotal.setText("Ksh "+ finalTtl);
-
-                if(finalTtl == 0){
-                    icon.setVisibility(View.VISIBLE);
-                    emptyTag.setVisibility(View.VISIBLE);
-                    checkoutBtn.setVisibility(View.GONE);
-                }
-
-                else {
-                    checkoutBtn.setVisibility(View.VISIBLE);
-                }
+                totalPrice.setText("Ksh "+total[0]);
             }
 
             @Override
@@ -287,6 +270,9 @@ public class MyCart extends AppCompatActivity {
                         else {
                             multipleRestaurants = false;
                         }
+
+                        itemCount = itemCount + list.get(i).getQuantity();
+                        totalItems.setText(""+itemCount);
                     }
 
                 }
