@@ -68,6 +68,12 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //myLocationRef.removeEventListener((ValueEventListener) this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_food, container, false);

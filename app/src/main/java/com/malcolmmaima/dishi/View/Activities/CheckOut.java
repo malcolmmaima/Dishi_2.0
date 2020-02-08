@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -248,6 +249,17 @@ public class CheckOut extends AppCompatActivity {
                                         finish();
                                         Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                     }
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
+                                        "Something went wrong", Snackbar.LENGTH_LONG);
+                                snackbar.show();
+
+                                if(snackbar.getDuration() == 3000){
+                                    finish();
                                 }
                             }
                         });
