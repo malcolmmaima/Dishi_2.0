@@ -1,6 +1,8 @@
 package com.malcolmmaima.dishi.View.Maps;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -60,7 +62,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
     private static String TAG = SearchLocation.class.getSimpleName();
     String myPhone, placeName;
-    private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     Double latitude, longitude;
     ImageView mGps;
@@ -166,14 +167,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         longitude = 0.0;
         placeName = "";
 
-        //get auth state
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
-
         /**
          * Initialize Places
          */
@@ -222,16 +215,13 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
             public void onClick(View v) {
                 if(checkValidation()){
                     progressBar.setVisibility(View.VISIBLE);
-                    myRef.child("my_location").child("latitude").setValue(latitude);
-                    myRef.child("my_location").child("longitude").setValue(longitude);
-                    myRef.child("my_location").child("place").setValue(placeName).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(SearchLocation.this, "Saved", Toast.LENGTH_LONG).show();
-                            progressBar.setVisibility(View.INVISIBLE);
-                            finish();
-                        }
-                    });
+
+                    //Send values back to activity that initiated the request
+                    setResult(Activity.RESULT_OK,
+                            new Intent().putExtra("latitude", latitude)
+                                    .putExtra("longitude", longitude)
+                                    .putExtra("place", placeName));
+                    finish();
                 }
 
                 else {

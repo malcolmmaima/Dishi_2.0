@@ -1,5 +1,10 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -181,7 +186,48 @@ public class MyCart extends AppCompatActivity {
 
                                     //Perform action only once (if loop is complete)
                                     if(i == list.size()-1){
-                                        Snackbar.make(v.getRootView(), "Multiple restaurants", Snackbar.LENGTH_LONG).show();
+
+                                        /**
+                                         * Prompt user they are about to order from multiple providers, this means an increase in delivery charges
+                                         */
+
+                                        AlertDialog multiple = new AlertDialog.Builder(MyCart.this)
+                                                .setMessage("You are about to order from more than one restaurant")
+                                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                                .setCancelable(false)
+                                                //set three option buttons
+                                                .setPositiveButton("PROCEED", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                                        //Snackbar.make(v.getRootView(), "Checkout module", Snackbar.LENGTH_LONG).show();
+
+                                                        //Slide to new activity
+                                                        Intent slideactivity = new Intent(MyCart.this, CheckOut.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                        slideactivity.putExtra("subTotal",total[0]);
+                                                        Bundle bndlanimation =
+                                                                null;
+                                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                            bndlanimation = ActivityOptions.makeCustomAnimation(MyCart.this, R.anim.animation, R.anim.animation2).toBundle();
+                                                        }
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                            try {
+                                                                startActivity(slideactivity, bndlanimation);
+                                                            } catch (Exception e){
+
+                                                            }
+                                                        }
+                                                    }
+                                                })//setPositiveButton
+
+                                                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                })
+
+                                                .create();
+                                        multiple.show();
                                     }
                                 }
 
@@ -190,7 +236,23 @@ public class MyCart extends AppCompatActivity {
 
                                     //Perform action only once (if loop is complete)
                                     if(i == list.size()-1){
-                                        Snackbar.make(v.getRootView(), "No Multiple restaurants", Snackbar.LENGTH_LONG).show();
+                                        //Snackbar.make(v.getRootView(), "Checkout module", Snackbar.LENGTH_LONG).show();
+
+                                        //Slide to new activity
+                                        Intent slideactivity = new Intent(MyCart.this, CheckOut.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        Bundle bndlanimation =
+                                                null;
+                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            bndlanimation = ActivityOptions.makeCustomAnimation(MyCart.this, R.anim.animation, R.anim.animation2).toBundle();
+                                        }
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            try {
+                                                startActivity(slideactivity, bndlanimation);
+                                            } catch (Exception e){
+
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -198,10 +260,10 @@ public class MyCart extends AppCompatActivity {
 
                         }
 
+                        //list is empty
                         else {
 
                             checkoutBtn.setVisibility(View.GONE);
-
                         }
 
                     }

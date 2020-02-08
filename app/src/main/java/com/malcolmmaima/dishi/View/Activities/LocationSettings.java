@@ -4,13 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +34,7 @@ public class LocationSettings extends AppCompatActivity {
     private FirebaseAuth mAuth;
     Switch defaultLocSwitch, liveLocSwitch;
     Button setLocation;
+    Double lat, lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,14 +146,48 @@ public class LocationSettings extends AppCompatActivity {
         setLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(LocationSettings.this, SearchLocation.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                startActivity(slideactivity);
+                requestLocation();
             }
         });
     }
 
+    /**
+     * Listen to the SearchLocation activity for LatLng values sent back
+     */
+    private static final int REQUEST_GET_MAP_LOCATION = 0;
+    void requestLocation() {
+        startActivityForResult(new Intent(LocationSettings.this, SearchLocation.class), REQUEST_GET_MAP_LOCATION);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_GET_MAP_LOCATION && resultCode == Activity.RESULT_OK) {
+            Double latitude = data.getDoubleExtra("latitude", 0.0);
+            Double longitude = data.getDoubleExtra("longitude", 0.0);
+
+            lat = latitude;
+            lng = longitude;
+            String placeName = data.getStringExtra("place");
+            // do something with B's return values
+
+            Snackbar.make(findViewById(R.id.parentlayout), "Saving...", Snackbar.LENGTH_LONG).show();
+            myRef.child("my_location").child("latitude").setValue(latitude);
+            myRef.child("my_location").child("longitude").setValue(longitude);
+            myRef.child("my_location").child("place").setValue(placeName).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Snackbar.make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    /**
+     * Check Location Status (if set)
+     */
     private void checkStaticLocation() {
         //Check if user has set default location
         myRef.child("my_location").addListenerForSingleValueEvent(new ValueEventListener() {
