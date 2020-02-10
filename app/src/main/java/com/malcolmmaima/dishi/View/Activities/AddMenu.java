@@ -524,6 +524,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetails.setPrice(price_);
                 productDetails.setDescription(description_);
                 productDetails.setImageURL(imageLink);
+                productDetails.setOwner(myPhone);
                 productDetails.setStorageLocation(imageLocation);
                 productDetails.setUploadDate(getDate());
 
@@ -575,6 +576,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetails.setPrice(price);
                                         productDetails.setDescription(description);
                                         productDetails.setImageURL(o.toString());
+                                        productDetails.setOwner(myPhone);
                                         productDetails.setStorageLocation(storageReference2nd.getPath());
                                         productDetails.setUploadDate(getDate());
 
