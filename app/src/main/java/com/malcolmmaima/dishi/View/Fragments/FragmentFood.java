@@ -223,181 +223,183 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                             /**
                              * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
                              */
-                            if(user.getLiveStatus() == true){
 
-                                /**
-                                 * Now check "locationType" so as to decide which location node to fetch, live or static
-                                 */
-                                if(user.getLocationType().equals("default")){
-                                    //if location type is default then fetch static location
-                                    DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/"+restaurants.getKey()+"/my_location");
+                            try {
+                                if (user.getLiveStatus() == true) {
 
-                                    defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
+                                    /**
+                                     * Now check "locationType" so as to decide which location node to fetch, live or static
+                                     */
+                                    if (user.getLocationType().equals("default")) {
+                                        //if location type is default then fetch static location
+                                        DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey() + "/my_location");
+
+                                        defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
 //                                            Toast.makeText(getContext(), restaurants.getKey() + ": "
 //                                                    + staticLocation.getLatitude() + ","
 //                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                            /**
-                                             * Now lets compute distance of each restaurant with customer location
-                                             */
-                                            CalculateDistance calculateDistance = new CalculateDistance();
-                                            Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                    liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                /**
+                                                 * Now lets compute distance of each restaurant with customer location
+                                                 */
+                                                CalculateDistance calculateDistance = new CalculateDistance();
+                                                Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                        liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
 
-                                            //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                            /**
-                                             * if distance meets parameters set fetch menu
-                                             */
+                                                /**
+                                                 * if distance meets parameters set fetch menu
+                                                 */
 
-                                            if(dist < location_filter){
-                                                //Fetch menu items of restaurants that have passed distance parameter
+                                                if (dist < location_filter) {
+                                                    //Fetch menu items of restaurants that have passed distance parameter
 
-                                                for(DataSnapshot menu : restaurants.getChildren()){
-                                                    //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                    ProductDetails product = menu.getValue(ProductDetails.class);
-                                                    product.setKey(menu.getKey());
-                                                    product.setDistance(dist);
-                                                    list.add(product);
+                                                    for (DataSnapshot menu : restaurants.getChildren()) {
+                                                        //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                        ProductDetails product = menu.getValue(ProductDetails.class);
+                                                        product.setKey(menu.getKey());
+                                                        product.setDistance(dist);
+                                                        list.add(product);
+                                                    }
                                                 }
+
+                                                if (!list.isEmpty()) {
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                    Collections.reverse(list);
+                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+
+                                                    recycler.notifyDataSetChanged();
+
+                                                    recyclerview.getItemAnimator().setAddDuration(200);
+                                                    recyclerview.getItemAnimator().setRemoveDuration(200);
+                                                    recyclerview.getItemAnimator().setMoveDuration(200);
+                                                    recyclerview.getItemAnimator().setChangeDuration(200);
+
+                                                    recyclerview.setAdapter(recycler);
+                                                    emptyTag.setVisibility(View.INVISIBLE);
+                                                    icon.setVisibility(View.INVISIBLE);
+                                                } else {
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+
+                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                    recyclerview.setAdapter(recycler);
+                                                    emptyTag.setVisibility(View.VISIBLE);
+                                                    icon.setVisibility(View.VISIBLE);
+
+                                                }
+
                                             }
 
-                                            if(!list.isEmpty()){
-
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                                Collections.reverse(list);
-                                                ProductAdapter recycler = new ProductAdapter(getContext(),list);
-                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                recyclerview.setLayoutManager(layoutmanager);
-                                                recyclerview.setItemAnimator( new DefaultItemAnimator());
-
-                                                recycler.notifyDataSetChanged();
-
-                                                recyclerview.getItemAnimator().setAddDuration(200);
-                                                recyclerview.getItemAnimator().setRemoveDuration(200);
-                                                recyclerview.getItemAnimator().setMoveDuration(200);
-                                                recyclerview.getItemAnimator().setChangeDuration(200);
-
-                                                recyclerview.setAdapter(recycler);
-                                                emptyTag.setVisibility(View.INVISIBLE);
-                                                icon.setVisibility(View.INVISIBLE);
-                                            }
-
-                                            else {
-
-                                                mSwipeRefreshLayout.setRefreshing(false);
-
-                                                ProductAdapter recycler = new ProductAdapter(getContext(),list);
-                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                recyclerview.setLayoutManager(layoutmanager);
-                                                recyclerview.setItemAnimator( new DefaultItemAnimator());
-                                                recyclerview.setAdapter(recycler);
-                                                emptyTag.setVisibility(View.VISIBLE);
-                                                icon.setVisibility(View.VISIBLE);
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                             }
+                                        });
+                                    }
+                                    /**
+                                     * If location type is live then track restaurant live location instead of static location
+                                     */
+                                    else if (user.getLocationType().equals("live")) {
+                                        DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurants.getKey());
 
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-                                }
-                                /**
-                                 * If location type is live then track restaurant live location instead of static location
-                                 */
-                                else if(user.getLocationType().equals("live")){
-                                    DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/"+restaurants.getKey());
-
-                                    restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
+                                        restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
 //                                            Toast.makeText(getContext(), restaurants.getKey() + ": "
 //                                                    + restLiveLoc.getLatitude() + ","
 //                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                            /**
-                                             * Now lets compute distance of each restaurant with customer location
-                                             */
-                                            CalculateDistance calculateDistance = new CalculateDistance();
-                                            Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                    liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+                                                /**
+                                                 * Now lets compute distance of each restaurant with customer location
+                                                 */
+                                                CalculateDistance calculateDistance = new CalculateDistance();
+                                                Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                        liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                            //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                            /**
-                                             * if distance meets parameters set then fetch menu
-                                             */
+                                                /**
+                                                 * if distance meets parameters set then fetch menu
+                                                 */
 
-                                            if(dist < location_filter){
-                                                //Fetch menu items of restaurants that have passed distance parameter
+                                                if (dist < location_filter) {
+                                                    //Fetch menu items of restaurants that have passed distance parameter
 
-                                                for(DataSnapshot menu : restaurants.getChildren()){
-                                                    //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                    ProductDetails product = menu.getValue(ProductDetails.class);
-                                                    product.setKey(menu.getKey());
-                                                    product.setDistance(dist);
-                                                    list.add(product);
+                                                    for (DataSnapshot menu : restaurants.getChildren()) {
+                                                        //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                        ProductDetails product = menu.getValue(ProductDetails.class);
+                                                        product.setKey(menu.getKey());
+                                                        product.setDistance(dist);
+                                                        list.add(product);
+                                                    }
                                                 }
+
+                                                if (!list.isEmpty()) {
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                    Collections.reverse(list);
+                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+
+                                                    recycler.notifyDataSetChanged();
+
+                                                    recyclerview.getItemAnimator().setAddDuration(200);
+                                                    recyclerview.getItemAnimator().setRemoveDuration(200);
+                                                    recyclerview.getItemAnimator().setMoveDuration(200);
+                                                    recyclerview.getItemAnimator().setChangeDuration(200);
+
+                                                    recyclerview.setAdapter(recycler);
+                                                    emptyTag.setVisibility(View.INVISIBLE);
+                                                    icon.setVisibility(View.INVISIBLE);
+                                                } else {
+
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+
+                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                    recyclerview.setAdapter(recycler);
+                                                    emptyTag.setVisibility(View.VISIBLE);
+                                                    icon.setVisibility(View.VISIBLE);
+
+                                                }
+
                                             }
 
-                                            if(!list.isEmpty()){
-
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                                Collections.reverse(list);
-                                                ProductAdapter recycler = new ProductAdapter(getContext(),list);
-                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                recyclerview.setLayoutManager(layoutmanager);
-                                                recyclerview.setItemAnimator( new DefaultItemAnimator());
-
-                                                recycler.notifyDataSetChanged();
-
-                                                recyclerview.getItemAnimator().setAddDuration(200);
-                                                recyclerview.getItemAnimator().setRemoveDuration(200);
-                                                recyclerview.getItemAnimator().setMoveDuration(200);
-                                                recyclerview.getItemAnimator().setChangeDuration(200);
-
-                                                recyclerview.setAdapter(recycler);
-                                                emptyTag.setVisibility(View.INVISIBLE);
-                                                icon.setVisibility(View.INVISIBLE);
-                                            }
-
-                                            else {
-
-                                                mSwipeRefreshLayout.setRefreshing(false);
-
-                                                ProductAdapter recycler = new ProductAdapter(getContext(),list);
-                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                recyclerview.setLayoutManager(layoutmanager);
-                                                recyclerview.setItemAnimator( new DefaultItemAnimator());
-                                                recyclerview.setAdapter(recycler);
-                                                emptyTag.setVisibility(View.VISIBLE);
-                                                icon.setVisibility(View.VISIBLE);
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                             }
+                                        });
+                                    }
 
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
+                                    /**
+                                     * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
+                                     * and "live" which tracks the restaurant's live location under "location/phone"
+                                     */
+                                    else {
+                                        Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                    }
                                 }
 
-                                /**
-                                 * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
-                                 * and "live" which tracks the restaurant's live location under "location/phone"
-                                 */
-                                else {
-                                    Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
-                                }
+                            } catch (Exception e){
+
                             }
                         }
 

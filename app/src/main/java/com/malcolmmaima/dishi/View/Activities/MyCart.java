@@ -329,6 +329,7 @@ public class MyCart extends AppCompatActivity {
                     for(int i=0; i<list.size(); i++){
 
                         //Compare other providers in the list with the first index
+
                         if(!restaurantName.equals(list.get(i).getOwner())){
                             //Toast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
                             multipleRestaurants = true;

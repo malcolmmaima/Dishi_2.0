@@ -1,9 +1,11 @@
 package com.malcolmmaima.dishi.Model;
 
 public class UserModel {
+    String phone;
     String account_type;
     String bio;
     int delivery_charge;
+    Double distance; //useful in our FragmentRestaurants fragment
     String email;
     String firstname;
     String gender;
@@ -15,6 +17,22 @@ public class UserModel {
     String verified;
     Integer followers;
     Integer following;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
 
     public Integer getFollowers() {
         return followers;
