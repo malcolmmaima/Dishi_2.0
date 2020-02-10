@@ -130,9 +130,10 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Write failed
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
                     }
                 });
+
             }
 
             @Override

@@ -138,6 +138,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                 Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                             }
                         });
+
             }
 
             @Override

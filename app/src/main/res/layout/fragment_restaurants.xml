@@ -20,7 +20,7 @@
             android:layout_height="200dp"
             android:layout_gravity="center"
             android:visibility="invisible"
-            android:src="@drawable/menu"/>
+            android:src="@drawable/shop"/>
 
         <TextView
             android:id="@+id/empty_tag"
