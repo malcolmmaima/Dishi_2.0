@@ -8,8 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ViewRestaurant;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -218,20 +219,25 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(context, "Slide to intent", Toast.LENGTH_SHORT).show();
+                if(restaurantDetails.getPhone() != null){
+                    //Slide to new activity
+                    Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-//                if(restaurantDetails.getPhone() != null){
-//                    //Slide to new activity
-//                    Intent slideactivity = new Intent(context, ViewRestaurant.class)
-//                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//                    slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
-//                    Bundle bndlanimation =
-//                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-//                    context.startActivity(slideactivity, bndlanimation);
-//                } else {
-//                    Toast.makeText(context, "Error fetching details, try again!", Toast.LENGTH_SHORT).show();
-//                }
+                    slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                    slideactivity.putExtra("distance", restaurantDetails.getDistance());
+                    slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
+                    Bundle bndlanimation =
+                            null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        context.startActivity(slideactivity, bndlanimation);
+                    }
+                } else {
+                    Toast.makeText(context, "Error fetching details, try again!", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
