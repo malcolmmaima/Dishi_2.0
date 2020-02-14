@@ -38,7 +38,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dip"
+                android:layout_height="wrap_content"
                 android:layout_weight="3.2"
                 android:orientation="vertical">
 
@@ -50,9 +50,10 @@
                     <ImageView
                         android:id="@+id/coverImageView"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="300dp"
+                        android:src="@drawable/shop"
                         android:layout_gravity="center"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
                         />
 
                     <LinearLayout
@@ -79,7 +80,7 @@
             <LinearLayout
                 android:id="@+id/interactive"
                 android:layout_width="match_parent"
-                android:layout_height="0dip"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.8"
                 android:orientation="horizontal">
 

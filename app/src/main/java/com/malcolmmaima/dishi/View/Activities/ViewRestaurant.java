@@ -124,11 +124,21 @@ public class ViewRestaurant extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
+        /**
+         * Receive values from Restaurant adapter
+         */
         final String restaurantPhone = getIntent().getStringExtra("restaurant_phone");
         Double distanceAway = getIntent().getDoubleExtra("distance", 0.0);
         String profilePic = getIntent().getStringExtra("profilePic");
 
         distAway.setText(distanceAway + "");
+
+        if(distanceAway < 1.0){
+            distAway.setText(distanceAway*1000 + "m away");
+        } else {
+            distAway.setText(distanceAway + "km away");
+
+        }
         /**
          * Load image url onto imageview
          */
