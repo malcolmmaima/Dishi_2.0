@@ -47,12 +47,14 @@ public class SplashActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        try {
-            //Enable disk persistence
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        } catch (Exception e){
 
-        }
+//        Temporarily disable disk persistence. uncomment to enable
+//        try {
+//            //Enable disk persistence
+//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        } catch (Exception e){
+//
+//        }
 
         mAuth = FirebaseAuth.getInstance();
 
