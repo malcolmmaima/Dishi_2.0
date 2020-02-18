@@ -20,6 +20,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -30,10 +32,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
+import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
+import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+
+    List<UserModel> orders;
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -42,10 +53,10 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     TextView liveTitle;
     CardView live;
 
-    DatabaseReference dbRef;
+    DatabaseReference dbRef, incomingOrders;
     FirebaseDatabase db;
     FirebaseUser user;
-    ValueEventListener liveListener;
+    ValueEventListener liveListener, inComingOrdersListener;
 
     TextView emptyTag;
     AppCompatImageView icon;
@@ -73,6 +84,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
         db = FirebaseDatabase.getInstance();
 
         dbRef = db.getReference("users/"+myPhone);
+        incomingOrders = db.getReference("orders/"+myPhone);
 
         //Our Live Status Switch
         liveTitle = v.findViewById(R.id.liveTitle);
@@ -103,6 +115,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 mSwipeRefreshLayout.setRefreshing(true);
                 // Fetching data from server
+                fetchOrders();
 
             }
         });
@@ -222,14 +235,120 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
         return  v;
     }
 
+    private void fetchOrders() {
+
+        /**
+         * Loop through users who have sent orders
+         */
+        inComingOrdersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                orders = new ArrayList<>();
+
+                for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
+
+                    /**
+                     * Now lets get the user details
+                     */
+                    DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+userOrders.getKey());
+
+                    /**
+                     * get items count
+                     */
+
+                    final DatabaseReference itemCountRef =
+                            FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+userOrders.getKey()+"/items");
+
+                    /**
+                     * Assign user details to model and set item count value as well
+                     */
+                    userDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull final DataSnapshot userDetails) {
+
+                            /**
+                             * get item count value then user details to model
+                             */
+                            itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    UserModel customer = userDetails.getValue(UserModel.class);
+                                    customer.setPhone(userOrders.getKey());
+                                    customer.itemCount = dataSnapshot.getChildrenCount();
+                                    orders.add(customer);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+
+
+                            if (!orders.isEmpty()) {
+
+                                mSwipeRefreshLayout.setRefreshing(false);
+                                Collections.reverse(orders);
+                                OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
+                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                recyclerview.setLayoutManager(layoutmanager);
+                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+
+                                recycler.notifyDataSetChanged();
+
+                                recyclerview.getItemAnimator().setAddDuration(200);
+                                recyclerview.getItemAnimator().setRemoveDuration(200);
+                                recyclerview.getItemAnimator().setMoveDuration(200);
+                                recyclerview.getItemAnimator().setChangeDuration(200);
+
+                                recyclerview.setAdapter(recycler);
+                                emptyTag.setVisibility(View.INVISIBLE);
+                                icon.setVisibility(View.INVISIBLE);
+                            } else {
+
+                                mSwipeRefreshLayout.setRefreshing(false);
+
+                                OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
+                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                recyclerview.setLayoutManager(layoutmanager);
+                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                recyclerview.setAdapter(recycler);
+                                emptyTag.setVisibility(View.VISIBLE);
+                                icon.setVisibility(View.VISIBLE);
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        incomingOrders.addValueEventListener(inComingOrdersListener);
+    }
+
     @Override
     public void onRefresh() {
-
+        fetchOrders();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         dbRef.removeEventListener(liveListener);
+        incomingOrders.removeEventListener(inComingOrdersListener);
     }
 }

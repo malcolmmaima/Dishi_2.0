@@ -187,6 +187,10 @@ public class CheckOut extends AppCompatActivity {
 
     private void sendOrder() {
 
+        progressDialog.setMessage("Sending...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         //Get current date
         GetCurrentDate currentDate = new GetCurrentDate();
         final String orderDate = currentDate.getDate();
@@ -246,6 +250,7 @@ public class CheckOut extends AppCompatActivity {
                                     myOrders.child(list.get(i).getOwner()).setValue("active");
 
                                     if(i == list.size()-1){
+                                        progressDialog.dismiss();
                                         finish();
                                         Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                     }
@@ -254,6 +259,8 @@ public class CheckOut extends AppCompatActivity {
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+
+                                progressDialog.dismiss();
                                 Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
                                         "Something went wrong", Snackbar.LENGTH_LONG);
                                 snackbar.show();

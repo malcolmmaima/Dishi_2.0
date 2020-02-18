@@ -17,6 +17,7 @@ public class UserModel {
     String verified;
     Integer followers;
     Integer following;
+    public long itemCount; //Not part of our user model, just a temporary data holder to be passed from OrdersFragment to orders adapter
 
     public String getPhone() {
         return phone;
