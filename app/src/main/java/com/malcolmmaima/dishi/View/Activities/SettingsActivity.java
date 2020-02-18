@@ -38,6 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
     CircleImageView profilePic;
     CardView personalDetails;
     RelativeLayout accountSettings, notificationSettings, help, about;
+    ValueEventListener myRefListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +66,10 @@ public class SettingsActivity extends AppCompatActivity {
         //Set fb database reference
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
-        //User is logged in
-        if(mAuth.getInstance().getCurrentUser() != null) {
-
             /**
              * Get logged in user details
              */
-            myRef.addValueEventListener(new ValueEventListener() {
+            myRefListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
@@ -95,8 +93,9 @@ public class SettingsActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            });
-        }
+            };
+
+        myRef.addValueEventListener(myRefListener);
 
         personalDetails.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,5 +163,11 @@ public class SettingsActivity extends AppCompatActivity {
         notificationSettings = findViewById(R.id.notifications);
         help = findViewById(R.id.help);
         about = findViewById(R.id.about);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myRef.removeEventListener(myRefListener);
     }
 }

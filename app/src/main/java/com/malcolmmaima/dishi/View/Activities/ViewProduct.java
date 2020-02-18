@@ -42,6 +42,7 @@ public class ViewProduct extends AppCompatActivity {
     int count;
     Menu myMenu;
     DatabaseReference myCart;
+    ValueEventListener cartListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,7 +226,7 @@ public class ViewProduct extends AppCompatActivity {
          */
         myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
         myCart = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
-        myCart.addValueEventListener(new ValueEventListener() {
+        cartListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
@@ -251,7 +252,8 @@ public class ViewProduct extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myCart.addValueEventListener(cartListener);
 
         return true;
     }
@@ -268,5 +270,12 @@ public class ViewProduct extends AppCompatActivity {
             return(true);
     }
         return(super.onOptionsItemSelected(item));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        myCart.removeEventListener(cartListener);
     }
 }

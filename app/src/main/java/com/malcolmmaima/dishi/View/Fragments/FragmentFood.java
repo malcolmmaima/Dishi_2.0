@@ -52,6 +52,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     DatabaseReference dbRef, menusRef, myLocationRef;
     FirebaseDatabase db;
     FirebaseUser user;
+    ValueEventListener locationListener;
 
     int location_filter;
 
@@ -166,7 +167,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
          */
 
         liveLocation = null;
-        myLocationRef.addValueEventListener(new ValueEventListener() {
+        locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 liveLocation = dataSnapshot.getValue(LiveLocation.class);
@@ -177,8 +178,8 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
-
+        };
+        myLocationRef.addValueEventListener(locationListener);
         /**
          * Showing Swipe Refresh animation on activity create
          * As animation won't start on onCreate, post runnable is used
@@ -423,5 +424,11 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
         fetchFood();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        myLocationRef.removeEventListener(locationListener);
     }
 }

@@ -42,6 +42,7 @@ public class ViewRestaurant extends AppCompatActivity {
     ImageView coverImageView, favourite, callBtn, shareRest;
     TextView restaurantName, distAway, likes;
     String RestaurantName, phone;
+    ValueEventListener providerFavsListener;
 
     //This is our tablayout
     private TabLayout tabLayout;
@@ -164,7 +165,7 @@ public class ViewRestaurant extends AppCompatActivity {
         myFavourites = FirebaseDatabase.getInstance().getReference("my_favourites/"+myPhone);
         providerFavs = FirebaseDatabase.getInstance().getReference("restaurant_favourites/"+ restaurantPhone);
 
-        providerFavs.addValueEventListener(new ValueEventListener() {
+        providerFavsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -180,7 +181,8 @@ public class ViewRestaurant extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        providerFavs.addValueEventListener(providerFavsListener);
 
         //Initialize on load
         myFavourites.child(phone).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -356,6 +358,6 @@ public class ViewRestaurant extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        providerFavs.removeEventListener(providerFavsListener);
     }
 }

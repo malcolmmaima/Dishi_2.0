@@ -55,6 +55,7 @@ public class MyCart extends AppCompatActivity {
     Boolean multipleRestaurants;
     DatabaseReference myCartRef, myLocationRef;
     FirebaseDatabase db;
+    ValueEventListener locationListener, cartListener;
     FirebaseUser user;
     int itemCount;
 
@@ -98,7 +99,7 @@ public class MyCart extends AppCompatActivity {
         myLocationRef = db.getReference("location/"+myPhone);
 
         liveLocation = null;
-        myLocationRef.addValueEventListener(new ValueEventListener() {
+        locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 liveLocation = dataSnapshot.getValue(LiveLocation.class);
@@ -109,7 +110,8 @@ public class MyCart extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myLocationRef.addValueEventListener(locationListener);
 
         fetchCart();
 
@@ -118,7 +120,7 @@ public class MyCart extends AppCompatActivity {
          */
         final int[] total = {0};
 
-        myCartRef.addValueEventListener(new ValueEventListener() {
+        cartListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 total[0] = 0;
@@ -135,7 +137,8 @@ public class MyCart extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myCartRef.addValueEventListener(cartListener);
 
         /**
          * Exit activity
@@ -366,5 +369,12 @@ public class MyCart extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myLocationRef.removeEventListener(locationListener);
+        myCartRef.removeEventListener(cartListener);
     }
 }

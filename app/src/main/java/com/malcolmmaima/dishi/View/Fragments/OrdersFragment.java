@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -44,6 +45,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     DatabaseReference dbRef;
     FirebaseDatabase db;
     FirebaseUser user;
+    ValueEventListener liveListener;
 
     TextView emptyTag;
     AppCompatImageView icon;
@@ -106,7 +108,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
         });
 
         liveTitle.setText("loading...");
-        dbRef.child("liveStatus").addValueEventListener(new ValueEventListener() {
+        liveListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -145,7 +147,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 liveTitle.setText("error...");
             }
 
-        });
+        };
+        dbRef.child("liveStatus").addValueEventListener(liveListener);
 
         liveStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
@@ -227,6 +230,6 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        dbRef.removeEventListener(liveListener);
     }
 }
