@@ -1,7 +1,10 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -15,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -160,6 +164,48 @@ public class ViewRestaurant extends AppCompatActivity {
         myFavourites = FirebaseDatabase.getInstance().getReference("my_favourites/"+myPhone);
         providerFavs = FirebaseDatabase.getInstance().getReference("restaurant_favourites/"+ restaurantPhone);
 
+        providerFavs.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int likesTotal = (int) dataSnapshot.getChildrenCount();
+                    likes.setText(""+likesTotal);
+                } catch (Exception e){
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //Initialize on load
+        myFavourites.child(phone).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String phone = dataSnapshot.getValue(String.class);
+                try {
+                    if (phone.equals("fav")) {
+                        favourite.setTag(R.drawable.ic_liked);
+                        favourite.setImageResource(R.drawable.ic_liked);
+                    } else {
+                        favourite.setTag(R.drawable.ic_like);
+                        favourite.setImageResource(R.drawable.ic_like);
+                    }
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         coverImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -201,6 +247,87 @@ public class ViewRestaurant extends AppCompatActivity {
             }
         });
 
+        callBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog callAlert = new AlertDialog.Builder(v.getContext())
+                        //set message, title, and icon
+                        .setMessage("Call " + RestaurantName + "?")
+                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                        //set three option buttons
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String phone_ = phone;
+                                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone_, null));
+                                startActivity(intent);
+                            }
+                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //do nothing
+
+                            }
+                        })//setNegativeButton
+
+                        .create();
+                callAlert.show();
+            }
+        });
+
+        shareRest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ViewRestaurant.this, "Share!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        favourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int id = (int) favourite.getTag();
+                if( id == R.drawable.ic_like){
+                    //Add to my favourites
+                    myFavourites.child(phone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            favourite.setTag(R.drawable.ic_liked);
+                            favourite.setImageResource(R.drawable.ic_liked);
+
+                            //Add to global restaurant likes
+                            providerFavs.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //Add favourite to restaurant's node as well
+                                }
+                            });
+                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                } else{
+                    //Remove from my favourites
+                    myFavourites.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            favourite.setTag(R.drawable.ic_like);
+                            favourite.setImageResource(R.drawable.ic_like);
+
+                            providerFavs.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //remove favourite from restaurant's node as well
+                                }
+                            });
+                            //Toast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+            }
+        });
+
 
     }
 
@@ -217,11 +344,18 @@ public class ViewRestaurant extends AppCompatActivity {
         Bundle data = new Bundle();//bundle instance
         data.putString("phone", phone);//string to pass with a key value
         data.putDouble("distance", distance);
+        data.putString("fullName", RestaurantName);
         restaurantMenu.setArguments(data);//Set bundle data to fragment
         restaurantReviews.setArguments(data);
 
         adapter.addFragment(restaurantMenu,"Menu");
         adapter.addFragment(restaurantReviews,"Reviews");
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }

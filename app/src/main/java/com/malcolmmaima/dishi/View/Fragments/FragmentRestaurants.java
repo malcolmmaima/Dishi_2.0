@@ -47,6 +47,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     LiveLocation liveLocation;
     TextView emptyTag, distanceShow;
     DatabaseReference dbRef, menusRef, myLocationRef;
+    ValueEventListener locationListener;
     FirebaseDatabase db;
     FirebaseUser user;
     SeekBar seekBar;
@@ -165,18 +166,24 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
          */
 
         liveLocation = null;
-        myLocationRef.addValueEventListener(new ValueEventListener() {
+        locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocation = dataSnapshot.getValue(LiveLocation.class);
-                //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                try {
+                    liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                    //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                } catch (Exception e){
+
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        myLocationRef.addValueEventListener(locationListener);
 
         /**
          * Showing Swipe Refresh animation on activity create
@@ -425,5 +432,13 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onRefresh() {
         fetchRestaurants();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        //Patch... dealing with memory leaks (any listener that uses addValueEventListener must be removed onDestroy())
+        myLocationRef.removeEventListener(locationListener);
     }
 }

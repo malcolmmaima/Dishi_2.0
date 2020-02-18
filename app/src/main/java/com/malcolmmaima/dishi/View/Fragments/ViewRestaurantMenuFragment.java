@@ -1,15 +1,21 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -17,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,12 +45,12 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
 
     List<ProductDetails> list;
     RecyclerView recyclerview;
-    String myPhone;
+    String myPhone, fullName, phone;
     TextView emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    DatabaseReference dbRef, menusRef;
+    DatabaseReference dbRef, menusRef, myFavourites, restaurantRef;
     FirebaseDatabase db;
     FirebaseUser user;
 
@@ -70,9 +77,13 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         db = FirebaseDatabase.getInstance();
         dbRef = db.getReference(myPhone);
 
-        String phone = getArguments().getString("phone");
+        phone = getArguments().getString("phone");
         distance = getArguments().getDouble("distance");
+        fullName = getArguments().getString("fullName");
         menusRef = db.getReference("menus/"+ phone);
+
+        restaurantRef = db.getReference( "restaurant_favourites/"+ phone);
+        myFavourites = db.getReference("my_favourites/"+myPhone);
 
 
         icon = v.findViewById(R.id.menuIcon);

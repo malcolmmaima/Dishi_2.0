@@ -223,4 +223,10 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onRefresh() {
 
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
 }

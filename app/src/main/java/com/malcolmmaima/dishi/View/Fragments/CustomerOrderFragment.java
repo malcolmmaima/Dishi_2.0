@@ -38,7 +38,7 @@ public class CustomerOrderFragment extends Fragment {
     DatabaseReference dbRef, myCartRef;
     FirebaseDatabase db;
     FirebaseUser user;
-
+    ValueEventListener cartListener;
 
     public static CustomerOrderFragment newInstance() {
         CustomerOrderFragment fragment = new CustomerOrderFragment();
@@ -73,7 +73,7 @@ public class CustomerOrderFragment extends Fragment {
         tabs.setupWithViewPager(viewPager);
 
         myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
-        myCartRef.addValueEventListener(new ValueEventListener() {
+        cartListener = new ValueEventListener() {
             @SuppressLint("RestrictedApi")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -98,7 +98,9 @@ public class CustomerOrderFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        myCartRef.addValueEventListener(cartListener);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,4 +154,10 @@ public class CustomerOrderFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //Dealing with memory leaks.
+        myCartRef.removeEventListener(cartListener);
+    }
 }

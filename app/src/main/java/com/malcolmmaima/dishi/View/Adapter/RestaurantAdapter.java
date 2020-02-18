@@ -40,6 +40,9 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
     List<UserModel> listdata;
     long DURATION = 200;
     private boolean on_attach = true;
+    ValueEventListener restListener;
+    DatabaseReference myFavourites, restaurantRef;
+    FirebaseDatabase db;
 
     public RestaurantAdapter(Context context, List<UserModel> listdata) {
         this.listdata = listdata;
@@ -66,8 +69,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
         holder.restaurantName.setText(restaurantDetails.getFirstname() + " " + restaurantDetails.getLastname());
         holder.likeImageView.setTag(R.drawable.ic_like);
 
-        final DatabaseReference myFavourites, restaurantRef;
-        FirebaseDatabase db;
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -75,7 +76,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
         // Assign FirebaseStorage instance to storageReference.
 
         db = FirebaseDatabase.getInstance();
-        restaurantRef = db.getReference( "restaurant_favourites/"+ restaurantDetails.getPhone());
+        restaurantRef = db.getReference( "restaurant_favourites");
         myFavourites = db.getReference("my_favourites/"+myPhone);
 
         /**
@@ -123,7 +124,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
             }
         });
 
-        restaurantRef.addValueEventListener(new ValueEventListener() {
+        restListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -139,7 +140,8 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        restaurantRef.child(restaurantDetails.getPhone()).addValueEventListener(restListener);
 
         holder.likeImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,7 +157,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
                             holder.likeImageView.setImageResource(R.drawable.ic_liked);
 
                             //Add to global restaurant likes
-                            restaurantRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                            restaurantRef.child(restaurantDetails.getPhone()).child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     //Add favourite to restaurant's node as well
@@ -174,7 +176,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
                             holder.likeImageView.setTag(R.drawable.ic_like);
                             holder.likeImageView.setImageResource(R.drawable.ic_like);
 
-                            restaurantRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            restaurantRef.child(restaurantDetails.getPhone()).child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     //remove favourite from restaurant's node as well
@@ -294,4 +296,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
 
         }
     }
+
+    // Will deal with removing active listeners on some sort of destroy or detach action
+    //restaurantRef.removeEventListener(restListener);
 }
