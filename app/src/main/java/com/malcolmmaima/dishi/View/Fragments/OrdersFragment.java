@@ -285,13 +285,10 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                 }
                             });
 
-
-
-
                             if (!orders.isEmpty()) {
 
                                 mSwipeRefreshLayout.setRefreshing(false);
-                                Collections.reverse(orders);
+                                //Collections.reverse(orders);
                                 OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
                                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                 recyclerview.setLayoutManager(layoutmanager);

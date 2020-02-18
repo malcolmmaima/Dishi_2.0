@@ -31,8 +31,8 @@
 
         <com.alexzh.circleimageview.CircleImageView
             android:id="@+id/profilePic"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/default_profile"
             app:view_shadowRadius="2dp"
             app:view_shadowDx="2dp"
@@ -51,7 +51,8 @@
             android:text="Customer Name"
             android:fontFamily="sans-serif"
             android:id="@+id/customerName"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
@@ -66,7 +67,8 @@
             android:fontFamily="sans-serif"
             android:textColor="@color/colorAccent"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginEnd="15dp"
@@ -83,6 +85,7 @@
             android:scaleType="centerCrop"
             android:background="@drawable/location_pin"
             android:layout_marginRight="10dp"
+            android:visibility="gone"
             />
 
         <TextView
@@ -94,7 +97,8 @@
             android:layout_marginTop="5dp"
             android:text=" 0 m away"
             android:layout_marginLeft="-10dp"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginRight="5dp"
+            android:visibility="gone"/>
 
 
     </RelativeLayout>
