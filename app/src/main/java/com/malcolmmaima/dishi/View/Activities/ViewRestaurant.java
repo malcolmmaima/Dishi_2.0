@@ -13,6 +13,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewPagerAdapter;
 import com.malcolmmaima.dishi.View.Fragments.MenuFragment;
 import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
+import com.malcolmmaima.dishi.View.Fragments.ViewRestaurantMenuFragment;
 import com.squareup.picasso.Picasso;
 
 public class ViewRestaurant extends AppCompatActivity {
@@ -46,7 +48,7 @@ public class ViewRestaurant extends AppCompatActivity {
     ViewPagerAdapter adapter;
 
     //Fragments
-    MenuFragment restaurantMenu;
+    ViewRestaurantMenuFragment restaurantMenu;
     ReviewsFragment restaurantReviews;
 
     @Override
@@ -128,7 +130,8 @@ public class ViewRestaurant extends AppCompatActivity {
          * Receive values from Restaurant adapter
          */
         final String restaurantPhone = getIntent().getStringExtra("restaurant_phone");
-        Double distanceAway = getIntent().getDoubleExtra("distance", 0.0);
+        final Double distanceAway = getIntent().getDoubleExtra("distance", 0.0);
+
         String profilePic = getIntent().getStringExtra("profilePic");
 
         distAway.setText(distanceAway + "");
@@ -139,6 +142,7 @@ public class ViewRestaurant extends AppCompatActivity {
             distAway.setText(distanceAway + "km away");
 
         }
+
         /**
          * Load image url onto imageview
          */
@@ -202,8 +206,9 @@ public class ViewRestaurant extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager)
     {
+        Double distance =  getIntent().getDoubleExtra("distance", 0.0);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        restaurantMenu = new MenuFragment();
+        restaurantMenu = new ViewRestaurantMenuFragment();
         restaurantReviews = new ReviewsFragment();
 
         phone = getIntent().getStringExtra("restaurant_phone");
@@ -211,6 +216,7 @@ public class ViewRestaurant extends AppCompatActivity {
         //Pass the phone number to the adapters
         Bundle data = new Bundle();//bundle instance
         data.putString("phone", phone);//string to pass with a key value
+        data.putDouble("distance", distance);
         restaurantMenu.setArguments(data);//Set bundle data to fragment
         restaurantReviews.setArguments(data);
 
