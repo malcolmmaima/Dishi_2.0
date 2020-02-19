@@ -105,7 +105,7 @@ public class CheckOut extends AppCompatActivity {
         VAT = Double.valueOf(df.format(VAT));
         VATamount.setText("Ksh " + VAT);
 
-        totalBillAmount = subTotalAmount + deliveryAmount + VAT;
+        totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
         totalBill.setText("Ksh " + totalBillAmount);
 
         setTitle("Checkout");

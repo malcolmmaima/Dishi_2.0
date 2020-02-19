@@ -117,9 +117,6 @@ public class AddMenu extends AppCompatActivity {
         phone = getIntent().getStringExtra("phone"); //From adapters
         key = getIntent().getStringExtra("key"); //From adapters, to allow for editing
 
-
-        final DatabaseReference myRef;
-        FirebaseDatabase db;
         FirebaseUser user;
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
