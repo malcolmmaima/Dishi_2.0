@@ -67,15 +67,8 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         db = FirebaseDatabase.getInstance();
         dbRef = db.getReference(myPhone);
+        menusRef = db.getReference("menus/"+ myPhone);
 
-        try {
-            String phone = getArguments().getString("phone");
-            Toast.makeText(getContext(), "phone not null", Toast.LENGTH_SHORT).show();
-            menusRef = db.getReference("menus/"+ phone);
-        } catch (Exception e){
-            Toast.makeText(getContext(), "phone null", Toast.LENGTH_SHORT).show();
-            menusRef = db.getReference("menus/"+ myPhone);
-        }
 
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
