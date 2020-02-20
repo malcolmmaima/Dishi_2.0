@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
+import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +39,7 @@ public class ViewCustomerOrder extends AppCompatActivity {
     TextView subTotal, deliveryChargeAmount, payment, totalBill;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
-    AppCompatButton confirmOrder;
+    AppCompatButton confirmOrder, declineOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class ViewCustomerOrder extends AppCompatActivity {
         totalBill = findViewById(R.id.totalBill);
         recyclerview = findViewById(R.id.rview);
         confirmOrder = findViewById(R.id.btn_confirm);
+        declineOrder = findViewById(R.id.btn_decline);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -94,7 +96,7 @@ public class ViewCustomerOrder extends AppCompatActivity {
 
                 if(!list.isEmpty()){
                     Collections.reverse(list);
-                    CartAdapter recycler = new CartAdapter(ViewCustomerOrder.this,list);
+                    ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this,list);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
@@ -122,6 +124,13 @@ public class ViewCustomerOrder extends AppCompatActivity {
 
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        declineOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

@@ -28,12 +28,9 @@
         android:layout_height="match_parent"
         android:layout_width="fill_parent">
 
-    <LinearLayout
+        <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
-
-        android:clipChildren="false"
+        android:layout_height="match_parent"
         android:orientation="vertical" >
 
         <androidx.cardview.widget.CardView
@@ -256,7 +253,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:paddingTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:id="@+id/rview">
 
         </androidx.recyclerview.widget.RecyclerView>
@@ -266,7 +263,7 @@
             android:gravity="center"
             android:layout_gravity="center|bottom"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="25dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
@@ -279,7 +276,24 @@
             android:background="@drawable/login_button"
             />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="200dp"
+            android:gravity="center"
+            android:layout_gravity="center|bottom"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:text="DECLINE"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/colorBackroundWhite"
+            android:id="@+id/btn_decline"
+            android:padding="12dp"
+            android:background="@drawable/dark_button"
+            />
     </LinearLayout>
+
 
     </ScrollView>
 
