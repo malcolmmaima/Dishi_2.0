@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.OnOrderChecked;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ViewCustomerOrder extends AppCompatActivity {
+public class ViewCustomerOrder extends AppCompatActivity implements OnOrderChecked {
 
     List<ProductDetails> list;
     String myPhone, phone, customerName;
@@ -96,7 +97,7 @@ public class ViewCustomerOrder extends AppCompatActivity {
 
                 if(!list.isEmpty()){
                     Collections.reverse(list);
-                    ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this,list);
+                    ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this, list, ViewCustomerOrder.this);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
@@ -155,5 +156,10 @@ public class ViewCustomerOrder extends AppCompatActivity {
         super.onDestroy();
 
         customerOrderItems.removeEventListener(customerOrderItemsListener);
+    }
+
+    @Override
+    public void onItemChecked(Boolean value) {
+        Toast.makeText(this, "checked: " + value, Toast.LENGTH_SHORT).show();
     }
 }

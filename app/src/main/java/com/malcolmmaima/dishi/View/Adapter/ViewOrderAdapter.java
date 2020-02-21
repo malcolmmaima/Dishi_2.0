@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.OnOrderChecked;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -51,9 +52,12 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
     long DURATION = 200;
     private boolean on_attach = true;
 
-    public ViewOrderAdapter(Context context, List<ProductDetails> listdata) {
+    OnOrderChecked onOrderChecked;
+
+    public ViewOrderAdapter(Context context, List<ProductDetails> listdata, OnOrderChecked onOrderChecked) {
         this.listdata = listdata;
         this.context = context;
+        this.onOrderChecked = onOrderChecked;
     }
 
     @Override
@@ -109,7 +113,7 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                onOrderChecked.onItemChecked(isChecked);
             }
         });
 
