@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.OnOrderChecked;
 import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
@@ -41,6 +44,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
+    CardView DeliveryAddress;
+
     final int[] total = {0};
 
     @Override
@@ -69,6 +74,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         recyclerview = findViewById(R.id.rview);
         confirmOrder = findViewById(R.id.btn_confirm);
         declineOrder = findViewById(R.id.btn_decline);
+        DeliveryAddress = findViewById(R.id.DeliveryAddress);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -96,7 +102,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 subTotal.setText("Ksh "+total[0]);
 
                 if(!list.isEmpty()){
-                    Collections.reverse(list);
+                    //Collections.reverse(list);
                     ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this, list, ViewCustomerOrder.this);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
                     recyclerview.setLayoutManager(layoutmanager);
@@ -123,6 +129,36 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         };
         customerOrderItems.addValueEventListener(customerOrderItemsListener);
 
+        DeliveryAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                customerOrderItemsListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.child("static_address").exists()){
+                            try {
+                                StaticLocation deliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                Toast.makeText(ViewCustomerOrder.this, "loc: " + deliveryLocation.getPlace(), Toast.LENGTH_SHORT).show();
+                            } catch (Exception e){
+
+                            }
+                        } else {
+                            Toast.makeText(ViewCustomerOrder.this, "loc doesn't exist, use live", Toast.LENGTH_SHORT).show();
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+
+                customerOrderItems.addListenerForSingleValueEvent(customerOrderItemsListener);
+            }
+        });
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,13 +194,22 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         customerOrderItems.removeEventListener(customerOrderItemsListener);
     }
 
+    /**
+     * Initialize tracking of total for selected orders
+     */
     int total_ = 0;
     @Override
     public void onItemChecked(Boolean isChecked, int position, String price, int quantity) {
 
+        /**
+         * Compute adapter price per quantity
+         */
         int adapterPrice = Integer.parseInt(price.trim());
         int adapterTotal = adapterPrice * quantity;
 
+        /**
+         * Add or subtract price of selected/unselected product
+         */
         if(isChecked){
             total_ = total_ + adapterTotal;
             totalAmount = total_ + deliveryCharge;
