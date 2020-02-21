@@ -18,6 +18,9 @@ public class ProductDetails {
     public String remarks;
     public String address;
 
+    //below values are from restaurant back to customer (setting order statu to confirmed or decline
+    public Boolean confirmed;
+
     public Double getDistance() {
         return distance;
     }
@@ -120,5 +123,13 @@ public class ProductDetails {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Boolean getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(Boolean confirmed) {
+        this.confirmed = confirmed;
     }
 }

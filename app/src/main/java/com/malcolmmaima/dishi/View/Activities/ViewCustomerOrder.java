@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -87,22 +89,26 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 total[0] = 0;
+
                 list = new ArrayList<>();
                 for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
-                    ProductDetails prod = items.getValue(ProductDetails.class);
-                    list.add(prod);
+                    try {
+                        ProductDetails prod = items.getValue(ProductDetails.class);
+                        prod.setKey(items.getKey());
+                        list.add(prod);
+                        int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                        total[0] = total[0] + adapterTotal;
+                        totalAmount = total[0] + deliveryCharge;
+                        payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
+                    } catch (Exception e){
 
-                    int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
-                    total[0] = total[0] + adapterTotal;
-                    totalAmount = total[0] + deliveryCharge;
-                    payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
-
+                    }
                 }
                 subTotal.setText("Ksh "+total[0]);
 
                 if(!list.isEmpty()){
-                    //Collections.reverse(list);
+                    Collections.reverse(list);
                     ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this, list, ViewCustomerOrder.this);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
                     recyclerview.setLayoutManager(layoutmanager);
@@ -136,6 +142,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 customerOrderItemsListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        /**
+                         * If this node exists then customer has set delivery address as static
+                         */
                         if(dataSnapshot.child("static_address").exists()){
                             try {
                                 StaticLocation deliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
@@ -143,7 +152,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             } catch (Exception e){
 
                             }
-                        } else {
+                        }
+                        /**
+                         * Node doen't exist which automatically means customer set "live" as delivery address
+                         */
+                        else {
                             Toast.makeText(ViewCustomerOrder.this, "loc doesn't exist, use live", Toast.LENGTH_SHORT).show();
                         }
 
@@ -162,8 +175,40 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
+                AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
+                        .setMessage("Accept " + customerName + "'s order?")
+                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                        .setCancelable(false)
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                int j = 0;
+                                //set product item status to confirmed
+                                for(int i = 0; i<list.size(); i++){
+                                    if(list.get(i).getConfirmed() == true){
+                                        j++;
+                                        customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(true);
+                                    }
 
+                                    if(i==list.size()-1){ //loop has reached the end
+                                        if(j==0){
+                                            Snackbar.make(v.getRootView(), "You must select available order items", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }
+                            }
+                        })//setPositiveButton
+
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Do nothing
+                            }
+                        })
+
+                        .create();
+                confirmOrd.show();
             }
         });
 
@@ -200,6 +245,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     int total_ = 0;
     @Override
     public void onItemChecked(Boolean isChecked, int position, String price, int quantity) {
+
+        list.get(position).setConfirmed(isChecked);
 
         /**
          * Compute adapter price per quantity

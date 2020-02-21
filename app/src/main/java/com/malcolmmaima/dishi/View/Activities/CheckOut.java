@@ -221,6 +221,7 @@ public class CheckOut extends AppCompatActivity {
                     product.setRemarks(myRemarks);
                     product.setDistance(null);
                     product.setUploadDate(orderDate);
+                    product.setConfirmed(false);
                     list.add(product);
 
                     DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("orders/"+product.getOwner());

@@ -235,6 +235,13 @@ public class OrdersFragment extends Fragment  {
         //Load progress dialog before fetching on runtime
         progressDialog.setMessage("Fetching...");
         progressDialog.show();
+
+        fetchOrders();
+
+        return  v;
+    }
+
+    private void fetchOrders() {
         /**
          * Loop through users who have sent orders
          */
@@ -242,7 +249,8 @@ public class OrdersFragment extends Fragment  {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                orders = new ArrayList<>();
+                progressDialog.dismiss();
+
                 for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
 
                     /**
@@ -263,7 +271,7 @@ public class OrdersFragment extends Fragment  {
                     userDetailsListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull final DataSnapshot userDetails) {
-
+                            orders = new ArrayList<>();
                             /**
                              * get item count value then user details to model
                              */
@@ -336,8 +344,6 @@ public class OrdersFragment extends Fragment  {
         };
 
         incomingOrders.addValueEventListener(inComingOrdersListener);
-
-        return  v;
     }
 
 
@@ -345,12 +351,22 @@ public class OrdersFragment extends Fragment  {
 //    public void onRefresh() {
 //    }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        dbRef.removeEventListener(liveListener);
-        incomingOrders.removeEventListener(inComingOrdersListener);
-        userDetailsRef.removeEventListener(userDetailsListener);
+        try {
+            dbRef.removeEventListener(liveListener);
+            incomingOrders.removeEventListener(inComingOrdersListener);
+            userDetailsRef.removeEventListener(userDetailsListener);
+        } catch (Exception e){
+
+        }
 
     }
 }

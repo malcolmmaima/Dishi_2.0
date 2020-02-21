@@ -71,6 +71,10 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
     public void onBindViewHolder(final ViewOrderAdapter.MyHolder holder, final int position) {
         final ProductDetails productDetails = listdata.get(position);
 
+        if(productDetails.getConfirmed() == true){
+            holder.checkBox.setVisibility(View.GONE);
+        }
+
         /**
          * Adapter animation
          */
