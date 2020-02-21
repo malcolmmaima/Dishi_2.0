@@ -214,8 +214,30 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
         declineOrder.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
+                AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
+                        .setMessage("Decline " + customerName + "'s order?")
+                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                        .setCancelable(false)
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //set product item status to confirmed
+                                for(int i = 0; i<list.size(); i++){
+                                    customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(false);
+                                }
+                            }
+                        })//setPositiveButton
 
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Do nothing
+                            }
+                        })
+
+                        .create();
+                confirmOrd.show();
             }
         });
 
