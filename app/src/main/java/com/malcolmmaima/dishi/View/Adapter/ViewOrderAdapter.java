@@ -113,7 +113,7 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                onOrderChecked.onItemChecked(isChecked);
+                onOrderChecked.onItemChecked(isChecked, position, productDetails.getPrice(), productDetails.getQuantity());
             }
         });
 

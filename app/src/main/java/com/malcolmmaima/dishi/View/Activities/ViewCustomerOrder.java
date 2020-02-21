@@ -41,6 +41,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
+    final int[] total = {0};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         /**
          * Initialize cart items total and keep track of items
          */
-        final int[] total = {0};
         customerOrderItemsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -158,8 +158,26 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         customerOrderItems.removeEventListener(customerOrderItemsListener);
     }
 
+    int total_ = 0;
     @Override
-    public void onItemChecked(Boolean value) {
-        Toast.makeText(this, "checked: " + value, Toast.LENGTH_SHORT).show();
+    public void onItemChecked(Boolean isChecked, int position, String price, int quantity) {
+
+        int adapterPrice = Integer.parseInt(price.trim());
+        int adapterTotal = adapterPrice * quantity;
+
+        if(isChecked){
+            total_ = total_ + adapterTotal;
+            totalAmount = total_ + deliveryCharge;
+            subTotal.setText("Ksh " + total_);
+            totalBill.setText("ksh " + totalAmount);
+        }
+
+        else {
+            total_ = total_ - adapterTotal;
+            if(total_ < 0) { total_ = 0;}
+            totalAmount = total_ + deliveryCharge;
+            subTotal.setText("Ksh " + total_);
+            totalBill.setText("ksh " + totalAmount);
+        }
     }
 }
