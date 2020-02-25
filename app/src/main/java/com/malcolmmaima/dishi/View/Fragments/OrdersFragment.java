@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -27,6 +28,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,11 +44,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class OrdersFragment extends Fragment  {
+public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
-    // implements SwipeRefreshLayout.OnRefreshListener
     List<UserModel> orders;
-    ProgressDialog progressDialog ;
+//    ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
     Switch liveStatus;
@@ -61,7 +62,7 @@ public class OrdersFragment extends Fragment  {
 
     TextView emptyTag;
     AppCompatImageView icon;
-//    SwipeRefreshLayout mSwipeRefreshLayout;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public static OrdersFragment newInstance() {
         OrdersFragment fragment = new OrdersFragment();
@@ -78,7 +79,7 @@ public class OrdersFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_orders, container, false);
-        progressDialog = new ProgressDialog(getContext());
+//        progressDialog = new ProgressDialog(getContext());
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -97,28 +98,29 @@ public class OrdersFragment extends Fragment  {
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
 
-//        // SwipeRefreshLayout
-//        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
-//        mSwipeRefreshLayout.setOnRefreshListener(this);
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-//                android.R.color.holo_green_dark,
-//                android.R.color.holo_orange_dark,
-//                android.R.color.holo_blue_dark);
-//
-//        /**
-//         * Showing Swipe Refresh animation on activity create
-//         * As animation won't start on onCreate, post runnable is used
-//         */
-//        mSwipeRefreshLayout.post(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//
-//                mSwipeRefreshLayout.setRefreshing(false);
-//
-//
-//            }
-//        });
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(false);
+                fetchOrders();
+
+
+            }
+        });
 
         liveTitle.setText("loading...");
         liveListener = new ValueEventListener() {
@@ -232,11 +234,36 @@ public class OrdersFragment extends Fragment  {
             }
         });
 
-        //Load progress dialog before fetching on runtime
-        progressDialog.setMessage("Fetching...");
-        progressDialog.show();
+//        //Load progress dialog before fetching on runtime
+//        progressDialog.setMessage("Fetching...");
+//        progressDialog.show();
 
-        fetchOrders();
+        incomingOrders.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Toast.makeText(getContext(), "New order, refresh", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         return  v;
     }
@@ -249,7 +276,7 @@ public class OrdersFragment extends Fragment  {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                progressDialog.dismiss();
+//                progressDialog.dismiss();
 
                 for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
 
@@ -285,8 +312,8 @@ public class OrdersFragment extends Fragment  {
 
                                     if (!orders.isEmpty()) {
 
-//                        mSwipeRefreshLayout.setRefreshing(false);
-                                        progressDialog.dismiss();
+                                        mSwipeRefreshLayout.setRefreshing(false);
+//                                        progressDialog.dismiss();
                                         Collections.reverse(orders);
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
                                         RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
@@ -305,8 +332,8 @@ public class OrdersFragment extends Fragment  {
                                         icon.setVisibility(View.INVISIBLE);
                                     } else {
 
-//                        mSwipeRefreshLayout.setRefreshing(false);
-                                        progressDialog.dismiss();
+                                        mSwipeRefreshLayout.setRefreshing(false);
+//                                        progressDialog.dismiss();
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
                                         RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                         recyclerview.setLayoutManager(layoutmanager);
@@ -332,7 +359,7 @@ public class OrdersFragment extends Fragment  {
 
                         }
                     };
-                    userDetailsRef.addValueEventListener(userDetailsListener);
+                    userDetailsRef.addListenerForSingleValueEvent(userDetailsListener);
 
                 }
             }
@@ -343,13 +370,14 @@ public class OrdersFragment extends Fragment  {
             }
         };
 
-        incomingOrders.addValueEventListener(inComingOrdersListener);
+        incomingOrders.addListenerForSingleValueEvent(inComingOrdersListener);
     }
 
 
-//    @Override
-//    public void onRefresh() {
-//    }
+    @Override
+    public void onRefresh() {
+        fetchOrders();
+    }
 
 
     @Override
@@ -363,7 +391,6 @@ public class OrdersFragment extends Fragment  {
         try {
             dbRef.removeEventListener(liveListener);
             incomingOrders.removeEventListener(inComingOrdersListener);
-            userDetailsRef.removeEventListener(userDetailsListener);
         } catch (Exception e){
 
         }

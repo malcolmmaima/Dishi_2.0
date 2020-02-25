@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -75,7 +76,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         totalBill = findViewById(R.id.totalBill);
         recyclerview = findViewById(R.id.rview);
         confirmOrder = findViewById(R.id.btn_confirm);
+        confirmOrder.setTag("confirm");
         declineOrder = findViewById(R.id.btn_decline);
+        declineOrder.setTag("active");
         DeliveryAddress = findViewById(R.id.DeliveryAddress);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -173,71 +176,119 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             }
         });
 
+        customerOrderItems.child("items").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot items : dataSnapshot.getChildren()){
+                    Boolean confirmed = items.child("confirmed").getValue(Boolean.class);
+                    if(confirmed){
+                        confirmOrder.setTag("end");
+                        confirmOrder.setText("END");
+                        declineOrder.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
-                        .setMessage("Accept " + customerName + "'s order?")
-                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                        .setCancelable(false)
-                        //set three option buttons
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                int j = 0;
-                                //set product item status to confirmed
-                                for(int i = 0; i<list.size(); i++){
-                                    if(list.get(i).getConfirmed() == true){
-                                        j++;
-                                        customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(true);
-                                    }
+                /**
+                 * Delivered order to address, notify customer
+                 */
+                if(confirmOrder.getTag().toString().equals("end")){
+                    Toast.makeText(ViewCustomerOrder.this, "Notify customer order arrived", Toast.LENGTH_SHORT).show();
+                }
+                /**
+                 * Accept order
+                 */
+                else {
+                    AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Accept " + customerName + "'s order?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    int j = 0;
+                                    //set product item status to confirmed
+                                    for(int i = 0; i<list.size(); i++){
+                                        if(list.get(i).getConfirmed() == true){
+                                            j++;
+                                            customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(true);
+                                        }
 
-                                    if(i==list.size()-1){ //loop has reached the end
-                                        if(j==0){
-                                            Snackbar.make(v.getRootView(), "You must select available order items", Snackbar.LENGTH_LONG).show();
+                                        if(i==list.size()-1){ //loop has reached the end
+
+                                            if(j==0){
+                                                Snackbar.make(v.getRootView(), "You must select available order items", Snackbar.LENGTH_LONG).show();
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        })//setPositiveButton
+                            })//setPositiveButton
 
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //Do nothing
-                            }
-                        })
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
 
-                        .create();
-                confirmOrd.show();
+                            .create();
+                    confirmOrd.show();
+                }
+
+
             }
         });
 
         declineOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
-                        .setMessage("Decline " + customerName + "'s order?")
-                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                        .setCancelable(false)
-                        //set three option buttons
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                //set product item status to confirmed
-                                for(int i = 0; i<list.size(); i++){
-                                    customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(false);
+                if(declineOrder.getTag().equals("declined")){
+                    Toast.makeText(ViewCustomerOrder.this, "Delete order", Toast.LENGTH_SHORT).show();
+                }
+
+                else {
+                    AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Decline " + customerName + "'s order?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    int j = 0;
+                                    //set product item status to confirmed
+                                    for(int i = 0; i<list.size(); i++){
+                                        customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(false);
+
+                                        if(i==list.size()-1){ //loop has reached the end
+                                            confirmOrder.setVisibility(View.GONE);
+                                            declineOrder.setTag("declined");
+                                            declineOrder.setText("DELETE");
+                                            Snackbar.make(v.getRootView(), "Order declined", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    }
                                 }
-                            }
-                        })//setPositiveButton
+                            })//setPositiveButton
 
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //Do nothing
-                            }
-                        })
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
 
-                        .create();
-                confirmOrd.show();
+                            .create();
+                    confirmOrd.show();
+                }
+
             }
         });
 
@@ -284,6 +335,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             totalAmount = total_ + deliveryCharge;
             subTotal.setText("Ksh " + total_);
             totalBill.setText("ksh " + totalAmount);
+
+            if(confirmOrder.getTag().toString().equals("end")){
+                confirmOrder.setTag("confirm");
+                confirmOrder.setText("CONFIRM");
+            }
         }
 
         else {
