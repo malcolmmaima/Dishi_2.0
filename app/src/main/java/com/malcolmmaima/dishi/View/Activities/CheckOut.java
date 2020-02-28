@@ -35,8 +35,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.R;
@@ -64,7 +66,6 @@ public class CheckOut extends AppCompatActivity {
     AppCompatImageView paymentStatus, deliveryLocationStatus;
     DatabaseReference myRef, myCartRef;
     ProgressDialog progressDialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,6 +217,7 @@ public class CheckOut extends AppCompatActivity {
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
                     final ProductDetails product = cart.getValue(ProductDetails.class);
+
                     product.setPaymentMethod(selectedPaymentMethod);
                     product.setAddress(locationSet);
                     product.setRemarks(myRemarks);

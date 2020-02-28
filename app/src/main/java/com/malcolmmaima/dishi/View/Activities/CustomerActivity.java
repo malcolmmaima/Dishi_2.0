@@ -36,6 +36,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
+import com.malcolmmaima.dishi.View.Fragments.MyOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.OrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
 import com.squareup.picasso.Picasso;
@@ -324,9 +325,8 @@ public class CustomerActivity extends AppCompatActivity
         final Class[] fragmentClass = {null};
 
         if (id == R.id.menu1) {
-            setTitle("Menu1");
-            //fragmentClass[0] = OrdersFragment.class;
-            Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            setTitle("My Orders");
+            fragmentClass[0] = MyOrdersFragment.class;
         }
 
         else if (id == R.id.menu2) {

@@ -25,7 +25,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.OnOrderChecked;
+import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.R;
@@ -41,13 +43,16 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     List<ProductDetails> list;
     String myPhone, phone, customerName;
     FirebaseUser user;
-    DatabaseReference customerOrderItems;
+    DatabaseReference customerOrderItems, myLocationRef;
     ValueEventListener customerOrderItemsListener;
     TextView subTotal, deliveryChargeAmount, payment, totalBill;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
     CardView DeliveryAddress;
+    LiveLocation liveLocation;
+    StaticLocation deliveryLocation;
+    ValueEventListener locationListener;
 
     final int[] total = {0};
 
@@ -63,6 +68,44 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         //Data passed from adapter
         phone = getIntent().getStringExtra("phone"); //From adapters
         customerName = getIntent().getStringExtra("name");
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+        customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
+
+        /**
+         * On create view fetch my location coordinates
+         */
+
+        liveLocation = null;
+        locationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                    //Toast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+
+                    /**
+                     * Compute distance between customer and restaurant
+                     */
+
+                    CalculateDistance calculateDistance = new CalculateDistance();
+                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                            liveLocation.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
+
+                    Toast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myLocationRef.addListenerForSingleValueEvent(locationListener);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -80,10 +123,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         declineOrder = findViewById(R.id.btn_decline);
         declineOrder.setTag("active");
         DeliveryAddress = findViewById(R.id.DeliveryAddress);
-
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
 
         /**
          * Initialize cart items total and keep track of items
@@ -141,7 +180,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                /**
+                 * On create view fetch customer location coordinates
+                 */
                 customerOrderItemsListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -150,8 +191,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                          */
                         if(dataSnapshot.child("static_address").exists()){
                             try {
-                                StaticLocation deliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                deliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
                                 Toast.makeText(ViewCustomerOrder.this, "loc: " + deliveryLocation.getPlace(), Toast.LENGTH_SHORT).show();
+
                             } catch (Exception e){
 
                             }
@@ -173,6 +215,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 };
 
                 customerOrderItems.addListenerForSingleValueEvent(customerOrderItemsListener);
+
             }
         });
 
