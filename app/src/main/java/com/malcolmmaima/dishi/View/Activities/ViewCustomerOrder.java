@@ -130,6 +130,12 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         customerOrderItemsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(!dataSnapshot.exists()){
+                    finish();
+                    Toast.makeText(ViewCustomerOrder.this, "Order Complete!", Toast.LENGTH_LONG).show();
+                }
+
                 total[0] = 0;
 
                 list = new ArrayList<>();

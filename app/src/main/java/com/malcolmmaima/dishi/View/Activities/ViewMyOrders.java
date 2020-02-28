@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,7 +43,7 @@ public class ViewMyOrders extends AppCompatActivity {
     List<ProductDetails> list;
     String myPhone, phone, customerName;
     FirebaseUser user;
-    DatabaseReference customerOrderItems;
+    DatabaseReference customerOrderItems, myOrders;
     ValueEventListener customerOrderItemsListener;
     TextView subTotal, deliveryChargeAmount, payment, totalBill;
     Double deliveryCharge, totalAmount;
@@ -68,6 +69,7 @@ public class ViewMyOrders extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
+        myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -92,6 +94,11 @@ public class ViewMyOrders extends AppCompatActivity {
         customerOrderItemsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(!dataSnapshot.exists()){
+                    finish();
+                    Toast.makeText(ViewMyOrders.this, "Does not exist!", Toast.LENGTH_SHORT).show();
+                }
                 total[0] = 0;
 
                 list = new ArrayList<>();
@@ -151,29 +158,45 @@ public class ViewMyOrders extends AppCompatActivity {
             }
         });
 
-        customerOrderItems.child("items").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot items : dataSnapshot.getChildren()){
-                    Boolean confirmed = items.child("confirmed").getValue(Boolean.class);
-                    if(confirmed){
-                        confirmOrder.setTag("end");
-                        confirmOrder.setText("END");
-                        declineOrder.setVisibility(View.GONE);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         confirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Toast.makeText(ViewMyOrders.this, "Clicked!", Toast.LENGTH_SHORT).show();
+                final AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
+                        .setMessage("Order has been delivered?")
+                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                        .setCancelable(false)
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        myOrders.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                finish();
+                                                Toast.makeText(ViewMyOrders.this, "Order Complete", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    }
+                                });
+
+                            }
+                        })//setPositiveButton
+
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Do nothing
+                                Snackbar.make(v.getRootView(), "Confirm once order has been delivered", Snackbar.LENGTH_LONG).show();
+                            }
+                        })
+                        .create();
+                confirmorder.show();
             }
         });
 
@@ -205,8 +228,4 @@ public class ViewMyOrders extends AppCompatActivity {
         customerOrderItems.removeEventListener(customerOrderItemsListener);
     }
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
 }

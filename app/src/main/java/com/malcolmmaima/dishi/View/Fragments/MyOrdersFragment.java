@@ -102,7 +102,7 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void run() {
 
-                mSwipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(true);
                 fetchOrders();
             }
         });
@@ -211,5 +211,10 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         fetchOrders();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }

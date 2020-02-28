@@ -115,7 +115,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void run() {
 
-                mSwipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(true);
                 fetchOrders();
 
 
@@ -305,14 +305,13 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    mSwipeRefreshLayout.setRefreshing(false);
                                     UserModel customer = userDetails.getValue(UserModel.class);
                                     customer.setPhone(userOrders.getKey());
                                     customer.itemCount = dataSnapshot.getChildrenCount();
                                     orders.add(customer);
 
                                     if (!orders.isEmpty()) {
-
-                                        mSwipeRefreshLayout.setRefreshing(false);
 //                                        progressDialog.dismiss();
                                         Collections.reverse(orders);
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
@@ -331,8 +330,6 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                         emptyTag.setVisibility(View.INVISIBLE);
                                         icon.setVisibility(View.INVISIBLE);
                                     } else {
-
-                                        mSwipeRefreshLayout.setRefreshing(false);
 //                                        progressDialog.dismiss();
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
                                         RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
