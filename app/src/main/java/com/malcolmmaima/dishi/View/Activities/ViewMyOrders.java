@@ -43,7 +43,7 @@ public class ViewMyOrders extends AppCompatActivity {
     List<ProductDetails> list;
     String myPhone, phone, customerName;
     FirebaseUser user;
-    DatabaseReference customerOrderItems, myOrders;
+    DatabaseReference customerOrderItems, myOrders, myOrdersHistory;
     ValueEventListener customerOrderItemsListener;
     TextView subTotal, deliveryChargeAmount, payment, totalBill;
     Double deliveryCharge, totalAmount;
@@ -69,6 +69,7 @@ public class ViewMyOrders extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
+        myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
         myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
@@ -170,20 +171,58 @@ public class ViewMyOrders extends AppCompatActivity {
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
 
-                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onSuccess(Void aVoid) {
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
-                                        myOrders.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                finish();
-                                                Toast.makeText(ViewMyOrders.this, "Order Complete", Toast.LENGTH_SHORT).show();
+                                            try {
+                                                ProductDetails prod = items.getValue(ProductDetails.class);
+                                                prod.setKey(items.getKey());
+
+                                                myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        customerOrderItems.child(items.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+
+                                                                myOrders.child(phone).removeValue();
+
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            } catch (Exception e){
+
                                             }
-                                        });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                     }
                                 });
+                                /**
+                                 * Listen to the node and make sure all order items have been transferred to history node
+                                 */
+                                customerOrderItems.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(!dataSnapshot.exists()){
+                                            finish();
+                                            Toast.makeText(ViewMyOrders.this, "Order Complete", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
 
                             }
                         })//setPositiveButton
