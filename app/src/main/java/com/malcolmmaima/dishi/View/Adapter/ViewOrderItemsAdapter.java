@@ -3,51 +3,70 @@ package com.malcolmmaima.dishi.View.Adapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.OnOrderChecked;
+import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
-import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
+import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHolder>{
+
+public class ViewOrderItemsAdapter extends RecyclerView.Adapter<ViewOrderItemsAdapter.MyHolder>{
+
     Context context;
-    List<UserModel> listdata;
+    List<ProductDetails> listdata;
     long DURATION = 200;
     private boolean on_attach = true;
 
-    public MyOrdersAdapter(Context context, List<UserModel> listdata) {
+    public ViewOrderItemsAdapter(Context context, List<ProductDetails> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
 
-
     @Override
-    public MyOrdersAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_order_card,parent,false);
+    public ViewOrderItemsAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_order_items_adapter,parent,false);
 
-        MyOrdersAdapter.MyHolder myHolder = new MyOrdersAdapter.MyHolder(view);
+        ViewOrderItemsAdapter.MyHolder myHolder = new ViewOrderItemsAdapter.MyHolder(view);
         return myHolder;
     }
 
-    public void onBindViewHolder(final MyOrdersAdapter.MyHolder holder, final int position) {
-        final UserModel orderDetails = listdata.get(position);
-
+    public void onBindViewHolder(final ViewOrderItemsAdapter.MyHolder holder, final int position) {
+        final ProductDetails productDetails = listdata.get(position);
 
         /**
          * Adapter animation
@@ -58,10 +77,9 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
          * Set widget values
          **/
 
-        holder.customerName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
-        holder.orderQty.setText("#"+orderDetails.itemCount);
-        holder.distanceAway.setText("loading...");
-
+        int price = productDetails.getQuantity() * Integer.parseInt(productDetails.getPrice());
+        holder.foodPrice.setText("Ksh "+price);
+        holder.foodName.setText(productDetails.getName());
 
         /**
          * Click listener on our card
@@ -69,14 +87,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, ViewMyOrders.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("phone", orderDetails.getPhone());
-                slideactivity.putExtra("name", orderDetails.getFirstname() + " " +  orderDetails.getLastname());
 
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                context.startActivity(slideactivity, bndlanimation);
             }
         });
 
@@ -84,26 +95,33 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
         /**
          * View image click listener
          */
-        holder.profilePic.setOnClickListener(new View.OnClickListener() {
+        holder.foodPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", orderDetails.getProfilePic());
+                slideactivity.putExtra("imageURL", productDetails.getImageURL());
                 context.startActivity(slideactivity);
             }
         });
 
+        holder.quantity.setText("Quantity: "+productDetails.getQuantity() + " x Ksh "+productDetails.getPrice());
+
+        if(productDetails.getConfirmed() == true){
+            holder.confirmedStatus.setVisibility(View.VISIBLE);
+        } else {
+            holder.confirmedStatus.setVisibility(View.GONE);
+        }
 
         /**
          * Load image url onto imageview
          */
         try {
             //Load food image
-            Picasso.with(context).load(orderDetails.getProfilePic()).fit().centerCrop()
-                    .placeholder(R.drawable.default_profile)
-                    .error(R.drawable.default_profile)
-                    .into(holder.profilePic);
+            Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
+                    .placeholder(R.drawable.menu)
+                    .error(R.drawable.menu)
+                    .into(holder.foodPic);
         } catch (Exception e){
 
         }
@@ -129,25 +147,27 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
         animator.start();
     }
 
+    @Override
     public int getItemCount() {
         return listdata.size();
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView orderQty, customerName,distanceAway;
-        ImageView profilePic;
+        TextView foodPrice, foodName, quantity;
+        ImageView foodPic, confirmedStatus;
         CardView cardView;
 
         public MyHolder(View itemView) {
             super(itemView);
-            customerName = itemView.findViewById(R.id.customerName);
-            orderQty = itemView.findViewById(R.id.orderQty);
-            profilePic = itemView.findViewById(R.id.profilePic);
+            foodPrice = itemView.findViewById(R.id.foodPrice);
+            foodName = itemView.findViewById(R.id.foodName);
+            foodPic = itemView.findViewById(R.id.foodPic);
             cardView = itemView.findViewById(R.id.card_view);
-            distanceAway = itemView.findViewById(R.id.distanceAway);
+            quantity = itemView.findViewById(R.id.quantity);
+            confirmedStatus = itemView.findViewById(R.id.confirmedStatus);
 
-//            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//            final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -160,5 +180,6 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
 
         }
     }
+
 
 }

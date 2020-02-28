@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackroundWhite"
+    tools:context=".View.Activities.ViewMyOrders"
+    android:id="@+id/parentlayout">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:maxHeight="@dimen/actionBarSize"
+        android:background="@color/pureWhite"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/actionBarSize"
+        android:elevation="5dp"
+        app:view_shadowDx="10dp"
+        app:view_shadowDy="0dp"
+        app:view_borderWidth="2dp"
+        app:view_borderColor="@color/colorPrimaryDark">
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_below="@id/toolbar"
+        android:layout_height="match_parent"
+        android:layout_width="fill_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_view"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingBottom="20dp"
+                    >
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/billTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_marginRight="70dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Total Bill:"
+                        android:textStyle="bold"
+                        />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Ksh 0"
+                        android:textSize="25dp"
+                        android:id="@+id/totalBill"
+                        android:fontFamily="sans-serif"
+                        android:textColor="@color/colorAccent"
+                        android:layout_alignParentRight="true"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Subtotal"
+                        android:fontFamily="sans-serif-light"
+                        android:id="@+id/productsSubtotal"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/billTitle"
+                        android:textColor="#666"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Ksh 0"
+                        android:id="@+id/subTotal"
+                        android:fontFamily="sans-serif"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/billTitle"
+                        android:textColor="#666"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Delivery Charge"
+                        android:fontFamily="sans-serif-light"
+                        android:id="@+id/DeliveryCharge"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/productsSubtotal"
+                        android:textColor="#666"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Ksh 0"
+                        android:id="@+id/deliveryChargeAmount"
+                        android:fontFamily="sans-serif"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@id/productsSubtotal"
+                        android:textColor="#666"
+                        />
+
+                    <TextView
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="VAT Charge (16%)"
+                        android:fontFamily="sans-serif-light"
+                        android:id="@+id/vatCharge"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/DeliveryCharge"
+                        android:textColor="#666"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Ksh 0"
+                        android:id="@+id/VATamount"
+                        android:fontFamily="sans-serif"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@id/DeliveryCharge"
+                        android:textColor="#666"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Payment"
+                        android:fontFamily="sans-serif-light"
+                        android:id="@+id/paymentType"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/vatCharge"
+                        android:textColor="#666"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Cash/Mpesa"
+                        android:id="@+id/payment"
+                        android:fontFamily="sans-serif"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@id/vatCharge"
+                        android:textColor="#666"
+                        />
+
+                    <LinearLayout
+                        android:layout_below="@id/productsSubtotal"
+                        android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content">
+
+                        <!-- Might add more widgets here -->
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/DeliveryAddress"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="20dp"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="40dp"
+                        app:tint="@color/colorPrimary"
+                        android:src="@drawable/location_pin"
+                        />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_marginTop="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_gravity="start"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:text="Track Order"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginEnd="10dp" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:paddingTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:id="@+id/rview">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="200dp"
+                android:gravity="center"
+                android:layout_gravity="center|bottom"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="CONFIRM"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/colorBackroundWhite"
+                android:id="@+id/btn_confirm"
+                android:padding="12dp"
+                android:background="@drawable/login_button"
+                />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:tag="confirm"
+                android:layout_width="200dp"
+                android:gravity="center"
+                android:layout_gravity="center|bottom"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="DECLINE"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/colorBackroundWhite"
+                android:id="@+id/btn_decline"
+                android:padding="12dp"
+                android:background="@drawable/dark_button"
+                />
+        </LinearLayout>
+
+
+    </ScrollView>
+
+</RelativeLayout>
