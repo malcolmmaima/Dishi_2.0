@@ -203,8 +203,40 @@ public class ViewMyOrders extends AppCompatActivity {
         declineOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Toast.makeText(ViewMyOrders.this, "Clicked!", Toast.LENGTH_SHORT).show();
+                AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
+                        .setMessage("Cancel your order?")
+                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                        .setCancelable(false)
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
 
+                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        myOrders.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                finish();
+                                                Toast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    }
+                                });
+
+                            }
+                        })//setPositiveButton
+
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Do nothing
+                            }
+                        })
+                        .create();
+                confirmorder.show();
             }
         });
 
