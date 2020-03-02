@@ -42,11 +42,13 @@ import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
-    List<UserModel> orders;
+    List<UserModel> orders = new ArrayList<>();
+
 //    ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -80,6 +82,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                              Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_orders, container, false);
 //        progressDialog = new ProgressDialog(getContext());
+
+        orders.clear();
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -170,7 +174,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 // do something, the isChecked will be
                 // true if the switch is in the On position
 
-                if(isChecked == true){
+                if(isChecked == true && buttonView.isPressed()){
                     final AlertDialog goLive = new AlertDialog.Builder(getContext())
                             .setMessage("Restaurant Go Live?")
                             //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
@@ -242,7 +246,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 try {
-                    Toast.makeText(getContext(), "New order, refresh", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "New order", Toast.LENGTH_LONG).show();
+                    //fetchOrders();
                 } catch(Exception e){
 
                 }
@@ -273,12 +278,13 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void fetchOrders() {
+        orders.clear();
         /**
          * Loop through users who have sent orders
          */
         inComingOrdersListener = new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
 
 //                progressDialog.dismiss();
 
@@ -302,7 +308,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     userDetailsListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull final DataSnapshot userDetails) {
-                            orders = new ArrayList<>();
+                            //orders.clear();
+
                             /**
                              * get item count value then user details to model
                              */
@@ -313,11 +320,11 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                     UserModel customer = userDetails.getValue(UserModel.class);
                                     customer.setPhone(userOrders.getKey());
                                     customer.itemCount = dataSnapshot.getChildrenCount();
+                                    //orders.add(customer);
                                     orders.add(customer);
 
                                     if (!orders.isEmpty()) {
-//                                        progressDialog.dismiss();
-                                        Collections.reverse(orders);
+                                        //Collections.reverse(orders);
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
                                         RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                         recyclerview.setLayoutManager(layoutmanager);
@@ -344,6 +351,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                         icon.setVisibility(View.VISIBLE);
 
                                     }
+
                                 }
 
                                 @Override

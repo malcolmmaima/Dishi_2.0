@@ -133,7 +133,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
+                try {
+                    Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
+                } catch(Exception e){
+
+                }
 
                 String myPhone;
                 myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
@@ -157,7 +161,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                 myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
+                        try {
+                            Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
+                        } catch (Exception e){
+
+                        }
                     }
                 });
             }
