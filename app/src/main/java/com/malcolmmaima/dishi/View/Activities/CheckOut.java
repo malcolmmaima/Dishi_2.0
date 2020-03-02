@@ -229,6 +229,7 @@ public class CheckOut extends AppCompatActivity {
                     DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("orders/"+product.getOwner());
 
                     ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
+                    ordersRef.child(myPhone).child("completed").setValue(false);
 
                     if(locationSet.equals("static")){
                         staticLocation.setLatitude(lat);

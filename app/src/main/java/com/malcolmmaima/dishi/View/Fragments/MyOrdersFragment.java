@@ -47,15 +47,11 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     //    ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
-    Switch liveStatus;
-    ImageView liveStatusIcon;
-    TextView liveTitle;
-    CardView live;
 
     DatabaseReference dbRef, myOrders, userDetailsRef;
     FirebaseDatabase db;
     FirebaseUser user;
-    ValueEventListener liveListener, inComingOrdersListener, userDetailsListener;
+    ValueEventListener userDetailsListener;
 
     TextView emptyTag;
     AppCompatImageView icon;

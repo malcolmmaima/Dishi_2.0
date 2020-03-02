@@ -99,6 +99,76 @@ public class ViewMyOrders extends AppCompatActivity {
                 if(!dataSnapshot.exists()){
                     finish();
                 }
+
+                try {
+                    Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
+                    if (completed == true) {
+                        final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
+                                .setMessage("Order Delivered?")
+                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                .setCancelable(false)
+                                //set three option buttons
+                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+
+                                                    try {
+                                                        ProductDetails prod = items.getValue(ProductDetails.class);
+                                                        prod.setKey(items.getKey());
+
+                                                        /**
+                                                         * Move order items to history node
+                                                         */
+                                                        myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+
+                                                                        myOrders.child(phone).removeValue();
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+
+                                                    } catch (Exception e) {
+
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+                                    }
+                                })//setPositiveButton
+
+                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                //Toast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                })
+
+                                .create();
+                        finish.show();
+                    }
+                } catch (Exception e){
+
+                }
                 total[0] = 0;
 
                 list = new ArrayList<>();
