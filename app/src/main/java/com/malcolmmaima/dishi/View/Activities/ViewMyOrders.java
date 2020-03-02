@@ -98,7 +98,6 @@ public class ViewMyOrders extends AppCompatActivity {
 
                 if(!dataSnapshot.exists()){
                     finish();
-                    Toast.makeText(ViewMyOrders.this, "Does not exist!", Toast.LENGTH_SHORT).show();
                 }
                 total[0] = 0;
 
@@ -180,10 +179,13 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 ProductDetails prod = items.getValue(ProductDetails.class);
                                                 prod.setKey(items.getKey());
 
+                                                /**
+                                                 * Move order items to history node
+                                                 */
                                                 myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        customerOrderItems.child(items.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
 

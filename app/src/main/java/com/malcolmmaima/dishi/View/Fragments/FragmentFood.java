@@ -327,60 +327,65 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                 /**
                                                  * Now lets compute distance of each restaurant with customer location
                                                  */
-                                                CalculateDistance calculateDistance = new CalculateDistance();
-                                                Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                        liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+                                                try {
+                                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                            liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * if distance meets parameters set then fetch menu
-                                                 */
+                                                    /**
+                                                     * if distance meets parameters set then fetch menu
+                                                     */
 
-                                                if (dist < location_filter) {
-                                                    //Fetch menu items of restaurants that have passed distance parameter
+                                                    if (dist < location_filter) {
+                                                        //Fetch menu items of restaurants that have passed distance parameter
 
-                                                    for (DataSnapshot menu : restaurants.getChildren()) {
-                                                        //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                        ProductDetails product = menu.getValue(ProductDetails.class);
-                                                        product.setKey(menu.getKey());
-                                                        product.setDistance(dist);
-                                                        list.add(product);
+                                                        for (DataSnapshot menu : restaurants.getChildren()) {
+                                                            //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            ProductDetails product = menu.getValue(ProductDetails.class);
+                                                            product.setKey(menu.getKey());
+                                                            product.setDistance(dist);
+                                                            list.add(product);
+                                                        }
                                                     }
+
+                                                    if (!list.isEmpty()) {
+
+                                                        mSwipeRefreshLayout.setRefreshing(false);
+                                                        Collections.reverse(list);
+                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                        recyclerview.setLayoutManager(layoutmanager);
+                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+
+                                                        recycler.notifyDataSetChanged();
+
+                                                        recyclerview.getItemAnimator().setAddDuration(200);
+                                                        recyclerview.getItemAnimator().setRemoveDuration(200);
+                                                        recyclerview.getItemAnimator().setMoveDuration(200);
+                                                        recyclerview.getItemAnimator().setChangeDuration(200);
+
+                                                        recyclerview.setAdapter(recycler);
+                                                        emptyTag.setVisibility(View.INVISIBLE);
+                                                        icon.setVisibility(View.INVISIBLE);
+                                                    } else {
+
+                                                        mSwipeRefreshLayout.setRefreshing(false);
+
+                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                        recyclerview.setLayoutManager(layoutmanager);
+                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                        recyclerview.setAdapter(recycler);
+                                                        emptyTag.setVisibility(View.VISIBLE);
+                                                        icon.setVisibility(View.VISIBLE);
+
+                                                    }
+                                                } catch (Exception e){
+
                                                 }
 
-                                                if (!list.isEmpty()) {
-
-                                                    mSwipeRefreshLayout.setRefreshing(false);
-                                                    Collections.reverse(list);
-                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                    recyclerview.setLayoutManager(layoutmanager);
-                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-
-                                                    recycler.notifyDataSetChanged();
-
-                                                    recyclerview.getItemAnimator().setAddDuration(200);
-                                                    recyclerview.getItemAnimator().setRemoveDuration(200);
-                                                    recyclerview.getItemAnimator().setMoveDuration(200);
-                                                    recyclerview.getItemAnimator().setChangeDuration(200);
-
-                                                    recyclerview.setAdapter(recycler);
-                                                    emptyTag.setVisibility(View.INVISIBLE);
-                                                    icon.setVisibility(View.INVISIBLE);
-                                                } else {
-
-                                                    mSwipeRefreshLayout.setRefreshing(false);
-
-                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                    recyclerview.setLayoutManager(layoutmanager);
-                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                    recyclerview.setAdapter(recycler);
-                                                    emptyTag.setVisibility(View.VISIBLE);
-                                                    icon.setVisibility(View.VISIBLE);
-
-                                                }
 
                                             }
 

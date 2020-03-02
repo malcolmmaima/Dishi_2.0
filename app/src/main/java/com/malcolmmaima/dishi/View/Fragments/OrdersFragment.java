@@ -241,7 +241,11 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
         incomingOrders.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Toast.makeText(getContext(), "New order, refresh", Toast.LENGTH_LONG).show();
+                try {
+                    Toast.makeText(getContext(), "New order, refresh", Toast.LENGTH_LONG).show();
+                } catch(Exception e){
+
+                }
             }
 
             @Override
