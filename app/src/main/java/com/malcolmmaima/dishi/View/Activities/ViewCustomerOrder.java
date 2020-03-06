@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.OnOrderChecked;
+import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.StaticLocation;
@@ -53,6 +58,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     LiveLocation liveLocation;
     StaticLocation deliveryLocation;
     ValueEventListener locationListener;
+    Menu myMenu;
 
     final int[] total = {0};
 
@@ -428,5 +434,106 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             subTotal.setText("Ksh " + total_);
             totalBill.setText("ksh " + totalAmount);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.assign_order_menu, menu);
+        myMenu = menu;
+        MenuItem item = menu.findItem(R.id.addRider);
+        if (item != null) {
+            item.setVisible(true);
+        }
+
+        else {
+            item.setVisible(false);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) { switch(item.getItemId()) {
+        case R.id.addRider:
+
+            /**
+             * Hide / show icon if atleast one order item confirmed
+             */
+            for(int i=0; i<list.size(); i++){
+                //Loop through the order items, if atleast one order item is confirmed then allow assigning of order to rider
+                if(list.get(i).getConfirmed() == true){
+                    i = list.size(); //end loop
+                    AlertDialog assignRider = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Assign order to rider?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    customerOrderItems.child("rider").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(!dataSnapshot.exists()){
+                                                Toast.makeText(ViewCustomerOrder.this, "Load riders list", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            else {
+                                                //Change rider
+                                                AlertDialog changeRider = new AlertDialog.Builder(ViewCustomerOrder.this)
+                                                        .setTitle("Already exists")
+                                                        .setMessage("Change rider?")
+                                                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                                        .setCancelable(false)
+                                                        //set three option buttons
+                                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                                //Load riders list
+                                                            }
+                                                        })//setPositiveButton
+
+                                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                                //Do nothing
+                                                            }
+                                                        })
+
+                                                        .create();
+                                                changeRider.show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                    //Load riders list
+
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                    Toast.makeText(ViewCustomerOrder.this, "Default rider is your account", Toast.LENGTH_LONG).show();
+                                }
+                            })
+
+                            .create();
+                    assignRider.show();
+                }
+
+                else {
+                    //
+                    Toast.makeText(this, "You must confirm at-least one item", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            return(true);
+    }
+        return(super.onOptionsItemSelected(item));
     }
 }
