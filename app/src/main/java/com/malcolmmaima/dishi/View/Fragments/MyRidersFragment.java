@@ -34,6 +34,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddRider;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
 import com.malcolmmaima.dishi.View.Adapter.MyOrdersAdapter;
+import com.malcolmmaima.dishi.View.Adapter.MyRidersAdapter;
 import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 
 import java.util.ArrayList;
@@ -133,7 +134,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     riders = new ArrayList<>();
-                    MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), riders);
+                    MyRidersAdapter recycler = new MyRidersAdapter(getContext(), riders);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -157,7 +158,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
 
                                 if (!riders.isEmpty()) {
                                     //Collections.reverse(orders);
-                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), riders);
+                                    MyRidersAdapter recycler = new MyRidersAdapter(getContext(), riders);
                                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -174,7 +175,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     icon.setVisibility(View.INVISIBLE);
                                 } else {
 //                                        progressDialog.dismiss();
-                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), riders);
+                                    MyRidersAdapter recycler = new MyRidersAdapter(getContext(), riders);
                                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());

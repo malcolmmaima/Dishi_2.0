@@ -2,13 +2,10 @@ package com.malcolmmaima.dishi.View.Adapter;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +24,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHolder>{
+public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHolder>{
     Context context;
     List<UserModel> listdata;
     long DURATION = 200;
@@ -42,21 +38,21 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
     String myPhone;
     FirebaseUser user;
 
-    public AddRiderAdapter(Context context, List<UserModel> listdata) {
+    public MyRidersAdapter(Context context, List<UserModel> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
 
 
     @Override
-    public AddRiderAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_add_rider,parent,false);
+    public MyRidersAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_my_rider,parent,false);
 
-        AddRiderAdapter.MyHolder myHolder = new AddRiderAdapter.MyHolder(view);
+        MyRidersAdapter.MyHolder myHolder = new MyRidersAdapter.MyHolder(view);
         return myHolder;
     }
 
-    public void onBindViewHolder(final AddRiderAdapter.MyHolder holder, final int position) {
+    public void onBindViewHolder(final MyRidersAdapter.MyHolder holder, final int position) {
         final UserModel orderDetails = listdata.get(position);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -72,7 +68,7 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
          * Set widget values
          **/
 
-        holder.customerName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
+        holder.riderName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
 
 
         /**
@@ -81,29 +77,7 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
-                        //set message, title, and icon
-                        .setMessage("Add " + orderDetails.getFirstname() + " " + orderDetails.getLastname() + "?")
-                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                        //set three option buttons
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                myRidersRef.child(orderDetails.getPhone()).setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        //Toast.makeText(context, "Added successfully", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                //do nothing
-
-                            }
-                        })//setNegativeButton
-
-                        .create();
-                addRider.show();
+                Toast.makeText(context, "Load rider details/options", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -161,13 +135,13 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView customerName;
+        TextView riderName;
         ImageView profilePic;
         CardView cardView;
 
         public MyHolder(View itemView) {
             super(itemView);
-            customerName = itemView.findViewById(R.id.riderName);
+            riderName = itemView.findViewById(R.id.riderName);
             profilePic = itemView.findViewById(R.id.profilePic);
             cardView = itemView.findViewById(R.id.card_view);
 
@@ -177,7 +151,30 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
                 @Override
                 public boolean onLongClick(View v) {
 
-                    //Do something
+                    final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
+                            //set message, title, and icon
+                            .setMessage("Remove " + riderName.getText().toString() + "?")
+                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                            //set three option buttons
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    myRidersRef.child(listdata.get(getAdapterPosition()).getPhone()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            listdata.remove(getAdapterPosition());
+                                            notifyItemRemoved(getAdapterPosition());
+                                        }
+                                    });
+                                }
+                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //do nothing
+
+                                }
+                            })//setNegativeButton
+
+                            .create();
+                    addRider.show();
                     return false;
                 }
             });
