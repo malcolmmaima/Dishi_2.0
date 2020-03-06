@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -156,9 +157,13 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         ProductDetails prod = items.getValue(ProductDetails.class);
                         prod.setKey(items.getKey());
                         list.add(prod);
-                        int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
-                        total[0] = total[0] + adapterTotal;
-                        totalAmount = total[0] + deliveryCharge;
+
+                        if(prod.getConfirmed() == true){
+                            int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                            total[0] = total[0] + adapterTotal;
+                            totalAmount = total[0] + deliveryCharge;
+                        }
+
                         payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
                     } catch (Exception e){
 
@@ -455,6 +460,31 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) { switch(item.getItemId()) {
+
+        case R.id.callCustomer:
+
+            final AlertDialog callAlert = new AlertDialog.Builder(this)
+                    //set message, title, and icon
+                    .setMessage("Call " + customerName + "?")
+                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                    //set three option buttons
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String phone_ = phone;
+                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone_, null));
+                            startActivity(intent);
+                        }
+                    }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            //do nothing
+
+                        }
+                    })//setNegativeButton
+
+                    .create();
+            callAlert.show();
+            return (true);
+
         case R.id.addRider:
 
             /**

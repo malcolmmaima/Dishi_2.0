@@ -5,6 +5,15 @@
     tools:context=".Views.Activities.ViewCustomerOrder">
 
     <item
-        android:id="@+id/addRider" android:icon="@drawable/deliver_nduthi_48dp" app:showAsAction="always"   android:title="Add Rider"/>
+        android:id="@+id/callCustomer"
+        android:icon="@drawable/ic_phone_black_24dp"
+        app:showAsAction="always"
+        android:title="Call Customer"/>
+
+    <item
+        android:id="@+id/addRider"
+        android:icon="@drawable/deliver_nduthi_48dp"
+        app:showAsAction="always"
+        android:title="Add Rider"/>
 
 </menu>
