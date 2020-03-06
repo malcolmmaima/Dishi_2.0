@@ -17,12 +17,10 @@
             android:icon="@drawable/ic_history_black_24dp"
             android:title="History" />
 
-        <!--
         <item
             android:id="@+id/menu4"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Menu 4" />
-        -->
+            android:icon="@drawable/deliver_nduthi_48dp"
+            android:title="My Riders" />
     </group>
 
     <item android:title="Account">
