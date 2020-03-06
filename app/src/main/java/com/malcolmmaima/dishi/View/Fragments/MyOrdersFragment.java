@@ -127,6 +127,9 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                     icon.setVisibility(View.VISIBLE);
                 }
 
+                /**
+                 * Exists, get customer details and order details
+                 */
                 else {
                     for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
 

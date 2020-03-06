@@ -45,7 +45,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     FirebaseUser user;
     DatabaseReference customerOrderItems, myLocationRef;
     ValueEventListener customerOrderItemsListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
@@ -123,6 +123,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         declineOrder = findViewById(R.id.btn_decline);
         declineOrder.setTag("active");
         DeliveryAddress = findViewById(R.id.DeliveryAddress);
+        customerRemarks = findViewById(R.id.customerRemarks);
 
         /**
          * Initialize cart items total and keep track of items
@@ -139,6 +140,10 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 total[0] = 0;
 
                 list = new ArrayList<>();
+
+                String remarks = dataSnapshot.child("remarks").getValue(String.class);
+
+                customerRemarks.setText("Remarks: "+remarks);
                 for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
                     try {

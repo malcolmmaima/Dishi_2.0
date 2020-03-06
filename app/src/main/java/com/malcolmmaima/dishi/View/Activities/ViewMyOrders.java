@@ -45,7 +45,7 @@ public class ViewMyOrders extends AppCompatActivity {
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory;
     ValueEventListener customerOrderItemsListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
@@ -88,6 +88,7 @@ public class ViewMyOrders extends AppCompatActivity {
         declineOrder = findViewById(R.id.btn_decline);
         declineOrder.setTag("active");
         DeliveryAddress = findViewById(R.id.DeliveryAddress);
+        myRemarks = findViewById(R.id.myOrderRemarks);
 
         /**
          * Initialize cart items total and keep track of items
@@ -102,6 +103,9 @@ public class ViewMyOrders extends AppCompatActivity {
 
                 try {
                     Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
+                    String remarks = dataSnapshot.child("remarks").getValue(String.class);
+
+                    myRemarks.setText("Remarks: "+remarks);
                     if (completed == true) {
                         final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
                                 .setMessage("Order Delivered?")

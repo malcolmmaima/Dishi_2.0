@@ -220,7 +220,6 @@ public class CheckOut extends AppCompatActivity {
 
                     product.setPaymentMethod(selectedPaymentMethod);
                     product.setAddress(locationSet);
-                    product.setRemarks(myRemarks);
                     product.setDistance(null);
                     product.setUploadDate(orderDate);
                     product.setConfirmed(false);
@@ -230,6 +229,7 @@ public class CheckOut extends AppCompatActivity {
 
                     ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
                     ordersRef.child(myPhone).child("completed").setValue(false);
+                    ordersRef.child(myPhone).child("remarks").setValue(myRemarks);
 
                     if(locationSet.equals("static")){
                         staticLocation.setLatitude(lat);

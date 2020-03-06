@@ -188,12 +188,27 @@
                     />
 
                 <LinearLayout
-                    android:layout_below="@id/productsSubtotal"
+                    android:layout_below="@id/paymentType"
+                    android:background="@color/colorBackroundWhite"
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
                     android:layout_height="wrap_content">
 
                     <!-- Might add more widgets here -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Remarks: "
+                        android:id="@+id/customerRemarks"
+                        android:fontFamily="sans-serif"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:textColor="#666"
+                        />
 
                 </LinearLayout>
 

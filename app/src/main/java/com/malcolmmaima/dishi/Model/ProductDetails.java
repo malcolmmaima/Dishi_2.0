@@ -15,7 +15,6 @@ public class ProductDetails {
 
     //below values are for our cart and orders, values from customer to restaurant
     public String paymentMethod;
-    public String remarks;
     public String address;
 
     //below values are from restaurant back to customer (setting order statu to confirmed or decline
@@ -109,13 +108,6 @@ public class ProductDetails {
         this.paymentMethod = paymentMethod;
     }
 
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
 
     public String getAddress() {
         return address;

@@ -131,34 +131,6 @@
                         android:textColor="#666"
                         />
 
-                    <TextView
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="VAT Charge (16%)"
-                        android:fontFamily="sans-serif-light"
-                        android:id="@+id/vatCharge"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_below="@id/DeliveryCharge"
-                        android:textColor="#666"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Ksh 0"
-                        android:id="@+id/VATamount"
-                        android:fontFamily="sans-serif"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginTop="10dp"
-                        android:layout_below="@id/DeliveryCharge"
-                        android:textColor="#666"
-                        />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -171,7 +143,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginBottom="10dp"
-                        android:layout_below="@id/vatCharge"
+                        android:layout_below="@id/DeliveryCharge"
                         android:textColor="#666"/>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -183,17 +155,35 @@
                         android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="10dp"
-                        android:layout_below="@id/vatCharge"
+                        android:layout_below="@id/DeliveryCharge"
                         android:textColor="#666"
                         />
 
+
+
                     <LinearLayout
-                        android:layout_below="@id/productsSubtotal"
+                        android:layout_below="@id/paymentType"
+                        android:background="@color/colorBackroundWhite"
                         android:layout_width="match_parent"
                         android:orientation="horizontal"
                         android:layout_height="wrap_content">
 
                         <!-- Might add more widgets here -->
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="Remarks: "
+                            android:id="@+id/myOrderRemarks"
+                            android:fontFamily="sans-serif"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_below="@id/paymentType"
+                            android:textColor="#666"
+                            />
 
                     </LinearLayout>
 
