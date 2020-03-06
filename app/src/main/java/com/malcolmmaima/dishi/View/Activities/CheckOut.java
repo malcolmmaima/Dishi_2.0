@@ -212,7 +212,7 @@ public class CheckOut extends AppCompatActivity {
                 }
 
                 else {
-                    myRemarks = remarks.getText().toString();
+                    myRemarks = remarks.getText().toString().trim();
                 }
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
