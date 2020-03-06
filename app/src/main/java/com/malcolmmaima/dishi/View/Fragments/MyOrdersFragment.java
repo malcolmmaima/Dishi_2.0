@@ -111,89 +111,106 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
         myOrders.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
 
-                    /**
-                     * Now lets get the user details
-                     */
-                    userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+userOrders.getKey());
+                /**
+                 * Check to see if my orders exists for my account
+                 */
+                if(!dataSnapshot.exists()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    orders = new ArrayList<>();
+                    MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
+                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                    recyclerview.setLayoutManager(layoutmanager);
+                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                    recyclerview.setAdapter(recycler);
+                    emptyTag.setVisibility(View.VISIBLE);
+                    icon.setVisibility(View.VISIBLE);
+                }
 
-                    /**
-                     * get items count
-                     */
+                else {
+                    for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
 
-                    final DatabaseReference itemCountRef =
-                            FirebaseDatabase.getInstance().getReference("orders/"+userOrders.getKey()+"/"+myPhone+"/items");
+                        /**
+                         * Now lets get the user details
+                         */
+                        userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+userOrders.getKey());
 
-                    /**
-                     * Assign user details to model and set item count value as well
-                     */
-                    userDetailsListener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull final DataSnapshot userDetails) {
-                            orders = new ArrayList<>();
-                            /**
-                             * get item count value then user details to model
-                             */
-                            itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    UserModel customer = userDetails.getValue(UserModel.class);
-                                    customer.setPhone(userOrders.getKey());
-                                    customer.itemCount = dataSnapshot.getChildrenCount();
-                                    orders.add(customer);
+                        /**
+                         * get items count
+                         */
 
-                                    if (!orders.isEmpty()) {
+                        final DatabaseReference itemCountRef =
+                                FirebaseDatabase.getInstance().getReference("orders/"+userOrders.getKey()+"/"+myPhone+"/items");
 
-                                        mSwipeRefreshLayout.setRefreshing(false);
+                        /**
+                         * Assign user details to model and set item count value as well
+                         */
+                        userDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull final DataSnapshot userDetails) {
+                                orders = new ArrayList<>();
+                                /**
+                                 * get item count value then user details to model
+                                 */
+                                itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        UserModel customer = userDetails.getValue(UserModel.class);
+                                        customer.setPhone(userOrders.getKey());
+                                        customer.itemCount = dataSnapshot.getChildrenCount();
+                                        orders.add(customer);
+
+                                        if (!orders.isEmpty()) {
+
+                                            mSwipeRefreshLayout.setRefreshing(false);
 //                                        progressDialog.dismiss();
-                                        Collections.reverse(orders);
-                                        MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                        recyclerview.setLayoutManager(layoutmanager);
-                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                            Collections.reverse(orders);
+                                            MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
+                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                            recyclerview.setLayoutManager(layoutmanager);
+                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
 
-                                        recycler.notifyDataSetChanged();
+                                            recycler.notifyDataSetChanged();
 
-                                        recyclerview.getItemAnimator().setAddDuration(200);
-                                        recyclerview.getItemAnimator().setRemoveDuration(200);
-                                        recyclerview.getItemAnimator().setMoveDuration(200);
-                                        recyclerview.getItemAnimator().setChangeDuration(200);
+                                            recyclerview.getItemAnimator().setAddDuration(200);
+                                            recyclerview.getItemAnimator().setRemoveDuration(200);
+                                            recyclerview.getItemAnimator().setMoveDuration(200);
+                                            recyclerview.getItemAnimator().setChangeDuration(200);
 
-                                        recyclerview.setAdapter(recycler);
-                                        emptyTag.setVisibility(View.INVISIBLE);
-                                        icon.setVisibility(View.INVISIBLE);
-                                    } else {
+                                            recyclerview.setAdapter(recycler);
+                                            emptyTag.setVisibility(View.INVISIBLE);
+                                            icon.setVisibility(View.INVISIBLE);
+                                        } else {
 
-                                        mSwipeRefreshLayout.setRefreshing(false);
+                                            mSwipeRefreshLayout.setRefreshing(false);
 //                                        progressDialog.dismiss();
-                                        MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                        recyclerview.setLayoutManager(layoutmanager);
-                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                        recyclerview.setAdapter(recycler);
-                                        emptyTag.setVisibility(View.VISIBLE);
-                                        icon.setVisibility(View.VISIBLE);
+                                            MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
+                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                            recyclerview.setLayoutManager(layoutmanager);
+                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                            recyclerview.setAdapter(recycler);
+                                            emptyTag.setVisibility(View.VISIBLE);
+                                            icon.setVisibility(View.VISIBLE);
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                     }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
+                                });
 
 
-                        }
+                            }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    };
-                    userDetailsRef.addListenerForSingleValueEvent(userDetailsListener);
+                            }
+                        });
 
+                    }
                 }
             }
 
