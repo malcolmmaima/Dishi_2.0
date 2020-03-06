@@ -6,6 +6,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -20,6 +21,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Adapter.AddRiderAdapter;
 import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 
 import java.util.ArrayList;
@@ -35,18 +40,24 @@ import java.util.List;
 public class AddRider extends AppCompatActivity {
 
     List<UserModel> riders = new ArrayList<>();
-    DatabaseReference riderUserAccounts;
+    DatabaseReference riderUserAccounts, myRidersRef;
     ProgressBar progressBar;
     EditText searchPhone;
     RecyclerView recyclerview;
     TextView emptyTag;
+    String myPhone;
+    FirebaseUser user;
+    ChildEventListener riderAddedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_rider);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
         riderUserAccounts = FirebaseDatabase.getInstance().getReference("users");
+        myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
 
         progressBar = findViewById(R.id.progressBar);
         searchPhone = findViewById(R.id.riderPhone);
@@ -92,6 +103,45 @@ public class AddRider extends AppCompatActivity {
                 searchRider(s.toString().trim());
             }
         });
+
+        riderAddedListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                /**
+                 * Check if rider has been added
+                 */
+                try {
+                    if (dataSnapshot.getKey().equals(searchPhone.getText().toString().trim())) {
+                        finish();
+                        Toast.makeText(AddRider.this, "Added successfully, refresh!", Toast.LENGTH_LONG).show();
+                    }
+                } catch (Exception e){
+
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myRidersRef.addChildEventListener(riderAddedListener);
     }
 
     private void searchRider(final String phone) {
@@ -114,7 +164,7 @@ public class AddRider extends AppCompatActivity {
                         if (!riders.isEmpty()) {
                             progressBar.setVisibility(View.INVISIBLE);
                             //Collections.reverse(orders);
-                            OrdersAdapter recycler = new OrdersAdapter(AddRider.this, riders);
+                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders);
                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
                             recyclerview.setLayoutManager(layoutmanager);
                             recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -130,8 +180,7 @@ public class AddRider extends AppCompatActivity {
                             emptyTag.setVisibility(View.INVISIBLE);
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
-//                                        progressDialog.dismiss();
-                            OrdersAdapter recycler = new OrdersAdapter(AddRider.this, riders);
+                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders);
                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
                             recyclerview.setLayoutManager(layoutmanager);
                             recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -150,4 +199,13 @@ public class AddRider extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            myRidersRef.removeEventListener(riderAddedListener);
+        } catch (Exception e){
+
+        }
+    }
 }

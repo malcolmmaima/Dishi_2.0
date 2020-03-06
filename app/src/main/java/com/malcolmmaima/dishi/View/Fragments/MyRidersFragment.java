@@ -144,7 +144,6 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 else {
                     for(final DataSnapshot rider : dataSnapshot.getChildren()){
-                        Toast.makeText(getContext(), "Rider: " + rider.getKey(), Toast.LENGTH_SHORT).show();
 
                         riderDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+rider.getKey());
 
@@ -207,4 +206,5 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onRefresh() {
         fetchRiders();
     }
+
 }
