@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ import com.malcolmmaima.dishi.Controller.OnOrderChecked;
 import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
@@ -41,11 +44,12 @@ import java.util.List;
 public class ViewMyOrders extends AppCompatActivity {
 
     List<ProductDetails> list;
-    String myPhone, phone, customerName;
+    String myPhone, phone, restaurantName;
     FirebaseUser user;
-    DatabaseReference customerOrderItems, myOrders, myOrdersHistory;
-    ValueEventListener customerOrderItemsListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks;
+    DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
+    ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName;
+    ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
@@ -64,7 +68,7 @@ public class ViewMyOrders extends AppCompatActivity {
 
         //Data passed from adapter
         phone = getIntent().getStringExtra("phone"); //From adapters
-        customerName = getIntent().getStringExtra("name");
+        restaurantName = getIntent().getStringExtra("name");
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -76,7 +80,7 @@ public class ViewMyOrders extends AppCompatActivity {
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle(customerName);
+        setTitle(restaurantName);
 
         subTotal = findViewById(R.id.subTotal);
         deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
@@ -89,6 +93,8 @@ public class ViewMyOrders extends AppCompatActivity {
         declineOrder.setTag("active");
         DeliveryAddress = findViewById(R.id.DeliveryAddress);
         myRemarks = findViewById(R.id.myOrderRemarks);
+        riderName = findViewById(R.id.riderName);
+        riderIcon = findViewById(R.id.riderIcon);
 
         /**
          * Initialize cart items total and keep track of items
@@ -223,6 +229,71 @@ public class ViewMyOrders extends AppCompatActivity {
             }
         };
         customerOrderItems.addValueEventListener(customerOrderItemsListener);
+
+        /**
+         * fetch current rider
+         */
+        currentRiderListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    riderName.setText(restaurantName);
+                }
+
+                else {
+                    final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
+                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                            riderName.setText(riderUser.getFirstname()+" "+riderUser.getLastname());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+phone+"/"+dataSnapshot.getValue());
+                    riderStatusListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
+                            String riderOrderStatus = dtSnapshot.getValue(String.class);
+                            if(!dtSnapshot.exists()){
+                                riderName.setText(restaurantName);
+                                customerOrderItems.child("rider").removeValue();
+                            }
+
+                            try {
+                                if (riderOrderStatus.equals("active")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
+
+                                }
+
+                                if (riderOrderStatus.equals("inactive")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                }
+                            } catch (Exception e){
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    };
+                    riderStatus.addValueEventListener(riderStatusListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
 
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override

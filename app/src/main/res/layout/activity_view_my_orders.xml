@@ -159,9 +159,8 @@
                         android:textColor="#666"
                         />
 
-
-
                     <LinearLayout
+                        android:id="@+id/remarksLayout"
                         android:layout_below="@id/paymentType"
                         android:background="@color/colorBackroundWhite"
                         android:layout_width="match_parent"
@@ -185,6 +184,33 @@
                             android:textColor="#666"
                             />
 
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginTop="10dp"
+                        android:layout_below="@id/remarksLayout"
+                        android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/riderIcon"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@drawable/deliver_nduthi_48dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginLeft="5dp"
+                            />
+
+                        <TextView
+                            android:id="@+id/riderName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#666"
+                            android:layout_gravity="center_vertical"
+                            android:text="Loading..."/>
                     </LinearLayout>
 
                 </RelativeLayout>
