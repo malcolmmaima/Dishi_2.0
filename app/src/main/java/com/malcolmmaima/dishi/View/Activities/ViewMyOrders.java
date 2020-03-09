@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,15 +29,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Controller.OnOrderChecked;
-import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
+import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -298,7 +296,12 @@ public class ViewMyOrders extends AppCompatActivity {
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ViewMyOrders.this, "Clicked", Toast.LENGTH_SHORT).show();
+                Intent slideactivity = new Intent(ViewMyOrders.this, GeoTracking.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("nduthi_phone", "+254778256039");
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
 
             }
         });

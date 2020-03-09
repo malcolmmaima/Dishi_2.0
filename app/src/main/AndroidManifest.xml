@@ -59,6 +59,7 @@
         <activity android:name=".View.Activities.WelcomeActivity" />
         <activity android:name=".View.Activities.SetupProfile" />
         <activity android:name=".View.Activities.LocationSettings" />
+        <activity android:name=".View.Maps.GeoTracking" />
         <activity
             android:name=".View.Maps.SearchLocation"
             android:label="@string/autocompletefromfragment" />
