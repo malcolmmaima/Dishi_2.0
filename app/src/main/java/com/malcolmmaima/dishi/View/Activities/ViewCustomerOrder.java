@@ -65,7 +65,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     ValueEventListener locationListener;
     Menu myMenu;
     List<String> myRiders, ridersName;
-    String [] riders;
 
     final int[] total = {0};
 
@@ -216,14 +215,15 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 myRiders = new ArrayList<String>();
                 ridersName = new ArrayList<String>();
-                riders = new String[(int) dataSnapshot.getChildrenCount()];
-                for(DataSnapshot rider : dataSnapshot.getChildren()){
-                    myRiders.add(rider.getKey());
+
+                for(final DataSnapshot rider : dataSnapshot.getChildren()){
                     DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+rider.getKey());
                     riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+
+                            myRiders.add(rider.getKey());
                             ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
                         }
 
@@ -612,31 +612,20 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             .setCancelable(false)
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
+                                public void onClick(DialogInterface dialog, final int whichButton) {
                                     customerOrderItems.child("rider").addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(!dataSnapshot.exists()){
-                                                /**
-                                                 * Assign ridersName ArrayList to a String[] array so as to display in alertdialog
-                                                 */
-                                                for(int i=0; i<ridersName.size(); i++){
-                                                    riders[i] = ridersName.get(i);
-
-                                                    /**
-                                                     * if loop has reached the end display AlertDialog
-                                                     */
-                                                    if(i==ridersName.size()-1){
-                                                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                                                        builder.setItems(riders, new DialogInterface.OnClickListener() {
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                customerOrderItems.child("rider").setValue(myRiders.get(which));
-                                                            }
-                                                        });
-                                                        builder.create();
-                                                        builder.show();
+                                                String [] riders = new String[ridersName.size()];
+                                                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                                                builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        customerOrderItems.child("rider").setValue(myRiders.get(which));
                                                     }
-                                                }
+                                                });
+                                                builder.create();
+                                                builder.show();
 
                                             }
 
@@ -651,26 +640,15 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                                 //Load riders list
-                                                                /**
-                                                                 * Assign ridersName ArrayList to a String[] array so as to display in alertdialog
-                                                                 */
-                                                                for(int i=0; i<ridersName.size(); i++){
-                                                                    riders[i] = ridersName.get(i);
-
-                                                                    /**
-                                                                     * if loop has reached the end display AlertDialog
-                                                                     */
-                                                                    if(i==ridersName.size()-1){
-                                                                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                                                                        builder.setItems(riders, new DialogInterface.OnClickListener() {
-                                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                                customerOrderItems.child("rider").setValue(myRiders.get(which));
-                                                                            }
-                                                                        });
-                                                                        builder.create();
-                                                                        builder.show();
+                                                                String [] riders = new String[ridersName.size()];
+                                                                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                                                                builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        customerOrderItems.child("rider").setValue(myRiders.get(which));
                                                                     }
-                                                                }
+                                                                });
+                                                                builder.create();
+                                                                builder.show();
                                                             }
                                                         })//setPositiveButton
 
