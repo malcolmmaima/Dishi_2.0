@@ -314,8 +314,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         };
         customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
 
-
-
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -513,11 +511,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     }
 
 
-
-    /**
-     * Initialize tracking of total for selected orders
-     */
-    int total_ = 0;
     @Override
     public void onItemChecked(Boolean isChecked, int position, String price, int quantity) {
 
@@ -533,9 +526,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
          * Add or subtract price of selected/unselected product
          */
         if(isChecked){
-            total_ = total_ + adapterTotal;
-            totalAmount = total_ + deliveryCharge;
-            subTotal.setText("Ksh " + total_);
+            total[0] = total[0] + adapterTotal;
+            totalAmount = total[0] + deliveryCharge;
+            subTotal.setText("Ksh " + total[0]);
             totalBill.setText("ksh " + totalAmount);
 
             if(confirmOrder.getTag().toString().equals("end")){
@@ -545,10 +538,10 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         }
 
         else {
-            total_ = total_ - adapterTotal;
-            if(total_ < 0) { total_ = 0;}
-            totalAmount = total_ + deliveryCharge;
-            subTotal.setText("Ksh " + total_);
+            total[0] = total[0] - adapterTotal;
+            if(total[0] < 0) { total[0] = 0;}
+            totalAmount = total[0] + deliveryCharge;
+            subTotal.setText("Ksh " + total[0]);
             totalBill.setText("ksh " + totalAmount);
         }
     }
