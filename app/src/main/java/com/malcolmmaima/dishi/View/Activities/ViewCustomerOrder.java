@@ -36,6 +36,7 @@ import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
@@ -49,8 +50,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     List<ProductDetails> list;
     String myPhone, phone, customerName;
     FirebaseUser user;
-    DatabaseReference customerOrderItems, myLocationRef;
-    ValueEventListener customerOrderItemsListener;
+    DatabaseReference customerOrderItems, myLocationRef, myRidersRef;
+    ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener;
     TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
@@ -60,6 +61,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     StaticLocation deliveryLocation;
     ValueEventListener locationListener;
     Menu myMenu;
+    List<String> myRiders, ridersName;
+    String [] riders;
 
     final int[] total = {0};
 
@@ -80,6 +83,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
         customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
+        myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
 
         /**
          * On create view fetch my location coordinates
@@ -198,6 +202,63 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             }
         };
         customerOrderItems.addValueEventListener(customerOrderItemsListener);
+
+        /**
+         * Fetch my riders list
+         */
+        myRidersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myRiders = new ArrayList<String>();
+                ridersName = new ArrayList<String>();
+                riders = new String[(int) dataSnapshot.getChildrenCount()];
+                for(DataSnapshot rider : dataSnapshot.getChildren()){
+                    myRiders.add(rider.getKey());
+                    DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+rider.getKey());
+                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                            ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        /**
+         * fetch current rider
+         */
+        currentRiderListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    Toast.makeText(ViewCustomerOrder.this, "No Rider set", Toast.LENGTH_SHORT).show();
+                }
+
+                else {
+                    Toast.makeText(ViewCustomerOrder.this, "Rider: " + dataSnapshot.getValue(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+
+        myRidersRef.addValueEventListener(myRidersListener);
 
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -400,6 +461,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         super.onDestroy();
 
         customerOrderItems.removeEventListener(customerOrderItemsListener);
+        customerOrderItems.removeEventListener(currentRiderListener);
+        myRidersRef.removeEventListener(myRidersListener);
     }
 
     /**
@@ -505,7 +568,27 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(!dataSnapshot.exists()){
-                                                Toast.makeText(ViewCustomerOrder.this, "Load riders list", Toast.LENGTH_SHORT).show();
+                                                /**
+                                                 * Assign ridersName ArrayList to a String[] array so as to display in alertdialog
+                                                 */
+                                                for(int i=0; i<ridersName.size(); i++){
+                                                    riders[i] = ridersName.get(i);
+
+                                                    /**
+                                                     * if loop has reached the end display AlertDialog
+                                                     */
+                                                    if(i==ridersName.size()-1){
+                                                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                                                        builder.setItems(riders, new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                customerOrderItems.child("rider").setValue(myRiders.get(which));
+                                                            }
+                                                        });
+                                                        builder.create();
+                                                        builder.show();
+                                                    }
+                                                }
+
                                             }
 
                                             else {
@@ -519,6 +602,26 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                                 //Load riders list
+                                                                /**
+                                                                 * Assign ridersName ArrayList to a String[] array so as to display in alertdialog
+                                                                 */
+                                                                for(int i=0; i<ridersName.size(); i++){
+                                                                    riders[i] = ridersName.get(i);
+
+                                                                    /**
+                                                                     * if loop has reached the end display AlertDialog
+                                                                     */
+                                                                    if(i==ridersName.size()-1){
+                                                                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                                                                        builder.setItems(riders, new DialogInterface.OnClickListener() {
+                                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                                customerOrderItems.child("rider").setValue(myRiders.get(which));
+                                                                            }
+                                                                        });
+                                                                        builder.create();
+                                                                        builder.show();
+                                                                    }
+                                                                }
                                                             }
                                                         })//setPositiveButton
 
