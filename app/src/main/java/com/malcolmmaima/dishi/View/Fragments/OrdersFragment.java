@@ -286,7 +286,12 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
 
-//                progressDialog.dismiss();
+                /**
+                 * My orders node doesn't exist, meaning i dont have any order requests
+                 */
+                if(!dataSnapshot.exists()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
 
                 for(final DataSnapshot userOrders : dataSnapshot.getChildren()){
 
