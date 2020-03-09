@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,9 +52,10 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     List<ProductDetails> list;
     String myPhone, phone, customerName;
     FirebaseUser user;
-    DatabaseReference customerOrderItems, myLocationRef, myRidersRef;
-    ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks;
+    DatabaseReference customerOrderItems, myLocationRef, myRidersRef, riderStatus;
+    ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName;
+    ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
@@ -135,6 +138,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         declineOrder.setTag("active");
         DeliveryAddress = findViewById(R.id.DeliveryAddress);
         customerRemarks = findViewById(R.id.customerRemarks);
+        riderName = findViewById(R.id.riderName);
+        riderIcon = findViewById(R.id.riderIcon);
 
         /**
          * Initialize cart items total and keep track of items
@@ -228,6 +233,13 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         }
                     });
                 }
+
+                try {
+                    Collections.reverse(myRiders);
+                    Collections.reverse(ridersName);
+                } catch (Exception e){
+
+                }
             }
 
             @Override
@@ -235,6 +247,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
             }
         };
+        myRidersRef.addValueEventListener(myRidersListener);
 
         /**
          * fetch current rider
@@ -243,11 +256,54 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.exists()){
-                    Toast.makeText(ViewCustomerOrder.this, "No Rider set", Toast.LENGTH_SHORT).show();
+                    riderName.setText("You are the default rider for this order. Assign rider top right icon.");
                 }
 
                 else {
-                    Toast.makeText(ViewCustomerOrder.this, "Rider: " + dataSnapshot.getValue(), Toast.LENGTH_SHORT).show();
+                    final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
+                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                            riderName.setText(riderUser.getFirstname()+" "+riderUser.getLastname());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone+"/"+dataSnapshot.getValue());
+                    riderStatusListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
+                            String riderOrderStatus = dtSnapshot.getValue(String.class);
+                            if(!dtSnapshot.exists()){
+                                Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
+                                customerOrderItems.child("rider").removeValue();
+                            }
+
+                            try {
+                                if (riderOrderStatus.equals("active")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
+
+                                }
+
+                                if (riderOrderStatus.equals("inactive")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                }
+                            } catch (Exception e){
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    };
+                    riderStatus.addValueEventListener(riderStatusListener);
                 }
             }
 
@@ -258,7 +314,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         };
         customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
 
-        myRidersRef.addValueEventListener(myRidersListener);
+
 
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -456,14 +512,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
-        customerOrderItems.removeEventListener(customerOrderItemsListener);
-        customerOrderItems.removeEventListener(currentRiderListener);
-        myRidersRef.removeEventListener(myRidersListener);
-    }
 
     /**
      * Initialize tracking of total for selected orders
@@ -668,5 +717,19 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             return(true);
     }
         return(super.onOptionsItemSelected(item));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try {
+            customerOrderItems.removeEventListener(customerOrderItemsListener);
+            customerOrderItems.removeEventListener(currentRiderListener);
+            myRidersRef.removeEventListener(myRidersListener);
+            riderStatus.removeEventListener(riderStatusListener);
+        } catch (Exception e){
+
+        }
     }
 }
