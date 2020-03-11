@@ -338,6 +338,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 customerOrderListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        /**
+                         * Rider set
+                         */
                         if(dataSnapshot.child("rider").exists()){
                             riderPhone = dataSnapshot.child("rider").getValue(String.class);
                            //Toast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
@@ -353,6 +356,56 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                     Toast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
                                             + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
+                                    /**
+                                     * Delivery location (Live or static)
+                                     */
+
+                                    deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
+                                    deliveryLocationListener = new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(dataSnapshot.child("static_address").exists()){
+                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+
+                                                /**
+                                                 * Track order movement
+                                                 */
+                                                try {
+                                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
+                                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
+                                                            trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                                } catch (Exception e){
+
+                                                }
+                                            }
+
+                                            else {
+                                                //myLat and myLong variables
+                                                Toast.makeText(GeoTracking.this, "delivery live("+myLat
+                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
+
+                                                /**
+                                                 * Track order movement
+                                                 */
+                                                try {
+                                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
+                                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
+                                                            trackOrderLatLng, loggedInUserLoc);
+                                                } catch (Exception e){
+
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    };
+                                    deliveryLocationRef.addValueEventListener(deliveryLocationListener);
+
                                 }
 
                                 @Override
@@ -361,57 +414,18 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                 }
                             };
                             riderLocationRef.addValueEventListener(riderLocationListener);
-                        }
 
-                        else {
-                            Toast.makeText(GeoTracking.this, "rider default: ("+restaurantLat
-                                    +","+restaurantLong+")", Toast.LENGTH_SHORT).show();
 
                         }
 
                         /**
-                         * Delivery location (Live or static)
+                         * Rider not set
                          */
+                        else {
+//                            Toast.makeText(GeoTracking.this, "rider default: ("+restaurantLat
+//                                    +","+restaurantLong+")", Toast.LENGTH_SHORT).show();
 
-                        deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
-                        deliveryLocationListener = new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.child("static_address").exists()){
-                                    staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
-//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
-
-                                    /**
-                                     * Track order movement
-                                     */
-                                    trackOrderLatLng = null;
-                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
-                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
-                                            trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
-                                }
-
-                                else {
-                                    //myLat and myLong variables
-                                    Toast.makeText(GeoTracking.this, "delivery live("+myLat
-                                            +","+myLong+")", Toast.LENGTH_SHORT).show();
-
-                                    /**
-                                     * Track order movement
-                                     */
-                                    trackOrderLatLng = null;
-                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
-                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
-                                            trackOrderLatLng, loggedInUserLoc);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        };
-                        deliveryLocationRef.addValueEventListener(deliveryLocationListener);
+                        }
                     }
 
                     @Override
