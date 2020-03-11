@@ -322,7 +322,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                  * Check if rider node exists in my order node. Basically confirming if restaurant has assigned order to a rider
                  */
 
-                customerOrderRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
+                customerOrderRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
                 customerOrderListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -348,14 +348,14 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      * Delivery location (Live or static)
                                      */
 
-                                    deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
+                                    deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
                                     deliveryLocationListener = new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
                                                 staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
-                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+//                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
                                                  * Track order movement
@@ -416,7 +416,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                              */
 
                             Toast.makeText(GeoTracking.this, "rest: " + restaurantPhone, Toast.LENGTH_SHORT).show();
-                            deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
+                            deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
                             deliveryLocationListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -518,7 +518,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          */
                         if(dataSnapshot.child("rider").exists()){
                             riderPhone = dataSnapshot.child("rider").getValue(String.class);
-                            //Toast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
 
                             /**
                              * Rider node exists, get rider location co-ordinates
@@ -535,14 +535,14 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      * Delivery location (Live or static)
                                      */
 
-                                    deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
+                                    deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
                                     deliveryLocationListener = new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
                                                 staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
-//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+//                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
                                                  * Track order movement
@@ -597,8 +597,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          * Rider not set
                          */
                         else {
-//                            Toast.makeText(GeoTracking.this, "rider default: ("+restaurantLat
-//                                    +","+restaurantLong+")", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
                             /**
                              * Delivery location (Live or static)
                              */
@@ -612,8 +611,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
                                         staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
-//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**
                                          * Track order movement
@@ -671,8 +669,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 callNduthi.setEnabled(true);
                 //If person making delivery is within 500m radius, send notification
                 //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-                message = "Customer received Order?";
-                callMsg = "Call Customer?";
+                message = "Has nduthi or provider delivered your order?";
+                callMsg = "Call delivery guy?";
 
 
             } catch (Exception e){
@@ -749,7 +747,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void animateTracking(Double riderLat, Double riderLong, LatLng from_, LatLng to_) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(riderLat, riderLong), zoomLevel));
+
 
         try {
             myCurrent.remove(); //Remove previous marker
@@ -759,13 +757,12 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
         }
 
-        String provider_snippet = "";
         if(accType.equals("1")){
-            provider_snippet = customerPhone;
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(riderLat, riderLong), zoomLevel));
         }
 
         if(accType.equals("2")){
-            provider_snippet = restaurantPhone;
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(to_, zoomLevel));
         }
 
         if(accType.equals("3")){
@@ -773,7 +770,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         }
 
         providerCurrent = mMap.addMarker(new MarkerOptions().position(from_).title("Rider")
-                .snippet(provider_snippet)
+                .snippet("")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_delivery_scooter_24dp))
                 .flat(true));
 
