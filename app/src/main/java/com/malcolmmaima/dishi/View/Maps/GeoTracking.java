@@ -1,11 +1,7 @@
 package com.malcolmmaima.dishi.View.Maps;
 
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -33,7 +29,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -49,11 +44,7 @@ import com.malcolmmaima.dishi.R;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Random;
-
 
 public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -67,11 +58,10 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     int zoomLevel;
     Double restaurantLat, restaurantLong;
     VerticalSeekBar zoomMap;
-    DatabaseReference myRef, customerOrderRef, riderLocationRef, deliveryLocationRef;
-    ValueEventListener customerOrderListener, riderLocationListener, deliveryLocationListener;
+    DatabaseReference myRef, customerOrderRef, riderLocationRef, deliveryLocationRef, restaurantLocationRef, mylocationRef;
+    ValueEventListener myRefListener, customerOrderListener, riderLocationListener, mylocationRefListener, deliveryLocationListener, restaurantLocationRefListener;
     String myPhone, accType, message, callMsg, restaurantPhone, riderPhone;
     ProgressDialog progressDialog;
-    List<String> names;
     LiveLocation riderLocation;
     StaticLocation staticDeliveryLocation;
 
@@ -93,6 +83,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         confirmOrd = findViewById(R.id.confirmOrd);
 
         restaurantPhone = getIntent().getStringExtra("restaurantPhone");
+        mylocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone); //loggedin user location reference
+        restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
 
         message = "Order delivered?";
         callMsg = "Call?";
@@ -134,7 +126,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         //Get logged in user account type
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
-        myRef.child("account_type").addValueEventListener(new ValueEventListener() {
+        myRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 accType = dataSnapshot.getValue(String.class);
@@ -145,13 +137,88 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myRef.child("account_type").addValueEventListener(myRefListener);
+
+        /**
+         * Get Restaurant Latitude and longitude
+         */
+        restaurantLocationRefListener =  new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                restaurantLat = dataSnapshot.getValue(Double.class);
+                //Toast.makeText(GeoFireActivity.this, "nduthiLat: " + nduthiLat, Toast.LENGTH_LONG).show();
+                try {
+                    track();
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        restaurantLocationRef.child("latitude").addValueEventListener(restaurantLocationRefListener);
+
+        restaurantLocationRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                restaurantLong = dataSnapshot.getValue(Double.class);
+                //Toast.makeText(GeoFireActivity.this, "nduthiLng: " + nduthiLat, Toast.LENGTH_LONG).show();
+                try {
+                    track();
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("dishi", "GeoFireActivity: " + databaseError);
+            }
+        };
+        restaurantLocationRef.child("longitude").addValueEventListener(restaurantLocationRefListener);
+        /**
+         * End Get Restaurant Latitude and longitude
+         */
+
+        //My latitude longitude coordinates
+        mylocationRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot myCords : dataSnapshot.getChildren()){
+                    if(myCords.getKey().equals("latitude")){
+                        myLat = myCords.getValue(Double.class);
+                    }
+
+                    if(myCords.getKey().equals("longitude")){
+                        myLong = myCords.getValue(Double.class);
+                    }
+                }
+
+                //Toast.makeText(GeoFireActivity.this, "lat: "+ myLat + " long: " + myLong, Toast.LENGTH_SHORT).show();
+                try {
+                    track();
+                } catch (Exception e){
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
+        mylocationRef.addValueEventListener(mylocationRefListener);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle("Track Nduthi");
+        setTitle("Track Order");
 
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -231,95 +298,12 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         confirmOrd.setEnabled(false);
         callNduthi.setEnabled(false);
 
-        if(progressDialog.isShowing()){
-            progressDialog.dismiss();
-        }
-
-        names = new ArrayList<String>();
-
         mMap = googleMap;
-        final DatabaseReference mylocationRef;
-        final DatabaseReference[] nduthiGuyRef = new DatabaseReference[1];
-        FirebaseDatabase db;
-
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-
-        db = FirebaseDatabase.getInstance();
-        mylocationRef = db.getReference("location/"+myPhone); //loggedin user location reference
-        nduthiGuyRef[0] = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
-
-
-        nduthiGuyRef[0].child("latitude").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                restaurantLat = dataSnapshot.getValue(Double.class);
-                //Toast.makeText(GeoFireActivity.this, "nduthiLat: " + nduthiLat, Toast.LENGTH_LONG).show();
-                try {
-                    track();
-                } catch (Exception e){
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        nduthiGuyRef[0].child("longitude").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                restaurantLong = dataSnapshot.getValue(Double.class);
-                //Toast.makeText(GeoFireActivity.this, "nduthiLng: " + nduthiLat, Toast.LENGTH_LONG).show();
-                try {
-                    track();
-                } catch (Exception e){
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("dishi", "GeoFireActivity: " + databaseError);
-            }
-        });
-
-        //My latitude longitude coordinates
-        mylocationRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for(DataSnapshot myCords : dataSnapshot.getChildren()){
-                    if(myCords.getKey().equals("latitude")){
-                        myLat = myCords.getValue(Double.class);
-                    }
-
-                    if(myCords.getKey().equals("longitude")){
-                        myLong = myCords.getValue(Double.class);
-                    }
-                }
-
-                //Toast.makeText(GeoFireActivity.this, "lat: "+ myLat + " long: " + myLong, Toast.LENGTH_SHORT).show();
-                try {
-                    track();
-                } catch (Exception e){
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
     }
 
     private void track() {
         if(accType.equals("1")) {//Customer
+            setTitle("Track Order");
             try {
                 loggedInUserLoc = new LatLng(myLat, myLong);
                 trackOrderLatLng = new LatLng(restaurantLat, restaurantLong); // default is restaurant coordinates
@@ -353,8 +337,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
                                     riderLocation = location.getValue(LiveLocation.class);
-                                    Toast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
-                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
+//                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                     /**
                                      * Delivery location (Live or static)
@@ -383,8 +367,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
                                             else {
                                                 //myLat and myLong variables
-                                                Toast.makeText(GeoTracking.this, "delivery live("+myLat
-                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
+//                                                Toast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
                                                  * Track order movement
@@ -424,6 +408,61 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                         else {
 //                            Toast.makeText(GeoTracking.this, "rider default: ("+restaurantLat
 //                                    +","+restaurantLong+")", Toast.LENGTH_SHORT).show();
+                            /**
+                             * Delivery location (Live or static)
+                             */
+
+                            deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
+                            deliveryLocationListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    /**
+                                     * Static address exists
+                                     */
+                                    if(dataSnapshot.child("static_address").exists()){
+                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+
+                                        /**
+                                         * Track order movement
+                                         */
+                                        try {
+                                            trackOrderLatLng = new LatLng(restaurantLat, restaurantLong);
+                                            animateTracking(restaurantLat, restaurantLong,
+                                                    trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                        } catch (Exception e){
+
+                                        }
+                                    }
+
+                                    /**
+                                     * Static address doesn't exist
+                                     */
+                                    else {
+                                        //myLat and myLong variables
+//                                        Toast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                                +","+myLong+")", Toast.LENGTH_SHORT).show();
+
+                                        /**
+                                         * Track order movement
+                                         */
+                                        try {
+                                            trackOrderLatLng = new LatLng(restaurantLat, restaurantLong);
+                                            animateTracking(restaurantLat, restaurantLong,
+                                                    trackOrderLatLng, loggedInUserLoc);
+                                        } catch (Exception e){
+
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            };
+                            deliveryLocationRef.addValueEventListener(deliveryLocationListener);
 
                         }
                     }
@@ -446,27 +485,16 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
 
             } catch (Exception e){
-                //Toast.makeText(GeoFireActivity.this, "Error: " + e.toString(), Toast.LENGTH_SHORT).show();
-//                confirmOrd.setEnabled(false);
-//                callNduthi.setEnabled(false);
-//                //Toast.makeText(GeoFireActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
-//                Log.d("dish", "GeoFireActivity: " + e);
-//                //loggedInUserLoc = new LatLng(-1.281647, 36.822638); //Default Nairobi
-//                myCurrent = mMap.addMarker(new MarkerOptions().position(loggedInUserLoc).title("Default Location").snippet("Error fetching your location"));
-//                providerCurrent = mMap.addMarker(new MarkerOptions().position(loggedInUserLoc).title("Default Location").snippet("Error fetching your location"));
-//                //Radius around my area
-//                myArea = mMap.addCircle(new CircleOptions().center(loggedInUserLoc)
-//                        .radius(500)//in meters
-//                        .strokeColor(Color.BLUE)
-//                        .fillColor(0x220000FF)
-//                        .strokeWidth(5.0f));
-//                mMap.moveCamera(CameraUpdateFactory.newLatLng(loggedInUserLoc));
-//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-1.281647, 36.822638), zoomLevel));
+                Toast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
+                confirmOrd.setEnabled(false);
+                callNduthi.setEnabled(false);
+
 
             }
         }
 
         if(accType.equals("2")) {//provider
+            setTitle("Track Customer");
 //            try {
 //                loggedInUserLoc = new LatLng(myLat, myLong);
 //                nduthiGuyLoc = new LatLng(nduthiLat, nduthiLng);
@@ -534,6 +562,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if(accType.equals("3")) {//nduthi
+            setTitle("Track Customer");
 
 //            try {
 //                loggedInUserLoc = new LatLng(myLat, myLong);
@@ -624,6 +653,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 .strokeColor(Color.BLUE)
                 .fillColor(0x220000FF)
                 .strokeWidth(5.0f));
+
+        progressDialog.dismiss();
     }
 
     public static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
@@ -675,6 +706,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             customerOrderRef.removeEventListener(customerOrderListener);
             riderLocationRef.removeEventListener(riderLocationListener);
             deliveryLocationRef.removeEventListener(deliveryLocationListener);
+            myRef.removeEventListener(myRefListener);
+            restaurantLocationRef.removeEventListener(restaurantLocationRefListener);
+            mylocationRef.removeEventListener(mylocationRefListener);
         } catch (Exception e){
 
         }
