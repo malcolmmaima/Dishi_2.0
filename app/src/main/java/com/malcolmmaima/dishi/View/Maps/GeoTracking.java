@@ -59,8 +59,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     int zoomLevel;
     Double restaurantLat, restaurantLong;
     VerticalSeekBar zoomMap;
-    DatabaseReference myRef, customerOrderRef, riderLocationRef, deliveryLocationRef, restaurantLocationRef, mylocationRef;
-    ValueEventListener myRefListener, customerOrderListener, riderLocationListener, mylocationRefListener, deliveryLocationListener, restaurantLocationRefListener;
+    DatabaseReference myRef, customerOrderRef, riderLocationRef, deliveryLocationRef, restaurantLocationRef, customerLocationRef;
+    ValueEventListener myRefListener, customerOrderListener, riderLocationListener, deliveryLocationListener, restaurantLocationRefListener, customerLocationRefListener;
     String myPhone, accType, message, callMsg, restaurantPhone, riderPhone, customerPhone;
     ProgressDialog progressDialog;
     LiveLocation riderLocation;
@@ -86,18 +86,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         restaurantPhone = getIntent().getStringExtra("restaurantPhone");
         customerPhone = getIntent().getStringExtra("customerPhone");
 
-        mylocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone); //loggedin user location reference
-
-        if(restaurantPhone != null){
-            //Toast.makeText(this, "restaurantPhone: set", Toast.LENGTH_SHORT).show();
-            restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
-        }
-
-        else if(customerPhone != null) {
-            //Toast.makeText(this, "customerPhone: set", Toast.LENGTH_SHORT).show();
-            restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+customerPhone);
-        }
-
+        restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
+        customerLocationRef = FirebaseDatabase.getInstance().getReference("location/"+customerPhone);
 
         message = "Order delivered?";
         callMsg = "Call?";
@@ -198,7 +188,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
          */
 
         //My latitude longitude coordinates
-        mylocationRefListener = new ValueEventListener() {
+        customerLocationRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -225,7 +215,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
-        mylocationRef.addValueEventListener(mylocationRefListener);
+        customerLocationRef.addValueEventListener(customerLocationRefListener);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -364,8 +354,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
                                                 staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
-//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
                                                  * Track order movement
@@ -420,12 +410,12 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          * Rider not set
                          */
                         else {
-//                            Toast.makeText(GeoTracking.this, "rider default: ("+restaurantLat
-//                                    +","+restaurantLong+")", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
                             /**
                              * Delivery location (Live or static)
                              */
 
+                            Toast.makeText(GeoTracking.this, "rest: " + restaurantPhone, Toast.LENGTH_SHORT).show();
                             deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+myPhone);
                             deliveryLocationListener = new ValueEventListener() {
                                 @Override
@@ -435,8 +425,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
                                         staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-//                            Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
-//                                    + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**
                                          * Track order movement
@@ -851,7 +840,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             deliveryLocationRef.removeEventListener(deliveryLocationListener);
             myRef.removeEventListener(myRefListener);
             restaurantLocationRef.removeEventListener(restaurantLocationRefListener);
-            mylocationRef.removeEventListener(mylocationRefListener);
+            customerLocationRef.removeEventListener(customerLocationRefListener);
         } catch (Exception e){
 
         }

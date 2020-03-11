@@ -300,7 +300,8 @@ public class ViewMyOrders extends AppCompatActivity {
             public void onClick(View v) {
                 Intent slideactivity = new Intent(ViewMyOrders.this, GeoTracking.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("customerPhone", phone);
+                slideactivity.putExtra("restaurantPhone", phone);
+                slideactivity.putExtra("customerPhone", myPhone);
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
                 startActivity(slideactivity, bndlanimation);

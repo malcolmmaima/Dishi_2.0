@@ -321,6 +321,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             public void onClick(View v) {
                 Intent slideactivity = new Intent(ViewCustomerOrder.this, GeoTracking.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("restaurantPhone", myPhone);
                 slideactivity.putExtra("customerPhone", phone);
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
