@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,6 +43,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
+import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -317,41 +319,12 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /**
-                 * On create view fetch customer location coordinates
-                 */
-                customerOrderItemsListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        /**
-                         * If this node exists then customer has set delivery address as static
-                         */
-                        if(dataSnapshot.child("static_address").exists()){
-                            try {
-                                deliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
-                                Toast.makeText(ViewCustomerOrder.this, "loc: " + deliveryLocation.getPlace(), Toast.LENGTH_SHORT).show();
-
-                            } catch (Exception e){
-
-                            }
-                        }
-                        /**
-                         * Node doen't exist which automatically means customer set "live" as delivery address
-                         */
-                        else {
-                            Toast.makeText(ViewCustomerOrder.this, "loc doesn't exist, use live", Toast.LENGTH_SHORT).show();
-                        }
-
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                };
-
-                customerOrderItems.addListenerForSingleValueEvent(customerOrderItemsListener);
+                Intent slideactivity = new Intent(ViewCustomerOrder.this, GeoTracking.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("customerPhone", phone);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
 
             }
         });

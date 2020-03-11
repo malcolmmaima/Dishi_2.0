@@ -243,8 +243,10 @@ public class ViewMyOrders extends AppCompatActivity {
                     riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            UserModel riderUser = dataSnapshot.getValue(UserModel.class);
-                            riderName.setText(riderUser.getFirstname()+" "+riderUser.getLastname());
+                            try {
+                                UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                                riderName.setText(riderUser.getFirstname() + " " + riderUser.getLastname());
+                            } catch (Exception e){}
                         }
 
                         @Override
@@ -298,7 +300,7 @@ public class ViewMyOrders extends AppCompatActivity {
             public void onClick(View v) {
                 Intent slideactivity = new Intent(ViewMyOrders.this, GeoTracking.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("restaurantPhone", phone);
+                slideactivity.putExtra("customerPhone", phone);
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
                 startActivity(slideactivity, bndlanimation);
