@@ -291,6 +291,13 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                  */
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
+                    OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
+                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                    recyclerview.setLayoutManager(layoutmanager);
+                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                    recyclerview.setAdapter(recycler);
+                    emptyTag.setVisibility(View.VISIBLE);
+                    icon.setVisibility(View.VISIBLE);
                 }
 
                 for(final DataSnapshot userOrders : dataSnapshot.getChildren()){

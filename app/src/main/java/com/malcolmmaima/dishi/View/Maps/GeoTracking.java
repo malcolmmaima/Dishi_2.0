@@ -110,9 +110,20 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 if(accType.equals("1")){
-                                    String phone = restaurantPhone;
-                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
-                                    startActivity(intent);
+
+                                    //Rider has been assigned
+                                    if(riderPhone != null){
+                                        String phone = riderPhone;
+                                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                        startActivity(intent);
+                                    }
+
+                                    //Rider not assigned, call restaurant
+                                    else {
+                                        String phone = restaurantPhone;
+                                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                        startActivity(intent);
+                                    }
                                 }
 
                                 if(accType.equals("2")){
@@ -229,7 +240,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                     customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
+                                            //Do nothing
                                         }
                                     });
                                 }
