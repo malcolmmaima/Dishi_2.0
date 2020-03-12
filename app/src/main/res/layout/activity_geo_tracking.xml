@@ -56,33 +56,37 @@
 
     </fragment>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/nduthiInfo"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:background="@color/colorBackroundWhite"
         android:paddingHorizontal="10dp"
         android:gravity="center_horizontal"
+        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         >
 
-        <Button
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/callNduthi"
-            android:text="Call"
-            android:textSize="20dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_phone_black_24dp"
+            android:layout_margin="10dp"
+            android:tint="@color/colorBackroundWhite"
+            app:backgroundTint="@color/dot_inactive_screen1" />
 
-        <Button
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/confirmOrd"
-            android:layout_toRightOf="@id/callNduthi"
-            android:text="Confirm"
-            android:textSize="20dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_action_save"
+            android:layout_margin="10dp"
+            android:tint="@color/colorBackroundWhite"
+            app:backgroundTint="@color/colorPrimaryDark" />
 
-
-
-    </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

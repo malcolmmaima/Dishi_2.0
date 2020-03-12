@@ -29,6 +29,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,18 +41,19 @@ import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.LiveLocation;
+import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
+import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    Button callNduthi, confirmOrd;
+    FloatingActionButton callNduthi, confirmOrd;
     double myLat, myLong;
     LatLng loggedInUserLoc, trackOrderLatLng;
     Marker myCurrent, providerCurrent;
@@ -59,7 +62,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     int zoomLevel;
     Double restaurantLat, restaurantLong;
     VerticalSeekBar zoomMap;
-    DatabaseReference myRef, customerOrderRef, riderLocationRef, deliveryLocationRef, restaurantLocationRef, customerLocationRef;
+    DatabaseReference myRef, myOrders, myOrdersHistory, customerOrderItems,customerOrderRef, riderLocationRef, deliveryLocationRef, restaurantLocationRef, customerLocationRef;
     ValueEventListener myRefListener, customerOrderListener, riderLocationListener, deliveryLocationListener, restaurantLocationRefListener, customerLocationRefListener;
     String myPhone, accType, message, callMsg, restaurantPhone, riderPhone, customerPhone;
     ProgressDialog progressDialog;
@@ -88,6 +91,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
         restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
         customerLocationRef = FirebaseDatabase.getInstance().getReference("location/"+customerPhone);
+        customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
+        myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+customerPhone);
+        myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+customerPhone);
 
         message = "Order delivered?";
         callMsg = "Call?";
@@ -134,8 +140,109 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
         confirmOrd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(GeoTracking.this, "Clicked", Toast.LENGTH_SHORT).show();
+            public void onClick(final View v) {
+                if(accType.equals("1")){
+                    final AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
+                            .setMessage("Order Delivered?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+
+                                                try {
+                                                    ProductDetails prod = items.getValue(ProductDetails.class);
+                                                    prod.setKey(items.getKey());
+
+                                                    /**
+                                                     * Move order items to history node
+                                                     */
+                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+
+                                                                    myOrders.child(restaurantPhone).removeValue();
+
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+
+                                                } catch (Exception e) {
+
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            //Toast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            })
+
+                            .create();
+                    finish.show();
+                }
+
+                if(accType.equals("2")){
+                    AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
+                            .setMessage("Order Delivered?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            })
+
+                            .create();
+                    finish.show();
+                }
+
+                if(accType.equals("3")){
+
+                }
+
             }
         });
 
