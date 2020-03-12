@@ -1,8 +1,12 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -22,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
 
 import com.malcolmmaima.dishi.Controller.PreferenceManager;
@@ -72,12 +77,41 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
 
             } else {
+                //get device id
+                final String android_id = Settings.Secure.getString(this.getContentResolver(),
+                        Settings.Secure.ANDROID_ID);
+
+
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
                 FirebaseDatabase db = FirebaseDatabase.getInstance();
                 final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
+                //Compare device id of current device and fetched device id,
+                //if not same prompt user to logout one device. limit account logins to one device
+                dbRef.child("device_id").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            String fetchedId = dataSnapshot.getValue(String.class);
+                            //device id's do not match, prompt to logout atleast one device
+                            if(!android_id.equals(fetchedId)){
+                                //Log out
+                                Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
+                                stopService(new Intent(SplashActivity.this, TrackingService.class));
+                                FirebaseAuth.getInstance().signOut();
+                                startActivity(new Intent(SplashActivity.this,MainActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
                 //Check whether user is verified, if true send them directly to MyAccountRestaurant
                 dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

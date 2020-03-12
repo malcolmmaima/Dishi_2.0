@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -398,12 +399,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
+                            FirebaseUser user = task.getResult().getUser();
+                            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+                            FirebaseDatabase db = FirebaseDatabase.getInstance();
+                            final DatabaseReference dbRef = db.getReference("users/" + myPhone);
+
+                            //get device id
+                            final String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                                    Settings.Secure.ANDROID_ID);
+                            dbRef.child("device_id").setValue(android_id);
+
                             progressDialog.setMessage("Success...");
                             progressDialog.setCancelable(false);
                             progressDialog.show();
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
-                            FirebaseUser user = task.getResult().getUser();
+
                             mVerified = true;
                             try {
                                 timer.cancel();
@@ -419,10 +432,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                             snackbar.show();
 
-                            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-                            FirebaseDatabase db = FirebaseDatabase.getInstance();
-                            final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
                             //Check whether user is verified, if true send them directly to MyAccount_(n)
                             dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {

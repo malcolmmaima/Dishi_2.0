@@ -102,7 +102,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
 
-                final AlertDialog myQuittingDialogBox = new AlertDialog.Builder(v.getContext())
+                final AlertDialog callAlert = new AlertDialog.Builder(v.getContext())
                         //set message, title, and icon
                         .setMessage(callMsg)
                         //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
@@ -145,7 +145,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                         })//setNegativeButton
 
                         .create();
-                myQuittingDialogBox.show();
+                callAlert.show();
             }
         });
 
