@@ -176,7 +176,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 if(isChecked == true && buttonView.isPressed()){
                     final AlertDialog goLive = new AlertDialog.Builder(getContext())
-                            .setMessage("Restaurant Go Live?")
+                            .setMessage("Go Live?")
                             //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
                             .setCancelable(false)
                             //set three option buttons

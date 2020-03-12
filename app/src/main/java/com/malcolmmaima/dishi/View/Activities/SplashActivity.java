@@ -88,8 +88,8 @@ public class SplashActivity extends AppCompatActivity {
                 FirebaseDatabase db = FirebaseDatabase.getInstance();
                 final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
-                //Compare device id of current device and fetched device id,
-                //if not same prompt user to logout one device. limit account logins to one device
+                //Compare device id of current device id and previous logged device id,
+                //if not same prompt logout device. On fresh login will set new device id. limit account logins to one device
                 dbRef.child("device_id").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -104,6 +104,10 @@ public class SplashActivity extends AppCompatActivity {
                                 startActivity(new Intent(SplashActivity.this,MainActivity.class)
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                             }
+                        }
+
+                        else {
+                            dbRef.child("device_id").setValue(android_id);
                         }
                     }
 
