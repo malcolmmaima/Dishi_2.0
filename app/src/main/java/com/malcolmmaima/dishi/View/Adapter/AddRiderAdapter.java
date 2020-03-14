@@ -21,10 +21,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.malcolmmaima.dishi.Controller.OnRiderSelected;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
@@ -38,13 +40,15 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
     List<UserModel> listdata;
     long DURATION = 200;
     private boolean on_attach = true;
-    DatabaseReference myRidersRef;
+    DatabaseReference myRidersRef, ridersRef;
     String myPhone;
     FirebaseUser user;
+    OnRiderSelected riderSelected;
 
-    public AddRiderAdapter(Context context, List<UserModel> listdata) {
+    public AddRiderAdapter(Context context, List<UserModel> listdata, OnRiderSelected riderSelected) {
         this.listdata = listdata;
         this.context = context;
+        this.riderSelected = riderSelected;
     }
 
 
@@ -80,7 +84,7 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
          */
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
                         //set message, title, and icon
                         .setMessage("Add " + orderDetails.getFirstname() + " " + orderDetails.getLastname() + "?")
@@ -88,12 +92,17 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
                         //set three option buttons
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                myRidersRef.child(orderDetails.getPhone()).setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                ridersRef = FirebaseDatabase.getInstance().getReference("my_restaurants/"+orderDetails.getPhone());
+
+                                //Once rider accepts request this value will change to true
+                                ridersRef.child(myPhone).setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        //Toast.makeText(context, "Added successfully", Toast.LENGTH_LONG).show();
+                                        riderSelected.onRiderSelected(orderDetails.getPhone(), myPhone);
+
                                     }
                                 });
+
                             }
                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {

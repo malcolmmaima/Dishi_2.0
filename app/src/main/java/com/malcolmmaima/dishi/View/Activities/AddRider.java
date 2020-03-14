@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.OnRiderSelected;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.AddRiderAdapter;
@@ -37,10 +38,11 @@ import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRider extends AppCompatActivity {
+public class AddRider extends AppCompatActivity implements OnRiderSelected {
 
     List<UserModel> riders = new ArrayList<>();
-    DatabaseReference riderUserAccounts, myRidersRef;
+    DatabaseReference riderUserAccounts, myRidersRef, ridersRef;
+    ValueEventListener ridersRefListener;
     ProgressBar progressBar;
     EditText searchPhone;
     RecyclerView recyclerview;
@@ -113,7 +115,7 @@ public class AddRider extends AppCompatActivity {
                 try {
                     if (dataSnapshot.getKey().equals(searchPhone.getText().toString().trim())) {
                         finish();
-                        Toast.makeText(AddRider.this, "Added successfully, refresh!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e){
 
@@ -164,7 +166,7 @@ public class AddRider extends AppCompatActivity {
                         if (!riders.isEmpty()) {
                             progressBar.setVisibility(View.INVISIBLE);
                             //Collections.reverse(orders);
-                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders);
+                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders, AddRider.this);
                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
                             recyclerview.setLayoutManager(layoutmanager);
                             recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -180,7 +182,7 @@ public class AddRider extends AppCompatActivity {
                             emptyTag.setVisibility(View.INVISIBLE);
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
-                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders);
+                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders, AddRider.this);
                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
                             recyclerview.setLayoutManager(layoutmanager);
                             recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -200,10 +202,31 @@ public class AddRider extends AppCompatActivity {
     }
 
     @Override
+    public void onRiderSelected(String riderPhone, String restaurantPhone) {
+        ridersRef = FirebaseDatabase.getInstance().getReference("my_restaurants/"+riderPhone+"/"+restaurantPhone);
+        ridersRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Toast.makeText(AddRider.this, "Request sent to rider", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        ridersRef.addValueEventListener(ridersRefListener);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         try {
             myRidersRef.removeEventListener(riderAddedListener);
+            ridersRef.removeEventListener(ridersRefListener);
         } catch (Exception e){
 
         }
