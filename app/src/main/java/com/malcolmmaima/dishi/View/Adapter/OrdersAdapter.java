@@ -81,6 +81,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("phone", orderDetails.getPhone());
                 slideactivity.putExtra("name", orderDetails.getFirstname() + " " +  orderDetails.getLastname());
+                slideactivity.putExtra("restaurantPhone", orderDetails.restaurantPhone);
 
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();

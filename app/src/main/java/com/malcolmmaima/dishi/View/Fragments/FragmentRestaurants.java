@@ -335,20 +335,21 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                  * Now lets compute distance of each restaurant with customer location
                                                  */
                                                 CalculateDistance calculateDistance = new CalculateDistance();
-                                                Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                        liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+                                                try {
+                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                            liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * if distance meets parameters set then fetch menu
-                                                 */
+                                                    /**
+                                                     * if distance meets parameters set then fetch menu
+                                                     */
 
-                                                if (dist < location_filter) {
-                                                    //Fetch menu items of restaurants that have passed distance parameter
+                                                    if (dist < location_filter) {
+                                                        //Fetch menu items of restaurants that have passed distance parameter
 
-                                                    user.setDistance(dist);
-                                                    list.add(user);
+                                                        user.setDistance(dist);
+                                                        list.add(user);
 //                                                    for (DataSnapshot menu : restaurants.getChildren()) {
 //                                                        //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
 //                                                        ProductDetails product = menu.getValue(ProductDetails.class);
@@ -356,8 +357,11 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
 //                                                        product.setDistance(dist);
 //                                                        list.add(product);
 //                                                    }
-                                                }
+                                                    }
 
+                                                } catch (Exception e){
+
+                                                }
                                                 if (!list.isEmpty()) {
                                                     mSwipeRefreshLayout.setRefreshing(false);
                                                     Collections.reverse(list);

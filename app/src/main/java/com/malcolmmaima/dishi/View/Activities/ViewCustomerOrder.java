@@ -52,10 +52,10 @@ import java.util.List;
 public class ViewCustomerOrder extends AppCompatActivity implements OnOrderChecked {
 
     List<ProductDetails> list;
-    String myPhone, phone, customerName;
+    String myPhone, phone, customerName, restaurantPhone;
     FirebaseUser user;
-    DatabaseReference customerOrderItems, myLocationRef, myRidersRef, riderStatus;
-    ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
+    DatabaseReference userRef, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
+    ValueEventListener userRefListener, customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
     TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
@@ -67,6 +67,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     ValueEventListener locationListener;
     Menu myMenu;
     List<String> myRiders, ridersName;
+    String accType;
 
     final int[] total = {0};
 
@@ -75,6 +76,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_customer_order);
 
+        accType = ""; //initialize
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
         //Initialize variables
         deliveryCharge = 0.0;
         totalAmount = 0.0;
@@ -82,9 +88,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         //Data passed from adapter
         phone = getIntent().getStringExtra("phone"); //From adapters
         customerName = getIntent().getStringExtra("name");
+        restaurantPhone = getIntent().getStringExtra("restaurantPhone");
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
         myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
         customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
         myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);

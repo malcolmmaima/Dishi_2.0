@@ -95,21 +95,29 @@ public class SplashActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()){
-                            String fetchedId = dataSnapshot.getValue(String.class);
-                            //device id's do not match, prompt to logout atleast one device
-                            if(!android_id.equals(fetchedId)){
-                                //Log out
-                                Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
-                                stopService(new Intent(SplashActivity.this, TrackingService.class));
-                                FirebaseAuth.getInstance().signOut();
-                                startActivity(new Intent(SplashActivity.this,MainActivity.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+
+                            try {
+                                String fetchedId = dataSnapshot.getValue(String.class);
+                                //device id's do not match, prompt to logout atleast one device
+                                if (!android_id.equals(fetchedId) || android_id != fetchedId) {
+                                    //Log out
+                                    Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
+                                    stopService(new Intent(SplashActivity.this, TrackingService.class));
+                                    FirebaseAuth.getInstance().signOut();
+                                    startActivity(new Intent(SplashActivity.this, MainActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                }
+
+                            } catch (Exception e){
+
                             }
                         }
 
                         else {
                             dbRef.child("device_id").setValue(android_id);
                         }
+
+
                     }
 
                     @Override
