@@ -90,6 +90,7 @@ public class SplashActivity extends AppCompatActivity {
 
                 //Compare device id of current device id and previous logged device id,
                 //if not same prompt logout device. On fresh login will set new device id. limit account logins to one device
+                //Using live listener to keep active track of any new logged device
                 dbRef.child("device_id").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

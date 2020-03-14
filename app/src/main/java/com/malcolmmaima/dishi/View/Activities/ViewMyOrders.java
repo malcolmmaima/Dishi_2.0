@@ -14,7 +14,11 @@ import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,6 +56,7 @@ public class ViewMyOrders extends AppCompatActivity {
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
     CardView DeliveryAddress;
+    Menu myMenu;
 
     final int[] total = {0};
 
@@ -443,6 +448,46 @@ public class ViewMyOrders extends AppCompatActivity {
         //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.view_my_order_menu, menu);
+        myMenu = menu;
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) { switch(item.getItemId()) {
+
+        case R.id.callRestaurant:
+
+            final AlertDialog callAlert = new AlertDialog.Builder(this)
+                    //set message, title, and icon
+                    .setMessage("Call " + restaurantName + "?")
+                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                    //set three option buttons
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String phone_ = phone;
+                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone_, null));
+                            startActivity(intent);
+                        }
+                    }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            //do nothing
+
+                        }
+                    })//setNegativeButton
+
+                    .create();
+            callAlert.show();
+            return (true);
+
+    }
+        return(super.onOptionsItemSelected(item));
     }
 
     @Override
