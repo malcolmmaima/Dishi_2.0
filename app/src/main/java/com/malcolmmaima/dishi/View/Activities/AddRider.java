@@ -203,6 +203,9 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
 
     @Override
     public void onRiderSelected(String riderPhone, String restaurantPhone) {
+        /**
+         * listen to the my_restaurants node to check if request has been sent
+         */
         ridersRef = FirebaseDatabase.getInstance().getReference("my_restaurants/"+riderPhone+"/"+restaurantPhone);
         ridersRefListener = new ValueEventListener() {
             @Override

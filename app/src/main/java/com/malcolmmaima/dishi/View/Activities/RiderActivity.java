@@ -36,6 +36,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
+import com.malcolmmaima.dishi.View.Fragments.MyRestaurantsFragment;
 import com.malcolmmaima.dishi.View.Fragments.OrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
 import com.malcolmmaima.dishi.View.Fragments.RiderFragment;
@@ -77,12 +78,15 @@ public class RiderActivity extends AppCompatActivity
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_rider:
+                    setTitle("Ride Requests");
                     selectedFragment = RiderFragment.newInstance();
                     break;
                 case R.id.navigation_home:
+                    setTitle("Home");
                     selectedFragment = HomeFragment.newInstance();
                     break;
                 case R.id.navigation_profile:
+                    setTitle("Profile");
                     selectedFragment = ProfileFragment.newInstance();
                     break;
             }
@@ -320,8 +324,8 @@ public class RiderActivity extends AppCompatActivity
         final Class[] fragmentClass = {null};
 
         if (id == R.id.menu1) {
-            //fragmentClass[0] = OrdersFragment.class;
-            Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            setTitle("My Restaurants");
+            fragmentClass[0] = MyRestaurantsFragment.class;
         }
 
         else if (id == R.id.menu2) {

@@ -7,7 +7,7 @@
         <item
             android:id="@+id/menu1"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="Menu 1" />
+            android:title="My Restaurants" />
         <item
             android:id="@+id/menu2"
             android:icon="@drawable/ic_home_black_24dp"
