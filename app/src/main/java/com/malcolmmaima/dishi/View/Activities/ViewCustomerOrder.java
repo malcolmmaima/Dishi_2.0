@@ -54,8 +54,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     List<ProductDetails> list;
     String myPhone, phone, customerName, restaurantPhone;
     FirebaseUser user;
-    DatabaseReference userRef, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
-    ValueEventListener userRefListener, customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
+    DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
+    ValueEventListener riderRequestsListener, customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
     TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
@@ -593,8 +593,14 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                 String [] riders = new String[ridersName.size()];
                                                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
                                                 builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        customerOrderItems.child("rider").setValue(myRiders.get(which));
+                                                    public void onClick(DialogInterface dialog, final int which) {
+                                                        customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
+                                                                riderRequests.child(myPhone).child(phone).setValue("assigned");
+                                                            }
+                                                        });
                                                     }
                                                 });
                                                 builder.create();
@@ -616,8 +622,15 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                                 String [] riders = new String[ridersName.size()];
                                                                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
                                                                 builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
-                                                                    public void onClick(DialogInterface dialog, int which) {
-                                                                        customerOrderItems.child("rider").setValue(myRiders.get(which));
+                                                                    public void onClick(DialogInterface dialog, final int which) {
+                                                                        customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
+                                                                                riderRequests.child(myPhone).child(phone).setValue("assigned");
+                                                                                //above... inform the rider's order request node of an active order assigned by restaurant (myphone) from customer (phone)
+                                                                            }
+                                                                        });
                                                                     }
                                                                 });
                                                                 builder.create();

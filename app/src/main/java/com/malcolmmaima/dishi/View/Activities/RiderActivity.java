@@ -112,14 +112,18 @@ public class RiderActivity extends AppCompatActivity
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        //get auth state
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        try {
+            //get auth state
+            mAuth = FirebaseAuth.getInstance();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            //Set fb database reference
+            myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
 
+        } catch (Exception e){
+
+        }
         /**
          * Manually displaying the first fragment - one time only
          */
