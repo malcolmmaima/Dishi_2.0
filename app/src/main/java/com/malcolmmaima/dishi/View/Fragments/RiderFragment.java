@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,23 +30,24 @@ import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RiderFragment extends Fragment {
+public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     List<UserModel> AssignedOrders = new ArrayList<>();
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference myRestaurantsRef;
-    ValueEventListener myRestaurantsRefListener;
+    DatabaseReference myRideOrderRequests;
+    ValueEventListener myRideOrderRequestsListener;
     FirebaseDatabase db;
     FirebaseUser user;
 
-    DatabaseReference[] ordersRef;
+    DatabaseReference [] ordersRef;
     ValueEventListener [] ordersRefListener;
 
     TextView emptyTag;
     AppCompatImageView icon;
     List <String> myRestaurants = new ArrayList<>();
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
 
     public static RiderFragment newInstance() {
@@ -65,31 +67,86 @@ public class RiderFragment extends Fragment {
         final View v = inflater.inflate(R.layout.fragment_rider, container, false);
         progressDialog = new ProgressDialog(getContext());
 
-        AssignedOrders.clear();
-
-
-
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        db = FirebaseDatabase.getInstance();
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
 
-        myRestaurantsRef = db.getReference("my_restaurants/"+myPhone);
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
 
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+                fetchOrders();
+
+
+            }
+        });
+
+        try {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            db = FirebaseDatabase.getInstance();
+
+            myRideOrderRequests = db.getReference("my_ride_requests/"+myPhone);
+        } catch (Exception e){
+
+        }
+
+
+        return  v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        try {
+            myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
+
+            for(int i=0; i<myRestaurants.size(); i++) {
+                ordersRef[i].removeEventListener(ordersRefListener[i]);
+                //Toast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e){
+
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchOrders();
+    }
+
+    private void fetchOrders() {
         /**
          * Loop through my restaurants and find restaurants I am a member of
          */
 
-         myRestaurantsRefListener = new ValueEventListener() {
+        AssignedOrders.clear();
+        myRestaurants.clear();
+        ordersRef = new DatabaseReference[0];
+        ordersRefListener = new ValueEventListener[0];
+
+        myRideOrderRequestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot restaurantPhone) {
 
                 ordersRef = new DatabaseReference[(int) restaurantPhone.getChildrenCount()];
                 ordersRefListener  = new ValueEventListener[(int) restaurantPhone.getChildrenCount()];
-                myRestaurants.clear();
+
                 for(DataSnapshot x : restaurantPhone.getChildren()){
                     myRestaurants.add(x.getKey()); //Add my restaurants to a list
                 }
@@ -99,10 +156,61 @@ public class RiderFragment extends Fragment {
                         ordersRef[i] = FirebaseDatabase.getInstance().getReference("orders/"+myRestaurants.get(i));
                         ordersRefListener[i] = new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for(DataSnapshot orders : dataSnapshot.getChildren()){
+                            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                                for(final DataSnapshot orders : dataSnapshot.getChildren()){
                                     if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
-                                        Toast.makeText(getContext(), "assigned: " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getContext(), "assigned: " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+
+                                        DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getKey());
+                                        ValueEventListener
+                                                userDetailsRefListener = new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot userDetails) {
+                                                UserModel assignedCustomer = userDetails.getValue(UserModel.class);
+                                                assignedCustomer.setPhone(dataSnapshot.getKey());
+                                                assignedCustomer.itemCount = 0;
+                                                assignedCustomer.restaurantPhone = orders.getKey();
+                                                AssignedOrders.add(assignedCustomer);
+
+                                                //Toast.makeText(getContext(), "user: "+ assignedCustomer.getPhone(), Toast.LENGTH_SHORT).show();
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                if (!AssignedOrders.isEmpty()) {
+
+                                                    //Collections.reverse(orders);
+                                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+
+                                                    recycler.notifyDataSetChanged();
+
+                                                    recyclerview.getItemAnimator().setAddDuration(200);
+                                                    recyclerview.getItemAnimator().setRemoveDuration(200);
+                                                    recyclerview.getItemAnimator().setMoveDuration(200);
+                                                    recyclerview.getItemAnimator().setChangeDuration(200);
+
+                                                    recyclerview.setAdapter(recycler);
+                                                    emptyTag.setVisibility(View.INVISIBLE);
+                                                    icon.setVisibility(View.INVISIBLE);
+                                                } else {
+//                                        progressDialog.dismiss();
+                                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                    recyclerview.setAdapter(recycler);
+                                                    emptyTag.setVisibility(View.VISIBLE);
+                                                    icon.setVisibility(View.VISIBLE);
+
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        };
+                                        userDetailsRef.addListenerForSingleValueEvent(userDetailsRefListener);
                                     }
                                 }
                             }
@@ -119,82 +227,6 @@ public class RiderFragment extends Fragment {
                 }
 
 
-                /**
-                 * Loop through restaurant's order to find out if I have been assigned any order
-                 */
-//                    ordersRefListener = new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(@NonNull final DataSnapshot customer) {
-//
-//                            for(final DataSnapshot order_ : customer.getChildren()){
-//                                Toast.makeText(getContext(), "Order: " + orders.getKey(), Toast.LENGTH_SHORT).show();
-//
-//                                //Toast.makeText(getContext(), "customer: " +order_.getKey(), Toast.LENGTH_SHORT).show();
-//                                DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+orders.getKey());
-//                                ValueEventListener
-//                                userDetailsRefListener = new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(@NonNull DataSnapshot userDetails) {
-//                                        if(order_.child("rider").exists()){
-//                                            if(order_.child("rider").getValue().equals(myPhone)){
-//                                                UserModel assignedCustomer = userDetails.getValue(UserModel.class);
-//                                                assignedCustomer.setPhone(order_.getKey());
-//                                                assignedCustomer.itemCount = 0;
-//                                                assignedCustomer.restaurantPhone = orders.getKey();
-//                                                AssignedOrders.add(assignedCustomer);
-//
-//                                                Toast.makeText(getContext(), "user: "+ assignedCustomer.getPhone(), Toast.LENGTH_SHORT).show();
-//
-//                                                if (!AssignedOrders.isEmpty()) {
-//                                                    //Collections.reverse(orders);
-//                                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
-//                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-//                                                    recyclerview.setLayoutManager(layoutmanager);
-//                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-//
-//                                                    recycler.notifyDataSetChanged();
-//
-//                                                    recyclerview.getItemAnimator().setAddDuration(200);
-//                                                    recyclerview.getItemAnimator().setRemoveDuration(200);
-//                                                    recyclerview.getItemAnimator().setMoveDuration(200);
-//                                                    recyclerview.getItemAnimator().setChangeDuration(200);
-//
-//                                                    recyclerview.setAdapter(recycler);
-//                                                    emptyTag.setVisibility(View.INVISIBLE);
-//                                                    icon.setVisibility(View.INVISIBLE);
-//                                                } else {
-////                                        progressDialog.dismiss();
-//                                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
-//                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-//                                                    recyclerview.setLayoutManager(layoutmanager);
-//                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-//                                                    recyclerview.setAdapter(recycler);
-//                                                    emptyTag.setVisibility(View.VISIBLE);
-//                                                    icon.setVisibility(View.VISIBLE);
-//
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    @Override
-//                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                    }
-//                                };
-//                                userDetailsRef.addListenerForSingleValueEvent(userDetailsRefListener);
-//
-//                            }
-//
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                        }
-//                    };
-//                    ordersRef.addValueEventListener(ordersRefListener);
-
             }
 
             @Override
@@ -202,22 +234,6 @@ public class RiderFragment extends Fragment {
 
             }
         };
-         myRestaurantsRef.addListenerForSingleValueEvent(myRestaurantsRefListener);
-
-
-
-
-        return  v;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        try {
-            myRestaurantsRef.removeEventListener(myRestaurantsRefListener);
-        } catch (Exception e){
-
-        }
+        myRideOrderRequests.addListenerForSingleValueEvent(myRideOrderRequestsListener);
     }
 }

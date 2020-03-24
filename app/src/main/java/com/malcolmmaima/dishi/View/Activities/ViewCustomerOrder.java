@@ -654,10 +654,18 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                         //Remove existing ride requests then set new request
                                                                                         for(DataSnapshot riders : dataSnapshot.getChildren()){
+                                                                                            /**
+                                                                                             * Delete any existing rider request for this particular order by looping through my riders,
+                                                                                             * getting their primary key (phone) then deleting from 'my_rider_requests'
+                                                                                             */
                                                                                             riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+riders.getKey());
                                                                                             riderRequests.child(myPhone).child(phone).removeValue();
                                                                                         }
 
+                                                                                        /**
+                                                                                         * then send fresh rider order request, this is to avoid assigning a single order to
+                                                                                         * multiple riders. Preventing duplicates
+                                                                                         */
                                                                                         riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
                                                                                         riderRequests.child(myPhone).child(phone).setValue("assigned");
                                                                                     }
