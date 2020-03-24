@@ -597,8 +597,26 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                         customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
-                                                                riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
-                                                                riderRequests.child(myPhone).child(phone).setValue("assigned");
+
+
+                                                                myRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        //Remove existing ride requests then set new request
+                                                                        for(DataSnapshot riders : dataSnapshot.getChildren()){
+                                                                            riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+riders.getKey());
+                                                                            riderRequests.child(myPhone).child(phone).removeValue();
+                                                                        }
+
+                                                                        riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
+                                                                        riderRequests.child(myPhone).child(phone).setValue("assigned");
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
                                                             }
                                                         });
                                                     }
@@ -623,12 +641,32 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
                                                                 builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
                                                                     public void onClick(DialogInterface dialog, final int which) {
+                                                                        /**
+                                                                         * Logic here is to assign the rider number to the order, then send rider request to rider awaiting confirmation
+                                                                         */
                                                                         customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                             @Override
                                                                             public void onSuccess(Void aVoid) {
-                                                                                riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
-                                                                                riderRequests.child(myPhone).child(phone).setValue("assigned");
-                                                                                //above... inform the rider's order request node of an active order assigned by restaurant (myphone) from customer (phone)
+
+
+                                                                                myRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                    @Override
+                                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                        //Remove existing ride requests then set new request
+                                                                                        for(DataSnapshot riders : dataSnapshot.getChildren()){
+                                                                                            riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+riders.getKey());
+                                                                                            riderRequests.child(myPhone).child(phone).removeValue();
+                                                                                        }
+
+                                                                                        riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
+                                                                                        riderRequests.child(myPhone).child(phone).setValue("assigned");
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                                    }
+                                                                                });
                                                                             }
                                                                         });
                                                                     }

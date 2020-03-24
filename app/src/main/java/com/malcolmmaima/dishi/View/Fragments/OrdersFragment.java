@@ -85,12 +85,16 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         orders.clear();
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        db = FirebaseDatabase.getInstance();
+        try {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            db = FirebaseDatabase.getInstance();
 
-        dbRef = db.getReference("users/"+myPhone);
-        incomingOrders = db.getReference("orders/"+myPhone);
+            dbRef = db.getReference("users/"+myPhone);
+            incomingOrders = db.getReference("orders/"+myPhone);
+        } catch (Exception e){
+
+        }
 
         //Our Live Status Switch
         liveTitle = v.findViewById(R.id.liveTitle);

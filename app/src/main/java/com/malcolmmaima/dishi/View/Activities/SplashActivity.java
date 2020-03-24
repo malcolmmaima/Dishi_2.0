@@ -108,14 +108,6 @@ public class SplashActivity extends AppCompatActivity {
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                                 }
 
-                                else if(android_id != fetchedId){
-                                    //Log out
-                                    Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
-                                    stopService(new Intent(SplashActivity.this, TrackingService.class));
-                                    FirebaseAuth.getInstance().signOut();
-                                    startActivity(new Intent(SplashActivity.this, MainActivity.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                }
 
                             } catch (Exception e){
 
