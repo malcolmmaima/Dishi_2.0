@@ -76,8 +76,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_customer_order);
 
-        accType = ""; //initialize
-
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
@@ -89,11 +87,21 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         phone = getIntent().getStringExtra("phone"); //From adapters
         customerName = getIntent().getStringExtra("name");
         restaurantPhone = getIntent().getStringExtra("restaurantPhone");
+        accType = getIntent().getStringExtra("accountType");
 
 
-        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
-        customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
-        myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
+        if(accType.equals("2")){
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+            customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
+            myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
+        }
+
+        if(accType.equals("3")){
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+            customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+phone);
+            myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone);
+        }
+
 
         /**
          * On create view fetch my location coordinates
@@ -282,7 +290,14 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         }
                     });
 
-                    riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone+"/"+dataSnapshot.getValue());
+                    if(accType.equals("2")){
+                        riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone+"/"+dataSnapshot.getValue());
+                    }
+
+                    if(accType.equals("3")){
+                        riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone+"/"+dataSnapshot.getValue());
+                    }
+
                     riderStatusListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
@@ -327,8 +342,17 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             public void onClick(View v) {
                 Intent slideactivity = new Intent(ViewCustomerOrder.this, GeoTracking.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("restaurantPhone", myPhone);
-                slideactivity.putExtra("customerPhone", phone);
+
+                if(accType.equals("2")){
+                    slideactivity.putExtra("restaurantPhone", myPhone);
+                    slideactivity.putExtra("customerPhone", phone);
+                }
+
+                if(accType.equals("3")){
+                    slideactivity.putExtra("restaurantPhone", restaurantPhone);
+                    slideactivity.putExtra("customerPhone", phone);
+                }
+
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
                 startActivity(slideactivity, bndlanimation);
@@ -537,6 +561,14 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         }
 
         else {
+            item.setVisible(false);
+        }
+
+        if(accType.equals("2")){
+            item.setVisible(true);
+        }
+
+        if(accType.equals("3")){
             item.setVisible(false);
         }
 

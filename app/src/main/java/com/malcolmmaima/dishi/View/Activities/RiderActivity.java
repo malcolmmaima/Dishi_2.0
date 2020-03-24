@@ -76,6 +76,8 @@ public class RiderActivity extends AppCompatActivity
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
+
+            setTitle("Ride Requests");
             switch (item.getItemId()) {
                 case R.id.navigation_rider:
                     setTitle("Ride Requests");

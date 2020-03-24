@@ -159,20 +159,20 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                                 for(final DataSnapshot orders : dataSnapshot.getChildren()){
                                     if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
-                                        //Toast.makeText(getContext(), "assigned: " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
 
-                                        DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getKey());
+                                        DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+orders.getKey());
                                         ValueEventListener
                                                 userDetailsRefListener = new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot userDetails) {
                                                 UserModel assignedCustomer = userDetails.getValue(UserModel.class);
-                                                assignedCustomer.setPhone(dataSnapshot.getKey());
-                                                assignedCustomer.itemCount = 0;
-                                                assignedCustomer.restaurantPhone = orders.getKey();
+                                                assignedCustomer.setPhone(orders.getKey());
+                                                assignedCustomer.itemCount = dataSnapshot.getChildrenCount();
+                                                assignedCustomer.restaurantPhone = dataSnapshot.getKey();
+                                                assignedCustomer.setAccount_type("3");
                                                 AssignedOrders.add(assignedCustomer);
 
-                                                //Toast.makeText(getContext(), "user: "+ assignedCustomer.getPhone(), Toast.LENGTH_SHORT).show();
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 if (!AssignedOrders.isEmpty()) {
 
