@@ -89,7 +89,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         restaurantPhone = getIntent().getStringExtra("restaurantPhone");
         accType = getIntent().getStringExtra("accountType");
 
-
         if(accType.equals("2")){
             myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
             customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
@@ -300,6 +299,14 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                     if(accType.equals("3")){
                         riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone+"/"+dataSnapshot.getValue());
+
+                        /**
+                         * Close this activity for rider if restaurant has assigned the order to a different rider
+                         */
+                        if(!myPhone.equals(dataSnapshot.getValue())){
+                            finish();
+                            Toast.makeText(ViewCustomerOrder.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
+                        }
                     }
 
                     riderStatusListener = new ValueEventListener() {

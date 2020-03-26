@@ -169,9 +169,9 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                             public void onDataChange(@NonNull DataSnapshot userDetails) {
                                                 UserModel assignedCustomer = userDetails.getValue(UserModel.class);
                                                 assignedCustomer.setPhone(orders.getKey());
-                                                assignedCustomer.itemCount = dataSnapshot.getChildrenCount();
+                                                assignedCustomer.itemCount = dataSnapshot.child(orders.getKey()).child("items").getChildrenCount();
                                                 assignedCustomer.restaurantPhone = dataSnapshot.getKey();
-                                                assignedCustomer.setAccount_type("3");
+                                                assignedCustomer.setAccount_type("3"); //This fragment belongs to rider accounts, type 3
                                                 AssignedOrders.add(assignedCustomer);
 
                                                 mSwipeRefreshLayout.setRefreshing(false);
