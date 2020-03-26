@@ -55,7 +55,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
     public void onBindViewHolder(final OrdersAdapter.MyHolder holder, final int position) {
         final UserModel orderDetails = listdata.get(position);
-
+        DatabaseReference restaurantUserDetails = FirebaseDatabase.getInstance().getReference("users/"+orderDetails.restaurantPhone);
 
         /**
          * Adapter animation
@@ -69,6 +69,33 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
         holder.customerName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
         holder.orderQty.setText("#"+orderDetails.itemCount);
         holder.distanceAway.setText("loading...");
+
+        if(orderDetails.getAccount_type().equals("3")){
+            holder.restaurantIcon.setVisibility(View.VISIBLE);
+            holder.restaurantName.setVisibility(View.VISIBLE);
+
+            restaurantUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+                        holder.restaurantName.setText(restaurant.getFirstname() + " " + restaurant.getLastname());
+                    } catch (Exception e){
+                        holder.restaurantName.setText("Error...");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        else {
+            holder.restaurantIcon.setVisibility(View.GONE);
+            holder.restaurantName.setVisibility(View.GONE);
+        }
 
 
         /**
@@ -143,8 +170,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView orderQty, customerName,distanceAway;
-        ImageView profilePic;
+        TextView orderQty, customerName,distanceAway, restaurantName;
+        ImageView profilePic, restaurantIcon, distanceAwayIcon;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -154,6 +181,9 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             profilePic = itemView.findViewById(R.id.profilePic);
             cardView = itemView.findViewById(R.id.card_view);
             distanceAway = itemView.findViewById(R.id.distanceAway);
+            restaurantIcon = itemView.findViewById(R.id.restaurantTag);
+            distanceAwayIcon = itemView.findViewById(R.id.locationTag);
+            restaurantName = itemView.findViewById(R.id.restaurantName);
 
 //            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 //            final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
