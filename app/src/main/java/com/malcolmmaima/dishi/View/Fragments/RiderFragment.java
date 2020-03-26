@@ -144,6 +144,26 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             });
                         }
 
+                        else {
+                            DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
+                            myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for(DataSnapshot restaurants : dataSnapshot.getChildren()){
+                                        //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                        DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
+                                        restaurantRidersRef.setValue("inactive");
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+
                     }
                 }
             }
