@@ -157,6 +157,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         ordersRefListener[i] = new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                                AssignedOrders.clear();
                                 for(final DataSnapshot orders : dataSnapshot.getChildren()){
                                     if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
                                         //Toast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
