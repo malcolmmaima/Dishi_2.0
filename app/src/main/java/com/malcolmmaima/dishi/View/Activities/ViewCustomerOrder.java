@@ -364,18 +364,21 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
                                     acceptOrd.setTag("decline");
                                     acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
+                                    confirmOrder.setVisibility(View.VISIBLE);
                                 }
 
                                 if (riderOrderStatus.equals("assigned")) {
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
                                     acceptOrd.setTag("accept");
                                     acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                    confirmOrder.setVisibility(View.GONE);
                                 }
 
                                 if (riderOrderStatus.equals("declined")) {
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
                                     acceptOrd.setTag("accept");
                                     acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                    confirmOrder.setVisibility(View.GONE);
                                 }
                             } catch (Exception e){
 

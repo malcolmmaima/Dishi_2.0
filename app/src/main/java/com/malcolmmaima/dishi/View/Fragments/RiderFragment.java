@@ -173,6 +173,16 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
+        } catch (Exception e){
+
+        }
+    }
+
+    @Override
     public void onRefresh() {
         fetchOrders();
     }
