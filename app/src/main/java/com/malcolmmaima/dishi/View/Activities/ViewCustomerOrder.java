@@ -73,6 +73,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     List<String> myRiders, ridersName;
     String accType, restaurantname, restaurantProfile;
     CircleImageView profilePic;
+    UserModel riderUser;
+    String riderPhone;
 
     final int[] total = {0};
 
@@ -150,7 +152,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone);
         }
 
-
         /**
          * On create view fetch my location coordinates
          */
@@ -206,6 +207,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 list = new ArrayList<>();
 
                 String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                try {
+                    riderPhone = dataSnapshot.child("rider").getValue(String.class);
+                } catch (Exception e){
+
+                }
 
                 customerRemarks.setText("Remarks: "+remarks);
                 for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
@@ -270,7 +276,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                            riderUser = dataSnapshot.getValue(UserModel.class);
 
                             myRiders.add(rider.getKey());
                             ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
@@ -313,7 +319,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                            riderUser = dataSnapshot.getValue(UserModel.class);
                             riderName.setText(riderUser.getFirstname()+" "+riderUser.getLastname());
                         }
 
@@ -324,11 +330,16 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     });
 
                     if(accType.equals("2")){
-                        riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone+"/"+dataSnapshot.getValue());
+                        try {
+                            //Toast.makeText(ViewCustomerOrder.this, "rider: "+ riderPhone, Toast.LENGTH_LONG).show();
+                            riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + riderPhone + "/" + myPhone + "/" + phone);
+                        } catch (Exception e){
+
+                        }
                     }
 
                     if(accType.equals("3")){
-                        riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone+"/"+dataSnapshot.getValue());
+                        riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone+"/"+restaurantPhone+"/"+phone);
 
                         /**
                          * Close this activity for rider if restaurant has assigned the order to a different rider
@@ -343,19 +354,28 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
                             String riderOrderStatus = dtSnapshot.getValue(String.class);
-                            if(!dtSnapshot.exists()){
+                            if(riderPhone == null){
                                 Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
                                 customerOrderItems.child("rider").removeValue();
                             }
 
                             try {
-                                if (riderOrderStatus.equals("active")) {
+                                if (riderOrderStatus.equals("accepted")) {
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
-
+                                    acceptOrd.setTag("decline");
+                                    acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
                                 }
 
-                                if (riderOrderStatus.equals("inactive")) {
+                                if (riderOrderStatus.equals("assigned")) {
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    acceptOrd.setTag("accept");
+                                    acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                }
+
+                                if (riderOrderStatus.equals("declined")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    acceptOrd.setTag("accept");
+                                    acceptOrd.setImageResource(R.drawable.ic_action_save);
                                 }
                             } catch (Exception e){
 
@@ -367,7 +387,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                         }
                     };
-                    riderStatus.addValueEventListener(riderStatusListener);
+                    try {
+                        riderStatus.addValueEventListener(riderStatusListener);
+                    } catch (Exception e){
+
+                    }
                 }
             }
 
@@ -390,6 +414,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    riderStatus.setValue("accepted");
                                     myRidersRef.child(myPhone).setValue("active").addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
@@ -422,6 +447,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    riderStatus.setValue("declined");
                                     myRidersRef.child(myPhone).setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

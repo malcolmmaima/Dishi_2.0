@@ -211,7 +211,11 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 slideactivity.putExtra("restaurantPhone", orderDetails.restaurantPhone);
                 slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
                 slideactivity.putExtra("accountType", orderDetails.getAccount_type());
-                slideactivity.putExtra("restaurantProfile", restaurant.getProfilePic());
+                try {
+                    slideactivity.putExtra("restaurantProfile", restaurant.getProfilePic()); //This value will be null for account type 2
+                } catch (Exception e){
+
+                }
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                 context.startActivity(slideactivity, bndlanimation);
