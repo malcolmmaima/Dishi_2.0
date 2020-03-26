@@ -44,7 +44,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-
 public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHolder>{
 
     Context context;

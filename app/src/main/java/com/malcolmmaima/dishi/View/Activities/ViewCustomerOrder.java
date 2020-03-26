@@ -107,34 +107,38 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
          * On create view fetch my location coordinates
          */
 
-        liveLocation = null;
-        locationListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    liveLocation = dataSnapshot.getValue(LiveLocation.class);
-                    //Toast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+        try {
+            liveLocation = null;
+            locationListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                        //Toast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                    /**
-                     * Compute distance between customer and restaurant
-                     */
+                        /**
+                         * Compute distance between customer and restaurant
+                         */
 
-                    CalculateDistance calculateDistance = new CalculateDistance();
-                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                            liveLocation.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
+                        CalculateDistance calculateDistance = new CalculateDistance();
+                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                liveLocation.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
 
-                    Toast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
-                } catch (Exception e){
+                        Toast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            }
+            };
+            myLocationRef.addListenerForSingleValueEvent(locationListener);
+        } catch (Exception e){
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        myLocationRef.addListenerForSingleValueEvent(locationListener);
+        }
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);

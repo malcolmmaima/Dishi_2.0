@@ -336,6 +336,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                     UserModel customer = userDetails.getValue(UserModel.class);
                                     customer.setPhone(userOrders.getKey());
                                     customer.itemCount = dataSnapshot.getChildrenCount();
+                                    customer.setAccount_type("2");
+                                    customer.restaurantPhone = myPhone;
                                     //orders.add(customer);
                                     orders.add(customer);
 
