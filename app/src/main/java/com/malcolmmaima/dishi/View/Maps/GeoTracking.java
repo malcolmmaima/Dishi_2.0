@@ -251,7 +251,36 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 }
 
                 if(accType.equals("3")){
+                    AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
+                            .setMessage("Order Delivered?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            })//setPositiveButton
 
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            //Do nothing
+                                        }
+                                    });
+                                }
+                            })
+
+                            .create();
+                    finish.show();
                 }
 
             }
@@ -992,7 +1021,6 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                     }
                 };
                 customerOrderRef.addValueEventListener(customerOrderListener);
-
 
 
                 confirmOrd.setEnabled(true);
