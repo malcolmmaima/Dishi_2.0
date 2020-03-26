@@ -24,7 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,6 +46,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 import com.malcolmmaima.dishi.View.Maps.GeoTracking;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,19 +58,21 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     String myPhone, phone, customerName, restaurantPhone;
     FirebaseUser user;
     DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
-    ValueEventListener riderRequestsListener, customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName;
+    ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName, restaurantName;
+    FloatingActionButton acceptOrd;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
-    CardView DeliveryAddress;
+    CardView DeliveryAddress, OrderStatus;
     LiveLocation liveLocation;
     StaticLocation deliveryLocation;
     ValueEventListener locationListener;
     Menu myMenu;
     List<String> myRiders, ridersName;
-    String accType;
+    String accType, restaurantname, restaurantProfile;
+    CircleImageView profilePic;
 
     final int[] total = {0};
 
@@ -88,14 +93,58 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         customerName = getIntent().getStringExtra("name");
         restaurantPhone = getIntent().getStringExtra("restaurantPhone");
         accType = getIntent().getStringExtra("accountType");
+        restaurantname = getIntent().getStringExtra("restaurantName");
+        restaurantProfile = getIntent().getStringExtra("restaurantProfile");
+
+        Toolbar topToolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(topToolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setTitle(customerName);
+
+        subTotal = findViewById(R.id.subTotal);
+        deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
+        payment = findViewById(R.id.payment);
+        totalBill = findViewById(R.id.totalBill);
+        recyclerview = findViewById(R.id.rview);
+        confirmOrder = findViewById(R.id.btn_confirm);
+        confirmOrder.setTag("confirm");
+        declineOrder = findViewById(R.id.btn_decline);
+        declineOrder.setTag("active");
+        DeliveryAddress = findViewById(R.id.DeliveryAddress);
+        customerRemarks = findViewById(R.id.customerRemarks);
+        riderName = findViewById(R.id.riderName);
+        riderIcon = findViewById(R.id.riderIcon);
+        profilePic = findViewById(R.id.profilePic);
+        OrderStatus = findViewById(R.id.card_order_status);
+        acceptOrd = findViewById(R.id.confirmOrd);
+        acceptOrd.setTag("accept");
+        restaurantName = findViewById(R.id.restaurantName);
+
+        restaurantName.setText(restaurantname);
+
+        /**
+         * Load image url onto imageview
+         */
+        try {
+            //Load retaurant image
+            Picasso.with(ViewCustomerOrder.this).load(restaurantProfile).fit().centerCrop()
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
+                    .into(profilePic);
+        } catch (Exception e){
+
+        }
 
         if(accType.equals("2")){
+            OrderStatus.setVisibility(View.GONE);
             myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
             customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
             myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
         }
 
         if(accType.equals("3")){
+            OrderStatus.setVisibility(View.VISIBLE);
             myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
             customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+phone);
             myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone);
@@ -139,25 +188,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
         }
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle(customerName);
-
-        subTotal = findViewById(R.id.subTotal);
-        deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
-        payment = findViewById(R.id.payment);
-        totalBill = findViewById(R.id.totalBill);
-        recyclerview = findViewById(R.id.rview);
-        confirmOrder = findViewById(R.id.btn_confirm);
-        confirmOrder.setTag("confirm");
-        declineOrder = findViewById(R.id.btn_decline);
-        declineOrder.setTag("active");
-        DeliveryAddress = findViewById(R.id.DeliveryAddress);
-        customerRemarks = findViewById(R.id.customerRemarks);
-        riderName = findViewById(R.id.riderName);
-        riderIcon = findViewById(R.id.riderIcon);
 
         /**
          * Initialize cart items total and keep track of items
@@ -347,6 +377,76 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             }
         };
         customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+
+        acceptOrd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(acceptOrd.getTag().equals("accept")){
+
+                    final AlertDialog accept = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Accept ride order request?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    myRidersRef.child(myPhone).setValue("active").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            acceptOrd.setTag("decline");
+                                            acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
+                                        }
+                                    });
+
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            })
+
+                            .create();
+                    accept.show();
+
+                }
+
+                if(acceptOrd.getTag().equals("decline")){
+
+                    final AlertDialog decline = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Decline ride order request?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    myRidersRef.child(myPhone).setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            acceptOrd.setTag("accept");
+                                            acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                        }
+                                    });
+
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            })
+
+                            .create();
+                    decline.show();
+
+                }
+
+            }
+        });
 
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override

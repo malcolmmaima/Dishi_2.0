@@ -71,7 +71,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //myLocationRef.removeEventListener((ValueEventListener) this);
+        myLocationRef.removeEventListener(locationListener);
     }
 
     @Override

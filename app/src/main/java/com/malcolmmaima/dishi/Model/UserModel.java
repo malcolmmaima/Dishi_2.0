@@ -19,6 +19,7 @@ public class UserModel {
     Integer following;
     public long itemCount; //Not part of our user model, just a temporary data holder to be passed from OrdersFragment to orders adapter
     public String restaurantPhone; //Not part of our user model, just a temporary data holder to be passed
+
     public String getPhone() {
         return phone;
     }

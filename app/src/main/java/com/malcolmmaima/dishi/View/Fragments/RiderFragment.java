@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +24,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocation;
+import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
@@ -36,7 +40,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference myRideOrderRequests;
+    DatabaseReference myRideOrderRequests, myLocationRef, customerLiveLocationRef;
     ValueEventListener myRideOrderRequestsListener;
     FirebaseDatabase db;
     FirebaseUser user;
@@ -67,6 +71,16 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         final View v = inflater.inflate(R.layout.fragment_rider, container, false);
         progressDialog = new ProgressDialog(getContext());
 
+        try {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            db = FirebaseDatabase.getInstance();
+
+            myRideOrderRequests = db.getReference("my_ride_requests/"+myPhone);
+        } catch (Exception e){
+
+        }
+
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
@@ -78,6 +92,8 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
+
+
 
         /**
          * Showing Swipe Refresh animation on activity create
@@ -95,27 +111,14 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             }
         });
 
-        try {
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
-            db = FirebaseDatabase.getInstance();
-
-            myRideOrderRequests = db.getReference("my_ride_requests/"+myPhone);
-        } catch (Exception e){
-
-        }
-
 
         return  v;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-
+    public void onDetach() {
+        super.onDetach();
         try {
-            myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
-
             for(int i=0; i<myRestaurants.size(); i++) {
                 ordersRef[i].removeEventListener(ordersRefListener[i]);
                 //Toast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
@@ -167,6 +170,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                                 userDetailsRefListener = new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot userDetails) {
+
                                                 UserModel assignedCustomer = userDetails.getValue(UserModel.class);
                                                 assignedCustomer.setPhone(orders.getKey());
                                                 assignedCustomer.itemCount = dataSnapshot.child(orders.getKey()).child("items").getChildrenCount();

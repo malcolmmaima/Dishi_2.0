@@ -24,6 +24,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocation;
+import com.malcolmmaima.dishi.Model.StaticLocation;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
@@ -38,6 +41,12 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     List<UserModel> listdata;
     long DURATION = 200;
     private boolean on_attach = true;
+    LiveLocation liveLocation, customerLive;
+    StaticLocation customerStatic;
+    Double dist;
+    DatabaseReference restaurantUserDetails, myLocationRef, customerLiveLocationRef, customerStaticLocationRef;
+    ValueEventListener myLocationRefListener, customerLiveLocationListener,customerStaticLocationListener;
+    UserModel restaurant;
 
     public OrdersAdapter(Context context, List<UserModel> listdata) {
         this.listdata = listdata;
@@ -55,7 +64,97 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
     public void onBindViewHolder(final OrdersAdapter.MyHolder holder, final int position) {
         final UserModel orderDetails = listdata.get(position);
-        DatabaseReference restaurantUserDetails = FirebaseDatabase.getInstance().getReference("users/"+orderDetails.restaurantPhone);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        restaurantUserDetails = FirebaseDatabase.getInstance().getReference("users/"+orderDetails.restaurantPhone);
+        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+        customerLiveLocationRef = FirebaseDatabase.getInstance().getReference("location/"+orderDetails.getPhone());
+        customerStaticLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+orderDetails.restaurantPhone+"/"+orderDetails.getPhone()+"/static_address");
+
+
+        /**
+         * On create view fetch my location coordinates
+         */
+
+        liveLocation = null;
+        myLocationRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                //Toast.makeText(context, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myLocationRef.addValueEventListener(myLocationRefListener);
+
+        /**
+         * Now fetch customer order location co-ordinates
+         */
+
+        customerLiveLocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    customerLive = dataSnapshot.getValue(LiveLocation.class);
+
+                    computeDistance(holder, liveLocation.getLatitude(),
+                            liveLocation.getLongitude(),
+                            customerLive.getLatitude(),
+                            customerLive.getLongitude());
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        customerLiveLocationRef.addValueEventListener(customerLiveLocationListener);
+
+
+        customerStaticLocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //compute static location coordinates
+                if(dataSnapshot.exists()) {
+                    try {
+                        customerStatic = dataSnapshot.getValue(StaticLocation.class);
+
+                        computeDistance(holder, liveLocation.getLatitude(),
+                                liveLocation.getLongitude(),
+                                customerStatic.getLatitude(),
+                                customerStatic.getLongitude());
+
+                    } catch (Exception e){
+
+                    }
+                }
+                // compute live location coordindates
+                else {
+                    try {
+                        computeDistance(holder, liveLocation.getLatitude(),
+                                liveLocation.getLongitude(),
+                                customerLive.getLatitude(),
+                                customerLive.getLongitude());
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        customerStaticLocationRef.addValueEventListener(customerStaticLocationListener);
 
         /**
          * Adapter animation
@@ -70,6 +169,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
         holder.orderQty.setText("#"+orderDetails.itemCount);
         holder.distanceAway.setText("loading...");
 
+
         if(orderDetails.getAccount_type().equals("3")){
             holder.restaurantIcon.setVisibility(View.VISIBLE);
             holder.restaurantName.setVisibility(View.VISIBLE);
@@ -78,7 +178,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
-                        UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+                        restaurant = dataSnapshot.getValue(UserModel.class);
                         holder.restaurantName.setText(restaurant.getFirstname() + " " + restaurant.getLastname());
                     } catch (Exception e){
                         holder.restaurantName.setText("Error...");
@@ -109,7 +209,9 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 slideactivity.putExtra("phone", orderDetails.getPhone());
                 slideactivity.putExtra("name", orderDetails.getFirstname() + " " +  orderDetails.getLastname());
                 slideactivity.putExtra("restaurantPhone", orderDetails.restaurantPhone);
+                slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
                 slideactivity.putExtra("accountType", orderDetails.getAccount_type());
+                slideactivity.putExtra("restaurantProfile", restaurant.getProfilePic());
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                 context.startActivity(slideactivity, bndlanimation);
@@ -144,6 +246,21 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
         }
 
+    }
+
+    private void computeDistance(MyHolder holder, Double x1, Double y1, Double x2, Double y2) {
+        CalculateDistance calculateDistance = new CalculateDistance();
+        dist = calculateDistance.distance(x1, y1, x2, y2, "K");
+        try {
+            if (dist < 1.0) {
+                holder.distanceAway.setText(dist * 1000 + "m away");
+            } else {
+                holder.distanceAway.setText(dist + "km away");
+
+            }
+        } catch (Exception e){
+
+        }
     }
 
     /**
@@ -185,8 +302,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             distanceAwayIcon = itemView.findViewById(R.id.locationTag);
             restaurantName = itemView.findViewById(R.id.restaurantName);
 
-//            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//            final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+//
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -199,5 +315,6 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
         }
     }
+
 
 }

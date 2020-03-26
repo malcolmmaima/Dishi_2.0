@@ -77,7 +77,6 @@ public class RiderActivity extends AppCompatActivity
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
 
-            setTitle("Ride Requests");
             switch (item.getItemId()) {
                 case R.id.navigation_rider:
                     setTitle("Ride Requests");
@@ -109,8 +108,8 @@ public class RiderActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle("");
 
+        setTitle("Ride Requests");
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
