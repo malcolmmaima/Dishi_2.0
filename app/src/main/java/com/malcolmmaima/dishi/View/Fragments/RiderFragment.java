@@ -40,7 +40,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference myRideOrderRequests, myLocationRef, customerLiveLocationRef;
+    DatabaseReference myRideOrderRequests, riderStatusRef;
     ValueEventListener myRideOrderRequestsListener;
     FirebaseDatabase db;
     FirebaseUser user;
@@ -77,6 +77,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             db = FirebaseDatabase.getInstance();
 
             myRideOrderRequests = db.getReference("my_ride_requests/"+myPhone);
+
         } catch (Exception e){
 
         }
@@ -107,9 +108,52 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 mSwipeRefreshLayout.setRefreshing(true);
                 fetchOrders();
 
-
             }
         });
+
+        /**
+         * We need to keep track of my active status and whether i (rider) have any orders in progress
+         */
+
+        myRideOrderRequestsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot restaurantRequest : dataSnapshot.getChildren()){
+                    //Toast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
+                    for(DataSnapshot assignedCustomer : restaurantRequest.getChildren()){
+                        /**
+                         * we just need 1 accepted order request to keep rider status to active otherwise if none then inactive
+                         */
+                        if(assignedCustomer.getValue().equals("accepted")){
+                            DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
+                            myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for(DataSnapshot restaurants : dataSnapshot.getChildren()){
+                                        //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                        DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
+                                        restaurantRidersRef.setValue("active");
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myRideOrderRequests.addValueEventListener(myRideOrderRequestsListener);
 
 
         return  v;
