@@ -1,19 +1,10 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -23,8 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,9 +21,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Adapter.MenuAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 
 import java.util.ArrayList;
@@ -50,11 +41,14 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    DatabaseReference dbRef, menusRef, myFavourites, restaurantRef;
+    DatabaseReference menusRef, myFavourites, restaurantRef, myRef, myLocationRef, restaurantLocationRef;
+    ValueEventListener myRefListener, mylocationListener, restaurantLocationListener;
     FirebaseDatabase db;
     FirebaseUser user;
 
-    Double distance;
+    Double dist, distance;
+    UserModel userModel;
+    LiveLocation myLocation, restaurantLocation;
 
     public static ViewRestaurantMenuFragment newInstance() {
         ViewRestaurantMenuFragment fragment = new ViewRestaurantMenuFragment();
@@ -75,20 +69,77 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         db = FirebaseDatabase.getInstance();
-        dbRef = db.getReference(myPhone);
 
         phone = getArguments().getString("phone");
-        distance = getArguments().getDouble("distance");
         fullName = getArguments().getString("fullName");
         menusRef = db.getReference("menus/"+ phone);
 
         restaurantRef = db.getReference( "restaurant_favourites/"+ phone);
         myFavourites = db.getReference("my_favourites/"+myPhone);
+        myRef = db.getReference("users/"+myPhone);
 
+        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+        restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+phone);
+
+        //Get my location coordinates
+        mylocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    myLocation = dataSnapshot.getValue(LiveLocation.class);
+                     distance = computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myLocationRef.addValueEventListener(mylocationListener);
+
+        //get restaurant location coordinates
+        restaurantLocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    restaurantLocation = dataSnapshot.getValue(LiveLocation.class);
+                    distance = computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
+                }catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        restaurantLocationRef.addValueEventListener(restaurantLocationListener);
 
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+
+        //Get my user details
+        myRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    userModel = dataSnapshot.getValue(UserModel.class);
+                }catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myRef.addValueEventListener(myRefListener);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -118,9 +169,25 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         return  v;
     }
 
+    private Double computeDistance(Double latitude, Double longitude, Double latitude1, Double longitude1, String k) {
+        CalculateDistance calculateDistance = new CalculateDistance();
+        dist = calculateDistance.distance(latitude, longitude, latitude1, longitude1, "K");
+
+        return dist;
+    }
+
     @Override
     public void onRefresh() {
         fetchMenu();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        myRef.removeEventListener(myRefListener);
+        myLocationRef.removeEventListener(mylocationListener);
+        restaurantLocationRef.removeEventListener(restaurantLocationListener);
     }
 
     private void fetchMenu() {
@@ -136,6 +203,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
                     ProductDetails productDetails = dataSnapshot1.getValue(ProductDetails.class); //Assign values to model
                     productDetails.setKey(dataSnapshot1.getKey()); //Get item keys, useful when performing delete operations
                     productDetails.setDistance(distance);
+                    productDetails.accountType = userModel.getAccount_type();
                     list.add(productDetails);
                     //progressDialog.dismiss();
                 }

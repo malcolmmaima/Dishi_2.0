@@ -27,6 +27,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocation;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewPagerAdapter;
@@ -43,6 +45,13 @@ public class ViewRestaurant extends AppCompatActivity {
     TextView restaurantName, distAway, likes;
     String RestaurantName, phone;
     ValueEventListener providerFavsListener;
+
+    DatabaseReference myLocationRef, restaurantLocationRef;
+    ValueEventListener mylocationListener, restaurantLocationListener;
+    LiveLocation myLocation, restaurantLocation;
+    Double dist;
+    String myPhone;
+    FirebaseUser user;
 
     //This is our tablayout
     private TabLayout tabLayout;
@@ -75,6 +84,17 @@ public class ViewRestaurant extends AppCompatActivity {
             }
         });
 
+        /**
+         * Receive values from Restaurant adapter
+         */
+        final String restaurantPhone = getIntent().getStringExtra("restaurant_phone");
+        final Double distanceAway = getIntent().getDoubleExtra("distance", 0.0);
+
+        String profilePic = getIntent().getStringExtra("profilePic");
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
         favourite = findViewById(R.id.likeImageView);
         callBtn = findViewById(R.id.callRestaurant);
         shareRest = findViewById(R.id.shareImageView);
@@ -84,6 +104,47 @@ public class ViewRestaurant extends AppCompatActivity {
 
         distAway = findViewById(R.id.distanceAway);
         likes = findViewById(R.id.likesTotal);
+
+        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+        restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
+
+        //Get my location coordinates
+        mylocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    myLocation = dataSnapshot.getValue(LiveLocation.class);
+                    computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myLocationRef.addValueEventListener(mylocationListener);
+
+        //get restaurant location coordinates
+        restaurantLocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    restaurantLocation = dataSnapshot.getValue(LiveLocation.class);
+                    computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
+                }catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        restaurantLocationRef.addValueEventListener(restaurantLocationListener);
 
         //Initializing viewPager
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -130,14 +191,6 @@ public class ViewRestaurant extends AppCompatActivity {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-        /**
-         * Receive values from Restaurant adapter
-         */
-        final String restaurantPhone = getIntent().getStringExtra("restaurant_phone");
-        final Double distanceAway = getIntent().getDoubleExtra("distance", 0.0);
-
-        String profilePic = getIntent().getStringExtra("profilePic");
 
         distAway.setText(distanceAway + "");
 
@@ -333,9 +386,23 @@ public class ViewRestaurant extends AppCompatActivity {
 
     }
 
+    private void computeDistance(Double latitude, Double longitude, Double latitude1, Double longitude1, String k) {
+        CalculateDistance calculateDistance = new CalculateDistance();
+        dist = calculateDistance.distance(latitude, longitude, latitude1, longitude1, "K");
+        try {
+            if (dist < 1.0) {
+                distAway.setText(dist * 1000 + "m away");
+            } else {
+                distAway.setText(dist + "km away");
+
+            }
+        } catch (Exception e){
+
+        }
+    }
+
     private void setupViewPager(ViewPager viewPager)
     {
-        Double distance =  getIntent().getDoubleExtra("distance", 0.0);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         restaurantMenu = new ViewRestaurantMenuFragment();
         restaurantReviews = new ReviewsFragment();
@@ -345,7 +412,6 @@ public class ViewRestaurant extends AppCompatActivity {
         //Pass the phone number to the adapters
         Bundle data = new Bundle();//bundle instance
         data.putString("phone", phone);//string to pass with a key value
-        data.putDouble("distance", distance);
         data.putString("fullName", RestaurantName);
         restaurantMenu.setArguments(data);//Set bundle data to fragment
         restaurantReviews.setArguments(data);
@@ -359,5 +425,7 @@ public class ViewRestaurant extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         providerFavs.removeEventListener(providerFavsListener);
+        myLocationRef.removeEventListener(mylocationListener);
+        restaurantLocationRef.removeEventListener(restaurantLocationListener);
     }
 }

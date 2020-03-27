@@ -265,6 +265,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                         ProductDetails product = menu.getValue(ProductDetails.class);
                                                         product.setKey(menu.getKey());
                                                         product.setDistance(dist);
+                                                        product.accountType = "1"; //This fragment belongs to account type 1 (customer)
                                                         list.add(product);
                                                     }
                                                 }

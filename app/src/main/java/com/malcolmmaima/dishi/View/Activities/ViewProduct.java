@@ -1,6 +1,7 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.alexzh.circleimageview.CircleImageView;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,7 +35,7 @@ import com.squareup.picasso.Picasso;
 
 public class ViewProduct extends AppCompatActivity {
 
-    String key, restaurant, restaurantName_,product, description, price, imageUrl, myPhone;
+    String key, restaurant, restaurantName_,product, description, price, imageUrl, myPhone, accType;
     Double distance;
     AppCompatTextView productName, productPrice, itemCount;
     TextView distanceAway, restaurantName, productDescription, subTotal;
@@ -43,6 +45,7 @@ public class ViewProduct extends AppCompatActivity {
     Menu myMenu;
     DatabaseReference myCart;
     ValueEventListener cartListener;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class ViewProduct extends AppCompatActivity {
         restaurantName = findViewById(R.id.restaurantName);
         productDescription = findViewById(R.id.productDescription);
         subTotal = findViewById(R.id.subTotal);
+        fab = findViewById(R.id.fab);
 
         /**
          * Receive values from product adapter via intent
@@ -79,6 +83,7 @@ public class ViewProduct extends AppCompatActivity {
         imageUrl = getIntent().getStringExtra("imageUrl");
         distance = getIntent().getDoubleExtra("distance", 0.0);
         restaurantName_ = getIntent().getStringExtra("restaurantName");
+        accType = getIntent().getStringExtra("accType");
 
         setTitle("Order Now"); //Set title
 
@@ -105,6 +110,15 @@ public class ViewProduct extends AppCompatActivity {
         } else {
             distanceAway.setText(distance + "km away");
 
+        }
+
+        if(!accType.equals("1")){
+            add.setEnabled(false);
+            fab.setEnabled(false);
+
+            add.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
+            minus.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
+            fab.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
         }
 
         /**
@@ -158,7 +172,6 @@ public class ViewProduct extends AppCompatActivity {
         //topToolBar.setLogo(R.drawable.dish);
         //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
-        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {

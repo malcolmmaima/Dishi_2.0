@@ -203,21 +203,30 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, ViewCustomerOrder.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("phone", orderDetails.getPhone());
-                slideactivity.putExtra("name", orderDetails.getFirstname() + " " +  orderDetails.getLastname());
-                slideactivity.putExtra("restaurantPhone", orderDetails.restaurantPhone);
-                slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
-                slideactivity.putExtra("accountType", orderDetails.getAccount_type());
-                try {
-                    slideactivity.putExtra("restaurantProfile", restaurant.getProfilePic()); //This value will be null for account type 2
-                } catch (Exception e){
 
+                if(!holder.restaurantName.getText().equals("loading...") && orderDetails.getPhone() != null
+                    && orderDetails.restaurantPhone != null && orderDetails.getAccount_type() != null
+                    && restaurant.getProfilePic() != null){
+
+                        Intent slideactivity = new Intent(context, ViewCustomerOrder.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("phone", orderDetails.getPhone());
+                        slideactivity.putExtra("name", orderDetails.getFirstname() + " " +  orderDetails.getLastname());
+                        slideactivity.putExtra("restaurantPhone", orderDetails.restaurantPhone);
+                        slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
+                        slideactivity.putExtra("accountType", orderDetails.getAccount_type());
+                        try {
+                            slideactivity.putExtra("restaurantProfile", restaurant.getProfilePic()); //This value will be null for account type 2
+                        } catch (Exception e){
+
+                        }
+                        Bundle bndlanimation =
+                                ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                        context.startActivity(slideactivity, bndlanimation);
+                } else {
+                    Toast.makeText(context, "fetching data...", Toast.LENGTH_SHORT).show();
                 }
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                context.startActivity(slideactivity, bndlanimation);
+
             }
         });
 

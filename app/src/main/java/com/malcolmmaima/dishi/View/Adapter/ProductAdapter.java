@@ -119,6 +119,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                 slideactivity.putExtra("price", productDetails.getPrice());
                 slideactivity.putExtra("imageUrl", productDetails.getImageURL());
                 slideactivity.putExtra("distance", productDetails.getDistance());
+                slideactivity.putExtra("accType", productDetails.accountType);
 
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
@@ -129,6 +130,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         /**
          * Add item to cart
          */
+
+        if(productDetails.accountType.equals("2") || productDetails.accountType.equals("3")){
+            holder.addToCart.setVisibility(View.GONE);
+        }
+
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
