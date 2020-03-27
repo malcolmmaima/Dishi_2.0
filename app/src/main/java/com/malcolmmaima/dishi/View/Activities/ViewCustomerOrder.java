@@ -380,6 +380,10 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                     acceptOrd.setImageResource(R.drawable.ic_action_save);
                                     confirmOrder.setVisibility(View.GONE);
                                 }
+
+                                if(accType.equals("2")){
+                                    confirmOrder.setVisibility(View.VISIBLE);
+                                }
                             } catch (Exception e){
 
                             }

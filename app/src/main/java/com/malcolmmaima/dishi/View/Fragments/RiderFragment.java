@@ -122,7 +122,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     //Toast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot assignedCustomer : restaurantRequest.getChildren()){
                         /**
-                         * we just need 1 accepted order request to keep rider status to active otherwise if none then inactive
+                         * we just need 1 'accepted' order request to keep rider status active otherwise if none then inactive
                          */
                         if(assignedCustomer.getValue().equals("accepted")){
                             DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
