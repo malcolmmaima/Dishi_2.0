@@ -33,7 +33,6 @@ public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHold
     Context context;
     List<UserModel> listdata;
     long DURATION = 200;
-    private boolean on_attach = true;
     DatabaseReference myRidersRef;
     String myPhone;
     FirebaseUser user;
@@ -115,6 +114,7 @@ public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHold
      * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
      */
     private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
         if(!on_attach){
             i = -1;
         }

@@ -28,10 +28,8 @@ import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
 public class LocationSettings extends AppCompatActivity {
 
-    private String TAG;
     String myPhone;
     private DatabaseReference myRef;
-    private FirebaseAuth mAuth;
     Switch defaultLocSwitch, liveLocSwitch;
     Button setLocation;
     Double lat, lng;
@@ -41,7 +39,7 @@ public class LocationSettings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_settings);
 
-        TAG = "LocationSettings";
+        String TAG = "LocationSettings";
 
         //Initialize widgets
         initWidgets();
@@ -62,7 +60,7 @@ public class LocationSettings extends AppCompatActivity {
         });
 
         //get auth state
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 

@@ -32,7 +32,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     String myPhone;
     private DatabaseReference myRef;
-    private FirebaseAuth mAuth;
     private String TAG;
     AppCompatTextView userName, phoneNumber;
     CircleImageView profilePic;
@@ -59,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
         setTitle("Settings");
 
         //get auth state
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 

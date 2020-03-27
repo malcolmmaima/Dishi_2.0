@@ -40,7 +40,6 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     Context context;
     List<UserModel> listdata;
     long DURATION = 200;
-    private boolean on_attach = true;
     LiveLocation liveLocation, customerLive;
     StaticLocation customerStatic;
     Double dist;
@@ -271,6 +270,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
      * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
      */
     private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
         if(!on_attach){
             i = -1;
         }

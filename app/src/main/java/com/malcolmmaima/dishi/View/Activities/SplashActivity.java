@@ -35,9 +35,7 @@ import io.fabric.sdk.android.Fabric;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private PreferenceManager prefManager;
     String myPhone;
-    private FirebaseAuth mAuth;
     ProgressBar progressBar;
 
     @Override
@@ -61,12 +59,12 @@ public class SplashActivity extends AppCompatActivity {
 //
 //        }
 
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         Fabric.with(this, new Crashlytics());
 
         // Checking for first time launch
-        prefManager = new PreferenceManager(this);
+        PreferenceManager prefManager = new PreferenceManager(this);
         if (!prefManager.isFirstTimeLaunch()) {
             if (mAuth.getInstance().getCurrentUser() == null || mAuth.getInstance().getCurrentUser().getPhoneNumber() == null) {
                 progressBar.setVisibility(View.GONE);

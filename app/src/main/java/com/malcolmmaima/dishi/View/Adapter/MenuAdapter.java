@@ -42,7 +42,6 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
     Context context;
     List<ProductDetails> listdata;
     long DURATION = 500;
-    private boolean on_attach = true;
 
     public MenuAdapter(Context context, List<ProductDetails> listdata) {
         this.listdata = listdata;
@@ -123,6 +122,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
      * @lhttps://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
      */
     private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
         if(!on_attach){
             i = -1;
         }

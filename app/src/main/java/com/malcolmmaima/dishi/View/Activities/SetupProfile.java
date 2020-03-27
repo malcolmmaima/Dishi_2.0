@@ -62,7 +62,7 @@ public class SetupProfile extends AppCompatActivity {
      * Firebase
      */
     StorageReference storageReference;
-    private DatabaseReference myRef, defaultsRef;
+    private DatabaseReference myRef;
     private FirebaseAuth mAuth;
 
     // Image request code for onActivityResult() .
@@ -91,7 +91,7 @@ public class SetupProfile extends AppCompatActivity {
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
         mAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference("users");
-        defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
+        DatabaseReference defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
 
         // Assign FirebaseStorage instance to storageReference.
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -263,6 +263,7 @@ public class SetupProfile extends AppCompatActivity {
                 // Adding addOnSuccessListener to second StorageReference.
                 storageReference2nd.putFile(FilePathUri)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @SuppressWarnings("unchecked")
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 

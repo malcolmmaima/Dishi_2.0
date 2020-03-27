@@ -67,7 +67,6 @@ public class PersonalDetails extends AppCompatActivity {
      */
     StorageReference storageReference;
     private DatabaseReference myRef;
-    private FirebaseAuth mAuth;
 
     // Image request code for onActivityResult() .
     int Image_Request_Code = 7;
@@ -106,7 +105,7 @@ public class PersonalDetails extends AppCompatActivity {
         imageURL = "";
 
         //get auth state
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 

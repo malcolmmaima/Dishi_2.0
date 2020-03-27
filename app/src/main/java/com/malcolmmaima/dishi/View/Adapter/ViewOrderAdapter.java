@@ -49,7 +49,6 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
     Context context;
     List<ProductDetails> listdata;
     long DURATION = 200;
-    private boolean on_attach = true;
 
     OnOrderChecked onOrderChecked;
 
@@ -139,6 +138,7 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
      * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
      */
     private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
         if(!on_attach){
             i = -1;
         }

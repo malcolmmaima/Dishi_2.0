@@ -66,7 +66,6 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
     Double latitude, longitude;
     ImageView mGps;
 
-    private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private static final float DEFAULT_ZOOM = 15f;
@@ -328,7 +327,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         progressBar.setVisibility(View.VISIBLE);
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
 
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         latitude = 0.0;
         longitude = 0.0;
         placeName = "";

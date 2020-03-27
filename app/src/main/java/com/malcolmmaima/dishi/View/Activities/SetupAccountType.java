@@ -42,7 +42,6 @@ public class SetupAccountType extends AppCompatActivity {
      * Firebase
      */
     private DatabaseReference myRef;
-    private FirebaseAuth mAuth;
     ProgressDialog progressDialog;
 
     @Override
@@ -60,7 +59,7 @@ public class SetupAccountType extends AppCompatActivity {
         myRef = FirebaseDatabase.getInstance().getReference("users");
 
         //get auth state
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
