@@ -238,7 +238,7 @@ public class ViewMyOrders extends AppCompatActivity {
          */
         currentRiderListener = new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.exists()){
                     riderName.setText(restaurantName);
                 }
@@ -260,7 +260,14 @@ public class ViewMyOrders extends AppCompatActivity {
                         }
                     });
 
-                    riderStatus = FirebaseDatabase.getInstance().getReference("my_riders/"+phone+"/"+dataSnapshot.getValue());
+                    /**
+                     * Reference:
+                     *
+                     * dataSnapshot.getValue() = the rider's phone
+                     * phone = the restaurant's phone
+                     */
+
+                    riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone+"/"+myPhone);
                     riderStatusListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
@@ -271,14 +278,27 @@ public class ViewMyOrders extends AppCompatActivity {
                             }
 
                             try {
-                                if (riderOrderStatus.equals("active")) {
+                                if (riderOrderStatus.equals("accepted")) {
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
-
+                                    confirmOrder.setVisibility(View.VISIBLE);
+                                    confirmOrder.setEnabled(true);
+                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.colorPrimary));
                                 }
 
-                                if (riderOrderStatus.equals("inactive")) {
+                                if (riderOrderStatus.equals("assigned")) {
                                     riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    confirmOrder.setVisibility(View.VISIBLE);
+                                    confirmOrder.setEnabled(false);
+                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
                                 }
+
+                                if (riderOrderStatus.equals("declined")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    confirmOrder.setVisibility(View.GONE);
+                                    confirmOrder.setEnabled(false);
+                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
+                                }
+
                             } catch (Exception e){
 
                             }

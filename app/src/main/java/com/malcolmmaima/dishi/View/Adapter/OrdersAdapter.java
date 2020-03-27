@@ -204,9 +204,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             @Override
             public void onClick(View v) {
 
-                if(!holder.restaurantName.getText().equals("loading...") && orderDetails.getPhone() != null
-                    && orderDetails.restaurantPhone != null && orderDetails.getAccount_type() != null
-                    && restaurant.getProfilePic() != null){
+                if(orderDetails.getPhone() != null){
 
                         Intent slideactivity = new Intent(context, ViewCustomerOrder.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

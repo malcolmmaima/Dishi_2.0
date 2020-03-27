@@ -131,7 +131,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
          * Add item to cart
          */
 
-        if(productDetails.accountType.equals("2") || productDetails.accountType.equals("3")){
+        if(!productDetails.accountType.equals("1")){
             holder.addToCart.setVisibility(View.GONE);
         }
 

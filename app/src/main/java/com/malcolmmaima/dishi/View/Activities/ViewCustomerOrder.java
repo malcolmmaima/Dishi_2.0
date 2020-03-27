@@ -425,7 +425,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
                             String riderOrderStatus = dtSnapshot.getValue(String.class);
-                            if(riderPhone == null){
+                            //Toast.makeText(ViewCustomerOrder.this, "status: " + riderOrderStatus, Toast.LENGTH_SHORT).show();
+                            if(riderOrderStatus == null && riderPhone == null){
                                 Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
                                 customerOrderItems.child("rider").removeValue();
                             }
