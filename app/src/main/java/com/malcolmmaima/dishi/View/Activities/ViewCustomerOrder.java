@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -75,6 +76,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     CircleImageView profilePic;
     UserModel riderUser;
     String riderPhone;
+    String [] restaurantActions = {"View","Message", "Call"};
 
     final int[] total = {0};
 
@@ -137,6 +139,75 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         } catch (Exception e){
 
         }
+
+        restaurantName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                builder.setTitle(restaurantname);
+                builder.setItems(restaurantActions, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if(which == 0){
+                            Intent slideactivity = new Intent(ViewCustomerOrder.this, ViewRestaurant.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            slideactivity.putExtra("restaurant_phone", restaurantPhone);
+                            slideactivity.putExtra("distance", 0.0);
+                            slideactivity.putExtra("profilePic", restaurantProfile);
+                            Bundle bndlanimation =
+                                    null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                startActivity(slideactivity, bndlanimation);
+                            }
+                        }
+                        if(which == 1){
+                            Snackbar snackbar = Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+
+                        if(which == 2){
+                            final AlertDialog callAlert = new AlertDialog.Builder(v.getContext())
+                                    //set message, title, and icon
+                                    .setMessage("Call " + restaurantname + "?")
+                                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                    //set three option buttons
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            String phone = restaurantPhone;
+                                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                            startActivity(intent);
+                                        }
+                                    }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            //do nothing
+
+                                        }
+                                    })//setNegativeButton
+
+                                    .create();
+                            callAlert.show();
+                        }
+
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(ViewCustomerOrder.this, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", restaurantProfile);
+                startActivity(slideactivity);
+            }
+        });
 
         if(accType.equals("2")){
             OrderStatus.setVisibility(View.GONE);
