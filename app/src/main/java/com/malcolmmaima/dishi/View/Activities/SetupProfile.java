@@ -297,6 +297,9 @@ public class SetupProfile extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
                                         // Handle any errors
+                                        progressDialog.dismiss();
+                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
                                     }
                                 });
 
@@ -306,8 +309,13 @@ public class SetupProfile extends AppCompatActivity {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
+                                try {
+                                    progressDialog.dismiss();
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception e){
+                                    
+                                }
                             }
                         })
 

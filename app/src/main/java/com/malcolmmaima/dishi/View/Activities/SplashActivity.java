@@ -63,6 +63,7 @@ public class SplashActivity extends AppCompatActivity {
 
         Fabric.with(this, new Crashlytics());
 
+
         // Checking for first time launch
         PreferenceManager prefManager = new PreferenceManager(this);
         if (!prefManager.isFirstTimeLaunch()) {
@@ -74,198 +75,229 @@ public class SplashActivity extends AppCompatActivity {
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
                 finish();
 
-            } else {
+            } else { //Are logged in
+
                 //get device id
                 final String android_id = Settings.Secure.getString(this.getContentResolver(),
                         Settings.Secure.ANDROID_ID);
 
-
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-                FirebaseDatabase db = FirebaseDatabase.getInstance();
-                final DatabaseReference dbRef = db.getReference("users/" + myPhone);
-
-                //Compare device id of current device id and previous logged device id,
-                //if not same prompt logout device. On fresh login will set new device id. limit account logins to one device
-                //Using live listener to keep active track of any new logged device
-                dbRef.child("device_id").addValueEventListener(new ValueEventListener() {
+                DatabaseReference adminRef = FirebaseDatabase.getInstance().getReference("admin");
+                adminRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()){
+                        try {
+                            Boolean maintenance = dataSnapshot.child("maintenance").getValue(Boolean.class);
 
-                            try {
-                                String fetchedId = dataSnapshot.getValue(String.class);
-                                //device id's do not match, prompt to logout atleast one device
-                                if (!android_id.equals(fetchedId)) {
-                                    //Log out
-                                    Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
-                                    stopService(new Intent(SplashActivity.this, TrackingService.class));
-                                    FirebaseAuth.getInstance().signOut();
-                                    startActivity(new Intent(SplashActivity.this, MainActivity.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                }
-
-
-                            } catch (Exception e){
-
+                            if (maintenance == true) {
+                                progressBar.setVisibility(View.GONE);
+                                Intent mainActivity = new Intent(SplashActivity.this, SystemMaintenance.class);
+                                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//Load Main Activity and clear activity stack
+                                startActivity(mainActivity);
                             }
+
+                            if (maintenance == false) {
+
+
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+                                FirebaseDatabase db = FirebaseDatabase.getInstance();
+                                final DatabaseReference dbRef = db.getReference("users/" + myPhone);
+
+                                //Compare device id of current device id and previous logged device id,
+                                //if not same prompt logout device. On fresh login will set new device id. limit account logins to one device
+                                //Using live listener to keep active track of any new logged device
+                                dbRef.child("device_id").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.exists()){
+
+                                            try {
+                                                String fetchedId = dataSnapshot.getValue(String.class);
+                                                //device id's do not match, prompt to logout atleast one device
+                                                if (!android_id.equals(fetchedId)) {
+                                                    //Log out
+                                                    Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
+                                                    stopService(new Intent(SplashActivity.this, TrackingService.class));
+                                                    FirebaseAuth.getInstance().signOut();
+                                                    startActivity(new Intent(SplashActivity.this, MainActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                                }
+
+
+                                            } catch (Exception e){
+
+                                            }
+                                        }
+
+                                        else {
+                                            dbRef.child("device_id").setValue(android_id);
+                                        }
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                                //Check whether user is verified, if true send them directly to MyAccountRestaurant
+                                dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        String verified = dataSnapshot.getValue(String.class);
+
+                                        //Toast.makeText(SplashActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                        if(verified == null){
+                                            verified = "false";
+
+                                            dbRef.child("verified").setValue(verified).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Intent mainActivity = new Intent(SplashActivity.this, SetupProfile.class);
+                                                    mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//Load Main Activity and clear activity stack
+                                                    startActivity(mainActivity);
+                                                }
+                                            })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            // Write failed
+                                                            progressBar.setVisibility(View.GONE);
+                                                            Toast.makeText(SplashActivity.this, "Error!", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    });
+
+                                        }
+
+                                        else if (verified.equals("true")) { //Will need to check account type as well, then redirect to account type
+
+                                            //User is verified, so we need to check their account type and redirect accordingly
+                                            dbRef.child("account_type").addValueEventListener(new ValueEventListener() {
+                                                @Override public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    final String account_type = dataSnapshot.getValue(String.class);
+                                                    //String account_type = Integer.toString(acc_type);
+
+                                                    if(account_type == null){
+                                                        //Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
+                                                        //Set account type to 0 if setting up no complete
+                                                        dbRef.child("account_type").setValue("0").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+
+                                                                //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+
+                                                                Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
+                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                Bundle bndlanimation =
+                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                                getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    else {
+                                                        if(account_type.equals("1")){ //Customer account
+                                                            try {
+                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
+                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                Bundle bndlanimation =
+                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                startActivity(slideactivity, bndlanimation);
+                                                            } catch (Exception e){
+
+                                                            }
+                                                        }
+
+                                                        else if (account_type.equals("2")){ //Provider Restaurant account
+                                                            try {
+                                                                progressBar.setVisibility(View.GONE);
+                                                                //Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
+                                                                Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
+                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                Bundle bndlanimation =
+                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                                startActivity(slideactivity, bndlanimation);
+                                                            } catch (Exception e){
+
+                                                            }
+                                                        }
+
+                                                        else if (account_type.equals("3")){ //Nduthi account
+                                                            try {
+                                                                progressBar.setVisibility(View.GONE);
+                                                                //Slide to new activity
+                                                                //Toast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
+                                                                Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
+                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                Bundle bndlanimation =
+                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                                startActivity(slideactivity, bndlanimation);
+                                                            } catch (Exception e){
+
+                                                            }
+
+                                                        }
+
+                                                        else if (account_type.equals("0")){
+                                                            //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+
+                                                            Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
+                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                            Bundle bndlanimation =
+                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                            getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                                        }
+
+                                                        else if (account_type.equals("x") || account_type.equals("X")){
+                                                            Intent slideactivity = new Intent(SplashActivity.this, BlockedAccount.class)
+                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                            Bundle bndlanimation =
+                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                                                            getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                                        }
+
+                                                        else { // Others
+                                                            finish();
+                                                            Toast.makeText(SplashActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    //DB error, try again...if fails login again
+                                                    //
+
+                                                }
+                                            });
+
+                                        } else {
+                                            progressBar.setVisibility(View.GONE);
+                                            //User is not verified so have them verify their profile details first
+                                            startActivity(new Intent(SplashActivity.this, SetupProfile.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                    }
+                                });
+                            }
+                        } catch (Exception e){
+
                         }
-
-                        else {
-                            dbRef.child("device_id").setValue(android_id);
-                        }
-
-
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
-                //Check whether user is verified, if true send them directly to MyAccountRestaurant
-                dbRef.child("verified").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String verified = dataSnapshot.getValue(String.class);
-
-                        //Toast.makeText(SplashActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
-                        if(verified == null){
-                            verified = "false";
-
-                            dbRef.child("verified").setValue(verified).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    progressBar.setVisibility(View.GONE);
-                                    Intent mainActivity = new Intent(SplashActivity.this, SetupProfile.class);
-                                    mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//Load Main Activity and clear activity stack
-                                    startActivity(mainActivity);
-                                }
-                            })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            // Write failed
-                                            progressBar.setVisibility(View.GONE);
-                                            Toast.makeText(SplashActivity.this, "Error!", Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-
-                        }
-
-                        else if (verified.equals("true")) { //Will need to check account type as well, then redirect to account type
-
-                            //User is verified, so we need to check their account type and redirect accordingly
-                            dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override public void onDataChange(DataSnapshot dataSnapshot) {
-                                    final String account_type = dataSnapshot.getValue(String.class);
-                                    //String account_type = Integer.toString(acc_type);
-
-                                    if(account_type == null){
-                                        //Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
-                                        //Set account type to 0 if setting up no complete
-                                        dbRef.child("account_type").setValue("0").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-
-                                                    //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
-
-                                                    Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
-                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                    Bundle bndlanimation =
-                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                    getApplicationContext().startActivity(slideactivity, bndlanimation);
-                                            }
-                                        });
-                                    }
-
-                                    else {
-                                        if(account_type.equals("1")){ //Customer account
-                                            try {
-                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
-                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                Bundle bndlanimation =
-                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                                startActivity(slideactivity, bndlanimation);
-                                            } catch (Exception e){
-
-                                            }
-                                        }
-
-                                        else if (account_type.equals("2")){ //Provider Restaurant account
-                                            try {
-                                                progressBar.setVisibility(View.GONE);
-                                                //Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
-                                            Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            Bundle bndlanimation =
-                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                            startActivity(slideactivity, bndlanimation);
-                                            } catch (Exception e){
-
-                                            }
-                                        }
-
-                                        else if (account_type.equals("3")){ //Nduthi account
-                                            try {
-                                                progressBar.setVisibility(View.GONE);
-                                                //Slide to new activity
-                                                //Toast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
-                                            Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            Bundle bndlanimation =
-                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                            startActivity(slideactivity, bndlanimation);
-                                            } catch (Exception e){
-
-                                            }
-
-                                        }
-
-                                        else if (account_type.equals("0")){
-                                            //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
-
-                                            Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            Bundle bndlanimation =
-                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                            getApplicationContext().startActivity(slideactivity, bndlanimation);
-                                        }
-
-                                        else if (account_type.equals("X")){
-                                            Snackbar snackbar = Snackbar
-                                                    .make((LinearLayout) findViewById(R.id.parentlayout), "Your account has been disabled", Snackbar.LENGTH_LONG);
-
-                                            snackbar.show();
-                                        }
-
-                                        else { // Others
-                                            Toast.makeText(SplashActivity.this, "'Others' account still in development", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    //DB error, try again...if fails login again
-                                    //
-
-                                }
-                            });
-
-                        } else {
-                            progressBar.setVisibility(View.GONE);
-                            //User is not verified so have them verify their profile details first
-                            startActivity(new Intent(SplashActivity.this, SetupProfile.class)
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
                     }
                 });
 
