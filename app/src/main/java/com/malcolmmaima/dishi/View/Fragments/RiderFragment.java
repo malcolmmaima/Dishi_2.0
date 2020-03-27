@@ -221,6 +221,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             @Override
             public void onDataChange(@NonNull DataSnapshot restaurantPhone) {
 
+                myRestaurants.clear();
                 ordersRef = new DatabaseReference[(int) restaurantPhone.getChildrenCount()];
                 ordersRefListener  = new ValueEventListener[(int) restaurantPhone.getChildrenCount()];
 
@@ -230,21 +231,23 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                 try {
                     for(int i=0; i<myRestaurants.size(); i++){
+                        AssignedOrders.clear(); //clear list
                         ordersRef[i] = FirebaseDatabase.getInstance().getReference("orders/"+myRestaurants.get(i));
                         ordersRefListener[i] = new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                                AssignedOrders.clear();
+
                                 for(final DataSnapshot orders : dataSnapshot.getChildren()){
+
                                     if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
                                         //Toast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
 
+                                        AssignedOrders.clear(); //clear list
                                         DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+orders.getKey());
                                         ValueEventListener
                                                 userDetailsRefListener = new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot userDetails) {
-
                                                 UserModel assignedCustomer = userDetails.getValue(UserModel.class);
                                                 assignedCustomer.setPhone(orders.getKey());
                                                 assignedCustomer.itemCount = dataSnapshot.child(orders.getKey()).child("items").getChildrenCount();
