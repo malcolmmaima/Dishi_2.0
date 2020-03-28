@@ -487,45 +487,49 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         riderName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                builder.setTitle("Rider Options");
-                builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, final int which) {
-                        if(which == 0){
-                            if(riderPhone != null){
-                                Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+
+                if(riderPhone != null && !riderPhone.equals(myPhone)){
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                    builder.setTitle("Rider Options");
+                    builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, final int which) {
+                            if(which == 0){
+                                if(riderPhone != null){
+                                    Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                }
+
+                                else {
+                                    Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                                }
                             }
 
-                            else {
-                                Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                            if(which == 1){
+                                if(riderPhone != null){
+                                    Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                }
+
+                                else {
+                                    Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+
+                            if(which == 2){
+                                if(riderPhone != null){
+                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
+                                    startActivity(intent);
+                                }
+
+                                else {
+                                    Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                                }
+
                             }
                         }
+                    });
+                    builder.create();
+                    builder.show();
+                }
 
-                        if(which == 1){
-                            if(riderPhone != null){
-                                Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
-                            }
-
-                            else {
-                                Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
-                            }
-                        }
-
-                        if(which == 2){
-                            if(riderPhone != null){
-                                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
-                                startActivity(intent);
-                            }
-
-                            else {
-                                Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
-                            }
-
-                        }
-                    }
-                });
-                builder.create();
-                builder.show();
             }
         });
         acceptOrd.setOnClickListener(new View.OnClickListener() {

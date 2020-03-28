@@ -180,6 +180,10 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                                                 public void onSuccess(Void aVoid) {
 
                                                                     myOrders.child(restaurantPhone).removeValue();
+                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                            ("my_ride_requests/"+riderPhone+"/"+restaurantPhone+"/"+myPhone);
+
+                                                                    rider.removeValue();
 
                                                                 }
                                                             });
