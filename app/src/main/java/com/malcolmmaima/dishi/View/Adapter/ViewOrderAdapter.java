@@ -112,6 +112,9 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
 
         holder.quantity.setText("Quantity: "+productDetails.getQuantity() + " x Ksh "+productDetails.getPrice());
 
+        if(!productDetails.accountType.equals("2")){
+            holder.checkBox.setEnabled(false);
+        }
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -15,10 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,6 +48,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     DatabaseReference restaurantUserDetails, myLocationRef, customerLiveLocationRef, customerStaticLocationRef;
     ValueEventListener myLocationRefListener, customerLiveLocationListener,customerStaticLocationListener;
     UserModel restaurant;
+    ChildEventListener myRideOrderRequestsChildListener;
+    DatabaseReference myRideOrderRequests;
 
     public OrdersAdapter(Context context, List<UserModel> listdata) {
         this.listdata = listdata;
@@ -70,6 +74,46 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
         myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
         customerLiveLocationRef = FirebaseDatabase.getInstance().getReference("location/"+orderDetails.getPhone());
         customerStaticLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+orderDetails.restaurantPhone+"/"+orderDetails.getPhone()+"/static_address");
+
+        if(orderDetails.getAccount_type().equals("3")){
+            myRideOrderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+orderDetails.riderPhone);
+
+            /**
+             * Listener to check if there are new ride requests
+             */
+
+            myRideOrderRequestsChildListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    //Toast.makeText(context, "New " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    //Toast.makeText(context, "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                    if(orderDetails.getPhone().equals(dataSnapshot.getKey())){
+                        listdata.remove(holder.getAdapterPosition());
+                        notifyItemRemoved(holder.getAdapterPosition());
+                    }
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            myRideOrderRequests.child(orderDetails.restaurantPhone).addChildEventListener(myRideOrderRequestsChildListener);
+        }
 
 
         /**

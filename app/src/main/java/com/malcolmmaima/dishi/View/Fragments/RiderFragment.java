@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -19,6 +20,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,6 +34,8 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
@@ -42,6 +46,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     DatabaseReference myRideOrderRequests, riderStatusRef;
     ValueEventListener myRideOrderRequestsListener;
+    ChildEventListener myRideOrderRequestsChildListener;
     FirebaseDatabase db;
     FirebaseUser user;
 
@@ -52,6 +57,8 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     AppCompatImageView icon;
     List <String> myRestaurants = new ArrayList<>();
     SwipeRefreshLayout mSwipeRefreshLayout;
+
+    UserModel assignedCustomer;
 
 
     public static RiderFragment newInstance() {
@@ -95,7 +102,6 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 android.R.color.holo_blue_dark);
 
 
-
         /**
          * Showing Swipe Refresh animation on activity create
          * As animation won't start on onCreate, post runnable is used
@@ -106,7 +112,39 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             public void run() {
 
                 mSwipeRefreshLayout.setRefreshing(true);
-                fetchOrders();
+                /**
+                 * Listener to check if there are new ride requests
+                 */
+
+                myRideOrderRequestsChildListener = new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Toast.makeText(getContext(), "New Request", Toast.LENGTH_SHORT).show();
+                        fetchOrders();
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                        //Toast.makeText(getContext(), "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                        fetchOrders();
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                myRideOrderRequests.addChildEventListener(myRideOrderRequestsChildListener);
 
             }
         });
@@ -118,6 +156,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         myRideOrderRequestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for(DataSnapshot restaurantRequest : dataSnapshot.getChildren()){
                     //Toast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot assignedCustomer : restaurantRequest.getChildren()){
@@ -197,6 +236,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         super.onDestroy();
         try {
             myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
+            myRideOrderRequests.removeEventListener(myRideOrderRequestsChildListener);
         } catch (Exception e){
 
         }
@@ -216,6 +256,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         myRestaurants.clear();
         ordersRef = new DatabaseReference[0];
         ordersRefListener = new ValueEventListener[0];
+        assignedCustomer = new UserModel();
 
         myRideOrderRequestsListener = new ValueEventListener() {
             @Override
@@ -231,8 +272,10 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                 try {
                     for(int i=0; i<myRestaurants.size(); i++){
+
                         AssignedOrders.clear(); //clear list
                         ordersRef[i] = FirebaseDatabase.getInstance().getReference("orders/"+myRestaurants.get(i));
+
                         ordersRefListener[i] = new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
@@ -249,18 +292,23 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                                 userDetailsRefListener = new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot userDetails) {
-                                                UserModel assignedCustomer = userDetails.getValue(UserModel.class);
+
+                                                assignedCustomer = userDetails.getValue(UserModel.class);
                                                 assignedCustomer.setPhone(orders.getKey());
+                                                assignedCustomer.riderPhone = myPhone;
                                                 assignedCustomer.itemCount = dataSnapshot.child(orders.getKey()).child("items").getChildrenCount();
                                                 assignedCustomer.restaurantPhone = dataSnapshot.getKey();
                                                 assignedCustomer.setAccount_type("3"); //This fragment belongs to rider accounts, type 3
+
                                                 AssignedOrders.add(assignedCustomer);
 
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 if (!AssignedOrders.isEmpty()) {
 
-                                                    //Collections.reverse(orders);
-                                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
+                                                    LinkedHashSet<UserModel> hashSet = new LinkedHashSet<>(AssignedOrders);
+                                                    ArrayList<UserModel> listWithoutDuplicates = new ArrayList<>(hashSet);
+
+                                                    OrdersAdapter recycler = new OrdersAdapter(getContext(), listWithoutDuplicates);
                                                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
                                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -275,6 +323,8 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                                     recyclerview.setAdapter(recycler);
                                                     emptyTag.setVisibility(View.INVISIBLE);
                                                     icon.setVisibility(View.INVISIBLE);
+                                                    myRestaurants.clear();
+
                                                 } else {
 //                                        progressDialog.dismiss();
                                                     OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
@@ -294,6 +344,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                             }
                                         };
                                         userDetailsRef.addListenerForSingleValueEvent(userDetailsRefListener);
+
                                     }
                                 }
                             }
@@ -303,7 +354,8 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                             }
                         };
-                        ordersRef[i].addValueEventListener(ordersRefListener[i]);
+                        ordersRef[i].addListenerForSingleValueEvent(ordersRefListener[i]);
+
                     }
                 } catch (Exception e){
 

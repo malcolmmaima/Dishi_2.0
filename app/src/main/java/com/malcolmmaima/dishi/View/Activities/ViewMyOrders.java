@@ -46,7 +46,7 @@ import java.util.List;
 public class ViewMyOrders extends AppCompatActivity {
 
     List<ProductDetails> list;
-    String myPhone, phone, restaurantName;
+    String myPhone, phone, restaurantName, riderPhone;
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
@@ -113,6 +113,12 @@ public class ViewMyOrders extends AppCompatActivity {
                 try {
                     Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
+
+                    try {
+                        riderPhone = dataSnapshot.child("rider").getValue(String.class);
+                    } catch (Exception e){
+
+                    }
 
                     myRemarks.setText("Remarks: "+remarks);
                     if (completed == true) {
@@ -272,9 +278,10 @@ public class ViewMyOrders extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
                             String riderOrderStatus = dtSnapshot.getValue(String.class);
-                            if(!dtSnapshot.exists()){
+                            if(riderOrderStatus == null && riderPhone == null){
+                                Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
                                 riderName.setText(restaurantName);
-                                customerOrderItems.child("rider").removeValue();
+                                //customerOrderItems.child("rider").removeValue(); //bug
                             }
 
                             try {

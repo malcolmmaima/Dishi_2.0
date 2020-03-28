@@ -290,6 +290,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     try {
                         ProductDetails prod = items.getValue(ProductDetails.class);
                         prod.setKey(items.getKey());
+                        prod.accountType = accType;
                         list.add(prod);
 
                         if(prod.getConfirmed() == true){
@@ -428,7 +429,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             //Toast.makeText(ViewCustomerOrder.this, "status: " + riderOrderStatus, Toast.LENGTH_SHORT).show();
                             if(riderOrderStatus == null && riderPhone == null){
                                 Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
-                                customerOrderItems.child("rider").removeValue();
+                                riderName.setText("Rider does not exist");
+                                //customerOrderItems.child("rider").removeValue(); //bug
                             }
 
                             try {
