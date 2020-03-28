@@ -149,6 +149,10 @@ public class ViewMyOrders extends AppCompatActivity {
                                                                     public void onSuccess(Void aVoid) {
 
                                                                         myOrders.child(phone).removeValue();
+                                                                        DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                ("my_ride_requests/"+riderPhone+"/"+phone+"/"+myPhone);
+
+                                                                        rider.removeValue();
 
                                                                     }
                                                                 });
@@ -373,6 +377,10 @@ public class ViewMyOrders extends AppCompatActivity {
                                                             public void onSuccess(Void aVoid) {
 
                                                                 myOrders.child(phone).removeValue();
+                                                                DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                        ("my_ride_requests/"+riderPhone+"/"+phone+"/"+myPhone);
+
+                                                                rider.removeValue();
 
                                                             }
                                                         });

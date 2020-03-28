@@ -85,7 +85,10 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             myRideOrderRequestsChildListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    //Toast.makeText(context, "New " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+
+                    if(!orderDetails.getPhone().equals(dataSnapshot.getKey())){
+                        Toast.makeText(context, "New Request", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
@@ -97,8 +100,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     //Toast.makeText(context, "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
                     if(orderDetails.getPhone().equals(dataSnapshot.getKey())){
-                        listdata.remove(holder.getAdapterPosition());
-                        notifyItemRemoved(holder.getAdapterPosition());
+                        listdata.remove(holder.getLayoutPosition());
+                        notifyItemRemoved(holder.getLayoutPosition());
                     }
                 }
 
