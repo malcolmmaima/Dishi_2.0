@@ -492,11 +492,23 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, final int which) {
                         if(which == 0){
-                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                            if(riderPhone != null){
+                                Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                            }
+
+                            else {
+                                Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                            }
                         }
 
                         if(which == 1){
-                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                            if(riderPhone != null){
+                                Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                            }
+
+                            else {
+                                Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                            }
                         }
 
                         if(which == 2){
