@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.malcolmmaima.dishi">
+    package="com.malcolmmaima.dishi" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -43,6 +43,11 @@
             android:name=".Controller.TrackingService"
             android:enabled="true"
             android:exported="true" />
+
+        <service
+            android:name=".Controller.ForegroundService"
+            android:enabled="true"
+            android:exported="true"></service>
 
         <activity android:name=".View.Activities.ViewProduct" />
         <activity android:name=".View.Activities.ViewImage" />
