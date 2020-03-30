@@ -251,7 +251,7 @@ public class RestaurantActivity extends AppCompatActivity
 
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //Toast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
@@ -345,7 +345,7 @@ public class RestaurantActivity extends AppCompatActivity
         startService(new Intent(this, TrackingService.class));
         //Notify the user that tracking has been enabled//
 
-        //Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+        //SafeToast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
 
         //////////////////////////////////
     }
@@ -371,19 +371,19 @@ public class RestaurantActivity extends AppCompatActivity
         if (id == R.id.menu1) {
             setTitle("My Menu");
             fragmentClass[0] = MenuFragment.class;
-            //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            //SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu2) {
             setTitle("Reviews");
             fragmentClass[0] = ReviewsFragment.class;
-            //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            //SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu3) {
             setTitle("History");
             fragmentClass[0] = HistoryFragment.class;
-            //Toast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            //SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu4) {
@@ -410,7 +410,7 @@ public class RestaurantActivity extends AppCompatActivity
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             //Log out
-                            //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                            //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
                             stopService(new Intent(RestaurantActivity.this, TrackingService.class));
                             FirebaseAuth.getInstance().signOut();
                             startActivity(new Intent(RestaurantActivity.this,SplashActivity.class)

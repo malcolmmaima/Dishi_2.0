@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class SetupAccountType extends AppCompatActivity {
 
     private String TAG;
@@ -71,7 +73,7 @@ public class SetupAccountType extends AppCompatActivity {
             customer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //Toast.makeText(SetupAccountType.this, "Customer account", Toast.LENGTH_SHORT).show();
+                    //SafeToast.makeText(SetupAccountType.this, "Customer account", Toast.LENGTH_SHORT).show();
                     accountType = "1";
 
                     try {
@@ -118,7 +120,7 @@ public class SetupAccountType extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             //error
-                            Toast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                         }
                     });
@@ -133,7 +135,7 @@ public class SetupAccountType extends AppCompatActivity {
             restaurant.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //Toast.makeText(SetupAccountType.this, "Restaurant account", Toast.LENGTH_SHORT).show();
+                    //SafeToast.makeText(SetupAccountType.this, "Restaurant account", Toast.LENGTH_SHORT).show();
                     accountType = "2";
 
                     try {
@@ -176,7 +178,7 @@ public class SetupAccountType extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             //error
-                            Toast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                         }
                     });
@@ -189,7 +191,7 @@ public class SetupAccountType extends AppCompatActivity {
             rider.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //Toast.makeText(SetupAccountType.this, "Rider account", Toast.LENGTH_SHORT).show();
+                    //SafeToast.makeText(SetupAccountType.this, "Rider account", Toast.LENGTH_SHORT).show();
                     accountType = "3";
 
                     try {
@@ -236,7 +238,7 @@ public class SetupAccountType extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             //error
-                            Toast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                         }
                     });
@@ -254,7 +256,7 @@ public class SetupAccountType extends AppCompatActivity {
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     //Log out
-                                    //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                                    //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
                                     FirebaseAuth.getInstance().signOut();
                                     startActivity(new Intent(SetupAccountType.this,SplashActivity.class)
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
@@ -277,7 +279,7 @@ public class SetupAccountType extends AppCompatActivity {
 
         //You're not logged in
         else {
-            Toast.makeText(this, "You're not logged in", Toast.LENGTH_LONG).show();
+            SafeToast.makeText(this, "You're not logged in", Toast.LENGTH_LONG).show();
             //Slide to new activity
             Intent slideactivity = new Intent(SetupAccountType.this, MainActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

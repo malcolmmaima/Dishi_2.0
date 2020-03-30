@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,12 +27,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
 
 import com.malcolmmaima.dishi.Controller.PreferenceManager;
 
 import io.fabric.sdk.android.Fabric;
+import io.fabric.sdk.android.services.common.SafeToast;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -70,13 +73,14 @@ public class SplashActivity extends AppCompatActivity {
             if (mAuth.getInstance().getCurrentUser() == null || mAuth.getInstance().getCurrentUser().getPhoneNumber() == null) {
                 progressBar.setVisibility(View.GONE);
                 //User is not signed in, send them back to verification page
-                //Toast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
+                //SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(SplashActivity.this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
-                finish();
+                stopNotificationService();
 
             } else { //Are logged in
 
+                startNotificationService();
                 //get device id
                 final String android_id = Settings.Secure.getString(this.getContentResolver(),
                         Settings.Secure.ANDROID_ID);
@@ -117,7 +121,7 @@ public class SplashActivity extends AppCompatActivity {
                                                 //device id's do not match, prompt to logout atleast one device
                                                 if (!android_id.equals(fetchedId)) {
                                                     //Log out
-                                                    Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
+                                                    SafeToast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
                                                     stopService(new Intent(SplashActivity.this, TrackingService.class));
                                                     FirebaseAuth.getInstance().signOut();
                                                     startActivity(new Intent(SplashActivity.this, MainActivity.class)
@@ -149,7 +153,7 @@ public class SplashActivity extends AppCompatActivity {
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         String verified = dataSnapshot.getValue(String.class);
 
-                                        //Toast.makeText(SplashActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                        //SafeToast.makeText(SplashActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
                                         if(verified == null){
                                             verified = "false";
 
@@ -167,7 +171,7 @@ public class SplashActivity extends AppCompatActivity {
                                                         public void onFailure(@NonNull Exception e) {
                                                             // Write failed
                                                             progressBar.setVisibility(View.GONE);
-                                                            Toast.makeText(SplashActivity.this, "Error!", Toast.LENGTH_LONG).show();
+                                                            SafeToast.makeText(SplashActivity.this, "Error!", Toast.LENGTH_LONG).show();
                                                         }
                                                     });
 
@@ -182,13 +186,13 @@ public class SplashActivity extends AppCompatActivity {
                                                     //String account_type = Integer.toString(acc_type);
 
                                                     if(account_type == null){
-                                                        //Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
+                                                        //SafeToast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
                                                         //Set account type to 0 if setting up no complete
                                                         dbRef.child("account_type").setValue("0").addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
 
-                                                                //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+                                                                //SafeToast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
 
                                                                 Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -202,7 +206,7 @@ public class SplashActivity extends AppCompatActivity {
                                                     else {
                                                         if(account_type.equals("1")){ //Customer account
                                                             try {
-                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                 Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                 Bundle bndlanimation =
@@ -216,7 +220,7 @@ public class SplashActivity extends AppCompatActivity {
                                                         else if (account_type.equals("2")){ //Provider Restaurant account
                                                             try {
                                                                 progressBar.setVisibility(View.GONE);
-                                                                //Toast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
+                                                                //SafeToast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
                                                                 Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                 Bundle bndlanimation =
@@ -231,7 +235,7 @@ public class SplashActivity extends AppCompatActivity {
                                                             try {
                                                                 progressBar.setVisibility(View.GONE);
                                                                 //Slide to new activity
-                                                                //Toast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
+                                                                //SafeToast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
                                                                 Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                 Bundle bndlanimation =
@@ -244,7 +248,7 @@ public class SplashActivity extends AppCompatActivity {
                                                         }
 
                                                         else if (account_type.equals("0")){
-                                                            //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+                                                            //SafeToast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
 
                                                             Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -263,7 +267,7 @@ public class SplashActivity extends AppCompatActivity {
 
                                                         else { // Others
                                                             finish();
-                                                            Toast.makeText(SplashActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
+                                                            SafeToast.makeText(SplashActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
                                                         }
                                                     }
 
@@ -310,5 +314,17 @@ public class SplashActivity extends AppCompatActivity {
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         }
 
+    }
+
+    public void startNotificationService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        serviceIntent.putExtra("title", "Dishi");
+        serviceIntent.putExtra("message", "Welcome to Dishi");
+        ContextCompat.startForegroundService(this, serviceIntent);
+    }
+
+    public void stopNotificationService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        stopService(serviceIntent);
     }
 }

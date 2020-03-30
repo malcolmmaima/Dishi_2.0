@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class ViewMyOrders extends AppCompatActivity {
 
     List<ProductDetails> list;
@@ -180,7 +182,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                         customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                //Toast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     }
@@ -406,7 +408,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if(!dataSnapshot.exists()){
                                             finish();
-                                            Toast.makeText(ViewMyOrders.this, "Order Complete", Toast.LENGTH_SHORT).show();
+                                            SafeToast.makeText(ViewMyOrders.this, "Order Complete", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
@@ -451,7 +453,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 finish();
-                                                Toast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
+                                                SafeToast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 

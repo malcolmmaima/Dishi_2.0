@@ -38,6 +38,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     Context context;
     List<UserModel> listdata;
@@ -87,7 +89,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
                     if(!orderDetails.getPhone().equals(dataSnapshot.getKey())){
-                        Toast.makeText(context, "New Request", Toast.LENGTH_SHORT).show();
+                        SafeToast.makeText(context, "New Request", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -98,7 +100,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    //Toast.makeText(context, "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                    //SafeToast.makeText(context, "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
                     if(orderDetails.getPhone().equals(dataSnapshot.getKey())){
                         listdata.remove(holder.getLayoutPosition());
                         notifyItemRemoved(holder.getLayoutPosition());
@@ -128,7 +130,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 liveLocation = dataSnapshot.getValue(LiveLocation.class);
-                //Toast.makeText(context, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                //SafeToast.makeText(context, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -269,7 +271,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                                 ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                         context.startActivity(slideactivity, bndlanimation);
                 } else {
-                    Toast.makeText(context, "fetching data...", Toast.LENGTH_SHORT).show();
+                    SafeToast.makeText(context, "fetching data...", Toast.LENGTH_SHORT).show();
                 }
 
             }

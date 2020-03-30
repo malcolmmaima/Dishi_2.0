@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class CheckOut extends AppCompatActivity {
 
     List<ProductDetails> list;
@@ -256,7 +258,7 @@ public class CheckOut extends AppCompatActivity {
                                     if(i == list.size()-1){
                                         progressDialog.dismiss();
                                         finish();
-                                        Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                        SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                     }
                                 }
                             }
@@ -320,7 +322,7 @@ public class CheckOut extends AppCompatActivity {
         startService(new Intent(this, TrackingService.class));
         //Notify the user that tracking has been enabled//
 
-        //Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+        //SafeToast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
 
         //////////////////////////////////
     }

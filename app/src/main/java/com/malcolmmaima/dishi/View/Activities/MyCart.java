@@ -103,7 +103,7 @@ public class MyCart extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 liveLocation = dataSnapshot.getValue(LiveLocation.class);
-                //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -184,7 +184,7 @@ public class MyCart extends AppCompatActivity {
 
                                 //Compare other providers in the list with the first index
                                 if(!restaurantName.equals(list.get(i).getOwner())){
-                                    //Toast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                                    //SafeToast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
                                     multipleRestaurants = true;
 
                                     //Perform action only once (if loop is complete)
@@ -334,7 +334,7 @@ public class MyCart extends AppCompatActivity {
                         //Compare other providers in the list with the first index
 
                         if(!restaurantName.equals(list.get(i).getOwner())){
-                            //Toast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                            //SafeToast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
                             multipleRestaurants = true;
                         }
 

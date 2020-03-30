@@ -29,6 +29,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHolder>{
     Context context;
     List<UserModel> listdata;
@@ -76,7 +78,7 @@ public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHold
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Load rider details/options", Toast.LENGTH_SHORT).show();
+                SafeToast.makeText(context, "Load rider details/options", Toast.LENGTH_SHORT).show();
             }
         });
 

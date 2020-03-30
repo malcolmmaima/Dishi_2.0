@@ -45,6 +45,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     List<UserModel> orders = new ArrayList<>();
@@ -250,7 +252,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 try {
-                    Toast.makeText(getContext(), "New order", Toast.LENGTH_LONG).show();
+                    SafeToast.makeText(getContext(), "New order", Toast.LENGTH_LONG).show();
                     //fetchOrders();
                 } catch(Exception e){
 

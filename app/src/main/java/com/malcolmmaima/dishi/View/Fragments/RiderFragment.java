@@ -38,6 +38,8 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     List<UserModel> AssignedOrders = new ArrayList<>();
     ProgressDialog progressDialog ;
@@ -120,7 +122,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         try {
-                            Toast.makeText(getContext(), "New Request", Toast.LENGTH_SHORT).show();
+                            SafeToast.makeText(getContext(), "New Request", Toast.LENGTH_SHORT).show();
                         } catch (Exception e){}
                         fetchOrders();
                     }
@@ -132,7 +134,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                     @Override
                     public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                        //Toast.makeText(getContext(), "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                        //SafeToast.makeText(getContext(), "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
                         fetchOrders();
                     }
 
@@ -160,7 +162,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 for(DataSnapshot restaurantRequest : dataSnapshot.getChildren()){
-                    //Toast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
+                    //SafeToast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot assignedCustomer : restaurantRequest.getChildren()){
                         /**
                          * we just need 1 'accepted' order request to keep rider status active otherwise if none then inactive
@@ -171,7 +173,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     for(DataSnapshot restaurants : dataSnapshot.getChildren()){
-                                        //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                        //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
                                         DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
                                         restaurantRidersRef.setValue("active");
 
@@ -191,7 +193,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     for(DataSnapshot restaurants : dataSnapshot.getChildren()){
-                                        //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                        //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
                                         DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
                                         restaurantRidersRef.setValue("inactive");
 
@@ -226,7 +228,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         try {
             for(int i=0; i<myRestaurants.size(); i++) {
                 ordersRef[i].removeEventListener(ordersRefListener[i]);
-                //Toast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
+                //SafeToast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e){
 
@@ -285,7 +287,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 for(final DataSnapshot orders : dataSnapshot.getChildren()){
 
                                     if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
-                                        //Toast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
+                                        //SafeToast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
 
                                         AssignedOrders.clear(); //clear list
                                         myRestaurants.clear();

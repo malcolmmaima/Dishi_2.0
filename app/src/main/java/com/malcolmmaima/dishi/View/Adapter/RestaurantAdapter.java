@@ -34,6 +34,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.MyHolder> {
 
     Context context;
@@ -162,7 +164,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
                                     //Add favourite to restaurant's node as well
                                 }
                             });
-                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                            //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -181,7 +183,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
                                     //remove favourite from restaurant's node as well
                                 }
                             });
-                            //Toast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                            //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -237,7 +239,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
                         context.startActivity(slideactivity, bndlanimation);
                     }
                 } else {
-                    Toast.makeText(context, "Error fetching details, try again!", Toast.LENGTH_SHORT).show();
+                    SafeToast.makeText(context, "Error fetching details, try again!", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -248,7 +250,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
         holder.shareImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Share!", Toast.LENGTH_SHORT).show();
+                SafeToast.makeText(context, "Share!", Toast.LENGTH_SHORT).show();
             }
         });
     }

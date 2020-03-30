@@ -109,7 +109,7 @@ public class TrackingService extends Service {
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
-        startForeground(2, notification);
+        startForeground(0, notification);
 
         stopTracking = false;
     }
@@ -170,7 +170,7 @@ public class TrackingService extends Service {
                             //Save the location data to the database//
 
                             ref.setValue(location);
-//                            Toast.makeText(getApplicationContext(), "Location data: lat(" +
+//                            SafeToast.makeText(getApplicationContext(), "Location data: lat(" +
 //                                    location.getLatitude() + ") long(" + location.getLongitude() + ")", Toast.LENGTH_SHORT).show();
                         }
                     }

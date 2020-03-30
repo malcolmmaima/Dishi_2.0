@@ -50,6 +50,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class AddMenu extends AppCompatActivity {
 
@@ -247,7 +249,7 @@ public class AddMenu extends AppCompatActivity {
         } else { //Editing existing item (key != null)
 
             setTitle("Edit Item");
-            //Toast.makeText(this, "key: " + key, Toast.LENGTH_SHORT).show();
+            //SafeToast.makeText(this, "key: " + key, Toast.LENGTH_SHORT).show();
 
             //Fetch item details from DB
             databaseReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -550,7 +552,7 @@ public class AddMenu extends AppCompatActivity {
                                         .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
 
                                 snackbar.show();
-                                //Toast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
+                                //SafeToast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
                             }
                         });
             }
@@ -603,7 +605,7 @@ public class AddMenu extends AppCompatActivity {
                                                                 .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
 
                                                         snackbar.show();
-                                                        //Toast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
+                                                        //SafeToast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
                                                     }
                                                 });
 
@@ -615,7 +617,7 @@ public class AddMenu extends AppCompatActivity {
                                     public void onFailure(@NonNull Exception exception) {
                                         // Handle any errors
                                         progressDialog.dismiss();
-                                        Toast.makeText(AddMenu.this, "Error: " + exception, Toast.LENGTH_SHORT).show();
+                                        SafeToast.makeText(AddMenu.this, "Error: " + exception, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -629,7 +631,7 @@ public class AddMenu extends AppCompatActivity {
                                 progressDialog.dismiss();
 
                                 // Showing exception erro message.
-                                //Toast.makeText(AddMenu.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+                                //SafeToast.makeText(AddMenu.this, exception.getMessage(), Toast.LENGTH_LONG).show();
 
                                 Snackbar snackbar = Snackbar
                                         .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
@@ -697,7 +699,7 @@ public class AddMenu extends AppCompatActivity {
                                         .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
 
                                 snackbar.show();
-                                //Toast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
+                                //SafeToast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
                             }
                         });
 
@@ -762,7 +764,7 @@ public class AddMenu extends AppCompatActivity {
                                                                 .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
 
                                                         snackbar.show();
-                                                        //Toast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
+                                                        //SafeToast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
                                                     }
                                                 });
 
@@ -781,7 +783,7 @@ public class AddMenu extends AppCompatActivity {
                                                 .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
 
                                         snackbar.show();
-                                        //Toast.makeText(AddMenu.this, "Error: " + exception, Toast.LENGTH_SHORT).show();
+                                        //SafeToast.makeText(AddMenu.this, "Error: " + exception, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -795,7 +797,7 @@ public class AddMenu extends AppCompatActivity {
                                 progressDialog.dismiss();
 
                                 // Showing exception erro message.
-                                Toast.makeText(AddMenu.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+                                SafeToast.makeText(AddMenu.this, exception.getMessage(), Toast.LENGTH_LONG).show();
 
                                 Snackbar snackbar = Snackbar
                                         .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);

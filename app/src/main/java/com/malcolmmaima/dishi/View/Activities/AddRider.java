@@ -38,6 +38,8 @@ import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class AddRider extends AppCompatActivity implements OnRiderSelected {
 
     List<UserModel> riders = new ArrayList<>();
@@ -115,7 +117,7 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
                 try {
                     if (dataSnapshot.getKey().equals(searchPhone.getText().toString().trim())) {
                         finish();
-                        Toast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
+                        SafeToast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e){
 
@@ -211,7 +213,7 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    Toast.makeText(AddRider.this, "Request sent to rider", Toast.LENGTH_LONG).show();
+                    SafeToast.makeText(AddRider.this, "Request sent to rider", Toast.LENGTH_LONG).show();
                     finish();
                 }
             }

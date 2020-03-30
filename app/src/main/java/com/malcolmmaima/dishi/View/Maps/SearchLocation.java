@@ -55,6 +55,8 @@ import com.malcolmmaima.dishi.R;
 
 import java.util.Arrays;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 import static io.fabric.sdk.android.services.concurrency.AsyncTask.init;
 
 public class SearchLocation extends AppCompatActivity implements OnMapReadyCallback,
@@ -83,7 +85,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //Toast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(SearchLocation.this)
@@ -189,14 +191,14 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 placeName = place.getName();
 
                 moveCamera(place.getLatLng(),DEFAULT_ZOOM, place.getName());
-                //Toast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
+                //SafeToast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(Status status) {
                 progressBar.setVisibility(View.INVISIBLE);
                 Log.i(TAG, "An error occurred: " + status);
-                //Toast.makeText(SearchLocation.this, "Error: " + status, Toast.LENGTH_SHORT).show();
+                //SafeToast.makeText(SearchLocation.this, "Error: " + status, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -224,7 +226,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 }
 
                 else {
-                    Toast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
+                    SafeToast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.INVISIBLE);
                     finish();
                 }
@@ -360,7 +362,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
-                            Toast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
+                            SafeToast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

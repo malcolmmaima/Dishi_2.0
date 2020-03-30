@@ -20,6 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.R;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class DeliverCharges extends AppCompatActivity {
 
     EditText pricePerKm;
@@ -72,7 +74,7 @@ public class DeliverCharges extends AppCompatActivity {
                     myRef.child("delivery_charge").setValue(price).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
+                            SafeToast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
                             finish();
                         }
                     });
