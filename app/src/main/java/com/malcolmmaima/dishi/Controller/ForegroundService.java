@@ -106,35 +106,52 @@ public class ForegroundService extends Service {
 
                         //loop through all my active restaurant orders
                         for(int i=0; i<activeRestaurantOrders.size(); i++){
-                            activeRestaurantRef[i] = FirebaseDatabase.getInstance().getReference("orders/"+activeRestaurantOrders.get(i)+"/"+myPhone);
-                            final int finalI = i;
-                            activeRestaurantListener[i] = new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    try {
-                                        Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
-                                        SafeToast.makeText(getApplicationContext(), "complete: " + complete, Toast.LENGTH_SHORT).show();
-                                        if (complete == true) {
-                                            String title = "Order Delivered";
-                                            String message = "Hi " + myUserDetails.getFirstname() + ", your order has arrived!";
-                                            sendOrderNotification("orderDelivered",title, message, ViewMyOrders.class, activeRestaurantOrders.get(finalI), "Test");
+
+                            try {
+                                activeRestaurantRef[i] = FirebaseDatabase.getInstance().getReference("orders/" + activeRestaurantOrders.get(i) + "/" + myPhone);
+                                final int finalI = i;
+                                activeRestaurantListener[i] = new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+                                            Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
+                                            SafeToast.makeText(getApplicationContext(), "complete: " + complete, Toast.LENGTH_SHORT).show();
+                                            if (complete == true) {
+                                                //Lets get the restaurant's name that will be passed in the notification intent
+                                                databaseReference.child("users").child(activeRestaurantOrders.get(finalI)).child("firstname").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        String restaurantName = dataSnapshot.getValue(String.class);
+                                                        String title = "Order Delivered";
+                                                        String message = "Hi " + myUserDetails.getFirstname() + ", your order has arrived!";
+                                                        sendOrderNotification("orderDelivered", title, message, ViewMyOrders.class, activeRestaurantOrders.get(finalI), restaurantName);
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
+                                            }
+                                        } catch (Exception e) {
                                         }
-                                    } catch (Exception e){}
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                };
+                                activeRestaurantRef[i].addValueEventListener(activeRestaurantListener[i]);
+
+                                Log.d("TAG", "activeRestaurants(" + activeRestaurantOrders.size() + "): " + activeRestaurantOrders.get(i));
+
+                                //Loop has reached the end
+                                if (i == activeRestaurantOrders.size() - 1) {
+                                    Log.d("TAG", "end of loop: i (" + i + ") == list (" + activeRestaurantOrders.size() + ")");
                                 }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            };
-                            activeRestaurantRef[i].addValueEventListener(activeRestaurantListener[i]);
-
-                            Log.d("TAG", "activeRestaurants("+activeRestaurantOrders.size()+"): " + activeRestaurantOrders.get(i));
-
-                            //Loop has reached the end
-                            if(i==activeRestaurantOrders.size()-1){
-                                Log.d("TAG", "end of loop: i ("+i+") == list ("+activeRestaurantOrders.size()+")");
-                            }
+                            } catch (Exception e){}
                         }
                     }
                 }
