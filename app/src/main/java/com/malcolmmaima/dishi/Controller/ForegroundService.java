@@ -38,6 +38,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 /**
  * https://androidwave.com/foreground-service-android-example/
+ * https://developer.android.com/training/notify-user/build-notification
  */
 
 public class ForegroundService extends Service {
@@ -81,7 +82,7 @@ public class ForegroundService extends Service {
         };
         databaseReference.child("users").child(myPhone).addValueEventListener(databaseListener);
 
-        SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
+        //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
         return START_STICKY;
     }
 
@@ -93,66 +94,44 @@ public class ForegroundService extends Service {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-
-                    DatabaseReference [] activeRestaurantRef = new DatabaseReference[(int) dataSnapshot.getChildrenCount()];
-                    ValueEventListener [] activeRestaurantListener = new ValueEventListener[(int) dataSnapshot.getChildrenCount()];
                     for(DataSnapshot providers : dataSnapshot.getChildren()){
-                        String provider = providers.getKey();
+                        final String provider = providers.getKey();
                         activeRestaurantOrders.add(provider);
-                    }
+                        DatabaseReference activeRestaurantRef_ = FirebaseDatabase.getInstance().getReference("orders/"+provider+ "/" + myPhone);
+                        activeRestaurantRef_.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
 
-                    //make sure array list contains the phones of the active restaurant orders
-                    if(!activeRestaurantOrders.isEmpty()){
+                                try {
+                                    if (complete == true) {
+                                        //Lets get the restaurant's name that will be passed in the notification intent
+                                        databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                int notifId = new Random().nextInt();
+                                                String restaurantName = dataSnapshot.child("firstname").getValue(String.class);
+                                                String lastName = dataSnapshot.child("lastname").getValue(String.class);
+                                                String title = "Order Delivered";
+                                                String message = "Order " + provider + " arrived!";
+                                                sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                            }
 
-                        //loop through all my active restaurant orders
-                        for(int i=0; i<activeRestaurantOrders.size(); i++){
-
-                            try {
-                                activeRestaurantRef[i] = FirebaseDatabase.getInstance().getReference("orders/" + activeRestaurantOrders.get(i) + "/" + myPhone);
-                                final int finalI = i;
-                                activeRestaurantListener[i] = new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        try {
-                                            Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
-                                            SafeToast.makeText(getApplicationContext(), "complete: " + complete, Toast.LENGTH_SHORT).show();
-                                            if (complete == true) {
-                                                //Lets get the restaurant's name that will be passed in the notification intent
-                                                databaseReference.child("users").child(activeRestaurantOrders.get(finalI)).child("firstname").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        String restaurantName = dataSnapshot.getValue(String.class);
-                                                        String title = "Order Delivered";
-                                                        String message = "Hi " + myUserDetails.getFirstname() + ", your order has arrived!";
-                                                        sendOrderNotification("orderDelivered", title, message, ViewMyOrders.class, activeRestaurantOrders.get(finalI), restaurantName);
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                             }
-                                        } catch (Exception e) {
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        });
 
                                     }
-                                };
-                                activeRestaurantRef[i].addValueEventListener(activeRestaurantListener[i]);
+                                } catch (Exception e){}
+                            }
 
-                                Log.d("TAG", "activeRestaurants(" + activeRestaurantOrders.size() + "): " + activeRestaurantOrders.get(i));
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                //Loop has reached the end
-                                if (i == activeRestaurantOrders.size() - 1) {
-                                    Log.d("TAG", "end of loop: i (" + i + ") == list (" + activeRestaurantOrders.size() + ")");
-                                }
-                            } catch (Exception e){}
-                        }
+                            }
+                        });
                     }
                 }
             }
@@ -166,26 +145,28 @@ public class ForegroundService extends Service {
     }
 
 
-    private void sendOrderNotification(String type, String title, String message, Class targetActivity, String restaurantPhone, String restaurantName){
+    private void sendOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String restaurantPhone, String restaurantName){
 
         if(type.equals("orderDelivered")){
-            Notification.Builder builder = new Notification.Builder(getApplicationContext())
+            Notification.Builder builder = new Notification.Builder(this)
                     .setSmallIcon(R.drawable.logo_notification)
                     .setContentTitle(title)
+                    .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                     .setContentText(message);
 
-            NotificationManager manager = (NotificationManager)getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            Intent intent = new Intent(getApplicationContext(), targetActivity);
+            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent intent = new Intent(this, targetActivity);
             intent.putExtra("phone", restaurantPhone);
             intent.putExtra("name", restaurantName);
-            PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
             builder.setContentIntent(contentIntent);
             Notification notification = builder.build();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             notification.defaults |= Notification.DEFAULT_SOUND;
             notification.icon |= Notification.BADGE_ICON_LARGE;
-
-            manager.notify(new Random().nextInt(), notification);
+            manager.notify(notifId, notification);
+            //stopSelf();
         }
 
         ////////////////////////////////////////////////
