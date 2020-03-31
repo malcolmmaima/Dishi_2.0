@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -281,6 +282,7 @@ public class ViewMyOrders extends AppCompatActivity {
 
                     riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone+"/"+myPhone);
                     riderStatusListener = new ValueEventListener() {
+                        @SuppressLint("RestrictedApi")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
                             String riderOrderStatus = dtSnapshot.getValue(String.class);
@@ -687,6 +689,7 @@ public class ViewMyOrders extends AppCompatActivity {
 
                     riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone_+"/"+myPhone);
                     riderStatusListener = new ValueEventListener() {
+                        @SuppressLint("RestrictedApi")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
                             String riderOrderStatus = dtSnapshot.getValue(String.class);
