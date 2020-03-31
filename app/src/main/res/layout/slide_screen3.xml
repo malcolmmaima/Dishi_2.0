@@ -32,6 +32,7 @@
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:fontFamily="sans-serif-medium"
-            android:textSize="@dimen/slide_desc" />
+            android:textSize="@dimen/slide_desc"
+            android:gravity="center_horizontal" />
     </LinearLayout>
 </RelativeLayout>
