@@ -101,15 +101,32 @@ public class ForegroundService extends Service {
                         activeRestaurantRef_.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
-
                                 try {
+                                    Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
                                     if (complete == true) {
                                         //Lets get the restaurant's name that will be passed in the notification intent
                                         databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                int notifId = new Random().nextInt();
+
+                                                /**
+                                                 * Now the challenge i'm facing with notifications is duplication of notifications
+                                                 * from a single trigger. To curb that i've decided to use the last 4 digits of the
+                                                 * restaurant's phone number as the notification id that way no duplicates. Not sure how
+                                                 * effective this is in the long runs as the app scales but meeh, you'll figure it out
+                                                 */
+                                                String lastFourDigits = "";     //substring containing last 4 characters
+
+                                                if (provider.length() > 4)
+                                                {
+                                                    lastFourDigits = provider.substring(provider.length() - 4);
+                                                }
+                                                else
+                                                {
+                                                    lastFourDigits = provider;
+                                                }
+
+                                                int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
                                                 String restaurantName = dataSnapshot.child("firstname").getValue(String.class);
                                                 String lastName = dataSnapshot.child("lastname").getValue(String.class);
                                                 String title = "Order Delivered";
@@ -159,6 +176,7 @@ public class ForegroundService extends Service {
             intent.putExtra("phone", restaurantPhone);
             intent.putExtra("name", restaurantName);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
             builder.setContentIntent(contentIntent);
             Notification notification = builder.build();
