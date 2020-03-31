@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -16,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -130,7 +133,7 @@ public class ForegroundService extends Service {
                                                 String restaurantName = dataSnapshot.child("firstname").getValue(String.class);
                                                 String lastName = dataSnapshot.child("lastname").getValue(String.class);
                                                 String title = "Order Delivered";
-                                                String message = "Order " + provider + " arrived!";
+                                                String message = restaurantName + " " + lastName + " order delivered!";
                                                 sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
                                             }
 
@@ -165,11 +168,18 @@ public class ForegroundService extends Service {
     private void sendOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String restaurantPhone, String restaurantName){
 
         if(type.equals("orderDelivered")){
-            Notification.Builder builder = new Notification.Builder(this)
-                    .setSmallIcon(R.drawable.logo_notification)
-                    .setContentTitle(title)
-                    .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                    .setContentText(message);
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.logo_notification)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle(title)
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText(message);
+            }
 
             NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
