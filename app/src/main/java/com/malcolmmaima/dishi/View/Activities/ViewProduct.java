@@ -1,7 +1,9 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.alexzh.circleimageview.CircleImageView;
@@ -32,6 +34,8 @@ import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
+
+import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewProduct extends AppCompatActivity {
 
@@ -120,6 +124,45 @@ public class ViewProduct extends AppCompatActivity {
             minus.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
             fab.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
         }
+
+        /**
+         * View restaurant
+         */
+
+        restaurantName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference profilePic = FirebaseDatabase.getInstance().getReference("users/"+restaurant+"/profilePic");
+                profilePic.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try {
+                            String profilepicture = dataSnapshot.getValue(String.class);
+                            //Slide to new activity
+                            Intent slideactivity = new Intent(ViewProduct.this, ViewRestaurant.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                            slideactivity.putExtra("restaurant_phone", restaurant);
+                            slideactivity.putExtra("distance", distance);
+                            slideactivity.putExtra("profilePic", profilepicture);
+                            Bundle bndlanimation =
+                                    null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                bndlanimation = ActivityOptions.makeCustomAnimation(ViewProduct.this, R.anim.animation, R.anim.animation2).toBundle();
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                startActivity(slideactivity, bndlanimation);
+                            }
+                        } catch (Exception e){}
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
 
         /**
          * Set product quantity

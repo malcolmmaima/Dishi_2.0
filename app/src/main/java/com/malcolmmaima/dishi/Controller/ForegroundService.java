@@ -134,7 +134,7 @@ public class ForegroundService extends Service {
                                         databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                restaurants.remove(provider);
+                                                restaurants.add(provider);
                                                 restaurantName = dataSnapshot.child("firstname").getValue(String.class);
                                                 lastName = dataSnapshot.child("lastname").getValue(String.class);
                                                 String title = "Order Delivered";
@@ -256,7 +256,7 @@ public class ForegroundService extends Service {
         }
 
 
-        else if(type.equals("orderDelivered") && !restaurants.contains(restaurantPhone)){
+        else if(type.equals("orderDelivered") && restaurants.contains(restaurantPhone)){
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -284,7 +284,7 @@ public class ForegroundService extends Service {
             notification.icon |= Notification.BADGE_ICON_LARGE;
             manager.notify(notifId, notification);
 
-            restaurants.add(restaurantPhone);
+            restaurants.remove(restaurantPhone);
         }
 
     }
