@@ -66,9 +66,12 @@ public class ForegroundService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        try {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+        } catch(Exception e){}
+
         try {
             String title = intent.getStringExtra("title");
             String message = intent.getStringExtra("message");
@@ -93,7 +96,9 @@ public class ForegroundService extends Service {
 
             }
         };
-        databaseReference.child("users").child(myPhone).addValueEventListener(databaseListener);
+        try {
+            databaseReference.child("users").child(myPhone).addValueEventListener(databaseListener);
+        } catch (Exception e){}
 
         //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
         return START_STICKY;

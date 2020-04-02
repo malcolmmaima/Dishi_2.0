@@ -168,8 +168,19 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             }
                         }
                         if(which == 1){
-                            Snackbar snackbar = Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG);
-                            snackbar.show();
+                            Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            slideactivity.putExtra("fromPhone", myPhone);
+                            slideactivity.putExtra("toPhone", restaurantPhone);
+                            Bundle bndlanimation =
+                                    null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                startActivity(slideactivity, bndlanimation);
+                            }
                         }
 
                         if(which == 2){
@@ -507,7 +518,19 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                             if(which == 1){
                                 if(riderPhone != null){
-                                    Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                    Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    slideactivity.putExtra("fromPhone", myPhone);
+                                    slideactivity.putExtra("toPhone", riderPhone);
+                                    Bundle bndlanimation =
+                                            null;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                                    }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        startActivity(slideactivity, bndlanimation);
+                                    }
                                 }
 
                                 else {

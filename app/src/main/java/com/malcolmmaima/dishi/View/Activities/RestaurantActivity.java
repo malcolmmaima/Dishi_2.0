@@ -60,6 +60,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -67,11 +69,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class RestaurantActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     FloatingActionButton addMenu;
-
+    Menu myMenu;
     String myPhone, imageURL;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
@@ -443,6 +447,32 @@ public class RestaurantActivity extends AppCompatActivity
             e.printStackTrace();
         }
         return true;
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_restaurant_account, menu);
+        myMenu = menu;
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.search:
+                SafeToast.makeText(this, "Search", Toast.LENGTH_SHORT).show();
+                return(true);
+
+            case R.id.sendDM:
+                Intent slideactivity = new Intent(RestaurantActivity.this, Inbox.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+                return(true);
+        }
+        return(super.onOptionsItemSelected(item));
     }
 
     @Override
