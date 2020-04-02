@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.malcolmmaima.dishi" >
-
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    package="com.malcolmmaima.dishi">
 
     <application
         android:allowBackup="true"
@@ -18,14 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.SystemMaintenance"></activity>
+        <activity android:name=".View.Activities.Inbox"></activity>
+        <activity android:name=".View.Activities.SystemMaintenance" />
         <activity android:name=".View.Activities.BlockedAccount" />
         <activity
             android:name=".View.Activities.AddRider"
             android:label="@string/title_activity_add_rider"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".View.Activities.ViewMyOrders"
-            android:launchMode="singleTop"/>
+        <activity
+            android:name=".View.Activities.ViewMyOrders"
+            android:launchMode="singleTop" />
         <activity android:name=".View.Activities.ViewCustomerOrder" />
         <activity
             android:name=".View.Activities.ViewRestaurant"
@@ -40,18 +33,9 @@
             android:label="@string/title_activity_my_cart"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
-            android:name=".Controller.TrackingService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <service
-            android:name=".Controller.ForegroundService"
-            android:enabled="true"
-            android:exported="true"></service>
-
         <activity android:name=".View.Activities.ViewProduct" />
         <activity android:name=".View.Activities.ViewImage" />
+
         <activity android:name=".View.Activities.PersonalDetails" />
         <activity android:name=".View.Activities.SettingsActivity" />
         <activity android:name=".View.Activities.AddMenu" />
@@ -71,33 +55,50 @@
         <activity
             android:name=".View.Maps.SearchLocation"
             android:label="@string/autocompletefromfragment" />
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/logo_notification" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorPrimary" />
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
-
         <activity
             android:name=".View.Activities.RiderActivity"
             android:label="@string/title_activity_rider" />
         <activity
             android:name=".View.Activities.RestaurantActivity"
             android:label="@string/title_activity_restaurant" />
+
         <activity
             android:name=".View.Activities.CustomerActivity"
             android:label="@string/title_activity_customer" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/logo_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+
+        <service
+            android:name=".Controller.TrackingService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Controller.ForegroundService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

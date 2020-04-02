@@ -420,7 +420,11 @@ public class CustomerActivity extends AppCompatActivity
                 return(true);
 
             case R.id.sendDM:
-                SafeToast.makeText(this, "Inbox", Toast.LENGTH_SHORT).show();
+                Intent slideactivity = new Intent(CustomerActivity.this, Inbox.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
                 return(true);
         }
         return(super.onOptionsItemSelected(item));
