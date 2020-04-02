@@ -72,7 +72,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
                     try {
                         listdata.remove(holder.getAdapterPosition());
                         notifyItemRemoved(holder.getAdapterPosition());
-                        SafeToast.makeText(context, orderDetails.getFirstname() + orderDetails.getLastname() + " order complete!", Toast.LENGTH_SHORT).show();
+                        SafeToast.makeText(context, orderDetails.getFirstname() +" "+ orderDetails.getLastname() + " order complete!", Toast.LENGTH_SHORT).show();
                     } catch (Exception e){}
                 }
             }

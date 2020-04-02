@@ -280,9 +280,13 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                 }
 
                                                 if (!list.isEmpty()) {
-
+                                                    /**
+                                                     * https://howtodoinjava.com/sort/collections-sort/
+                                                     * We want to sort from nearest to furthest location
+                                                     */
+                                                    Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                     mSwipeRefreshLayout.setRefreshing(false);
-                                                    Collections.reverse(list);
+                                                    //Collections.reverse(list);
                                                     RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
                                                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
@@ -365,8 +369,13 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
 
                                                 }
                                                 if (!list.isEmpty()) {
+                                                    /**
+                                                     * https://howtodoinjava.com/sort/collections-sort/
+                                                     * We want to sort from nearest to furthest location
+                                                     */
+                                                    Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                     mSwipeRefreshLayout.setRefreshing(false);
-                                                    Collections.reverse(list);
+                                                    //Collections.reverse(list);
                                                     RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
                                                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
