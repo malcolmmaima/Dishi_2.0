@@ -36,14 +36,14 @@ import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    List<UserModel> orders;
+    List<UserModel> orders = new ArrayList<>();
     //    ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -58,8 +58,9 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     SwipeRefreshLayout mSwipeRefreshLayout;
 
 
-    public static MyOrdersFragment newInstance() {
+    public MyOrdersFragment newInstance() {
         MyOrdersFragment fragment = new MyOrdersFragment();
+        fetchOrders(); //Ukora ...calling this method from here fixes my orders list duplication bug problem so meeeh
         return fragment;
     }
 
@@ -97,17 +98,20 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             @Override
             public void run() {
-
                 mSwipeRefreshLayout.setRefreshing(true);
                 fetchOrders();
             }
         });
 
 
+
+
         return  v;
     }
 
+
     private void fetchOrders() {
+        orders.clear();
         myOrders.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -137,36 +141,32 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                          * Now lets get the user details
                          */
                         userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+userOrders.getKey());
-
-                        /**
-                         * get items count
-                         */
-
-                        final DatabaseReference itemCountRef =
-                                FirebaseDatabase.getInstance().getReference("orders/"+userOrders.getKey()+"/"+myPhone+"/items");
-
                         /**
                          * Assign user details to model and set item count value as well
                          */
                         userDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot userDetails) {
-                                orders = new ArrayList<>();
+                                final UserModel customer = userDetails.getValue(UserModel.class);
+                                customer.setPhone(userOrders.getKey());
+                                orders.add(customer);
                                 /**
                                  * get item count value then user details to model
                                  */
+                                final DatabaseReference itemCountRef =
+                                        FirebaseDatabase.getInstance().getReference("orders/"+userOrders.getKey()+"/"+myPhone+"/items");
+
                                 itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        UserModel customer = userDetails.getValue(UserModel.class);
-                                        customer.setPhone(userOrders.getKey());
-                                        customer.itemCount = dataSnapshot.getChildrenCount();
-                                        orders.add(customer);
 
+                                        customer.itemCount = dataSnapshot.getChildrenCount();
+
+//                                        LinkedHashSet<UserModel> hashSet = new LinkedHashSet<>(orders);
+//                                        ArrayList<UserModel> listWithoutDuplicates = new ArrayList<>(hashSet);
                                         if (!orders.isEmpty()) {
 
                                             mSwipeRefreshLayout.setRefreshing(false);
-//                                        progressDialog.dismiss();
                                             Collections.reverse(orders);
                                             MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
                                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
@@ -196,6 +196,7 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                             icon.setVisibility(View.VISIBLE);
 
                                         }
+
                                     }
 
                                     @Override
@@ -203,7 +204,6 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
 
                                     }
                                 });
-
 
                             }
 
@@ -213,7 +213,10 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                             }
                         });
 
+
                     }
+
+
                 }
             }
 
@@ -227,10 +230,5 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         fetchOrders();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 }
