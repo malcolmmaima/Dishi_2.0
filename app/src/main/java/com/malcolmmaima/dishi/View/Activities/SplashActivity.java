@@ -44,6 +44,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        startNotificationService();
     }
 
     @Override
@@ -79,8 +80,6 @@ public class SplashActivity extends AppCompatActivity {
                 stopNotificationService();
 
             } else { //Are logged in
-
-                startNotificationService();
                 //get device id
                 final String android_id = Settings.Secure.getString(this.getContentResolver(),
                         Settings.Secure.ANDROID_ID);

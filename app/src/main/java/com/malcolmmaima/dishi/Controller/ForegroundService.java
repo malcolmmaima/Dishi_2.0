@@ -145,28 +145,59 @@ public class ForegroundService extends Service {
 
                                     }
 
-                                    for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
-                                        ProductDetails prod = items.getValue(ProductDetails.class);
-                                        if(prod.getConfirmed() == true){
-                                            databaseReference.child("users").child(prod.getOwner()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    restaurantName = dataSnapshot.child("firstname").getValue(String.class);
-                                                    lastName = dataSnapshot.child("lastname").getValue(String.class);
-
-                                                    String title = "Order Confirmed";
-                                                    String message = restaurantName + " " + lastName +" confirmed order items";
-                                                    sendOrderNotification(notifId, "orderConfirmed", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-                                    }
                                 } catch (Exception e){}
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("orders/"+provider+ "/"+myPhone+"/items");
+                        itemsRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (provider.length() > 4)
+                                {
+                                    lastFourDigits = provider.substring(provider.length() - 4);
+                                }
+                                int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
+
+
+                                for(DataSnapshot snap : dataSnapshot.getChildren()){
+                                    DatabaseReference item = FirebaseDatabase.getInstance().getReference("orders/"+provider+ "/"+myPhone+"/items/"+snap.getKey());
+                                    item.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            ProductDetails prod = snap.getValue(ProductDetails.class);
+
+                                            if(prod.getConfirmed() == true){
+                                                databaseReference.child("users").child(prod.getOwner()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        restaurantName = dataSnapshot.child("firstname").getValue(String.class);
+                                                        lastName = dataSnapshot.child("lastname").getValue(String.class);
+
+                                                        String title = "Order Confirmed";
+                                                        String message = restaurantName + " " + lastName +" confirmed order items";
+                                                        sendOrderNotification(notifId+1, "orderConfirmed", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
                             }
 
                             @Override
@@ -186,10 +217,43 @@ public class ForegroundService extends Service {
         databaseReference.child("my_orders").child(myPhone).addValueEventListener(myOrdersListener);
     }
 
+    ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once thus an arraylist that keeps trach
+    //of restaurant notifications. One notification for each confirmed order item(s) since the listener that calls this function of type "orderConfirmed"
+    //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
 
     private void sendOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String restaurantPhone, String restaurantName){
 
-        if(type.equals("orderDelivered")){
+        if(type.equals("orderConfirmed") && !restaurants.contains(restaurantPhone)){
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.dish)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle(title)
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText(message);
+            }
+
+            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent intent = new Intent(this, targetActivity);
+            intent.putExtra("phone", restaurantPhone);
+            intent.putExtra("name", restaurantName);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
+            builder.setContentIntent(contentIntent);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.icon |= Notification.BADGE_ICON_LARGE;
+            manager.notify(notifId, notification);
+
+            restaurants.add(restaurantPhone); //Add the restaurant's phone to this list that we track to control number of notifications of this type
+        }
+        else if(type.equals("orderDelivered")){
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -219,34 +283,6 @@ public class ForegroundService extends Service {
             //stopSelf();
         }
 
-        else if(type.equals("orderConfirmed")){
-            Notification.Builder builder = null;
-            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                builder = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.dish)
-                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                        .setContentTitle(title)
-                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                        .setSound(soundUri)
-                        .setContentText(message);
-            }
-
-            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-            Intent intent = new Intent(this, targetActivity);
-            intent.putExtra("phone", restaurantPhone);
-            intent.putExtra("name", restaurantName);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
-            builder.setContentIntent(contentIntent);
-            Notification notification = builder.build();
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            notification.defaults |= Notification.DEFAULT_SOUND;
-            notification.icon |= Notification.BADGE_ICON_LARGE;
-            manager.notify(notifId, notification);
-        }
 
         ////////////////////////////////////////////////
         /**
