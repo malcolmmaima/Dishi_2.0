@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.auth.User;
+import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.SplashActivity;
@@ -51,6 +52,8 @@ public class ForegroundService extends Service {
     String myPhone;
     FirebaseUser user;
     UserModel myUserDetails;
+    String restaurantName, lastName;
+    String lastFourDigits = "";     //substring containing last 4 characters
 
     @Override
     public void onCreate() {
@@ -94,6 +97,7 @@ public class ForegroundService extends Service {
     private void startCustomerNotifications() {
         //Check order status
 
+
         final ArrayList<String> activeRestaurantOrders = new ArrayList<>();
         myOrdersListener = new ValueEventListener() {
             @Override
@@ -108,32 +112,26 @@ public class ForegroundService extends Service {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 try {
                                     Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
+                                    /**
+                                     * Now the challenge i'm facing with notifications is duplication of notifications
+                                     * from a single trigger. To curb that i've decided to use the last 4 digits of the
+                                     * restaurant's phone number as the notification id that way no duplicates. Not sure how
+                                     * effective this is in the long runs as the app scales but meeh, you'll figure it out
+                                     */
+                                    if (provider.length() > 4)
+                                    {
+                                        lastFourDigits = provider.substring(provider.length() - 4);
+                                    }
+                                    int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
+
                                     if (complete == true) {
                                         //Lets get the restaurant's name that will be passed in the notification intent
                                         databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                /**
-                                                 * Now the challenge i'm facing with notifications is duplication of notifications
-                                                 * from a single trigger. To curb that i've decided to use the last 4 digits of the
-                                                 * restaurant's phone number as the notification id that way no duplicates. Not sure how
-                                                 * effective this is in the long runs as the app scales but meeh, you'll figure it out
-                                                 */
-                                                String lastFourDigits = "";     //substring containing last 4 characters
-
-                                                if (provider.length() > 4)
-                                                {
-                                                    lastFourDigits = provider.substring(provider.length() - 4);
-                                                }
-                                                else
-                                                {
-                                                    lastFourDigits = provider;
-                                                }
-
-                                                int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
-                                                String restaurantName = dataSnapshot.child("firstname").getValue(String.class);
-                                                String lastName = dataSnapshot.child("lastname").getValue(String.class);
+                                                restaurantName = dataSnapshot.child("firstname").getValue(String.class);
+                                                lastName = dataSnapshot.child("lastname").getValue(String.class);
                                                 String title = "Order Delivered";
                                                 String message = restaurantName + " " + lastName + " order delivered!";
                                                 sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
@@ -145,6 +143,28 @@ public class ForegroundService extends Service {
                                             }
                                         });
 
+                                    }
+
+                                    for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
+                                        ProductDetails prod = items.getValue(ProductDetails.class);
+                                        if(prod.getConfirmed() == true){
+                                            databaseReference.child("users").child(prod.getOwner()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    restaurantName = dataSnapshot.child("firstname").getValue(String.class);
+                                                    lastName = dataSnapshot.child("lastname").getValue(String.class);
+
+                                                    String title = "Order Confirmed";
+                                                    String message = restaurantName + " " + lastName +" confirmed order items";
+                                                    sendOrderNotification(notifId, "orderConfirmed", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
                                     }
                                 } catch (Exception e){}
                             }
@@ -197,6 +217,35 @@ public class ForegroundService extends Service {
             notification.icon |= Notification.BADGE_ICON_LARGE;
             manager.notify(notifId, notification);
             //stopSelf();
+        }
+
+        else if(type.equals("orderConfirmed")){
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.dish)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle(title)
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText(message);
+            }
+
+            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent intent = new Intent(this, targetActivity);
+            intent.putExtra("phone", restaurantPhone);
+            intent.putExtra("name", restaurantName);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
+            builder.setContentIntent(contentIntent);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.icon |= Notification.BADGE_ICON_LARGE;
+            manager.notify(notifId, notification);
         }
 
         ////////////////////////////////////////////////
