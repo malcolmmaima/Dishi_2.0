@@ -71,11 +71,13 @@ public class ForegroundService extends Service {
         databaseListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myUserDetails = dataSnapshot.getValue(UserModel.class);
+                try {
+                    myUserDetails = dataSnapshot.getValue(UserModel.class);
 
-                if(myUserDetails.getAccount_type().equals("1")){
-                    startCustomerNotifications();
-                }
+                    if (myUserDetails.getAccount_type().equals("1")) {
+                        startCustomerNotifications();
+                    }
+                } catch (Exception e){}
             }
 
             @Override
@@ -223,9 +225,10 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SafeToast.makeText(getApplicationContext(),"Notification stopped", Toast.LENGTH_SHORT).show();
-        databaseReference.removeEventListener(databaseListener);
-        databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
+        try {
+            databaseReference.removeEventListener(databaseListener);
+            databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
+        } catch(Exception e){}
     }
     @Nullable
     @Override
