@@ -55,6 +55,11 @@ public class ForegroundService extends Service {
     String restaurantName, lastName;
     String lastFourDigits = "";     //substring containing last 4 characters
 
+    ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once thus an arraylist that keeps trach
+    //of restaurant notifications. One notification for each confirmed order item(s) since the listener that calls this function of type "orderConfirmed"
+    //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -129,7 +134,7 @@ public class ForegroundService extends Service {
                                         databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                                                restaurants.remove(provider);
                                                 restaurantName = dataSnapshot.child("firstname").getValue(String.class);
                                                 lastName = dataSnapshot.child("lastname").getValue(String.class);
                                                 String title = "Order Delivered";
@@ -217,10 +222,6 @@ public class ForegroundService extends Service {
         databaseReference.child("my_orders").child(myPhone).addValueEventListener(myOrdersListener);
     }
 
-    ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once thus an arraylist that keeps trach
-    //of restaurant notifications. One notification for each confirmed order item(s) since the listener that calls this function of type "orderConfirmed"
-    //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
-
     private void sendOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String restaurantPhone, String restaurantName){
 
         if(type.equals("orderConfirmed") && !restaurants.contains(restaurantPhone)){
@@ -253,7 +254,9 @@ public class ForegroundService extends Service {
 
             restaurants.add(restaurantPhone); //Add the restaurant's phone to this list that we track to control number of notifications of this type
         }
-        else if(type.equals("orderDelivered")){
+
+
+        else if(type.equals("orderDelivered") && !restaurants.contains(restaurantPhone)){
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -280,36 +283,17 @@ public class ForegroundService extends Service {
             notification.defaults |= Notification.DEFAULT_SOUND;
             notification.icon |= Notification.BADGE_ICON_LARGE;
             manager.notify(notifId, notification);
-            //stopSelf();
+
+            restaurants.add(restaurantPhone);
         }
 
-
-        ////////////////////////////////////////////////
-        /**
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(this, SplashActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setSmallIcon(R.drawable.logo_notification)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .build();
-
-        // Issue the notification.
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notificationId, notification);
-
-        //startForeground(1, notification);
-        //do heavy work on a background thread
-        //stopSelf(); */
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        restaurants.clear(); //Clear the tracker used in our send notification function
         try {
             databaseReference.removeEventListener(databaseListener);
             databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
@@ -319,16 +303,5 @@ public class ForegroundService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Foreground Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
-        }
     }
 }
