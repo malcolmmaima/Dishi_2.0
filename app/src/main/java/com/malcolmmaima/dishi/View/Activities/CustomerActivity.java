@@ -55,6 +55,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -69,6 +71,7 @@ public class CustomerActivity extends AppCompatActivity
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     private String TAG, imageURL;
+    Menu myMenu;
     private static final int PERMISSIONS_REQUEST = 100;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -399,6 +402,28 @@ public class CustomerActivity extends AppCompatActivity
             e.printStackTrace();
         }
         return true;
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_customer_account, menu);
+        myMenu = menu;
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.search:
+                SafeToast.makeText(this, "Search", Toast.LENGTH_SHORT).show();
+                return(true);
+
+            case R.id.sendDM:
+                SafeToast.makeText(this, "Inbox", Toast.LENGTH_SHORT).show();
+                return(true);
+        }
+        return(super.onOptionsItemSelected(item));
     }
 
     @Override
