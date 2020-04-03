@@ -88,11 +88,11 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot messages : dataSnapshot.getChildren()){
-                    chatMessage = messages.getValue(MessageModel.class);
-                    chatMessage.setKey(messages.getKey());
-                    chatMessage.setRead(true);
-                    SafeToast.makeText(Chat.this, "key: " + chatMessage.getMessage(), Toast.LENGTH_SHORT).show();
+                messages.clear();
+                for(DataSnapshot message : dataSnapshot.getChildren()){
+                    chatMessage = message.getValue(MessageModel.class);
+                    chatMessage.setKey(message.getKey());
+                    messages.add(chatMessage);
                 }
             }
 

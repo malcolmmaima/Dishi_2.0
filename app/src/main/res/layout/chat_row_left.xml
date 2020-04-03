@@ -23,7 +23,8 @@
             android:textSize="17sp"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
-        <TextClock
+        <TextView
+            android:id="@+id/timeStamp"
             android:layout_toEndOf="@+id/text"
             android:layout_alignParentBottom="true"
             android:text="1:30 P.M."
