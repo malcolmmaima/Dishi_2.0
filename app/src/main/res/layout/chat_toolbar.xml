@@ -4,7 +4,7 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="@color/colorPrimary" >
+    android:background="@color/pureWhite" >
     <RelativeLayout
         android:id="@+id/goBack"
         android:onClick="backPress"
@@ -18,6 +18,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="5dp"
             android:scaleType="centerInside"
+            android:tint="@color/black"
             android:src="@drawable/left_arrow"/>
         <ImageView
             android:layout_toRightOf="@+id/back"
@@ -42,7 +43,7 @@
         <TextView
             android:id="@+id/name"
             android:text="Name"
-            android:textColor="@color/pureWhite"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="17dp"
             android:layout_weight="1"
@@ -52,7 +53,7 @@
         <TextView
             android:id="@+id/last_seen"
             android:text="Last seen at 3:34 a.m"
-            android:textColor="#80ffffff"
+            android:textColor="@color/black"
             android:layout_below="@+id/name"
             android:layout_weight="1"
             android:textSize="12dp"

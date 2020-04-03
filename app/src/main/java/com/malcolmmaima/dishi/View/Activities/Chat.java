@@ -127,7 +127,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         });
 
         name = (TextView) mCustomView.findViewById(R.id.name);
-        name.setText(contactName);
+        name.setText("Contact Name");
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,19 +170,12 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 return true;
             case R.id.chat_search:
                 return true;
-            case R.id.chat_mute:
-                //TODO add custom dialog box
-                return true;
-            case R.id.chat_wallpaper:
-                return true;
             case R.id.chat_block:
                 //TODO add custom dialog box
                 return true;
             case R.id.chat_clearchat:
                 return true;
             case R.id.chat_emailchat:
-                return true;
-            case R.id.chat_addshortcut:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

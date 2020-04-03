@@ -7,24 +7,34 @@
     android:background="@drawable/background"
     tools:context=".View.Activities.Chat">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chat_toolbar"
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout="@layout/chat_toolbar"
-        android:background="?attr/colorPrimary"
-        android:padding="0dp"
-        android:elevation="4dp"
-        android:titleTextColor="@color/pureWhite"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-    </androidx.appcompat.widget.Toolbar>
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorBackroundWhite"
+        android:fitsSystemWindows="true">
+            <androidx.appcompat.widget.Toolbar
+                app:layout_collapseMode="none"
+                android:id="@+id/chat_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout="@layout/chat_toolbar"
+                android:background="@color/pureWhite"
+                android:padding="0dp"
+                android:elevation="4dp"
+                android:titleTextColor="@color/black"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="65dp"
         android:layout_marginTop="65dp">
 
         <ListView
@@ -38,19 +48,16 @@
 
     <RelativeLayout
         android:id="@+id/sendLayer"
-        android:background="@drawable/layout_bg"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/send"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="510dp"
+        android:layout_marginTop="0dp"
         android:paddingLeft="2dp"
         android:paddingRight="10dp"
         android:paddingBottom="6dp"
-        android:layout_height="wrap_content"
-        android:minHeight="40dp">
+        android:layout_height="wrap_content">
 
         <ImageButton
             android:id="@+id/emoji"
@@ -60,21 +67,22 @@
             android:scaleType="fitCenter"
             android:padding="5dp"
             android:layout_alignParentBottom="true"
-            android:layout_height="36dp" />
+            android:layout_height="40dp" />
 
         <EditText
             android:id="@+id/chatBox"
             android:layout_toRightOf="@+id/emoji"
             android:hint="Type a message"
-            android:layout_toLeftOf="@+id/attachFile"
-            android:background="@null"
+            android:background="@drawable/layout_bg"
             android:textSize="18sp"
-            android:paddingBottom="5dp"
             android:layout_alignParentBottom="true"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxHeight="100dp"
-            android:minHeight="36dp" />
+            android:padding="10dp"
+            android:inputType="textMultiLine"
+            android:minHeight="36dp"
+            android:shadowRadius="40"/>
 
         <ImageButton
             android:id="@+id/attachFile"
@@ -83,10 +91,13 @@
             android:background="@null"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/camera"
-            android:layout_width="25dp"
-            android:layout_height="30dp"  />
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:visibility="gone"
+            android:paddingBottom="0dp"/>
 
         <ImageButton
+            android:visibility="gone"
             android:id="@+id/camera"
             android:src="@drawable/camera"
             android:background="@drawable/layout_bg1"
@@ -96,22 +107,25 @@
             android:layout_marginRight="5dp"
             android:scaleType="fitCenter"
             android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true" />
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="20dp"/>
     </RelativeLayout>
 
-    <ImageButton
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/send"
-        android:layout_width="36dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginRight="5dp"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/layout_bg_send"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="0dp"
+        app:srcCompat="@drawable/ic_send_white_24dp"
+        android:tag="@string/tag_send"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/send"
         android:layout_alignParentEnd="true"
-        android:padding="7dp"
-        android:scaleType="fitCenter"
-        android:layout_height="36dp"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        app:backgroundTint="@color/dot_inactive_screen1" />
 
 </RelativeLayout>
