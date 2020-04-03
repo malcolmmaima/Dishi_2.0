@@ -6,6 +6,7 @@ public class MessageModel {
     public String reciever;
     public String timeStamp;
     public String message;
+    public Boolean read;
 
     public String getKey() {
         return key;
@@ -45,5 +46,13 @@ public class MessageModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Boolean getRead() {
+        return read;
+    }
+
+    public void setRead(Boolean read) {
+        this.read = read;
     }
 }

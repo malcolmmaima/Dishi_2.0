@@ -52,7 +52,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     DatabaseReference recipientRef, myRef, recipientMessagesRef, myMessagedRef;
     ValueEventListener recipientListener, myRefListener, recipientMessagesListener, myMessagesListener;
     UserModel recipientUser, senderUser;
-    ArrayList<String> messages;
+    MessageModel chatMessage;
+    ArrayList<MessageModel> messages;
     EditText editText;
     ListView list;
     MyChatAdapter arrayAdapter;
@@ -83,11 +84,24 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         sendBtn = findViewById(R.id.send);
         list= (ListView) findViewById(R.id.list);
-        messages = new ArrayList<String>();
-        messages.add("hello");
-        messages.add("good bye");
-        messages.add("good night");
-        messages.add("good morning");
+        messages = new ArrayList<>();
+        myMessagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot messages : dataSnapshot.getChildren()){
+                    chatMessage = messages.getValue(MessageModel.class);
+                    chatMessage.setKey(messages.getKey());
+                    chatMessage.setRead(true);
+                    SafeToast.makeText(Chat.this, "key: " + chatMessage.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myMessagedRef.addValueEventListener(myMessagesListener);
 
         arrayAdapter=new MyChatAdapter(this,messages);
         list.setAdapter(arrayAdapter);
@@ -228,10 +242,11 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     dm.setReciever(toPhone);
                     dm.setTimeStamp(getDate());
                     dm.setMessage(message.trim());
+                    dm.setRead(false);
                     recipientMessagesRef.child(key).setValue(dm);
                     myMessagedRef.child(key).setValue(dm);
 
-                    messages.add(message.trim());
+                    messages.add(dm);
                     editText.setText("");
                     arrayAdapter.notifyDataSetChanged();
                     list.setSelection(list.getAdapter().getCount()-1);

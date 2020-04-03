@@ -6,14 +6,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.R;
 
 import java.util.ArrayList;
 
 public class MyChatAdapter extends BaseAdapter {
     Activity activity;
-    ArrayList<String> data;
-    public MyChatAdapter(Activity activity, ArrayList<String> data)
+    ArrayList<MessageModel> data;
+    public MyChatAdapter(Activity activity, ArrayList<MessageModel> data)
     {
         this.activity=activity;
         this.data=data;
