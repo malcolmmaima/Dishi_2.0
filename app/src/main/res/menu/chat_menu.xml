@@ -6,7 +6,7 @@
     <item
         android:id="@+id/chat_call"
         android:title="Call"
-        android:icon="@drawable/call"
+        android:icon="@drawable/ic_phone_black_24dp"
         app:showAsAction="always"
         android:showAsAction="always"
         tools:ignore="AppCompatResource" />

@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -20,19 +21,33 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alexzh.circleimageview.CircleImageView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.MyChatAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
+    DatabaseReference recipientRef, myRef;
+    ValueEventListener recipientListener, myRefListener;
+    UserModel recipientUser;
     ArrayList<String> messages;
     EditText editText;
     ListView list;
     MyChatAdapter arrayAdapter;
     TextView name;
     Toolbar toolbar;
+    CircleImageView profilePic;
     Intent intent;
     ImageButton sendBtn;
     int count = 0;
@@ -42,13 +57,12 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        String from = getIntent().getStringExtra("fromPhone");
-        String to = getIntent().getStringExtra("toPhone");
+        String fromPhone = getIntent().getStringExtra("fromPhone");
+        String toPhone = getIntent().getStringExtra("toPhone");
+        recipientRef = FirebaseDatabase.getInstance().getReference("users/"+toPhone);
+        myRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone);
 
-        Toast.makeText(this, "fro: " + from + " to: " + to, Toast.LENGTH_SHORT).show();
 
-        intent = getIntent();
-        String contactName = intent.getStringExtra("name");
         toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(null);
@@ -71,7 +85,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         View mCustomView = mInflater.inflate(R.layout.chat_toolbar, null);
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
-
+        name = mCustomView.findViewById(R.id.name);
+        profilePic = mCustomView.findViewById(R.id.profilePic);
 
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -126,8 +141,42 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         });
 
-        name = (TextView) mCustomView.findViewById(R.id.name);
-        name.setText("Contact Name");
+        recipientListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    recipientUser = dataSnapshot.getValue(UserModel.class);
+                    name.setText(recipientUser.getFirstname() + " " + recipientUser.getLastname());
+
+                    Picasso.with(Chat.this).load(recipientUser.getProfilePic()).fit().centerCrop()
+                            .placeholder(R.drawable.default_profile)
+                            .error(R.drawable.default_profile)
+                            .into(profilePic);
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        recipientRef.addListenerForSingleValueEvent(recipientListener);
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(recipientUser.getProfilePic() != null){
+                    Intent slideactivity = new Intent(Chat.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", recipientUser.getProfilePic());
+                    startActivity(slideactivity);
+                }
+
+            }
+        });
+
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override

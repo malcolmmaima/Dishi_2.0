@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="@color/pureWhite" >
+    android:background="@color/pureWhite">
     <RelativeLayout
         android:id="@+id/goBack"
         android:onClick="backPress"
@@ -20,16 +20,22 @@
             android:scaleType="centerInside"
             android:tint="@color/black"
             android:src="@drawable/left_arrow"/>
-        <ImageView
+
+        <com.alexzh.circleimageview.CircleImageView
             android:layout_toRightOf="@+id/back"
-            android:layout_marginLeft="2dp"
-            android:src="@drawable/no_image"
-            android:layout_centerVertical="true"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="4dp"
-            android:layout_width="30dp"
-            android:layout_height="30dp" />
+            android:layout_marginTop="3dp"
+            android:id="@+id/profilePic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/default_profile"
+            app:view_shadowRadius="2dp"
+            app:view_shadowDx="2dp"
+            app:view_shadowDy="0dp"
+            app:view_borderWidth="2dp"
+            app:view_borderColor="#cccccc"
+            android:scaleType="fitXY"
+            android:foregroundGravity="center_vertical"
+            />
     </RelativeLayout>
     <LinearLayout
         android:layout_toRightOf="@+id/goBack"
@@ -47,6 +53,7 @@
             android:textStyle="bold"
             android:textSize="17dp"
             android:layout_weight="1"
+            android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -57,6 +64,7 @@
             android:layout_below="@+id/name"
             android:layout_weight="1"
             android:textSize="12dp"
+            android:visibility="visible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

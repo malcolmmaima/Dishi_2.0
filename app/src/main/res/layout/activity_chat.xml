@@ -15,7 +15,7 @@
         android:backgroundTint="@color/colorBackroundWhite"
         android:fitsSystemWindows="true">
             <androidx.appcompat.widget.Toolbar
-                app:layout_collapseMode="none"
+                app:layout_collapseMode="pin"
                 android:id="@+id/chat_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -57,7 +57,7 @@
         android:paddingLeft="2dp"
         android:paddingRight="10dp"
         android:paddingBottom="6dp"
-        android:layout_height="wrap_content">
+        android:layout_height="100dp">
 
         <ImageButton
             android:id="@+id/emoji"
