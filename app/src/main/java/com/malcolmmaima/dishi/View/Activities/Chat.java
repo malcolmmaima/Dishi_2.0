@@ -6,7 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,20 +32,26 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.MyChatAdapter;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
-    DatabaseReference recipientRef, myRef;
-    ValueEventListener recipientListener, myRefListener;
-    UserModel recipientUser;
+    DatabaseReference recipientRef, myRef, recipientMessagesRef, myMessagedRef;
+    ValueEventListener recipientListener, myRefListener, recipientMessagesListener, myMessagesListener;
+    UserModel recipientUser, senderUser;
     ArrayList<String> messages;
     EditText editText;
     ListView list;
@@ -48,7 +59,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     TextView name;
     Toolbar toolbar;
     CircleImageView profilePic;
-    Intent intent;
     ImageButton sendBtn;
     int count = 0;
 
@@ -61,6 +71,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         String toPhone = getIntent().getStringExtra("toPhone");
         recipientRef = FirebaseDatabase.getInstance().getReference("users/"+toPhone);
         myRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone);
+        recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
+        myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
 
 
         toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
@@ -141,11 +153,15 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         });
 
+        /**
+         * Get recipient's user details
+         */
         recipientListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     recipientUser = dataSnapshot.getValue(UserModel.class);
+                    recipientUser.setPhone(toPhone);
                     name.setText(recipientUser.getFirstname() + " " + recipientUser.getLastname());
 
                     Picasso.with(Chat.this).load(recipientUser.getProfilePic()).fit().centerCrop()
@@ -163,6 +179,29 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         };
         recipientRef.addListenerForSingleValueEvent(recipientListener);
+
+        /**
+         * Get sender's user details
+         */
+        myRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    senderUser = dataSnapshot.getValue(UserModel.class);
+                    senderUser.setPhone(fromPhone);
+
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myRef.addListenerForSingleValueEvent(myRefListener);
+
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,6 +222,15 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             public void onClick(View v) {
                 String message=editText.getText().toString();
                 if(null!=message&&message.length()>0) {
+                    MessageModel dm = new MessageModel();
+                    String key = recipientMessagesRef.push().getKey();
+                    dm.setSender(fromPhone);
+                    dm.setReciever(toPhone);
+                    dm.setTimeStamp(getDate());
+                    dm.setMessage(message.trim());
+                    recipientMessagesRef.child(key).setValue(dm);
+                    myMessagedRef.child(key).setValue(dm);
+
                     messages.add(message.trim());
                     editText.setText("");
                     arrayAdapter.notifyDataSetChanged();
@@ -212,8 +260,46 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
-            case R.id.chat_viewcontact:
-                //startActivity(new Intent(this,ViewContact.class));
+            case R.id.chat_call:
+                if(recipientUser.getPhone() != null){
+                    final AlertDialog callAlert = new AlertDialog.Builder(Chat.this)
+                            //set message, title, and icon
+                            .setMessage("Call " + recipientUser.getFirstname() + " " + recipientUser.getLastname() + "?")
+                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                            //set three option buttons
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    String phone = recipientUser.getPhone();
+                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                    startActivity(intent);
+                                }
+                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //do nothing
+
+                                }
+                            })//setNegativeButton
+
+                            .create();
+                    callAlert.show();
+                }
+
+                return  true;
+            case R.id.chat_view_profile:
+                if(recipientUser.getPhone() != null){
+                    Intent slideactivity = new Intent(Chat.this, ViewProfile.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("phone", recipientUser.getPhone());
+                    Bundle bndlanimation =
+                            null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        bndlanimation = ActivityOptions.makeCustomAnimation(Chat.this, R.anim.animation,R.anim.animation2).toBundle();
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        startActivity(slideactivity, bndlanimation);
+                    }
+                }
                 return true;
             case R.id.chat_media:
                 return true;
@@ -241,7 +327,17 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         super.onBackPressed();
     }
 
-    public void profileClick(View v){
-        //startActivity(new Intent(this, ViewContact.class));
+
+    private String getDate() {
+        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        TimeZone timeZone = TimeZone.getDefault();
+        Calendar calendar = Calendar.getInstance(timeZone);
+        String time = date+ ":" +
+                String.format("%02d" , calendar.get(Calendar.HOUR_OF_DAY))+":"+
+                String.format("%02d" , calendar.get(Calendar.MINUTE))+":"+
+                String.format("%02d" , calendar.get(Calendar.SECOND)) +":"+
+                timeZone.getDisplayName(false, TimeZone.SHORT);
+
+        return time;
     }
 }

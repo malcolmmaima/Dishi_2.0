@@ -11,7 +11,7 @@
         android:showAsAction="always"
         tools:ignore="AppCompatResource" />
     <item
-        android:id="@+id/chat_viewcontact"
+        android:id="@+id/chat_view_profile"
         android:title="View Profile"
         app:showAsAction="never"/>
     <item
