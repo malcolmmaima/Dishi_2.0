@@ -57,6 +57,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -68,6 +70,7 @@ public class RiderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     String myPhone, imageURL;
+    Menu myMenu;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     private String TAG;
@@ -398,6 +401,32 @@ public class RiderActivity extends AppCompatActivity
             e.printStackTrace();
         }
         return true;
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_rider_account, menu);
+        myMenu = menu;
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.search:
+                SafeToast.makeText(this, "Search", Toast.LENGTH_SHORT).show();
+                return(true);
+
+            case R.id.sendDM:
+                Intent slideactivity = new Intent(RiderActivity.this, Inbox.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+                return(true);
+        }
+        return(super.onOptionsItemSelected(item));
     }
 
     @Override

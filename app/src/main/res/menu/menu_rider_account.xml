@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Views.Activities.RiderActivity">
+
+    <item
+        android:id="@+id/search" android:icon="@drawable/ic_search_black_48dp" app:showAsAction="always"   android:title="Search"/>
+
+    <item
+        android:id="@+id/sendDM" android:icon="@drawable/ic_send_black_48dp" app:showAsAction="always"   android:title="Message" />
+
+</menu>

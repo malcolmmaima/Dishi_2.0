@@ -91,10 +91,10 @@ public class MyChatAdapter extends BaseAdapter {
     public String[] Split(String timeStamp){
 
         String[] arrSplit = timeStamp.split(":");
-        for (int i=0; i < arrSplit.length; i++)
-        {
-            //Toast.makeText(activity, "val: " + arrSplit[1i, Toast.LENGTH_SHORT).show();
-        }
+//        for (int i=0; i < arrSplit.length; i++)
+//        {
+//            //Toast.makeText(activity, "val: " + arrSplit[1i, Toast.LENGTH_SHORT).show();
+//        }
 
         return arrSplit;
     }

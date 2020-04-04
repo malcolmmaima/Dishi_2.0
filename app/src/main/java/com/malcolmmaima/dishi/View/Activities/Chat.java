@@ -57,7 +57,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     EditText editText;
     ListView list;
     MyChatAdapter arrayAdapter;
-    TextView name;
+    TextView name, userStatus;
     Toolbar toolbar;
     CircleImageView profilePic;
     ImageButton sendBtn;
@@ -113,6 +113,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         name = mCustomView.findViewById(R.id.name);
         profilePic = mCustomView.findViewById(R.id.profilePic);
+        userStatus = mCustomView.findViewById(R.id.userStatus);
 
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
