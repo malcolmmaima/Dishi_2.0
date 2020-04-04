@@ -3,6 +3,7 @@ package com.malcolmmaima.dishi.View.Adapter;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,8 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.alexzh.circleimageview.CircleImageView;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -42,11 +45,11 @@ public class ChatListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view=convertView;
         view=activity.getLayoutInflater().inflate(R.layout.chat_list, null);
-        TextView name=(TextView)view.findViewById(R.id.contact_name);
-        TextView time=(TextView)view.findViewById(R.id.message_time);
-        TextView message=(TextView)view.findViewById(R.id.message);
-        ImageView picture = (ImageView) view.findViewById(R.id.user_dp);
-        ImageView mute = (ImageView) view.findViewById(R.id.mute);
+        TextView name=view.findViewById(R.id.contact_name);
+        TextView time=view.findViewById(R.id.message_time);
+        TextView message=view.findViewById(R.id.message);
+        CircleImageView picture =  view.findViewById(R.id.user_dp);
+        ImageView mute = view.findViewById(R.id.mute);
         name.setText(data.get(position).getFirstname()+" "+data.get(position).getLastname());
         time.setText("11:53 P.M.");
         message.setText("Some message");
@@ -60,14 +63,11 @@ public class ChatListAdapter extends BaseAdapter {
         } catch (Exception e){
 
         }
-        picture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Dialog dialog = new Dialog(context);
-                dialog.setTitle("");
-                dialog.setContentView(R.layout.image_click);
-                dialog.show();
-            }
+        picture.setOnClickListener(v -> {
+            Intent slideactivity = new Intent(context, ViewImage.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            slideactivity.putExtra("imageURL", data.get(position).getProfilePic());
+            context.startActivity(slideactivity);
         });
 
         return view;

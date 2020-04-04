@@ -112,6 +112,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         name = mCustomView.findViewById(R.id.name);
+        name.setText("loading...");
         profilePic = mCustomView.findViewById(R.id.profilePic);
         userStatus = mCustomView.findViewById(R.id.userStatus);
 

@@ -4,48 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@color/colorBackroundWhite"
     tools:context=".View.Activities.Chat">
 
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+    <androidx.appcompat.widget.Toolbar
+        app:layout_collapseMode="pin"
+        android:id="@+id/chat_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorBackroundWhite"
-        android:fitsSystemWindows="true">
-            <androidx.appcompat.widget.Toolbar
-                app:layout_collapseMode="pin"
-                android:id="@+id/chat_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout="@layout/chat_toolbar"
-                android:background="@color/pureWhite"
-                android:padding="0dp"
-                android:elevation="4dp"
-                android:titleTextColor="@color/black"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-            </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
+        android:layout_height="?attr/actionBarSize"
+        android:layout="@layout/chat_toolbar"
+        android:background="@color/pureWhite"
+        android:padding="0dp"
+        android:elevation="4dp"
+        android:titleTextColor="@color/black"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    </androidx.appcompat.widget.Toolbar>
 
     <RelativeLayout
+
+        android:layout_marginTop="65dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="65dp"
-        android:layout_marginTop="65dp">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="65dp">
 
         <ListView
             android:id="@+id/list"
             android:background="@null"
             android:divider="@null"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:stackFromBottom="true"/>
 
     </RelativeLayout>
-
     <RelativeLayout
         android:id="@+id/sendLayer"
         android:layout_width="match_parent"
@@ -111,7 +102,6 @@
             android:layout_alignParentRight="true"
             android:layout_marginBottom="20dp"/>
     </RelativeLayout>
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/send"

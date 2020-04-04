@@ -14,13 +14,21 @@
         android:layout_marginLeft="10dp"
         android:paddingTop="4dp"
         android:paddingLeft="1dp">
-        <ImageView
+
+        <com.alexzh.circleimageview.CircleImageView
             android:id="@+id/user_dp"
             android:layout_width="60dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/dp_foreground"
-            android:scaleType="centerCrop"
-            android:background="@drawable/no_image"/>
+            android:layout_height="60dp"
+            android:src="@drawable/default_profile"
+            app:view_shadowRadius="2dp"
+            app:view_shadowDx="2dp"
+            app:view_shadowDy="0dp"
+            app:view_borderWidth="2dp"
+            app:view_borderColor="#cccccc"
+            android:scaleType="fitXY"
+            android:foregroundGravity="center_vertical"
+            />
+
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/chat_block"
