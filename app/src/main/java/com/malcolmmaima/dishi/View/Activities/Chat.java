@@ -94,7 +94,10 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 for(DataSnapshot message : dataSnapshot.getChildren()){
                     chatMessage = message.getValue(MessageModel.class);
                     chatMessage.setKey(message.getKey());
-                    messages.add(chatMessage);
+
+                    if(chatMessage.getMessage() != null){
+                        messages.add(chatMessage);
+                    }
                 }
             }
 
@@ -118,19 +121,23 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         profilePic = mCustomView.findViewById(R.id.profilePic);
         userStatus = mCustomView.findViewById(R.id.userStatus);
 
+        ArrayList<Integer> deletes = new ArrayList<>();
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
                 if(checked){
                     count = count + 1;
+                    deletes.add(position);
                 }
                 else
                     count =count-1;
+                    try {deletes.remove(position);}catch (Exception e){}
                 mode.setTitle(count+"");
                 mode.setSubtitle(null);
                 mode.setTag(false);
                 mode.setTitleOptionalHint(false);
+                list.high
             }
 
             @Override
@@ -148,18 +155,29 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             @Override
             public boolean onActionItemClicked(android.view.ActionMode mode, MenuItem item) {
                 switch(item.getItemId()) {
-                    case R.id.reply:
+                    /** case R.id.reply:
                         return true;
                     case R.id.star_message:
                         return true;
+                     case R.id.forward:
+                     return true;
                     case R.id.info:
-                        return true;
+                        return true; */
                     case R.id.delete:
+                        for (int i=0; i<deletes.size(); i++){
+                            //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
+                            myMessagedRef.child(messages.get(deletes.get(i)).getKey()).removeValue();
+
+                            if(i==deletes.size()-1){
+                                deletes.clear();
+                                count = 0;
+                                mode.finish();
+                            }
+                        }
                         return true;
                     case R.id.copy:
                         return true;
-                    case R.id.forward:
-                        return true;
+
                     default:
                         return false;
                 }
@@ -167,7 +185,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
             @Override
             public void onDestroyActionMode(android.view.ActionMode mode) {
-
+                count = 0;
+                deletes.clear();
             }
         });
 
@@ -320,16 +339,13 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     }
                 }
                 return true;
-            case R.id.chat_media:
-                return true;
-            case R.id.chat_search:
-                return true;
+            /**case R.id.chat_media:
+                return true; */
+
             case R.id.chat_block:
                 //TODO add custom dialog box
                 return true;
             case R.id.chat_clearchat:
-                return true;
-            case R.id.chat_emailchat:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

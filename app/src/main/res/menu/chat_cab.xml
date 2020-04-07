@@ -2,23 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+    <!-- <item
         android:id="@+id/reply"
         android:title="Reply"
         android:icon="@drawable/copy"
-        app:showAsAction="always" />
-
+        app:showAsAction="always" /> -->
+<!--
     <item
         android:id="@+id/star_message"
         android:title="Starred Message"
         android:icon="@drawable/star"
-        app:showAsAction="always" />
-
+        app:showAsAction="always" /> -->
+<!--
     <item
         android:id="@+id/info"
         android:title="Info"
         android:icon="@drawable/info"
-        app:showAsAction="always" />
+        app:showAsAction="always" /> -->
 
     <item
         android:id="@+id/delete"
@@ -32,11 +32,11 @@
         android:icon="@drawable/copy"
         app:showAsAction="always" />
 
-    <item
+<!--    <item
         android:id="@+id/forward"
         android:title="Forward"
         android:icon="@drawable/forward"
-        app:showAsAction="always" />
+        app:showAsAction="always" /> -->
 
 
 </menu>

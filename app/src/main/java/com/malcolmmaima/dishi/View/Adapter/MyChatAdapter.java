@@ -48,43 +48,56 @@ public class MyChatAdapter extends BaseAdapter {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
+        notifyDataSetChanged();
         /**
          * if the intended recipient of the message opens it then update message state read = true
          */
-        if(myPhone.equals(data.get(position).getReciever())){
-            senderMessageRef = FirebaseDatabase.getInstance()
-                    .getReference("messages/"+data.get(position).getSender()+"/"+myPhone);
 
-            myMessageRef = FirebaseDatabase.getInstance()
-                    .getReference("messages/"+myPhone+"/"+data.get(position).getSender());
+        try {
+            if (myPhone.equals(data.get(position).getReciever())) {
+                senderMessageRef = FirebaseDatabase.getInstance()
+                        .getReference("messages/" + data.get(position).getSender() + "/" + myPhone);
 
-            try {
-                myMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
-                senderMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
-            } catch (Exception e){}
-        }
+                myMessageRef = FirebaseDatabase.getInstance()
+                        .getReference("messages/" + myPhone + "/" + data.get(position).getSender());
+
+                try {
+                    if(data.get(position).getMessage() != null){
+                        myMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
+                        senderMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
+                    }
+
+                } catch (Exception e) {
+                }
+            }
+        } catch (Exception e){}
 
 
         View view=convertView;
-        if(!data.get(position).getSender().equals(myPhone))
-        {
-            view=activity.getLayoutInflater().inflate(R.layout.chat_row_left, null);
-        }
-        else
-        {
-            view=activity.getLayoutInflater().inflate(R.layout.chat_row_right, null);
-        }
-        TextView text = view.findViewById(R.id.text);
-        TextView timeStamp = view.findViewById(R.id.timeStamp);
+        try {
+            if (!data.get(position).getSender().equals(myPhone)) {
+                view = activity.getLayoutInflater().inflate(R.layout.chat_row_left, null);
+            } else {
+                view = activity.getLayoutInflater().inflate(R.layout.chat_row_right, null);
+            }
 
-        text.setText(data.get(position).getMessage());
+            TextView text = view.findViewById(R.id.text);
+            TextView timeStamp = view.findViewById(R.id.timeStamp);
 
-        //2020-04-03:23:22:00:GMT+03:00
-        String[] timeS = Split(data.get(position).getTimeStamp());
+            text.setText(data.get(position).getMessage());
 
-        timeStamp.setText(timeS[1]+":"+timeS[2]);
+            //2020-04-03:23:22:00:GMT+03:00
+            String[] timeS = Split(data.get(position).getTimeStamp());
 
+            /**
+             * timeS[0] = date
+             * timeS[1] = hr
+             * timeS[2] = min
+             * timeS[3] = seconds
+             * timeS[4] = timezone
+             */
+            timeStamp.setText(timeS[1]+":"+timeS[2]);
+        } catch (Exception e){}
         return view;
     }
 

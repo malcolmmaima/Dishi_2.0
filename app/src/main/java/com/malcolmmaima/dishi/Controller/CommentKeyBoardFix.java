@@ -5,6 +5,9 @@ import android.graphics.Rect;
 import android.view.View;
 import android.widget.FrameLayout;
 
+/**
+ * This fix works perfectly. Credits to: https://stackoverflow.com/questions/32649710/android-toolbar-moves-up-when-keyboard-appears
+ */
 public class CommentKeyBoardFix
 {
     private View mChildOfContent;

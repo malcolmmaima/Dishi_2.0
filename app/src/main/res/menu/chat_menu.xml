@@ -14,14 +14,11 @@
         android:id="@+id/chat_view_profile"
         android:title="View Profile"
         app:showAsAction="never"/>
-    <item
+<!--    <item
         android:id="@+id/chat_media"
         android:title="Media"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/chat_search"
-        android:title="Search"
-        app:showAsAction="never"/>
+        app:showAsAction="never"/> -->
+
     <item
         android:id="@+id/chat_more"
         android:title="More">
@@ -34,10 +31,6 @@
                 <item
                     android:id="@+id/chat_clearchat"
                     android:title="Clear Chat"
-                    app:showAsAction="never" />
-                <item
-                    android:id="@+id/chat_emailchat"
-                    android:title="Email Chat"
                     app:showAsAction="never" />
             </menu>
         </group>

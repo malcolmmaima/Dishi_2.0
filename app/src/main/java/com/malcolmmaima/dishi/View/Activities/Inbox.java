@@ -123,6 +123,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                             mSwipeRefreshLayout.setRefreshing(false);
                             contactDm = dataSnapshot.getValue(UserModel.class);
                             contactDm.setPhone(userDm.getKey());
+
                             chatlist.add(contactDm);
 
                             if(!chatlist.isEmpty()){
