@@ -95,7 +95,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/ic_add_white_36dp"
+                android:background="@drawable/ic_add_black_48dp"
                 android:backgroundTint="@color/colorPrimary"/>
 
 

@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -67,6 +68,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        new CommentKeyBoardFix(this);
 
         String fromPhone = getIntent().getStringExtra("fromPhone");
         String toPhone = getIntent().getStringExtra("toPhone");

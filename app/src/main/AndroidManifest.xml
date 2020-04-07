@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.Chat"></activity>
+        <activity android:name=".View.Activities.Chat" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".View.Activities.Inbox" />
         <activity android:name=".View.Activities.SystemMaintenance" />
         <activity android:name=".View.Activities.BlockedAccount" />

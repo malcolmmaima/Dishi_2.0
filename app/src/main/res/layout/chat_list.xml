@@ -64,6 +64,7 @@
             android:layout_height="wrap_content" />
         <ImageView
             android:id="@+id/mute"
+            android:visibility="gone"
             android:layout_below="@+id/message_time"
             android:src="@drawable/mute_black"
             android:layout_alignParentRight="true"

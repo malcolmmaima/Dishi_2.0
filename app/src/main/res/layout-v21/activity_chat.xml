@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Activities.Chat">
+    tools:context=".View.Activities.Chat"
+    android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
         app:layout_collapseMode="pin"
@@ -18,10 +19,14 @@
         android:elevation="4dp"
         android:titleTextColor="@color/black"
         android:layout_alignParentTop="true"
-        android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
     </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </ScrollView>
 
     <RelativeLayout
 
@@ -50,11 +55,7 @@
         android:paddingLeft="2dp"
         android:paddingRight="10dp"
         android:paddingBottom="6dp"
-        android:layout_height="100dp"
-        android:paddingEnd="10dp"
-        android:paddingStart="2dp"
-        android:layout_toStartOf="@+id/send"
-        android:layout_marginStart="10dp">
+        android:layout_height="100dp">
 
         <ImageButton
             android:id="@+id/emoji"
@@ -80,8 +81,7 @@
             android:inputType="textMultiLine"
             android:minHeight="36dp"
             android:shadowRadius="40"
-            android:layout_toEndOf="@+id/emoji"
-            android:autofillHints="" />
+            android:layout_toEndOf="@+id/emoji" />
 
         <ImageButton
             android:id="@+id/attachFile"
