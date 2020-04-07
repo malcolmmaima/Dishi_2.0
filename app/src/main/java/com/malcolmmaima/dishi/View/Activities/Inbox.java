@@ -114,14 +114,14 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
+                chatlist.clear();
+                if(!dataSnapshot.hasChildren()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
                     chatList.setAdapter(adapter);
                     emptyTag.setVisibility(View.VISIBLE);
                     icon.setVisibility(View.VISIBLE);
                 } else {
-                    chatlist.clear();
                     for(DataSnapshot userDm : dataSnapshot.getChildren()){
                         DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
                         userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
