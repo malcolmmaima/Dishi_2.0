@@ -8,6 +8,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -41,6 +44,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -121,23 +125,21 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         profilePic = mCustomView.findViewById(R.id.profilePic);
         userStatus = mCustomView.findViewById(R.id.userStatus);
 
-        ArrayList<Integer> deletes = new ArrayList<>();
+        ArrayList<Integer> selectedMsgs = new ArrayList<>();
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
                 if(checked){
                     count = count + 1;
-                    deletes.add(position);
+                    selectedMsgs.add(position);
                 }
                 else
                     count =count-1;
-                    try {deletes.remove(position);}catch (Exception e){}
                 mode.setTitle(count+"");
                 mode.setSubtitle(null);
                 mode.setTag(false);
                 mode.setTitleOptionalHint(false);
-                list.high
             }
 
             @Override
@@ -164,18 +166,27 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     case R.id.info:
                         return true; */
                     case R.id.delete:
-                        for (int i=0; i<deletes.size(); i++){
+                        for (int i=0; i<selectedMsgs.size(); i++){
                             //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
-                            myMessagedRef.child(messages.get(deletes.get(i)).getKey()).removeValue();
+                            myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue();
 
-                            if(i==deletes.size()-1){
-                                deletes.clear();
+                            if(i==selectedMsgs.size()-1){
+                                selectedMsgs.clear();
                                 count = 0;
                                 mode.finish();
                             }
                         }
                         return true;
                     case R.id.copy:
+                        // Append all selected messages to a single string  variable and pass to setClipboard()
+                        String [] selected = new String[selectedMsgs.size()];
+                        StringBuffer sb = new StringBuffer();
+                        for (int i=0; i<selectedMsgs.size(); i++){
+                            selected[i] = messages.get(selectedMsgs.get(i)).getMessage();
+                        }
+
+                        String str = Arrays.toString(selected);
+                        setClipboard(Chat.this, str, mode);
                         return true;
 
                     default:
@@ -186,7 +197,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             @Override
             public void onDestroyActionMode(android.view.ActionMode mode) {
                 count = 0;
-                deletes.clear();
+                selectedMsgs.clear();
             }
         });
 
@@ -362,7 +373,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         super.onBackPressed();
     }
 
-
     private String getDate() {
         String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         TimeZone timeZone = TimeZone.getDefault();
@@ -374,5 +384,21 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 timeZone.getDisplayName(false, TimeZone.SHORT);
 
         return time;
+    }
+
+    private void setClipboard(Context context, String text, android.view.ActionMode mode) {
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+            SafeToast.makeText(Chat.this, "Copied!", Toast.LENGTH_SHORT).show();
+            mode.finish();
+
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+            SafeToast.makeText(Chat.this, "Copied!", Toast.LENGTH_SHORT).show();
+            mode.finish();
+        }
     }
 }

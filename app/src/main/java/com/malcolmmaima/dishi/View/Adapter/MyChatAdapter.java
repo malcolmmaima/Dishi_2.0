@@ -101,6 +101,7 @@ public class MyChatAdapter extends BaseAdapter {
         return view;
     }
 
+
     public String[] Split(String timeStamp){
 
         String[] arrSplit = timeStamp.split(":");
