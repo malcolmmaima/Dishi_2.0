@@ -114,41 +114,51 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                chatlist.clear();
-                for(DataSnapshot userDm : dataSnapshot.getChildren()){
-                    DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
-                    userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            mSwipeRefreshLayout.setRefreshing(false);
-                            contactDm = dataSnapshot.getValue(UserModel.class);
-                            contactDm.setPhone(userDm.getKey());
+                if(!dataSnapshot.exists()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                    chatList.setAdapter(adapter);
+                    emptyTag.setVisibility(View.VISIBLE);
+                    icon.setVisibility(View.VISIBLE);
+                } else {
+                    chatlist.clear();
+                    for(DataSnapshot userDm : dataSnapshot.getChildren()){
+                        DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
+                        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                contactDm = dataSnapshot.getValue(UserModel.class);
+                                contactDm.setPhone(userDm.getKey());
 
-                            chatlist.add(contactDm);
+                                chatlist.add(contactDm);
 
-                            if(!chatlist.isEmpty()){
-                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                chatList.setAdapter(adapter);
-                                emptyTag.setVisibility(View.GONE);
-                                icon.setVisibility(View.GONE);
+                                if(!chatlist.isEmpty()){
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                    chatList.setAdapter(adapter);
+                                    emptyTag.setVisibility(View.GONE);
+                                    icon.setVisibility(View.GONE);
+                                }
+
+                                else {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                    chatList.setAdapter(adapter);
+                                    emptyTag.setVisibility(View.VISIBLE);
+                                    icon.setVisibility(View.VISIBLE);
+                                }
+
+
                             }
 
-                            else {
-                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                chatList.setAdapter(adapter);
-                                emptyTag.setVisibility(View.VISIBLE);
-                                icon.setVisibility(View.VISIBLE);
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
                             }
-
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
+                        });
+                    }
                 }
+
             }
 
             @Override
@@ -158,6 +168,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
         };
         myMessagesRef.addValueEventListener(myMessagesListener);
 
+        ArrayList<Integer> selectedMsgs = new ArrayList<>();
         chatList.setOnItemClickListener(this);
         chatList.setOnItemLongClickListener(this);
         chatList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -166,6 +177,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 if(checked){
                     count++;
+                    selectedMsgs.add(position);
                 }
                 else
                     count--;
@@ -189,21 +201,18 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch(item.getItemId()) {
-                    case R.id.menu_pin:
-                        return true;
                     case R.id.menu_delete:
+                        for (int i=0; i<selectedMsgs.size(); i++){
+                            myMessagesRef.child(chatlist.get(selectedMsgs.get(i)).getPhone()).removeValue();
+
+                            if(i==selectedMsgs.size()-1){
+                                selectedMsgs.clear();
+                                count = 0;
+                                mode.finish();
+                            }
+                        }
                         return true;
-                    case R.id.menu_mute:
-                        return true;
-                    case R.id.menu_archive:
-                        return true;
-                    case R.id.menu_addChatShortcut:
-                        return true;
-                    case R.id.menu_viewContact:
-                        //startActivity(new Intent(getContext(),ViewContact.class));
-                        return true;
-                    case R.id.menu_markAsUnread:
-                        return true;
+
                     default:
                         return false;
                 }
@@ -263,7 +272,6 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
             adapter.notifyDataSetChanged();
             actionMode.finish();
             actionMode = null;
-            Toast.makeText(Inbox.this, "Hello 1", Toast.LENGTH_SHORT).show();
         }
     }
 }

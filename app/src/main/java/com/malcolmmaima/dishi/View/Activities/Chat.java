@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.ActivityOptions;
@@ -26,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +68,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     Toolbar toolbar;
     CircleImageView profilePic;
     ImageButton sendBtn;
+    RelativeLayout mainContent;
     int count = 0;
 
     @Override
@@ -81,7 +84,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
         myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
 
-
+        mainContent = findViewById(R.id.main_content);
         toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(null);
@@ -111,6 +114,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         };
         myMessagedRef.addValueEventListener(myMessagesListener);
+
 
         arrayAdapter=new MyChatAdapter(this,messages);
         list.setAdapter(arrayAdapter);
@@ -357,6 +361,24 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 //TODO add custom dialog box
                 return true;
             case R.id.chat_clearchat:
+                AlertDialog clearChat = new AlertDialog.Builder(Chat.this)
+                        //set message, title, and icon
+                        .setMessage("Clear chat?")
+                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                        //set three option buttons
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                myMessagedRef.removeValue();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //do nothing
+
+                            }
+                        })//setNegativeButton
+
+                        .create();
+                clearChat.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
