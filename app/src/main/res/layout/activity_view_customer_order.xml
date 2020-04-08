@@ -8,6 +8,7 @@
     android:orientation="vertical"
     android:background="@color/colorBackroundWhite"
     tools:context=".View.Activities.ViewCustomerOrder"
+    android:focusableInTouchMode="true"
     android:id="@+id/parentlayout">
 
     <androidx.appcompat.widget.Toolbar
@@ -40,11 +41,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 card_view:cardCornerRadius="5dp"
-                android:focusableInTouchMode="false"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
                 card_view:view_borderWidth="2dp"
-                android:focusedByDefault="true"
                 card_view:view_borderColor="#ffffff" >
 
                 <RelativeLayout
@@ -110,7 +109,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 card_view:cardCornerRadius="5dp"
-                android:focusableInTouchMode="false"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
                 card_view:view_borderWidth="2dp"
@@ -323,7 +321,6 @@
                 android:layout_marginRight="15dp"
                 android:layout_marginLeft="15dp"
                 card_view:cardCornerRadius="5dp"
-                android:focusableInTouchMode="false"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
                 card_view:view_borderWidth="2dp"
