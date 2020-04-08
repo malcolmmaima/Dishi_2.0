@@ -65,7 +65,13 @@ public class ChatListAdapter extends BaseAdapter {
              */
             time.setText(timeS[1]+":"+timeS[2]);
 
-            message.setText(data.get(position).message);
+            if(data.get(position).message.length() > 35) {
+                message.setText(data.get(position).message.substring(0, 35) + "...");
+            } else {
+                message.setText(data.get(position).message);
+            }
+
+
         } catch (Exception e){}
 
 

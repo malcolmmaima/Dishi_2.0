@@ -116,6 +116,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     private void fetchMessages() {
         chatlist.clear();
         contactDm = null;
+        chatMessage = null;
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -313,7 +314,6 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     @Override
     protected void onResume() {
         super.onResume();
-        fetchMessages();
     }
 
     @Override
