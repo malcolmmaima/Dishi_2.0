@@ -291,6 +291,7 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                                         AssignedOrders.clear(); //clear list
                                         myRestaurants.clear();
+                                        assignedCustomer = new UserModel();
                                         DatabaseReference userDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+orders.getKey());
                                         ValueEventListener
                                                 userDetailsRefListener = new ValueEventListener() {

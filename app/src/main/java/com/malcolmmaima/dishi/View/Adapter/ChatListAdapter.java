@@ -51,8 +51,20 @@ public class ChatListAdapter extends BaseAdapter {
         CircleImageView picture =  view.findViewById(R.id.user_dp);
         ImageView mute = view.findViewById(R.id.mute);
         name.setText(data.get(position).getFirstname()+" "+data.get(position).getLastname());
-        time.setText("11:53 P.M.");
-        message.setText("Some message");
+
+        //2020-04-03:23:22:00:GMT+03:00
+        String[] timeS = Split(data.get(position).timeStamp);
+
+        /**
+         * timeS[0] = date
+         * timeS[1] = hr
+         * timeS[2] = min
+         * timeS[3] = seconds
+         * timeS[4] = timezone
+         */
+        time.setText(timeS[1]+":"+timeS[2]);
+
+        message.setText(data.get(position).message);
 
         try {
             //Load food image
@@ -71,5 +83,16 @@ public class ChatListAdapter extends BaseAdapter {
         });
 
         return view;
+    }
+
+    public String[] Split(String timeStamp){
+
+        String[] arrSplit = timeStamp.split(":");
+//        for (int i=0; i < arrSplit.length; i++)
+//        {
+//            //Toast.makeText(activity, "val: " + arrSplit[1i, Toast.LENGTH_SHORT).show();
+//        }
+
+        return arrSplit;
     }
 }

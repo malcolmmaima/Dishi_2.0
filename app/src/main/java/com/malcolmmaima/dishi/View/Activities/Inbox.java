@@ -29,7 +29,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ChatListAdapter;
@@ -52,6 +54,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     UserModel contactDm;
     ListView chatList;
     ChatListAdapter adapter;
+    MessageModel chatMessage;
     int count=0;
     public ActionMode actionMode = null;
 
@@ -127,26 +130,48 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                         DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
                         userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                contactDm = dataSnapshot.getValue(UserModel.class);
-                                contactDm.setPhone(userDm.getKey());
-                                chatlist.add(contactDm);
+                            public void onDataChange(@NonNull DataSnapshot users) {
 
-                                if(!chatlist.isEmpty()){
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                    adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                    chatList.setAdapter(adapter);
-                                    emptyTag.setVisibility(View.GONE);
-                                    icon.setVisibility(View.GONE);
-                                }
+                                Query lastQuery = myMessagesRef.child(userDm.getKey()).orderByKey().limitToLast(1);
+                                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        //String timeStamp = dataSnapshot.child("timeStamp").getValue(String.class);
 
-                                else {
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                    adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                    chatList.setAdapter(adapter);
-                                    emptyTag.setVisibility(View.VISIBLE);
-                                    icon.setVisibility(View.VISIBLE);
-                                }
+                                        for(DataSnapshot message : dataSnapshot.getChildren()){
+                                            chatMessage = message.getValue(MessageModel.class);
+                                            chatMessage.setKey(message.getKey());
+
+                                            contactDm = users.getValue(UserModel.class);
+                                            contactDm.setPhone(userDm.getKey());
+                                            contactDm.timeStamp = chatMessage.getTimeStamp();
+                                            contactDm.message = chatMessage.getMessage();
+                                            chatlist.add(contactDm);
+
+                                            if(!chatlist.isEmpty()){
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                                chatList.setAdapter(adapter);
+                                                emptyTag.setVisibility(View.GONE);
+                                                icon.setVisibility(View.GONE);
+                                            }
+
+                                            else {
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                                chatList.setAdapter(adapter);
+                                                emptyTag.setVisibility(View.VISIBLE);
+                                                icon.setVisibility(View.VISIBLE);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        // Handle possible errors.
+                                    }
+                                });
+
 
 
                             }

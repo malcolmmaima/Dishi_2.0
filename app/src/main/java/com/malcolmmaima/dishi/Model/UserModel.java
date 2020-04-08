@@ -20,6 +20,8 @@ public class UserModel {
     public long itemCount; //Not part of our user model, just a temporary data holder to be passed from OrdersFragment to orders adapter
     public String restaurantPhone; //Not part of our user model, just a temporary data holder to be passed
     public String riderPhone; //temp data holder for use in RiderFragment. will be passed to adapter
+    public String timeStamp; //A temporary data holder for our inbox, we want to pass the most recent DM timestamp so as to display in chatListAdapter
+    public String message; //Serves the same purpose as above variable
 
     public String getPhone() {
         return phone;
