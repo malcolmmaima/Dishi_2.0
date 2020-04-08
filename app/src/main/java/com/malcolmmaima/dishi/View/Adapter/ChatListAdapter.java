@@ -11,9 +11,20 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+
+import androidx.annotation.NonNull;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
@@ -26,6 +37,10 @@ public class ChatListAdapter extends BaseAdapter {
     ArrayList<UserModel> data;
     Context context;
     long DURATION = 200;
+    DatabaseReference messageRef;
+    String myPhone;
+    FirebaseUser user;
+    int unreadCount = 0;
 
     public ChatListAdapter(Activity activity, ArrayList<UserModel> data, Context context)
     {
@@ -50,6 +65,10 @@ public class ChatListAdapter extends BaseAdapter {
         View view=convertView;
         view=activity.getLayoutInflater().inflate(R.layout.chat_list, null);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        messageRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+data.get(position).getPhone());
+
         /**
          * Adapter animation
          */
@@ -57,10 +76,39 @@ public class ChatListAdapter extends BaseAdapter {
 
         TextView name=view.findViewById(R.id.contact_name);
         TextView time=view.findViewById(R.id.message_time);
+        TextView unread=view.findViewById(R.id.unreadCount);
         TextView message=view.findViewById(R.id.message);
         CircleImageView picture =  view.findViewById(R.id.user_dp);
         ImageView mute = view.findViewById(R.id.mute);
         name.setText(data.get(position).getFirstname()+" "+data.get(position).getLastname());
+
+        /**
+         * unread count for messages
+         */
+        messageRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot messages : dataSnapshot.getChildren()){
+                    MessageModel message = messages.getValue(MessageModel.class);
+                    if(message.getSender().equals(data.get(position).getPhone()) && message.getRead() != true){
+                        unreadCount++;
+                        unread.setVisibility(View.VISIBLE);
+                        unread.setText(""+unreadCount);
+                    }
+
+                    else {
+                        unread.setVisibility(View.GONE);
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //2020-04-03:23:22:00:GMT+03:00
         try {
@@ -135,4 +183,5 @@ public class ChatListAdapter extends BaseAdapter {
         animatorSet.play(animator);
         animator.start();
     }
+
 }

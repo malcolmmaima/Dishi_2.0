@@ -247,6 +247,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                 selectedMsgs.clear();
                                 count = 0;
                                 mode.finish();
+                                fetchMessages();
                             }
                         }
                         return true;
