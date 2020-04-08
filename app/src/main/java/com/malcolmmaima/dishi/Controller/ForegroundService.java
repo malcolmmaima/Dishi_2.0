@@ -47,8 +47,8 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
-    DatabaseReference databaseReference;
-    ValueEventListener databaseListener, myOrdersListener;
+    DatabaseReference databaseReference, myUserDetailsRef;
+    ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     String myPhone;
     FirebaseUser user;
     UserModel myUserDetails;
@@ -70,6 +70,7 @@ public class ForegroundService extends Service {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             databaseReference = FirebaseDatabase.getInstance().getReference();
+            myUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
         } catch(Exception e){}
 
         try {
@@ -79,14 +80,17 @@ public class ForegroundService extends Service {
         /**
          * Get logged in user details
          */
-        databaseListener = new ValueEventListener() {
+        myUserDetailsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
-
                     if (myUserDetails.getAccount_type().equals("1")) {
                         startCustomerNotifications();
+                    }
+
+                    if(myUserDetails.getAccount_type().equals("2")){
+                        startRestaurantNotifications();
                     }
                 } catch (Exception e){}
             }
@@ -97,16 +101,19 @@ public class ForegroundService extends Service {
             }
         };
         try {
-            databaseReference.child("users").child(myPhone).addValueEventListener(databaseListener);
+            myUserDetailsRef.addValueEventListener(myUserDetailsListener);
         } catch (Exception e){}
 
         //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
         return START_STICKY;
     }
 
+    private void startRestaurantNotifications() {
+
+    }
+
     private void startCustomerNotifications() {
         //Check order status
-
 
         final ArrayList<String> activeRestaurantOrders = new ArrayList<>();
         myOrdersListener = new ValueEventListener() {

@@ -437,4 +437,10 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             mode.finish();
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myMessagedRef.removeEventListener(myMessagesListener);
+    }
 }
