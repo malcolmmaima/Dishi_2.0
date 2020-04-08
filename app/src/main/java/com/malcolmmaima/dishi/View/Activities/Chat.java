@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -172,7 +173,12 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     case R.id.delete:
                         for (int i=0; i<selectedMsgs.size(); i++){
                             //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
-                            myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue();
+                            myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    arrayAdapter.notifyDataSetChanged();
+                                }
+                            });
 
                             if(i==selectedMsgs.size()-1){
                                 selectedMsgs.clear();

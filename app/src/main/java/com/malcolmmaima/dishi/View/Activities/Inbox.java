@@ -37,6 +37,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ChatListAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
@@ -114,11 +115,12 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
     private void fetchMessages() {
         chatlist.clear();
+        contactDm = null;
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 chatlist.clear();
-                contactDm = new UserModel();
+                contactDm = null;
                 if(!dataSnapshot.hasChildren()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
@@ -127,11 +129,18 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                     icon.setVisibility(View.VISIBLE);
                 } else {
                     for(DataSnapshot userDm : dataSnapshot.getChildren()){
+                        /**
+                         * Get recipient user details
+                         */
                         DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
                         userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot users) {
 
+
+                                /**
+                                 * Get recipient's last message
+                                 */
                                 Query lastQuery = myMessagesRef.child(userDm.getKey()).orderByKey().limitToLast(1);
                                 lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
@@ -147,22 +156,22 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                             contactDm.timeStamp = chatMessage.getTimeStamp();
                                             contactDm.message = chatMessage.getMessage();
                                             chatlist.add(contactDm);
+                                        }
 
-                                            if(!chatlist.isEmpty()){
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                                chatList.setAdapter(adapter);
-                                                emptyTag.setVisibility(View.GONE);
-                                                icon.setVisibility(View.GONE);
-                                            }
+                                        if(!chatlist.isEmpty()){
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                            adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                            chatList.setAdapter(adapter);
+                                            emptyTag.setVisibility(View.GONE);
+                                            icon.setVisibility(View.GONE);
+                                        }
 
-                                            else {
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                                chatList.setAdapter(adapter);
-                                                emptyTag.setVisibility(View.VISIBLE);
-                                                icon.setVisibility(View.VISIBLE);
-                                            }
+                                        else {
+                                            mSwipeRefreshLayout.setRefreshing(false);
+                                            adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                            chatList.setAdapter(adapter);
+                                            emptyTag.setVisibility(View.VISIBLE);
+                                            icon.setVisibility(View.VISIBLE);
                                         }
                                     }
 
@@ -171,6 +180,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                         // Handle possible errors.
                                     }
                                 });
+
 
 
 
@@ -191,7 +201,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
             }
         };
-        myMessagesRef.addValueEventListener(myMessagesListener);
+        myMessagesRef.addListenerForSingleValueEvent(myMessagesListener);
 
         ArrayList<Integer> selectedMsgs = new ArrayList<>();
         chatList.setOnItemClickListener(this);
@@ -298,5 +308,10 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
             actionMode.finish();
             actionMode = null;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

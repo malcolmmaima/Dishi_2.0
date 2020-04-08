@@ -53,18 +53,22 @@ public class ChatListAdapter extends BaseAdapter {
         name.setText(data.get(position).getFirstname()+" "+data.get(position).getLastname());
 
         //2020-04-03:23:22:00:GMT+03:00
-        String[] timeS = Split(data.get(position).timeStamp);
+        try {
+            String[] timeS = Split(data.get(position).timeStamp);
 
-        /**
-         * timeS[0] = date
-         * timeS[1] = hr
-         * timeS[2] = min
-         * timeS[3] = seconds
-         * timeS[4] = timezone
-         */
-        time.setText(timeS[1]+":"+timeS[2]);
+            /**
+             * timeS[0] = date
+             * timeS[1] = hr
+             * timeS[2] = min
+             * timeS[3] = seconds
+             * timeS[4] = timezone
+             */
+            time.setText(timeS[1]+":"+timeS[2]);
 
-        message.setText(data.get(position).message);
+            message.setText(data.get(position).message);
+        } catch (Exception e){}
+
+
 
         try {
             //Load food image
