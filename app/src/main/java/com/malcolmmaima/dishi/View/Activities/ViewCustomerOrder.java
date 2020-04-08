@@ -503,7 +503,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                 if(riderPhone != null && !riderPhone.equals(myPhone)){
                     androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                    builder.setTitle("Rider Options");
+                    builder.setTitle(riderName.getText().toString());
                     builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, final int which) {
                             if(which == 0){
@@ -1034,7 +1034,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     //Do nothing
-                                    SafeToast.makeText(ViewCustomerOrder.this, "Default rider is your account", Toast.LENGTH_LONG).show();
+                                    //SafeToast.makeText(ViewCustomerOrder.this, "Default rider is your account", Toast.LENGTH_LONG).show();
                                 }
                             })
 
@@ -1049,6 +1049,22 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             }
 
             return(true);
+
+        case R.id.sendMessage:
+            Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            slideactivity.putExtra("fromPhone", myPhone);
+            slideactivity.putExtra("toPhone", phone);
+            Bundle bndlanimation =
+                    null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                startActivity(slideactivity, bndlanimation);
+            }
+            return  (true);
     }
         return(super.onOptionsItemSelected(item));
     }

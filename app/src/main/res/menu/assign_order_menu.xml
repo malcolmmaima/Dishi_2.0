@@ -4,16 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Views.Activities.ViewCustomerOrder">
 
-    <item
-        android:id="@+id/callCustomer"
-        android:icon="@drawable/ic_phone_black_24dp"
-        app:showAsAction="always"
-        android:title="Call Customer"/>
 
     <item
         android:id="@+id/addRider"
         android:icon="@drawable/deliver_nduthi_48dp"
         app:showAsAction="always"
         android:title="Add Rider"/>
+
+    <item
+        android:id="@+id/callCustomer"
+        android:icon="@drawable/ic_phone_black_24dp"
+        app:showAsAction="never"
+        android:title="Call"/>
+
+    <item
+        android:id="@+id/sendMessage"
+        android:icon="@drawable/ic_send_black_48dp"
+        app:showAsAction="never"
+        android:title="Message"/>
 
 </menu>
