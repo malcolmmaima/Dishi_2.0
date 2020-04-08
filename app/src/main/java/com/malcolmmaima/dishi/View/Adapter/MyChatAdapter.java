@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ public class MyChatAdapter extends BaseAdapter {
     ArrayList<MessageModel> data;
     FirebaseUser user;
     String myPhone;
+    long DURATION = 200;
 
     public MyChatAdapter(Activity activity, ArrayList<MessageModel> data)
     {
@@ -48,7 +51,7 @@ public class MyChatAdapter extends BaseAdapter {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
         /**
          * if the intended recipient of the message opens it then update message state read = true
          */
@@ -74,6 +77,7 @@ public class MyChatAdapter extends BaseAdapter {
 
 
         View view=convertView;
+
         try {
             if (!data.get(position).getSender().equals(myPhone)) {
                 view = activity.getLayoutInflater().inflate(R.layout.chat_row_left, null);
@@ -98,6 +102,7 @@ public class MyChatAdapter extends BaseAdapter {
              */
             timeStamp.setText(timeS[1]+":"+timeS[2]);
         } catch (Exception e){}
+
         return view;
     }
 
@@ -112,5 +117,6 @@ public class MyChatAdapter extends BaseAdapter {
 
         return arrSplit;
     }
+
 }
 

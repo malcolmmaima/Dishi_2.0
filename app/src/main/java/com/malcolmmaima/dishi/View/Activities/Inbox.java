@@ -146,7 +146,6 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                 lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        //String timeStamp = dataSnapshot.child("timeStamp").getValue(String.class);
 
                                         for(DataSnapshot message : dataSnapshot.getChildren()){
                                             chatMessage = message.getValue(MessageModel.class);
@@ -160,6 +159,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                         }
 
                                         if(!chatlist.isEmpty()){
+                                            Collections.sort(chatlist, (chat1, chat2) -> (chat2.timeStamp.compareTo(chat1.timeStamp)));
                                             mSwipeRefreshLayout.setRefreshing(false);
                                             adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
                                             chatList.setAdapter(adapter);
