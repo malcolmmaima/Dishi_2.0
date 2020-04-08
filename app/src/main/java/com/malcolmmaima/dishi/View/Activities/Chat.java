@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -76,7 +77,11 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        //keep toolbar pinned at top. push edittext on keyboard load
         new CommentKeyBoardFix(this);
+        //Hide keyboard on activity load
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         String fromPhone = getIntent().getStringExtra("fromPhone");
         String toPhone = getIntent().getStringExtra("toPhone");
@@ -106,7 +111,13 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     if(chatMessage.getMessage() != null){
                         messages.add(chatMessage);
                     }
+
                 }
+
+                arrayAdapter=new MyChatAdapter(Chat.this,messages);
+                list.setAdapter(arrayAdapter);
+                list.setOnItemClickListener(Chat.this);
+                list.setOnItemLongClickListener(Chat.this);
             }
 
             @Override
@@ -117,10 +128,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         myMessagedRef.addValueEventListener(myMessagesListener);
 
 
-        arrayAdapter=new MyChatAdapter(this,messages);
-        list.setAdapter(arrayAdapter);
-        list.setOnItemClickListener(this);
-        list.setOnItemLongClickListener(this);
+
         editText=(EditText)findViewById(R.id.chatBox);
         View mCustomView = mInflater.inflate(R.layout.chat_toolbar, null);
         getSupportActionBar().setCustomView(mCustomView);

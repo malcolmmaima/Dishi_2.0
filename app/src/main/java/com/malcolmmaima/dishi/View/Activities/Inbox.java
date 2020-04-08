@@ -159,7 +159,9 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                         }
 
                                         if(!chatlist.isEmpty()){
-                                            Collections.sort(chatlist, (chat1, chat2) -> (chat2.timeStamp.compareTo(chat1.timeStamp)));
+                                            try {
+                                                Collections.sort(chatlist, (chat1, chat2) -> (chat2.timeStamp.compareTo(chat1.timeStamp)));
+                                            } catch (Exception e){}
                                             mSwipeRefreshLayout.setRefreshing(false);
                                             adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
                                             chatList.setAdapter(adapter);
