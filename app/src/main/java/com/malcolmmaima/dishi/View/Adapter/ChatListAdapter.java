@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -23,6 +25,8 @@ public class ChatListAdapter extends BaseAdapter {
     Activity activity;
     ArrayList<UserModel> data;
     Context context;
+    long DURATION = 200;
+
     public ChatListAdapter(Activity activity, ArrayList<UserModel> data, Context context)
     {
         this.activity=activity;
@@ -45,6 +49,12 @@ public class ChatListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view=convertView;
         view=activity.getLayoutInflater().inflate(R.layout.chat_list, null);
+
+        /**
+         * Adapter animation
+         */
+        setAnimation(view, position);
+
         TextView name=view.findViewById(R.id.contact_name);
         TextView time=view.findViewById(R.id.message_time);
         TextView message=view.findViewById(R.id.message);
@@ -104,5 +114,25 @@ public class ChatListAdapter extends BaseAdapter {
 //        }
 
         return arrSplit;
+    }
+
+    /**
+     * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
+     */
+    private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
+        if(!on_attach){
+            i = -1;
+        }
+        boolean isNotFirstItem = i == -1;
+        i++;
+        itemView.setAlpha(0.f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
+        ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
+        animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
+        animator.setDuration(500);
+        animatorSet.play(animator);
+        animator.start();
     }
 }
