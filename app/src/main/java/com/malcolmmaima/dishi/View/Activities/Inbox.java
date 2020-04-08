@@ -311,6 +311,12 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        fetchMessages();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
