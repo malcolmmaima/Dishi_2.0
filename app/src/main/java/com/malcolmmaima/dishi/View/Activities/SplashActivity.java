@@ -55,14 +55,6 @@ public class SplashActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
 
 
-//        Temporarily disable disk persistence. uncomment to enable
-//        try {
-//            //Enable disk persistence
-//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-//        } catch (Exception e){
-//
-//        }
-
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         Fabric.with(this, new Crashlytics());
@@ -90,6 +82,14 @@ public class SplashActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         try {
                             Boolean maintenance = dataSnapshot.child("maintenance").getValue(Boolean.class);
+                            Boolean diskPersistence = dataSnapshot.child("disk_persistence").getValue(Boolean.class);
+
+                            try {
+                                /**
+                                 * Enable/disable disk persistence
+                                 */
+                                FirebaseDatabase.getInstance().setPersistenceEnabled(diskPersistence);
+                            } catch (Exception e){ }
 
                             if (maintenance == true) {
                                 progressBar.setVisibility(View.GONE);
