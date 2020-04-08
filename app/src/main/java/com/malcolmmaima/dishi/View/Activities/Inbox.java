@@ -115,6 +115,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 chatlist.clear();
+                contactDm = new UserModel();
                 if(!dataSnapshot.hasChildren()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
@@ -129,7 +130,6 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 contactDm = dataSnapshot.getValue(UserModel.class);
                                 contactDm.setPhone(userDm.getKey());
-
                                 chatlist.add(contactDm);
 
                                 if(!chatlist.isEmpty()){
