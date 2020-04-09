@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +32,7 @@ import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.SplashActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 
@@ -47,7 +49,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
-    DatabaseReference databaseReference, myUserDetailsRef;
+    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     String myPhone;
     FirebaseUser user;
@@ -73,10 +75,6 @@ public class ForegroundService extends Service {
             myUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
         } catch(Exception e){}
 
-        try {
-            String title = intent.getStringExtra("title");
-            String message = intent.getStringExtra("message");
-        } catch (Exception e){}
         /**
          * Get logged in user details
          */
@@ -109,7 +107,56 @@ public class ForegroundService extends Service {
     }
 
     private void startRestaurantNotifications() {
+        myOrdersRef = FirebaseDatabase.getInstance().getReference("orders/"+myPhone);
+        myOrdersRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getKey());
+                userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try {
+                            UserModel customer = dataSnapshot.getValue(UserModel.class);
+                            String title = "New Order";
+                            String message = "New order from " + customer.getFirstname() + " " + customer.getLastname();
+                            String customerPhone = dataSnapshot.getKey();
+                            if (customerPhone.length() > 4) {
+                                lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
+                            }
+                            int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
+                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, RestaurantActivity.class);
+                        } catch (Exception e){}
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void startCustomerNotifications() {
@@ -267,7 +314,6 @@ public class ForegroundService extends Service {
             restaurants.add(restaurantPhone); //Add the restaurant's phone to this list that we track to control number of notifications of this type
         }
 
-
         else if(type.equals("orderDelivered") && restaurants.contains(restaurantPhone)){
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -297,6 +343,37 @@ public class ForegroundService extends Service {
             manager.notify(notifId, notification);
 
             restaurants.remove(restaurantPhone);
+        }
+
+    }
+
+    private void sendCustomerOrderNotification(int notifId, String type, String title, String message, Class targetActivity){
+
+        if(type.equals("newOrderRequest")){
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.dish)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle(title)
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText(message);
+            }
+
+            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent intent = new Intent(this, targetActivity);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
+            builder.setContentIntent(contentIntent);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.icon |= Notification.BADGE_ICON_LARGE;
+            manager.notify(notifId, notification);
         }
 
     }
