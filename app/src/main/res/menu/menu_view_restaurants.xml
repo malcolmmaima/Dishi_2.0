@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.malcolmmaima.dishi.View.Activities.ViewRestaurant">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/sendMessage"
+        android:icon="@drawable/ic_send_black_48dp"
+        app:showAsAction="always"
+        android:title="Message"/>
 </menu>

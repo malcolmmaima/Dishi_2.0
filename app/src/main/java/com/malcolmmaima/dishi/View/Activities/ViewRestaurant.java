@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,7 +50,7 @@ public class ViewRestaurant extends AppCompatActivity {
     TextView restaurantName, distAway, likes;
     String RestaurantName, phone;
     ValueEventListener providerFavsListener;
-
+    Menu myMenu;
     DatabaseReference myLocationRef, restaurantLocationRef;
     ValueEventListener mylocationListener, restaurantLocationListener;
     LiveLocation myLocation, restaurantLocation;
@@ -386,6 +389,38 @@ public class ViewRestaurant extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_view_restaurants, menu);
+        myMenu = menu;
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) { switch(item.getItemId()) {
+
+        case R.id.sendMessage:
+            Intent slideactivity = new Intent(ViewRestaurant.this, Chat.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            slideactivity.putExtra("fromPhone", myPhone);
+            slideactivity.putExtra("toPhone", phone);
+            Bundle bndlanimation =
+                    null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                bndlanimation = ActivityOptions.makeCustomAnimation(ViewRestaurant.this, R.anim.animation,R.anim.animation2).toBundle();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                startActivity(slideactivity, bndlanimation);
+            }
+            return  (true);
+
+    }
+        return(super.onOptionsItemSelected(item));
     }
 
     private void computeDistance(Double latitude, Double longitude, Double latitude1, Double longitude1, String k) {
