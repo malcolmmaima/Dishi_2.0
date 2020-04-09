@@ -1,7 +1,9 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -44,7 +46,15 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        startNotificationService();
+        /**
+         * onStart check to see if ForegroundService is already running, if not then start
+         */
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+
     }
 
     @Override
@@ -324,5 +334,35 @@ public class SplashActivity extends AppCompatActivity {
     public void stopNotificationService() {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
