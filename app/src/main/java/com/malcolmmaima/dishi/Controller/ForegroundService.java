@@ -504,7 +504,7 @@ public class ForegroundService extends Service {
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 builder = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.dish)
+                        .setSmallIcon(R.drawable.deliver_nduthi_48dp)
                         .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                         .setContentTitle(title)
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
