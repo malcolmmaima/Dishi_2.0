@@ -248,38 +248,6 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
 //        progressDialog.setMessage("Fetching...");
 //        progressDialog.show();
 
-        incomingOrders.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                try {
-                    //SafeToast.makeText(getContext(), "New order", Toast.LENGTH_LONG).show();
-                    //fetchOrders();
-                } catch(Exception e){
-
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
         return  v;
     }
 

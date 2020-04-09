@@ -806,7 +806,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
     }
 
-
     @Override
     public void onItemChecked(Boolean isChecked, int position, String price, int quantity) {
 

@@ -33,7 +33,9 @@ import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
+import com.malcolmmaima.dishi.View.Activities.RiderActivity;
 import com.malcolmmaima.dishi.View.Activities.SplashActivity;
+import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 
 import java.lang.annotation.Target;
@@ -49,7 +51,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
-    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef;
+    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     String myPhone;
     FirebaseUser user;
@@ -90,6 +92,12 @@ public class ForegroundService extends Service {
                     if(myUserDetails.getAccount_type().equals("2")){
                         startRestaurantNotifications();
                     }
+
+                    if(myUserDetails.getAccount_type().equals("3")){
+                        startRiderNotifications();
+                    }
+
+
                 } catch (Exception e){}
             }
 
@@ -106,26 +114,108 @@ public class ForegroundService extends Service {
         return START_STICKY;
     }
 
+    private void startRiderNotifications(){
+        myRideRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone);
+        myRideRequests.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot restaurants, @Nullable String s) {
+                DatabaseReference assignedCustomersRef = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone+"/"+restaurants.getKey());
+                assignedCustomersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot customers : dataSnapshot.getChildren()){
+                            //Get user details
+                            DatabaseReference customerDetails = FirebaseDatabase.getInstance().getReference("users/"+customers.getKey());
+                            customerDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    UserModel customer = dataSnapshot.getValue(UserModel.class);
+
+                                    DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+restaurants.getKey());
+                                    restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+
+                                            //compose our notification and send
+                                            String title = restaurant.getFirstname()+" "+restaurant.getLastname();
+                                            String message = "Deliver to "+customer.getFirstname()+" "+customer.getLastname();
+                                            String customerPhone = customers.getKey();
+                                            if (customerPhone.length() > 4) {
+                                                lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
+                                            }
+                                            int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
+                                            sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void startRestaurantNotifications() {
         myOrdersRef = FirebaseDatabase.getInstance().getReference("orders/"+myPhone);
         myOrdersRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getKey());
+            public void onChildAdded(@NonNull DataSnapshot customerPhones, @Nullable String s) {
+                int itemCount = (int) customerPhones.child("items").getChildrenCount();
+                //Get user details
+                DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+customerPhones.getKey());
                 userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         try {
                             UserModel customer = dataSnapshot.getValue(UserModel.class);
-                            String title = "New Order";
-                            String message = "New order from " + customer.getFirstname() + " " + customer.getLastname();
-                            String customerPhone = dataSnapshot.getKey();
+
+                            //compose our notification and send
+                            String title = customer.getFirstname() + " " + customer.getLastname();
+                            String message = "New order request (" + itemCount + ")";
+                            String customerPhone = customerPhones.getKey();
                             if (customerPhone.length() > 4) {
                                 lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
                             }
                             int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
-                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, RestaurantActivity.class);
+                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, RestaurantActivity.class, customerPhone, title);
                         } catch (Exception e){}
                     }
 
@@ -347,7 +437,7 @@ public class ForegroundService extends Service {
 
     }
 
-    private void sendCustomerOrderNotification(int notifId, String type, String title, String message, Class targetActivity){
+    private void sendCustomerOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String customerPhone, String customerName){
 
         if(type.equals("newOrderRequest")){
             Notification.Builder builder = null;
@@ -365,6 +455,11 @@ public class ForegroundService extends Service {
 
             NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
+//            intent.putExtra("phone", customerPhone);
+//            intent.putExtra("name", customerName);
+//            intent.putExtra("restaurantPhone", myPhone);
+//            intent.putExtra("restaurantName", myUserDetails.getFirstname()+" "+myUserDetails.getLastname());
+//            intent.putExtra("accountType", "2");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
@@ -377,6 +472,43 @@ public class ForegroundService extends Service {
         }
 
     }
+
+    private void sendRiderOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String customerPhone, String restaurantPhone){
+
+        if(type.equals("newRideRequest")){
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.dish)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle(title)
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText(message);
+            }
+
+            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent intent = new Intent(this, targetActivity);
+//            intent.putExtra("phone", customerPhone);
+//            intent.putExtra("name", customerName);
+//            intent.putExtra("restaurantPhone", myPhone);
+//            intent.putExtra("restaurantName", myUserDetails.getFirstname()+" "+myUserDetails.getLastname());
+//            intent.putExtra("accountType", "2");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
+            builder.setContentIntent(contentIntent);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.icon |= Notification.BADGE_ICON_LARGE;
+            manager.notify(notifId, notification);
+        }
+
+    }
+
 
     @Override
     public void onDestroy() {
