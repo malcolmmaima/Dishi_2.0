@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.auth.User;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -51,7 +52,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
-    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests;
+    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, myMessages;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     String myPhone;
     FirebaseUser user;
@@ -76,6 +77,9 @@ public class ForegroundService extends Service {
             databaseReference = FirebaseDatabase.getInstance().getReference();
             myUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
         } catch(Exception e){}
+
+        //initialize chat notifications listener
+        startChatNotifications();
 
         /**
          * Get logged in user details
@@ -112,6 +116,67 @@ public class ForegroundService extends Service {
 
         //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
         return START_STICKY;
+    }
+
+    private void startChatNotifications() {
+        myMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
+        myMessages.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot incoming, @Nullable String s) {
+                DatabaseReference incomingMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+incoming.getKey());
+                incomingMessages.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot message, @Nullable String s) {
+                        MessageModel messages = message.getValue(MessageModel.class);
+                        try {
+                            if (!messages.getSender().equals(myPhone) && messages.getRead() != true) {
+                                //Fire up notification for the new chat messages
+                            }
+                        } catch (Exception e){}
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void startRiderNotifications(){
