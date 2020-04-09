@@ -107,7 +107,7 @@ public class ForegroundService extends Service {
             }
         };
         try {
-            myUserDetailsRef.addValueEventListener(myUserDetailsListener);
+            myUserDetailsRef.addListenerForSingleValueEvent(myUserDetailsListener);
         } catch (Exception e){}
 
         //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
@@ -126,7 +126,6 @@ public class ForegroundService extends Service {
                  * For each restaurant, get the customers i have been assigned to and their user details
                  */
                 DatabaseReference assignedCustomersRef = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone+"/"+restaurants.getKey());
-                //I'm using 'addValueEventListener' instead of 'addListenerForSingleValueEvent' because i want a live listener on restaurant nodes whenever they assign me a new customer
                 assignedCustomersRef.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot customers, @Nullable String s) {

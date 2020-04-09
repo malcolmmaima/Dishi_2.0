@@ -88,9 +88,6 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                    if(!orderDetails.getPhone().equals(dataSnapshot.getKey())){
-                        SafeToast.makeText(context, "New Request", Toast.LENGTH_SHORT).show();
-                    }
                 }
 
                 @Override

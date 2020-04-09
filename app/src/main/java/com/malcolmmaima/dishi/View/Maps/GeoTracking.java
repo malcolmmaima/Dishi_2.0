@@ -135,7 +135,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                 }
 
                                 if(accType.equals("3")){
-
+                                    String phone = customerPhone;
+                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                    startActivity(intent);
                                 }
 
                             }
@@ -645,8 +647,6 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                     }
                 };
                 customerOrderRef.addValueEventListener(customerOrderListener);
-
-
 
                 confirmOrd.setEnabled(true);
                 callNduthi.setEnabled(true);
