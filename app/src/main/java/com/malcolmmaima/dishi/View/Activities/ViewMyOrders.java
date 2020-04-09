@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -743,7 +744,6 @@ public class ViewMyOrders extends AppCompatActivity {
         customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -779,6 +779,22 @@ public class ViewMyOrders extends AppCompatActivity {
                     .create();
             callAlert.show();
             return (true);
+
+        case R.id.sendMessage:
+            Intent slideactivity = new Intent(ViewMyOrders.this, Chat.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            slideactivity.putExtra("fromPhone", myPhone);
+            slideactivity.putExtra("toPhone", phone);
+            Bundle bndlanimation =
+                    null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                bndlanimation = ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                startActivity(slideactivity, bndlanimation);
+            }
+            return  (true);
 
     }
         return(super.onOptionsItemSelected(item));

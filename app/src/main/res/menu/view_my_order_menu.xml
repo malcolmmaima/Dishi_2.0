@@ -10,4 +10,10 @@
         app:showAsAction="always"
         android:title="Call Restaurant" />
 
+    <item
+        android:id="@+id/sendMessage"
+        android:icon="@drawable/ic_send_black_48dp"
+        app:showAsAction="always"
+        android:title="Message"/>
+
 </menu>
