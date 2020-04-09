@@ -115,52 +115,72 @@ public class ForegroundService extends Service {
     }
 
     private void startRiderNotifications(){
+        /**
+         * Get the ride requests from the 'my_ride_requests' node (contains restaurants with customers as child nodes)
+         */
         myRideRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone);
         myRideRequests.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot restaurants, @Nullable String s) {
+                /**
+                 * For each restaurant, get the customers i have been assigned to and their user details
+                 */
                 DatabaseReference assignedCustomersRef = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone+"/"+restaurants.getKey());
-                assignedCustomersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                //I'm using 'addValueEventListener' instead of 'addListenerForSingleValueEvent' because i want a live listener on restaurant nodes whenever they assign me a new customer
+                assignedCustomersRef.addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for(DataSnapshot customers : dataSnapshot.getChildren()){
-                            //Get user details
-                            DatabaseReference customerDetails = FirebaseDatabase.getInstance().getReference("users/"+customers.getKey());
-                            customerDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    UserModel customer = dataSnapshot.getValue(UserModel.class);
+                    public void onChildAdded(@NonNull DataSnapshot customers, @Nullable String s) {
+                        //Get user details
+                        DatabaseReference customerDetails = FirebaseDatabase.getInstance().getReference("users/"+customers.getKey());
+                        customerDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                UserModel customer = dataSnapshot.getValue(UserModel.class);
 
-                                    DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+restaurants.getKey());
-                                    restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+                                DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+restaurants.getKey());
+                                restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        UserModel restaurant = dataSnapshot.getValue(UserModel.class);
 
-                                            //compose our notification and send
-                                            String title = restaurant.getFirstname()+" "+restaurant.getLastname();
-                                            String message = "Deliver to "+customer.getFirstname()+" "+customer.getLastname();
-                                            String customerPhone = customers.getKey();
-                                            if (customerPhone.length() > 4) {
-                                                lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
-                                            }
-                                            int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
-                                            sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                        //compose our notification and send
+                                        String title = restaurant.getFirstname()+" "+restaurant.getLastname();
+                                        String message = "Deliver to "+customer.getFirstname()+" "+customer.getLastname();
+                                        String customerPhone = customers.getKey();
+                                        if (customerPhone.length() > 4) {
+                                            lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
                                         }
+                                        int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
+                                        sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                    }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                        }
-                                    });
-                                }
+                                    }
+                                });
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                }
-                            });
-                        }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                     }
 
                     @Override
@@ -371,6 +391,9 @@ public class ForegroundService extends Service {
         databaseReference.child("my_orders").child(myPhone).addValueEventListener(myOrdersListener);
     }
 
+    /**
+     * Notification Builders for each account type
+     */
     private void sendOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String restaurantPhone, String restaurantName){
 
         if(type.equals("orderConfirmed") && !restaurants.contains(restaurantPhone)){
@@ -491,11 +514,6 @@ public class ForegroundService extends Service {
 
             NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
-//            intent.putExtra("phone", customerPhone);
-//            intent.putExtra("name", customerName);
-//            intent.putExtra("restaurantPhone", myPhone);
-//            intent.putExtra("restaurantName", myUserDetails.getFirstname()+" "+myUserDetails.getLastname());
-//            intent.putExtra("accountType", "2");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
@@ -509,6 +527,9 @@ public class ForegroundService extends Service {
 
     }
 
+    /**
+     * End of notification builders
+     */
 
     @Override
     public void onDestroy() {

@@ -121,9 +121,6 @@ public class RiderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 myRideOrderRequestsChildListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        try {
-                            SafeToast.makeText(getContext(), "New Request", Toast.LENGTH_SHORT).show();
-                        } catch (Exception e){}
                         fetchOrders();
                     }
 
