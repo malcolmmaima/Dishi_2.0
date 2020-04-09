@@ -10,10 +10,15 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.R;
 
@@ -64,14 +69,38 @@ public class MyChatAdapter extends BaseAdapter {
                 myMessageRef = FirebaseDatabase.getInstance()
                         .getReference("messages/" + myPhone + "/" + data.get(position).getSender());
 
-                try {
-                    if(data.get(position).getMessage() != null){
-                        myMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
-                        senderMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
+                myMessageRef.child(data.get(position).getKey()).child("message").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            try {
+                                myMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
+                            } catch (Exception e){}
+                        }
                     }
 
-                } catch (Exception e) {
-                }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                senderMessageRef.child(data.get(position).getKey()).child("message").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            try {
+                                senderMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
+                            } catch (Exception e){}
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         } catch (Exception e){}
 
