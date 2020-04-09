@@ -44,7 +44,8 @@
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
                 card_view:view_borderWidth="2dp"
-                card_view:view_borderColor="#ffffff" >
+                card_view:view_borderColor="#ffffff"
+                android:background="@color/pureWhite">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -232,6 +233,7 @@
                 card_view:view_borderWidth="2dp"
                 card_view:view_borderColor="#ffffff"
                 android:focusable="true"
+                android:background="@color/pureWhite"
                 android:foreground="?android:attr/selectableItemBackground"
                 >
 

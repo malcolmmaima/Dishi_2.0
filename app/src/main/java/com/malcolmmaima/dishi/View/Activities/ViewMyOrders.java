@@ -61,7 +61,7 @@ public class ViewMyOrders extends AppCompatActivity {
     AppCompatButton confirmOrder, declineOrder;
     CardView DeliveryAddress;
     Menu myMenu;
-
+    String [] riderOptions = {"View","Message", "Call"};
     final int[] total = {0};
 
     @Override
@@ -335,6 +335,56 @@ public class ViewMyOrders extends AppCompatActivity {
             }
         };
         customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+
+        riderName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+
+                if(riderPhone != null && !riderPhone.equals(myPhone)){
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewMyOrders.this);
+                    builder.setTitle(riderName.getText().toString());
+                    builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, final int which) {
+                            if(which == 0){
+                                if(riderPhone != null){
+                                    Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+
+                            if(which == 1){
+                                if(riderPhone != null){
+                                    Intent slideactivity = new Intent(ViewMyOrders.this, Chat.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    slideactivity.putExtra("fromPhone", myPhone);
+                                    slideactivity.putExtra("toPhone", riderPhone);
+                                    Bundle bndlanimation =
+                                            null;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        bndlanimation = ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
+                                    }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        startActivity(slideactivity, bndlanimation);
+                                    }
+                                }
+
+                            }
+
+                            if(which == 2){
+                                if(riderPhone != null){
+                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
+                                    startActivity(intent);
+                                }
+
+                            }
+                        }
+                    });
+                    builder.create();
+                    builder.show();
+                }
+
+            }
+        });
 
         DeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
