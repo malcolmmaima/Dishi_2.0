@@ -39,6 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
@@ -99,6 +100,9 @@ public class AddMenu extends AppCompatActivity {
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        //keep toolbar pinned at top. push edittext on keyboard load
+        new CommentKeyBoardFix(this);
 
         //Hide keyboard on activity load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
