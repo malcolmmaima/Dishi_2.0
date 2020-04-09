@@ -6,6 +6,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.PersonalDetails;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewRestaurant;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -115,8 +117,20 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
 
                                     }
                                     if(which == 1){
-                                        Snackbar snackbar = Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG);
-                                        snackbar.show();
+                                        Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                        slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                        slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                        slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
+                                        Bundle bndlanimation =
+                                                null;
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                                        }
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            context.startActivity(slideactivity, bndlanimation);
+                                        }
                                     }
 
                                 }
