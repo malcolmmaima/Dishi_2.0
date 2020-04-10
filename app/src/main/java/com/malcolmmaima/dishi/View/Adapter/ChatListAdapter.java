@@ -93,15 +93,15 @@ public class ChatListAdapter extends BaseAdapter {
                     try {
                         MessageModel message_ = messages.getValue(MessageModel.class);
                         /**
-                         * Check to see if message from sender to me has been marked as read
+                         * Check to see if message from sender to receiver has been marked as read
                          */
                         if (message_.getSender().equals(data.get(position).getPhone()) && message_.getRead() != true) {
                             unreadCount++;
                             unread.setVisibility(View.VISIBLE);
                             unread.setText("" + unreadCount);
 
-                            if(message_.getMessage().length() > 35) {
-                                message.setText(message_.getMessage().substring(0, 35) + "...");
+                            if(message_.getMessage().length() > 30) {
+                                message.setText(message_.getMessage().substring(0, 30) + "...");
                             } else {
                                 message.setText(message_.getMessage());
                             }
@@ -133,8 +133,8 @@ public class ChatListAdapter extends BaseAdapter {
              */
             time.setText(timeS[1]+":"+timeS[2]);
 
-            if(data.get(position).message.length() > 35) {
-                message.setText(data.get(position).message.substring(0, 35) + "...");
+            if(data.get(position).message.length() > 30) {
+                message.setText(data.get(position).message.substring(0, 30) + "...");
             } else {
                 message.setText(data.get(position).message);
             }

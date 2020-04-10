@@ -658,12 +658,18 @@ public class ForegroundService extends Service {
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 builder = new Notification.Builder(this)
+                        .setGroupSummary(true)
+                        .setGroup(String.valueOf(notifId))
                         .setSmallIcon(R.drawable.logo_notification)
                         .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                         .setContentTitle(title)
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                         .setSound(soundUri)
-                        .setContentText(message);
+                        .setContentText(message)
+                        .setStyle(new Notification.BigTextStyle()
+                                .bigText(message));
+
+
             }
 
             NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
