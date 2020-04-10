@@ -135,15 +135,17 @@ public class ForegroundService extends Service {
         myMessages.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot incoming, @Nullable String s) {
+                final int[] unreadCounter = {0};
                 DatabaseReference incomingMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+incoming.getKey());
                 incomingMessages.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot message, @Nullable String s) {
+
                         MessageModel messages = message.getValue(MessageModel.class);
                         try {
                             if (!messages.getSender().equals(myPhone) && messages.getRead() != true) {
                                 //Fire up notification for the new chat messages
-
+                                unreadCounter[0]++;
                                 String incomingPhone = messages.getSender();
                                 if (incomingPhone.length() > 5) {
                                     lastFiveDigits = incomingPhone.substring(incomingPhone.length() - 5); //We'll use this as the notification's unique ID
@@ -151,6 +153,7 @@ public class ForegroundService extends Service {
                                 int notifId = Integer.parseInt(lastFiveDigits); //new Random().nextInt();
                                 int rand = new Random().nextInt(10);
                                 DatabaseReference incomingUserDetails = FirebaseDatabase.getInstance().getReference("users/"+messages.getSender());
+                                int finalUnreadCounter = unreadCounter[0];
                                 incomingUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -158,7 +161,13 @@ public class ForegroundService extends Service {
 
                                         //compose our notification and send
                                         String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
-                                        String msg = messages.getMessage();
+                                        String msg;
+                                        if(finalUnreadCounter != 1){
+                                            msg = finalUnreadCounter + " new messages";
+                                            unreadCounter[0] = 0;
+                                        } else {
+                                            msg = messages.getMessage();
+                                        }
 
                                         //We want to check if user is currently in Chat activity, no need to send notification if
                                         //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
@@ -666,7 +675,7 @@ public class ForegroundService extends Service {
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                         .setSound(soundUri)
                         .setContentText(message)
-                        .setStyle(new Notification.BigTextStyle()
+                        .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
                                 .bigText(message));
 
 
@@ -678,7 +687,7 @@ public class ForegroundService extends Service {
             intent.putExtra("toPhone", myphone);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent,PendingIntent.FLAG_IMMUTABLE);
             builder.setContentIntent(contentIntent);
             Notification notification = builder.build();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
