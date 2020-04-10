@@ -208,12 +208,14 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     case R.id.delete:
                         for (int i=0; i<selectedMsgs.size(); i++){
                             //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
-                            myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    arrayAdapter.notifyDataSetChanged();
-                                }
-                            });
+                            try {
+                                myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        arrayAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            } catch (Exception e){}
 
                             if(i==selectedMsgs.size()-1){
                                 selectedMsgs.clear();
@@ -310,20 +312,17 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     dm.setMessage(message.trim());
                     dm.setRead(false);
                     recipientMessagesRef.child(key).setValue(dm);
-                    myMessagedRef.child(key).setValue(dm).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            messages.add(dm);
-                            editText.setText("");
-                            arrayAdapter.notifyDataSetChanged();
-                            list.setSelection(list.getAdapter().getCount()-1);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
+                    myMessagedRef.child(key).setValue(dm).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            editText.setText(dm.getMessage());
                             SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
                         }
                     });
+                    messages.add(dm);
+                    editText.setText("");
+                    arrayAdapter.notifyDataSetChanged();
+                    list.setSelection(list.getAdapter().getCount()-1);
                 }
             }
         });

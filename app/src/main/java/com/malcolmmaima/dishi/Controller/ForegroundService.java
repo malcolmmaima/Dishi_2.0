@@ -1,10 +1,12 @@
 package com.malcolmmaima.dishi.Controller;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
@@ -43,6 +45,7 @@ import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import io.fabric.sdk.android.services.common.SafeToast;
@@ -157,7 +160,22 @@ public class ForegroundService extends Service {
                                         String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
                                         String msg = messages.getMessage();
 
-                                        sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+                                        //We want to check if user is currently in Chat activity, no need to send notification if
+                                        //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
+                                        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+                                        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+                                        Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
+                                        ComponentName componentInfo = taskInfo.get(0).topActivity;
+                                        componentInfo.getPackageName();
+                                        Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
+
+                                        if(!taskInfo.get(0).topActivity.getClassName().equals("com.malcolmmaima.dishi.View.Activities.Chat")){
+
+                                            //TODO find a way to get data from Chat activity and compare to new notification data.
+                                            //If i am actively in chat don't fire up notification
+                                            sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+                                        }
+
                                     }
 
                                     @Override
