@@ -88,16 +88,23 @@ public class ChatListAdapter extends BaseAdapter {
         messageRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                unreadCount = 0;
                 for(DataSnapshot messages : dataSnapshot.getChildren()){
                     try {
-                        MessageModel message = messages.getValue(MessageModel.class);
+                        MessageModel message_ = messages.getValue(MessageModel.class);
                         /**
                          * Check to see if message from sender to me has been marked as read
                          */
-                        if (message.getSender().equals(data.get(position).getPhone()) && message.getRead() != true) {
+                        if (message_.getSender().equals(data.get(position).getPhone()) && message_.getRead() != true) {
                             unreadCount++;
                             unread.setVisibility(View.VISIBLE);
                             unread.setText("" + unreadCount);
+
+                            if(message_.getMessage().length() > 35) {
+                                message.setText(message_.getMessage().substring(0, 35) + "...");
+                            } else {
+                                message.setText(message_.getMessage());
+                            }
                         } else {
                             unread.setVisibility(View.GONE);
                         }

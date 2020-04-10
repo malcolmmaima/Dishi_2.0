@@ -60,8 +60,8 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
-    DatabaseReference recipientRef, myRef, recipientMessagesRef, myMessagedRef;
-    ValueEventListener recipientListener, myRefListener, recipientMessagesListener, myMessagesListener;
+    DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef;
+    ValueEventListener recipientListener, recipientMessagesListener, myMessagesListener;
     UserModel recipientUser, senderUser;
     MessageModel chatMessage;
     ArrayList<MessageModel> messages;
@@ -73,12 +73,17 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     CircleImageView profilePic;
     ImageButton sendBtn;
     RelativeLayout mainContent;
+    String myPhone;
+    FirebaseUser user;
     int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         //keep toolbar pinned at top. push edittext on keyboard load
         new CommentKeyBoardFix(this);
@@ -87,6 +92,22 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
         String fromPhone = getIntent().getStringExtra("fromPhone");
         String toPhone = getIntent().getStringExtra("toPhone");
+        //For debugging purposes
+        //Toast.makeText(this, "from => "+fromPhone +" to => " +toPhone, Toast.LENGTH_LONG).show();
+
+        if(toPhone.equals(myPhone)){
+            //For debugging purposes
+            //Toast.makeText(this, "from = myphone", Toast.LENGTH_SHORT).show();
+            recipientRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone);
+            recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
+            myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
+        }
+
+        else {
+            recipientRef = FirebaseDatabase.getInstance().getReference("users/"+toPhone);
+            recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
+            myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
+        }
 
         //You never know :-D ...
         if(fromPhone.equals(toPhone)){
@@ -94,10 +115,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             finish();
         }
 
-        recipientRef = FirebaseDatabase.getInstance().getReference("users/"+toPhone);
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone);
-        recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
-        myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
 
         mainContent = findViewById(R.id.main_content);
         toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
@@ -255,28 +272,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         };
         recipientRef.addListenerForSingleValueEvent(recipientListener);
 
-        /**
-         * Get sender's user details
-         */
-        myRefListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    senderUser = dataSnapshot.getValue(UserModel.class);
-                    senderUser.setPhone(fromPhone);
-
-                } catch (Exception e){
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        myRef.addListenerForSingleValueEvent(myRefListener);
-
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,8 +294,16 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 if(null!=message&&message.length()>0) {
                     MessageModel dm = new MessageModel();
                     String key = recipientMessagesRef.push().getKey();
-                    dm.setSender(fromPhone);
-                    dm.setReciever(toPhone);
+                    if(toPhone.equals(myPhone)){
+                        dm.setSender(toPhone);
+                        dm.setReciever(fromPhone);
+                    }
+
+                    else {
+                        dm.setSender(fromPhone);
+                        dm.setReciever(toPhone);
+                    }
+
                     dm.setTimeStamp(getDate());
                     dm.setMessage(message.trim());
                     dm.setRead(false);
@@ -314,6 +317,167 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 }
             }
         });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        String fromPhone_ = intent.getStringExtra("fromPhone");
+        String toPhone_ = intent.getStringExtra("toPhone");
+
+        //For debugging purposes
+        //Toast.makeText(this, "new from => "+fromPhone_ +" to => " +toPhone_, Toast.LENGTH_LONG).show();
+
+        //You never know :-D ...
+        if(fromPhone_.equals(toPhone_)){
+            SafeToast.makeText(this, "not allowed!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        recipientRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone_);
+        recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone_+"/"+fromPhone_);
+        myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone_+"/"+toPhone_);
+
+        myMessagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                messages.clear();
+                for(DataSnapshot message : dataSnapshot.getChildren()){
+                    chatMessage = message.getValue(MessageModel.class);
+                    chatMessage.setKey(message.getKey());
+
+                    if(chatMessage.getMessage() != null){
+                        messages.add(chatMessage);
+                    }
+
+                }
+
+                arrayAdapter=new MyChatAdapter(Chat.this,messages);
+                list.setAdapter(arrayAdapter);
+                list.setOnItemClickListener(Chat.this);
+                list.setOnItemLongClickListener(Chat.this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myMessagedRef.addValueEventListener(myMessagesListener);
+
+        ArrayList<Integer> selectedMsgs = new ArrayList<>();
+        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
+                if(checked){
+                    count = count + 1;
+                    selectedMsgs.add(position);
+                }
+                else
+                    count =count-1;
+                mode.setTitle(count+"");
+                mode.setSubtitle(null);
+                mode.setTag(false);
+                mode.setTitleOptionalHint(false);
+            }
+
+            @Override
+            public boolean onCreateActionMode(android.view.ActionMode mode, Menu menu) {
+                MenuInflater inflater=mode.getMenuInflater();
+                inflater.inflate(R.menu.chat_cab,menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.view.ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(android.view.ActionMode mode, MenuItem item) {
+                switch(item.getItemId()) {
+                    /** case R.id.reply:
+                     return true;
+                     case R.id.star_message:
+                     return true;
+                     case R.id.forward:
+                     return true;
+                     case R.id.info:
+                     return true; */
+                    case R.id.delete:
+                        for (int i=0; i<selectedMsgs.size(); i++){
+                            //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
+                            myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    arrayAdapter.notifyDataSetChanged();
+                                }
+                            });
+
+                            if(i==selectedMsgs.size()-1){
+                                selectedMsgs.clear();
+                                count = 0;
+                                mode.finish();
+                            }
+                        }
+                        return true;
+                    case R.id.copy:
+                        // Append all selected messages to a single string  variable and pass to setClipboard()
+                        String [] selected = new String[selectedMsgs.size()];
+                        StringBuffer sb = new StringBuffer();
+                        for (int i=0; i<selectedMsgs.size(); i++){
+                            selected[i] = messages.get(selectedMsgs.get(i)).getMessage();
+                        }
+
+                        String str = Arrays.toString(selected);
+                        setClipboard(Chat.this, str, mode);
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(android.view.ActionMode mode) {
+                count = 0;
+                selectedMsgs.clear();
+            }
+        });
+
+        /**
+         * Get recipient's user details
+         */
+        recipientListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    recipientUser = dataSnapshot.getValue(UserModel.class);
+                    recipientUser.setPhone(toPhone_);
+                    name.setText(recipientUser.getFirstname() + " " + recipientUser.getLastname());
+
+                    Picasso.with(Chat.this).load(recipientUser.getProfilePic()).fit().centerCrop()
+                            .placeholder(R.drawable.default_profile)
+                            .error(R.drawable.default_profile)
+                            .into(profilePic);
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        recipientRef.addListenerForSingleValueEvent(recipientListener);
+
+
     }
 
     @Override

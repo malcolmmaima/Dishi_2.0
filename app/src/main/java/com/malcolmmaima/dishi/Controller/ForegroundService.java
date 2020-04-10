@@ -33,6 +33,8 @@ import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.Chat;
+import com.malcolmmaima.dishi.View.Activities.Inbox;
 import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.RiderActivity;
 import com.malcolmmaima.dishi.View.Activities.SplashActivity;
@@ -59,6 +61,7 @@ public class ForegroundService extends Service {
     UserModel myUserDetails;
     String restaurantName, lastName;
     String lastFourDigits = "";     //substring containing last 4 characters
+    String lastFiveDigits = "";
 
     ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once thus an arraylist that keeps trach
     //of restaurant notifications. One notification for each confirmed order item(s) since the listener that calls this function of type "orderConfirmed"
@@ -131,6 +134,31 @@ public class ForegroundService extends Service {
                         try {
                             if (!messages.getSender().equals(myPhone) && messages.getRead() != true) {
                                 //Fire up notification for the new chat messages
+
+                                String incomingPhone = messages.getSender();
+                                if (incomingPhone.length() > 5) {
+                                    lastFiveDigits = incomingPhone.substring(incomingPhone.length() - 5); //We'll use this as the notification's unique ID
+                                }
+                                int notifId = Integer.parseInt(lastFiveDigits); //new Random().nextInt();
+                                int rand = new Random().nextInt(10);
+                                DatabaseReference incomingUserDetails = FirebaseDatabase.getInstance().getReference("users/"+messages.getSender());
+                                incomingUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        UserModel incomingUser = dataSnapshot.getValue(UserModel.class);
+
+                                        //compose our notification and send
+                                        String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
+                                        String msg = messages.getMessage();
+
+                                        sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
                         } catch (Exception e){}
                     }
@@ -591,6 +619,39 @@ public class ForegroundService extends Service {
 
     }
 
+    private void sendChatNotification(int notifId, String type, String title, String message, Class targetActivity, String incomingPhone, String myphone){
+
+        if(type.equals("newUnreadMsg")){
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.logo_notification)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle(title)
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText(message);
+            }
+
+            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+            Intent intent = new Intent(this, targetActivity);
+            intent.putExtra("fromPhone", incomingPhone);
+            intent.putExtra("toPhone", myphone);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.setContentIntent(contentIntent);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.icon |= Notification.BADGE_ICON_LARGE;
+            manager.notify(notifId, notification);
+        }
+
+    }
+
     /**
      * End of notification builders
      */
@@ -610,4 +671,5 @@ public class ForegroundService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 }
