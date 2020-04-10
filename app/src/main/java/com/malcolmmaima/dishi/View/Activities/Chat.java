@@ -33,7 +33,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -61,8 +63,8 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
     DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef;
-    ValueEventListener recipientListener, recipientMessagesListener, myMessagesListener;
-    UserModel recipientUser, senderUser;
+    ValueEventListener recipientListener, myMessagesListener;
+    UserModel recipientUser;
     MessageModel chatMessage;
     ArrayList<MessageModel> messages;
     EditText editText;
@@ -95,6 +97,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         //For debugging purposes
         //Toast.makeText(this, "from => "+fromPhone +" to => " +toPhone, Toast.LENGTH_LONG).show();
 
+        //This is a bugfix since i noticed on clicking message notification i was getting some very innacurate/dirty data sent to the wrong nodes
         if(toPhone.equals(myPhone)){
             //For debugging purposes
             //Toast.makeText(this, "from = myphone", Toast.LENGTH_SHORT).show();
@@ -109,12 +112,11 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
         }
 
-        //You never know :-D ...
+        //You never know :-D ... you can't message yourself
         if(fromPhone.equals(toPhone)){
             SafeToast.makeText(this, "not allowed!", Toast.LENGTH_SHORT).show();
             finish();
         }
-
 
         mainContent = findViewById(R.id.main_content);
         toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
@@ -152,7 +154,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         };
         myMessagedRef.addValueEventListener(myMessagesListener);
-
 
 
         editText=(EditText)findViewById(R.id.chatBox);
@@ -272,7 +273,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         };
         recipientRef.addListenerForSingleValueEvent(recipientListener);
 
-
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,7 +286,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         });
 
-
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -294,6 +293,9 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 if(null!=message&&message.length()>0) {
                     MessageModel dm = new MessageModel();
                     String key = recipientMessagesRef.push().getKey();
+
+                    //This is a feature fix, we need to perform this check
+                    //since toPhone & fromPhone are bound to change due to notification activity
                     if(toPhone.equals(myPhone)){
                         dm.setSender(toPhone);
                         dm.setReciever(fromPhone);
@@ -308,12 +310,20 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     dm.setMessage(message.trim());
                     dm.setRead(false);
                     recipientMessagesRef.child(key).setValue(dm);
-                    myMessagedRef.child(key).setValue(dm);
-
-                    messages.add(dm);
-                    editText.setText("");
-                    arrayAdapter.notifyDataSetChanged();
-                    list.setSelection(list.getAdapter().getCount()-1);
+                    myMessagedRef.child(key).setValue(dm).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            messages.add(dm);
+                            editText.setText("");
+                            arrayAdapter.notifyDataSetChanged();
+                            list.setSelection(list.getAdapter().getCount()-1);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             }
         });
@@ -323,6 +333,10 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
+        /**
+         * onNewIntent() is triggered if user is already in the Chat activity and user clicks on mesg notification,
+         * you want to refresh some of the key data
+         */
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
@@ -477,7 +491,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         };
         recipientRef.addListenerForSingleValueEvent(recipientListener);
 
-
     }
 
     @Override
@@ -546,6 +559,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
             case R.id.chat_block:
                 //TODO add custom dialog box
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                snackbar.show();
                 return true;
             case R.id.chat_clearchat:
                 AlertDialog clearChat = new AlertDialog.Builder(Chat.this)

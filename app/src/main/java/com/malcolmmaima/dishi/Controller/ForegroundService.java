@@ -60,11 +60,14 @@ public class ForegroundService extends Service {
     FirebaseUser user;
     UserModel myUserDetails;
     String restaurantName, lastName;
-    String lastFourDigits = "";     //substring containing last 4 characters
-    String lastFiveDigits = "";
 
-    ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once thus an arraylist that keeps trach
-    //of restaurant notifications. One notification for each confirmed order item(s) since the listener that calls this function of type "orderConfirmed"
+    //We use this two variables as our notification ID because they are unique and attached to a user phone number
+    String lastFourDigits = "";     //substring containing last 4 characters
+    String lastFiveDigits = "";     //substring containing last 5 characters
+
+    ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once
+    // thus an arraylist that keeps trach of restaurant notifications. One notification for each confirmed order
+    // item(s) since the listener that calls this function of type "orderConfirmed"
     //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
 
 
@@ -121,6 +124,9 @@ public class ForegroundService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * Initialize Chat listener
+     */
     private void startChatNotifications() {
         myMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
         myMessages.addChildEventListener(new ChildEventListener() {
@@ -207,6 +213,9 @@ public class ForegroundService extends Service {
         });
     }
 
+    /**
+     * Initialize Notification listeners for different account types (3 total)
+     */
     private void startRiderNotifications(){
         /**
          * Get the ride requests from the 'my_ride_requests' node (contains restaurants with customers as child nodes)
@@ -482,6 +491,10 @@ public class ForegroundService extends Service {
         };
         databaseReference.child("my_orders").child(myPhone).addValueEventListener(myOrdersListener);
     }
+
+    /**
+     * End of Notification listeners
+     */
 
     /**
      * Notification Builders for each account type
