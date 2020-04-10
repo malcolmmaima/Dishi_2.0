@@ -63,6 +63,7 @@ public class ForegroundService extends Service {
     FirebaseUser user;
     UserModel myUserDetails;
     String restaurantName, lastName;
+    final int[] unreadCounter = {0};
 
     //We use this two variables as our notification ID because they are unique and attached to a user phone number
     String lastFourDigits = "";     //substring containing last 4 characters
@@ -135,7 +136,7 @@ public class ForegroundService extends Service {
         myMessages.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot incoming, @Nullable String s) {
-                final int[] unreadCounter = {0};
+
                 DatabaseReference incomingMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+incoming.getKey());
                 incomingMessages.addChildEventListener(new ChildEventListener() {
                     @Override
@@ -164,7 +165,7 @@ public class ForegroundService extends Service {
                                         String msg;
                                         if(finalUnreadCounter != 1){
                                             msg = finalUnreadCounter + " new messages";
-                                            unreadCounter[0] = 0;
+
                                         } else {
                                             msg = messages.getMessage();
                                         }
@@ -198,7 +199,7 @@ public class ForegroundService extends Service {
 
                     @Override
                     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                        unreadCounter[0] = 0;
                     }
 
                     @Override
