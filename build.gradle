@@ -5,6 +5,7 @@ buildscript {
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://dl.bintray.com/hani-momanii/maven"}
         
     }
     dependencies {
@@ -30,6 +31,7 @@ allprojects {
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
+        maven { url "https://dl.bintray.com/hani-momanii/maven"}
     }
 }
 

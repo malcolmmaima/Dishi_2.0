@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,15 +59,20 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
+    private static final String TAG = "ChatActivity";
     DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef;
     ValueEventListener recipientListener, myMessagesListener;
     UserModel recipientUser;
     MessageModel chatMessage;
     ArrayList<MessageModel> messages;
+    ImageButton emoji;
+    EmojiconEditText emojiconEditText;
     EditText editText;
     ListView list;
     MyChatAdapter arrayAdapter;
@@ -78,12 +84,14 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     String myPhone;
     FirebaseUser user;
     int count = 0;
+    View rootView;
+    EmojIconActions emojIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
+        rootView = findViewById(R.id.parentlayout);
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
@@ -126,6 +134,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         LayoutInflater mInflater = LayoutInflater.from(this);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         sendBtn = findViewById(R.id.send);
+        emoji = findViewById(R.id.emoji);
         list= (ListView) findViewById(R.id.list);
         messages = new ArrayList<>();
         myMessagesListener = new ValueEventListener() {
@@ -154,9 +163,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         };
         myMessagedRef.addValueEventListener(myMessagesListener);
-
-
-        editText=(EditText)findViewById(R.id.chatBox);
+        emojiconEditText = findViewById(R.id.chatBox);
         View mCustomView = mInflater.inflate(R.layout.chat_toolbar, null);
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -248,6 +255,21 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         });
 
+        emojIcon = new EmojIconActions(this, rootView, emojiconEditText, emoji);
+        emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
+        emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
+        emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
+            @Override
+            public void onKeyboardOpen() {
+                Log.e(TAG, "Keyboard opened!");
+            }
+
+            @Override
+            public void onKeyboardClose() {
+                Log.e(TAG, "Keyboard closed");
+            }
+        });
+
         /**
          * Get recipient's user details
          */
@@ -288,10 +310,17 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         });
 
+        emoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emojIcon.ShowEmojIcon();
+            }
+        });
+
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message=editText.getText().toString();
+                String message=emojiconEditText.getText().toString();
                 if(null!=message&&message.length()>0) {
                     MessageModel dm = new MessageModel();
                     String key = recipientMessagesRef.push().getKey();
@@ -315,12 +344,12 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     myMessagedRef.child(key).setValue(dm).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            editText.setText(dm.getMessage());
+                            emojiconEditText.setText(dm.getMessage());
                             SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
                         }
                     });
                     messages.add(dm);
-                    editText.setText("");
+                    emojiconEditText.setText("");
                     arrayAdapter.notifyDataSetChanged();
                     list.setSelection(list.getAdapter().getCount()-1);
                 }

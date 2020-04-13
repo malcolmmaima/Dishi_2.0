@@ -199,7 +199,7 @@ public class ForegroundService extends Service {
 
                     @Override
                     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        unreadCounter[0] = 0;
+                        unreadCounter[0] = 0; // this onChildChanged() is triggered when user opens chat notification and child value of 'read' is changed to 'true'
                     }
 
                     @Override
@@ -669,6 +669,7 @@ public class ForegroundService extends Service {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 builder = new Notification.Builder(this)
                         .setGroupSummary(true)
+                        //.setOnlyAlertOnce(true)
                         .setGroup(String.valueOf(notifId))
                         .setSmallIcon(R.drawable.logo_notification)
                         .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
@@ -688,7 +689,7 @@ public class ForegroundService extends Service {
             intent.putExtra("toPhone", myphone);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent,PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(contentIntent);
             Notification notification = builder.build();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
