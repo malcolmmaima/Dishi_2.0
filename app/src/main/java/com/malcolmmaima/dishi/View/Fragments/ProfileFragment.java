@@ -13,10 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.collect.Range;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
@@ -34,15 +39,16 @@ import java.text.DecimalFormat;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import io.fabric.sdk.android.services.common.SafeToast;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "ProfileFragment";
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference myRef;
-    ValueEventListener myListener;
+    DatabaseReference myRef, myPostUpdates;
+    ValueEventListener myListener, myPostListener;
     FirebaseUser user;
 
     CircleImageView profilePhoto;
@@ -53,6 +59,10 @@ public class ProfileFragment extends Fragment {
     EmojIconActions emojIcon;
     Button postBtn;
     UserModel myUserDetails;
+
+    TextView emptyTag;
+    AppCompatImageView icon;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
@@ -83,13 +93,36 @@ public class ProfileFragment extends Fragment {
         postBtn.setVisibility(View.GONE);
         emoji.setVisibility(View.GONE);
 
+        icon = v.findViewById(R.id.menuIcon);
+        emptyTag = v.findViewById(R.id.empty_tag);
 
-        progressDialog = new ProgressDialog(getContext());
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+                fetchPosts();
+            }
+        });
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+        myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+myPhone);
 
         myStatusUpdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -253,7 +286,27 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getContext(), myStatusUpdate.getText().toString(), Toast.LENGTH_SHORT).show();
+                //Get current date
+                GetCurrentDate currentDate = new GetCurrentDate();
+                String postDate = currentDate.getDate();
+
+                if(!myStatusUpdate.getText().toString().equals("")){
+                    StatusUpdateModel statusUpdate = new StatusUpdateModel();
+                    statusUpdate.setStatus(myStatusUpdate.getText().toString());
+                    statusUpdate.setAuthor(myPhone);
+                    statusUpdate.setTimePosted(postDate);
+                    String key = myPostUpdates.push().getKey();
+                    myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            myStatusUpdate.setText("");
+                            myStatusUpdate.clearFocus();
+                        }
+                    });
+
+                } else {
+                    SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -278,9 +331,17 @@ public class ProfileFragment extends Fragment {
         return  v;
     }
 
+    private void fetchPosts() {
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         myRef.removeEventListener(myListener);
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchPosts();
     }
 }
