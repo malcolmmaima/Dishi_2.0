@@ -40,6 +40,7 @@
             app:view_borderWidth="2dp"
             app:view_borderColor="#cccccc"
             android:scaleType="fitXY"
+            android:background="@color/pureWhite"
             android:foregroundGravity="center_vertical"
             />
 

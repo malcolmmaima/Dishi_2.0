@@ -20,6 +20,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@drawable/default_profile"
+            android:background="@color/pureWhite"
             app:view_shadowRadius="2dp"
             app:view_shadowDx="2dp"
             app:view_shadowDy="0dp"

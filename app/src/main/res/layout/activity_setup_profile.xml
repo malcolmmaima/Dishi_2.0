@@ -52,7 +52,7 @@
             android:layout_height="100dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/profile_circular_border_imageview"
+            android:background="@color/pureWhite"
             android:elevation="3dp"
             android:padding="5dp"
             android:scaleType="centerCrop"

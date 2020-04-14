@@ -54,6 +54,7 @@
                     app:view_borderColor="#cccccc"
                     app:view_borderWidth="2dp"
                     app:view_shadowDx="5dp"
+                    android:background="@color/colorBackroundWhite"
                     app:view_shadowDy="5dp"
                     app:view_shadowRadius="6dp" />
 
