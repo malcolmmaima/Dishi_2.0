@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.common.collect.Range;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +29,8 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
+
+import java.text.DecimalFormat;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
@@ -132,8 +135,100 @@ public class ProfileFragment extends Fragment {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
                     profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
                     profileBio.setText(myUserDetails.getBio());
-                    followers.setText(myUserDetails.getFollowers());
-                    following.setText(myUserDetails.getFollowing());
+
+                    Double totalFollowers = Double.valueOf(myUserDetails.getFollowers());
+                    Double totalFollowing = Double.valueOf(myUserDetails.getFollowing());
+                    /**
+                     * Followers counter
+                     */
+
+                    //below 1000
+                    if(totalFollowers < 1000){
+                        DecimalFormat value = new DecimalFormat("#");
+                        followers.setText(""+value.format(totalFollowers));
+                    }
+
+                    // 1000 to 999,999
+                    else if(totalFollowers >= 1000 && totalFollowers <= 999999){
+                        if(totalFollowers % 1000 == 0){ //No remainder
+                            DecimalFormat value = new DecimalFormat("#####");
+                            followers.setText(""+value.format(totalFollowers/1000)+"K");
+                        }
+
+                        else { //Has remainder 999.9K
+                            DecimalFormat value = new DecimalFormat("######.#");
+                            Double divided = totalFollowers/1000;
+                            if(value.format(divided).equals("1000")){
+                                followers.setText("1M"); //if rounded off
+                            } else {
+                                followers.setText(""+value.format(divided)+"K");
+                            }
+                        }
+                    }
+
+                    // 1,000,0000 to 999,999,999
+                    else if(totalFollowers >= 1000000 && totalFollowers <= 999999999){
+                        if(totalFollowers % 1000000 == 0) { //No remainder
+                            DecimalFormat value = new DecimalFormat("#");
+                            followers.setText(""+value.format(totalFollowers/1000000)+"M");
+                        }
+
+                        else { //Has remainder 9.9M, 999.9M etc
+                            DecimalFormat value = new DecimalFormat("#.#");
+                            if(value.format(totalFollowers/1000000).equals("1000")){
+                                followers.setText("1B"); //if rounded off
+                            } else {
+                                followers.setText(""+value.format(totalFollowers/1000000)+"M");
+                            }
+                        }
+                    }
+
+                    /**
+                     * Following counter
+                     */
+                    //below 1000
+                    if(totalFollowing < 1000){
+                        DecimalFormat value = new DecimalFormat("#");
+                        following.setText(""+value.format(totalFollowing));
+                    }
+
+                    // 1000 to 999,999
+                    else if(totalFollowing >= 1000 && totalFollowing <= 999999){
+                        if(totalFollowing % 1000 == 0){ //No remainder
+                            DecimalFormat value = new DecimalFormat("#####");
+                            following.setText(""+value.format(totalFollowing/1000)+"K");
+                        }
+
+                        else { //Has remainder 999.9K
+                            DecimalFormat value = new DecimalFormat("######.#");
+                            Double divided = totalFollowing/1000;
+                            if(value.format(divided).equals("1000")){
+                                following.setText("1M"); //if rounded off
+                            } else {
+                                following.setText(""+value.format(divided)+"K");
+                            }
+                        }
+                    }
+
+                    // 1,000,0000 to 999,999,999
+                    else if(totalFollowing >= 1000000 && totalFollowing <= 999999999){
+                        if(totalFollowing % 1000000 == 0) { //No remainder
+                            DecimalFormat value = new DecimalFormat("#");
+                            following.setText(""+value.format(totalFollowing/1000000)+"M");
+                        }
+
+                        else { //Has remainder 9.9M, 999.9M etc
+                            DecimalFormat value = new DecimalFormat("#.#");
+                            if(value.format(totalFollowing/1000000).equals("1000")){
+                                following.setText("1B"); //if rounded off
+                            } else {
+                                following.setText(""+value.format(totalFollowing/1000000)+"M");
+                            }
+                        }
+                    }
+
+
+
                 } catch (Exception e){}
 
                 try {
@@ -186,6 +281,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(getContext(), "destroyed!", Toast.LENGTH_SHORT).show();
+        myRef.removeEventListener(myListener);
     }
 }
