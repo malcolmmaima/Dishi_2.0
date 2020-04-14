@@ -269,6 +269,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
             @Override
             public void onKeyboardClose() {
+                emojIcon.closeEmojIcon();
                 Log.e(TAG, "Keyboard closed");
             }
         });

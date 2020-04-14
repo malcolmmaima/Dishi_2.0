@@ -6,21 +6,17 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu1"
-            android:icon="@drawable/ic_reorder_black_24dp"
+            android:icon="@drawable/ic_reorder_black_48dp"
             android:title="Menu" />
         <item
             android:id="@+id/menu2"
-            android:icon="@drawable/ic_comment_black_24dp"
-            android:title="Reviews" />
-        <item
-            android:id="@+id/menu3"
-            android:icon="@drawable/ic_history_black_24dp"
-            android:title="History" />
+            android:icon="@drawable/ic_assessment_black_48dp"
+            android:title="Stats" />
 
         <item
             android:id="@+id/menu4"
             android:icon="@drawable/deliver_nduthi_48dp"
-            android:title="My Riders" />
+            android:title="Riders" />
     </group>
 
     <item android:title="Account">

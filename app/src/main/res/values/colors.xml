@@ -12,6 +12,13 @@
     <color name="green">#00ff00</color>
     <color name="black_overlay">#66000000</color>
 
+    <color name="lightgray">#ededed</color>
+    <color name="deeppurple">#7c4dff</color>
+    <color name="yello">#ffb300</color>
+    <color name="darkblue">#23283a</color>
+    <color name="testcolorblue">#152b38</color>
+    <color name="pink">#fe104d</color>
+
     <!-- Screens background color-->
     <color name="bg_slider_screen1">#f4b241</color>
     <color name="bg_slider_screen2">#16bc7d</color>
