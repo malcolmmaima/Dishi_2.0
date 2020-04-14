@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -33,9 +34,13 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
@@ -43,7 +48,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "ProfileFragment";
-    ProgressDialog progressDialog ;
+    List<StatusUpdateModel> statusUpdates;
     RecyclerView recyclerview;
     String myPhone;
 
@@ -164,6 +169,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         myListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mSwipeRefreshLayout.setRefreshing(false);
                 try {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
                     profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
@@ -332,6 +338,56 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     private void fetchPosts() {
+        //Fetch the updates from status_updates node
+        myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mSwipeRefreshLayout.setRefreshing(true);
+                statusUpdates = new ArrayList<>();
+                for(DataSnapshot updates : dataSnapshot.getChildren()){
+                    StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
+                    statusUpdateModel.key = updates.getKey();
+                    statusUpdateModel.setCurrentWall(myPhone);
+                    statusUpdates.add(statusUpdateModel);
+                }
+
+                try {
+                    if (!statusUpdates.isEmpty()) {
+                        emptyTag.setVisibility(View.GONE);
+                        Collections.reverse(statusUpdates);
+                        recyclerview.setVisibility(View.VISIBLE);
+                        StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
+                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                        recyclerview.setLayoutManager(layoutmanager);
+
+                        recycler.notifyDataSetChanged();
+
+                        recyclerview.getItemAnimator().setAddDuration(1000);
+                        recyclerview.getItemAnimator().setRemoveDuration(1000);
+                        recyclerview.getItemAnimator().setMoveDuration(1000);
+                        recyclerview.getItemAnimator().setChangeDuration(1000);
+
+                        recyclerview.setAdapter(recycler);
+                    } else {
+                        emptyTag.setText("NO POSTS");
+                        emptyTag.setVisibility(View.VISIBLE);
+                        recyclerview.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                catch (Exception e){
+                    emptyTag.setVisibility(View.VISIBLE);
+                    emptyTag.setText("ERROR");
+                    recyclerview.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override

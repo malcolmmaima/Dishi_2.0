@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="5dp"
+    android:focusableInTouchMode="false"
+    card_view:view_shadowDx="2dp"
+    card_view:view_shadowDy="0dp"
+    card_view:view_borderWidth="2dp"
+    card_view:view_borderColor="#cccccc"
+    android:foreground="?android:attr/selectableItemBackground"
+    >
+
+    <RelativeLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        >
+
+        <com.alexzh.circleimageview.CircleImageView
+            android:id="@+id/profilePic"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/default_profile"
+            app:view_shadowRadius="2dp"
+            app:view_shadowDx="2dp"
+            app:view_shadowDy="0dp"
+            app:view_borderWidth="2dp"
+            app:view_borderColor="#cccccc"
+            android:scaleType="fitXY"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Profile name"
+            android:id="@+id/profileName"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/profilePic"
+            android:layout_toLeftOf="@+id/foodPrice"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            >
+
+            <ImageView
+                android:id="@+id/deleteBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_delete_black_48dp"
+                android:visibility="invisible"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_toRightOf="@id/profilePic"
+            android:layout_below="@id/profileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Update..."
+                android:id="@+id/userUpdate"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="20dp"
+                android:textColor="#666"/>
+
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/userUpdate">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/ic_access_time_black_48dp"
+                    android:layout_marginRight="3dp"/>
+
+                <TextView
+                    android:id="@+id/timePosted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="loading..."/>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
