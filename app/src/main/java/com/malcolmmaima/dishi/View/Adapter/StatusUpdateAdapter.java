@@ -66,7 +66,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         //Setup db references
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
-        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getAuthor()+"/"+statusUpdateModel.key);
+        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
 
         //fetch post User Details
         postUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -97,6 +97,39 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         //set post details
         holder.userUpdate.setText(statusUpdateModel.getStatus());
 
+        //Like status
+        postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    holder.likePost.setTag(R.drawable.unliked);
+                    holder.likePost.setImageResource(R.drawable.unliked);
+                } else {
+                    holder.likePost.setTag(R.drawable.liked);
+                    holder.likePost.setImageResource(R.drawable.liked);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //likes count
+        postDetails.child("likes").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int totalLikes = (int) dataSnapshot.getChildrenCount();
+                holder.likesTotal.setText(""+totalLikes);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,6 +141,43 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             @Override
             public void onClick(View view) {
                 Toast.makeText(context, "clicked!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.likePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = (int)holder.likePost.getTag();
+                if( id == R.drawable.unliked){
+                    //Add to my favourites
+                    postDetails.child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            holder.likePost.setTag(R.drawable.liked);
+                            holder.likePost.setImageResource(R.drawable.liked);
+                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                } else{
+                    //Remove from my favourites
+                    postDetails.child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            holder.likePost.setTag(R.drawable.unliked);
+                            holder.likePost.setImageResource(R.drawable.unliked);
+                        }
+                    });
+
+                }
+            }
+        });
+
+        holder.sharePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "share!", Toast.LENGTH_SHORT).show();
             }
         });
 

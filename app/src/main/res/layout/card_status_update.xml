@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Profile name"
+            android:text="loading..."
             android:id="@+id/profileName"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Update..."
+            android:text="loading..."
             android:id="@+id/userUpdate"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="25dp"
@@ -121,10 +121,12 @@
 
                 <ImageView
                     android:id="@+id/likePost"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_like" />
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:backgroundTint="@color/lightgray"
+                    android:src="@drawable/unliked" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -137,8 +139,9 @@
                     android:id="@+id/comments"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_comment_black_24dp" />
+                    android:padding="6dp"
+                    android:backgroundTint="@color/lightgray"
+                    android:src="@drawable/comment" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -151,8 +154,12 @@
                     android:id="@+id/sharePost"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_share" />
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingBottom="6dp"
+                    android:visibility="gone"
+                    android:backgroundTint="@color/lightgray"
+                    android:src="@drawable/share" />
 
             </LinearLayout>
         </RelativeLayout>

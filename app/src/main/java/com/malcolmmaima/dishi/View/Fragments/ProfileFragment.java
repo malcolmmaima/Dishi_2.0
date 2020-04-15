@@ -300,6 +300,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     StatusUpdateModel statusUpdate = new StatusUpdateModel();
                     statusUpdate.setStatus(myStatusUpdate.getText().toString());
                     statusUpdate.setAuthor(myPhone);
+                    statusUpdate.setPostedTo(myPhone);
                     statusUpdate.setTimePosted(postDate);
                     String key = myPostUpdates.push().getKey();
                     myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -347,7 +348,6 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 for(DataSnapshot updates : dataSnapshot.getChildren()){
                     StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
                     statusUpdateModel.key = updates.getKey();
-                    statusUpdateModel.setCurrentWall(myPhone);
                     statusUpdates.add(statusUpdateModel);
                 }
 

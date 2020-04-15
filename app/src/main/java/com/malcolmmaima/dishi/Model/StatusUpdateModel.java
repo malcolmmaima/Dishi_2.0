@@ -7,7 +7,6 @@ public class StatusUpdateModel {
     public String key;
     public String author;
     public String postedTo;
-    public String currentWall;
     public String commentKey;
     public String image;
 
@@ -50,14 +49,6 @@ public class StatusUpdateModel {
 
     public String getPostedTo() {
         return postedTo;
-    }
-
-    public String getCurrentWall() {
-        return currentWall;
-    }
-
-    public void setCurrentWall(String currentWall) {
-        this.currentWall = currentWall;
     }
 
     public String getImage() {
