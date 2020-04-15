@@ -3,10 +3,12 @@ package com.malcolmmaima.dishi.View.Activities;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,24 +44,32 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 
+import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 import static android.view.View.INVISIBLE;
 
-public class ViewStatus extends AppCompatActivity {
+public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "ViewStatus";
     DatabaseReference postRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener;
     TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted;
     ImageView profilePic, deleteBtn, likePost, comments, sharePost;
     String myPhone;
     Button postStatus;
-    EditText statusPost;
+    EmojiconEditText statusPost;
     RecyclerView recyclerView;
     List<StatusUpdateModel> list;
     String phone;
     UserModel authorUser;
     StatusUpdateModel viewPost;
+    ImageButton emoji;
+    EmojIconActions emojIcon;
+    View rootView;
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    String key, postedTo, author;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +82,7 @@ public class ViewStatus extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
+        rootView = findViewById(R.id.parentlayout);
         profileName = findViewById(R.id.profileName);
         userUpdate = findViewById(R.id.userUpdate);
         profilePic = findViewById(R.id.profilePic);
@@ -85,6 +97,8 @@ public class ViewStatus extends AppCompatActivity {
         recyclerView = findViewById(R.id.rview);
         emptyTag = findViewById(R.id.empty_tag);
         timePosted = findViewById(R.id.timePosted);
+        emoji = findViewById(R.id.emoji);
+        emoji.setVisibility(View.GONE);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -104,12 +118,32 @@ public class ViewStatus extends AppCompatActivity {
         //topToolBar.setLogo(R.drawable.logo);
         //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
-        final String author = getIntent().getStringExtra("author");
-        final String postedTo = getIntent().getStringExtra("postedTo");
-        final String key = getIntent().getStringExtra("key");
+        String author = getIntent().getStringExtra("author");
+        postedTo = getIntent().getStringExtra("postedTo");
+        key = getIntent().getStringExtra("key");
 
         postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo);
         authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
+
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(ViewStatus.this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+                fetchComments();
+            }
+        });
 
         //Get author's user details
         authorUserDetailsRefListener = new ValueEventListener() {
@@ -171,6 +205,13 @@ public class ViewStatus extends AppCompatActivity {
             }
         });
 
+        emoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emojIcon.ShowEmojIcon();
+            }
+        });
+
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,6 +219,43 @@ public class ViewStatus extends AppCompatActivity {
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("imageURL", authorUser.getProfilePic());
                 startActivity(slideactivity);
+            }
+        });
+
+        statusPost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    emoji.setVisibility(View.VISIBLE);
+                    postStatus.setVisibility(View.VISIBLE);
+                }
+                else {
+
+                    if(statusPost.getText().toString().length() > 1){
+                        postStatus.setVisibility(View.VISIBLE);
+                        emoji.setVisibility(View.VISIBLE);
+                    } else {
+                        postStatus.setVisibility(View.GONE);
+                        emoji.setVisibility(View.GONE);
+                    }
+
+                }
+            }
+        });
+
+        emojIcon = new EmojIconActions(ViewStatus.this, rootView, statusPost, emoji);
+        emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
+        emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
+        emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
+            @Override
+            public void onKeyboardOpen() {
+                Log.e(TAG, "Keyboard opened!");
+            }
+
+            @Override
+            public void onKeyboardClose() {
+                emojIcon.closeEmojIcon();
+                Log.e(TAG, "Keyboard closed");
             }
         });
 
@@ -282,6 +360,10 @@ public class ViewStatus extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void fetchComments() {
+        mSwipeRefreshLayout.setRefreshing(true);
         //Fetch the updates from status_updates node
         commentsListener = new ValueEventListener() {
             @Override
@@ -299,6 +381,7 @@ public class ViewStatus extends AppCompatActivity {
                 }
 
                 try {
+                    mSwipeRefreshLayout.setRefreshing(false);
                     if (!list.isEmpty()) {
                         emptyTag.setVisibility(INVISIBLE);
                         //Collections.reverse(list);
@@ -332,7 +415,7 @@ public class ViewStatus extends AppCompatActivity {
 
             }
         };
-        postRef.child(key).child("comments").addValueEventListener(commentsListener);
+        postRef.child(key).child("comments").addListenerForSingleValueEvent(commentsListener);
     }
 
     @Override
@@ -340,6 +423,11 @@ public class ViewStatus extends AppCompatActivity {
         super.onDestroy();
         authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
         postRef.removeEventListener(likesListener);
-        postRef.removeEventListener(commentsListener);
+        //postRef.removeEventListener(commentsListener);
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchComments();
     }
 }
