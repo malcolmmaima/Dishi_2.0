@@ -3,7 +3,9 @@ package com.malcolmmaima.dishi.View.Adapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +47,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     Context context;
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
+    DatabaseReference postDetails;
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -74,7 +77,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         //Setup db references
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
-        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
+        postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
 
         //fetch post User Details
         postUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -249,6 +252,39 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             commentsTotal = itemView.findViewById(R.id.commentsTotal);
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
+
+            //Long Press
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    //I (logged in user) can delete any comment on any post on my wall as i wish
+                    final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
+                            //set message, title, and icon
+                            .setMessage("Delete post?")
+                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                            //set three option buttons
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            listdata.remove(getAdapterPosition());
+                                            notifyItemRemoved(getAdapterPosition());
+                                        }
+                                    });
+                                }
+                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //do nothing
+
+                                }
+                            })//setNegativeButton
+
+                            .create();
+                    addRider.show();
+                    return false;
+                }
+            });
         }
     }
 

@@ -189,6 +189,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                 @Override
                 public boolean onLongClick(View v) {
 
+                    //I (logged in user) can delete any comment on any post on my wall as i wish
                     final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
                             //set message, title, and icon
                             .setMessage("Delete comment?")
@@ -201,10 +202,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                                         public void onSuccess(Void aVoid) {
                                             listdata.remove(getAdapterPosition());
                                             notifyItemRemoved(getAdapterPosition());
-
-                                            Log.d(TAG, "onLongClick: "+ "deleted: "+listdata.get(getAdapterPosition()).getPostedTo()
-                                                    +" => "+ listdata.get(getAdapterPosition()).getCommentKey() + " => "
-                                                    + listdata.get(getAdapterPosition()).key);
                                         }
                                     });
                                 }
