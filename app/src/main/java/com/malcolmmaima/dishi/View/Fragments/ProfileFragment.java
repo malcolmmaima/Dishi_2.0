@@ -291,7 +291,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mSwipeRefreshLayout.setRefreshing(true);
                 //Get current date
                 GetCurrentDate currentDate = new GetCurrentDate();
                 String postDate = currentDate.getDate();
@@ -306,8 +306,21 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            mSwipeRefreshLayout.setRefreshing(false);
                             myStatusUpdate.setText("");
                             myStatusUpdate.clearFocus();
+                            statusUpdate.key = key;
+                            statusUpdates.add(statusUpdate);
+
+                            emptyTag.setVisibility(View.GONE);
+                            icon.setVisibility(View.GONE);
+                            recyclerview.setVisibility(View.VISIBLE);
+                            Collections.reverse(statusUpdates);
+                            StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
+                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                            recyclerview.setLayoutManager(layoutmanager);
+                            recycler.notifyDataSetChanged();
+                            recyclerview.setAdapter(recycler);
                         }
                     });
 
@@ -364,12 +377,6 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         recyclerview.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
-
-                        recyclerview.getItemAnimator().setAddDuration(1000);
-                        recyclerview.getItemAnimator().setRemoveDuration(1000);
-                        recyclerview.getItemAnimator().setMoveDuration(1000);
-                        recyclerview.getItemAnimator().setChangeDuration(1000);
-
                         recyclerview.setAdapter(recycler);
                     } else {
                         emptyTag.setText("NO POSTS");

@@ -47,7 +47,6 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     Context context;
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
-    DatabaseReference postDetails;
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -77,7 +76,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         //Setup db references
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
-        postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
+        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
 
         //fetch post User Details
         postUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -265,6 +264,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                             //set three option buttons
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+listdata.get(getAdapterPosition()).getPostedTo()+"/"+listdata.get(getAdapterPosition()).key);
                                     postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

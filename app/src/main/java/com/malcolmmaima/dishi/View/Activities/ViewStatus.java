@@ -170,21 +170,23 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         authorUserDetailsRef.addValueEventListener(authorUserDetailsRefListener);
 
         //Get post details
-        postRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
-                    userUpdate.setText(viewPost.getStatus());
-                } catch (Exception e){}
-            }
+        try {
+            postRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
+                        userUpdate.setText(viewPost.getStatus());
+                    } catch (Exception e) {
+                    }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
-
+                }
+            });
+        } catch (Exception e){}
         //Post timestamp
         timePosted.setText("loading...");
 
