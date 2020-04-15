@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -29,11 +31,11 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
 
 import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
@@ -42,6 +44,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
     Context context;
     List<StatusUpdateModel> listdata;
+    long DURATION = 200;
 
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
@@ -121,8 +124,26 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         postDetails.child("likes").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int totalLikes = (int) dataSnapshot.getChildrenCount();
-                holder.likesTotal.setText(""+totalLikes);
+                try {
+                    int totalLikes = (int) dataSnapshot.getChildrenCount();
+                    holder.likesTotal.setText("" + totalLikes);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //comments count
+        postDetails.child("comments").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalComments = (int) dataSnapshot.getChildrenCount();
+                    holder.commentsTotal.setText("" + totalComments);
+                } catch (Exception e){}
             }
 
             @Override
@@ -188,9 +209,14 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Toast.makeText(context, "clicked!", Toast.LENGTH_SHORT).show();
-
+                Intent slideactivity = new Intent(context, ViewStatus.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                slideactivity.putExtra("key", statusUpdateModel.key);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                context.startActivity(slideactivity, bndlanimation);
             }
         });
     }
@@ -220,5 +246,25 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
         }
+    }
+
+    /**
+     * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
+     */
+    private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
+        if(!on_attach){
+            i = -1;
+        }
+        boolean isNotFirstItem = i == -1;
+        i++;
+        itemView.setAlpha(0.f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
+        ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
+        animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
+        animator.setDuration(500);
+        animatorSet.play(animator);
+        animator.start();
     }
 }
