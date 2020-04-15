@@ -282,12 +282,17 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(ViewStatus.this, "Comment posted!", Toast.LENGTH_SHORT).show();
+                            SafeToast.makeText(ViewStatus.this, "Comment posted!", Toast.LENGTH_SHORT).show();
                             comment.key = commentKey;
                             statusPost.setText("");
                             list.add(comment);
 
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTag.setVisibility(View.GONE);
                             CommentAdapter recycler = new CommentAdapter(ViewStatus.this, list);
+                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewStatus.this);
+                            recyclerView.setLayoutManager(layoutmanager);
+                            recycler.notifyDataSetChanged();
                             recyclerView.setAdapter(recycler);
                         }
                     });

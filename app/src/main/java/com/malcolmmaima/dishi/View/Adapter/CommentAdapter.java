@@ -3,7 +3,9 @@ package com.malcolmmaima.dishi.View.Adapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,10 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -178,7 +183,46 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             commentsTotal = itemView.findViewById(R.id.commentsTotal);
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
+
+            //Long Press
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
+                            //set message, title, and icon
+                            .setMessage("Delete comment?")
+                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                            //set three option buttons
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    postRef.child(listdata.get(getAdapterPosition()).getCommentKey()).child("comments").child(listdata.get(getAdapterPosition()).key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            listdata.remove(getAdapterPosition());
+                                            notifyItemRemoved(getAdapterPosition());
+
+                                            Log.d(TAG, "onLongClick: "+ "deleted: "+listdata.get(getAdapterPosition()).getPostedTo()
+                                                    +" => "+ listdata.get(getAdapterPosition()).getCommentKey() + " => "
+                                                    + listdata.get(getAdapterPosition()).key);
+                                        }
+                                    });
+                                }
+                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //do nothing
+
+                                }
+                            })//setNegativeButton
+
+                            .create();
+                    addRider.show();
+                    return false;
+                }
+            });
+
         }
+
     }
 
     /**
