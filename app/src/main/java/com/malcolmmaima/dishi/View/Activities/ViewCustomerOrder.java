@@ -326,13 +326,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
-
                     recycler.notifyDataSetChanged();
-
-                    recyclerview.getItemAnimator().setAddDuration(200);
-                    recyclerview.getItemAnimator().setRemoveDuration(200);
-                    recyclerview.getItemAnimator().setMoveDuration(200);
-                    recyclerview.getItemAnimator().setChangeDuration(200);
                     recyclerview.setAdapter(recycler);
 
 

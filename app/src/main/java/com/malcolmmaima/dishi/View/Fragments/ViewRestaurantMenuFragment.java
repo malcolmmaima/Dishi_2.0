@@ -216,14 +216,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
-
                     recycler.notifyDataSetChanged();
-
-                    recyclerview.getItemAnimator().setAddDuration(500);
-                    recyclerview.getItemAnimator().setRemoveDuration(500);
-                    recyclerview.getItemAnimator().setMoveDuration(500);
-                    recyclerview.getItemAnimator().setChangeDuration(500);
-
                     recyclerview.setAdapter(recycler);
                     emptyTag.setVisibility(View.INVISIBLE);
                     icon.setVisibility(View.INVISIBLE);

@@ -41,7 +41,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     Context context;
     List<ProductDetails> listdata;
-    long DURATION = 500;
+    long DURATION = 200;
 
     public MenuAdapter(Context context, List<ProductDetails> listdata) {
         this.listdata = listdata;

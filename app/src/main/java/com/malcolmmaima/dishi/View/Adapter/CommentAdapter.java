@@ -188,32 +188,35 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone)){
+                        //I (logged in user) can delete any comment on any post on my wall as i wish
+                        final AlertDialog deleteComment = new AlertDialog.Builder(v.getContext())
+                                //set message, title, and icon
+                                .setMessage("Delete comment?")
+                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                //set three option buttons
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        postRef.child(listdata.get(getAdapterPosition()).getCommentKey()).child("comments").child(listdata.get(getAdapterPosition()).key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                listdata.remove(getAdapterPosition());
+                                                notifyItemRemoved(getAdapterPosition());
+                                            }
+                                        });
+                                    }
+                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        //do nothing
 
-                    //I (logged in user) can delete any comment on any post on my wall as i wish
-                    final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
-                            //set message, title, and icon
-                            .setMessage("Delete comment?")
-                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                            //set three option buttons
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    postRef.child(listdata.get(getAdapterPosition()).getCommentKey()).child("comments").child(listdata.get(getAdapterPosition()).key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            listdata.remove(getAdapterPosition());
-                                            notifyItemRemoved(getAdapterPosition());
-                                        }
-                                    });
-                                }
-                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    //do nothing
+                                    }
+                                })//setNegativeButton
 
-                                }
-                            })//setNegativeButton
-
-                            .create();
-                    addRider.show();
+                                .create();
+                        deleteComment.show();
+                    }
                     return false;
                 }
             });

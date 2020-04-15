@@ -264,7 +264,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mSwipeRefreshLayout.setRefreshing(true);
                 GetCurrentDate getCurrentDate = new GetCurrentDate();
                 String time = getCurrentDate.getDate();
 
@@ -277,6 +277,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 String commentKey = postRef.push().getKey();
 
                 if(statusPost.getText().toString().equals("")){
+                    mSwipeRefreshLayout.setRefreshing(false);
                     SafeToast.makeText(ViewStatus.this, "You must enter something!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -284,7 +285,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            SafeToast.makeText(ViewStatus.this, "Comment posted!", Toast.LENGTH_SHORT).show();
+                            mSwipeRefreshLayout.setRefreshing(false);
                             comment.key = commentKey;
                             statusPost.setText("");
                             list.add(comment);
@@ -321,6 +322,22 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             }
         };
         postRef.child(key).child("likes").addValueEventListener(likesListener);
+
+        commentsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalComments = (int) dataSnapshot.getChildrenCount();
+                    commentsTotal.setText("" + totalComments);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        postRef.child(key).child("comments").addValueEventListener(commentsListener);
 
         //On loading adapter fetch the like status
         postRef.child(key).child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -380,9 +397,6 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                int totalComments = (int) dataSnapshot.getChildrenCount();
-                commentsTotal.setText("" + totalComments);
-
                 list = new ArrayList<>();
                 for(DataSnapshot updates : dataSnapshot.getChildren()){
                     StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
@@ -429,7 +443,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         super.onDestroy();
         authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
         postRef.removeEventListener(likesListener);
-        //postRef.removeEventListener(commentsListener);
+        postRef.removeEventListener(commentsListener);
     }
 
     @Override

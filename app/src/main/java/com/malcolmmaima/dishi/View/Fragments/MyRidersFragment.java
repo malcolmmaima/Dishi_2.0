@@ -162,14 +162,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
-
                                     recycler.notifyDataSetChanged();
-
-                                    recyclerview.getItemAnimator().setAddDuration(200);
-                                    recyclerview.getItemAnimator().setRemoveDuration(200);
-                                    recyclerview.getItemAnimator().setMoveDuration(200);
-                                    recyclerview.getItemAnimator().setChangeDuration(200);
-
                                     recyclerview.setAdapter(recycler);
                                     emptyTag.setVisibility(View.INVISIBLE);
                                     icon.setVisibility(View.INVISIBLE);

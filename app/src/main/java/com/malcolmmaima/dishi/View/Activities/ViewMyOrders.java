@@ -225,13 +225,7 @@ public class ViewMyOrders extends AppCompatActivity {
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
-
                     recycler.notifyDataSetChanged();
-
-                    recyclerview.getItemAnimator().setAddDuration(200);
-                    recyclerview.getItemAnimator().setRemoveDuration(200);
-                    recyclerview.getItemAnimator().setMoveDuration(200);
-                    recyclerview.getItemAnimator().setChangeDuration(200);
                     recyclerview.setAdapter(recycler);
 
 
@@ -682,13 +676,7 @@ public class ViewMyOrders extends AppCompatActivity {
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
-
                     recycler.notifyDataSetChanged();
-
-                    recyclerview.getItemAnimator().setAddDuration(200);
-                    recyclerview.getItemAnimator().setRemoveDuration(200);
-                    recyclerview.getItemAnimator().setMoveDuration(200);
-                    recyclerview.getItemAnimator().setChangeDuration(200);
                     recyclerview.setAdapter(recycler);
 
 
