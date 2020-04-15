@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -47,6 +48,7 @@ import static android.view.View.INVISIBLE;
 public class ViewStatus extends AppCompatActivity {
 
     DatabaseReference postRef, authorUserDetailsRef;
+    ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener;
     TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted;
     ImageView profilePic, deleteBtn, likePost, comments, sharePost;
     String myPhone;
@@ -62,6 +64,9 @@ public class ViewStatus extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_status);
+
+        //Hide keyboard on activity load
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -107,7 +112,7 @@ public class ViewStatus extends AppCompatActivity {
         authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
 
         //Get author's user details
-        authorUserDetailsRef.addValueEventListener(new ValueEventListener() {
+        authorUserDetailsRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -127,7 +132,8 @@ public class ViewStatus extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        authorUserDetailsRef.addValueEventListener(authorUserDetailsRefListener);
 
         //Get post details
         postRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -210,9 +216,8 @@ public class ViewStatus extends AppCompatActivity {
 
         });
 
-
         //Fetch status update likes
-        postRef.child(key).child("likes").addValueEventListener(new ValueEventListener() {
+        likesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -225,23 +230,8 @@ public class ViewStatus extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
-
-        //Fetch comments count
-        postRef.child(key).child("comments").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    int totalComments = (int) dataSnapshot.getChildrenCount();
-                    commentsTotal.setText("" + totalComments);
-                } catch (Exception e){}
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        };
+        postRef.child(key).child("likes").addValueEventListener(likesListener);
 
         //On loading adapter fetch the like status
         postRef.child(key).child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -293,9 +283,13 @@ public class ViewStatus extends AppCompatActivity {
         });
 
         //Fetch the updates from status_updates node
-        postRef.child(key).child("comments").addValueEventListener(new ValueEventListener() {
+        commentsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                int totalComments = (int) dataSnapshot.getChildrenCount();
+                commentsTotal.setText("" + totalComments);
+
                 list = new ArrayList<>();
                 for(DataSnapshot updates : dataSnapshot.getChildren()){
                     StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
@@ -337,6 +331,15 @@ public class ViewStatus extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        postRef.child(key).child("comments").addValueEventListener(commentsListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
+        postRef.removeEventListener(likesListener);
+        postRef.removeEventListener(commentsListener);
     }
 }

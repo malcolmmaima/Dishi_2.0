@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
 
@@ -35,12 +38,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import static com.crashlytics.android.core.CrashlyticsCore.TAG;
+
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
 
     Context context;
     List<StatusUpdateModel> listdata;
-    DatabaseReference myRef, postStatus;
+    DatabaseReference postRef, commentAuthorUserDetailsRef;
 
     public CommentAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -61,8 +66,38 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         final StatusUpdateModel statusUpdateModel = listdata.get(position);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        myRef = FirebaseDatabase.getInstance().getReference(myPhone);
+        postRef = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo());
+        commentAuthorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
+        UserModel[] commentUser = new UserModel[listdata.size()];
 
+        //fetch post User Details
+        commentAuthorUserDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    commentUser[position] = dataSnapshot.getValue(UserModel.class);
+
+                    //Set profile pic
+                    Picasso.with(context).load(commentUser[position].getProfilePic()).fit().centerCrop()
+                            .placeholder(R.drawable.default_profile)
+                            .error(R.drawable.default_profile)
+                            .into(holder.profilePic);
+
+                    holder.profileName.setText(commentUser[position].getFirstname() + " " + commentUser[position].getLastname());
+                } catch (Exception e){
+                    Log.d(TAG, "onDataChange: "+e.getMessage());
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //set comment
+        holder.userUpdate.setText(statusUpdateModel.getStatus());
 
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,15 +119,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!myPhone.equals(statusUpdateModel.getAuthor())){
-                    Intent slideactivity = new Intent(context, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    slideactivity.putExtra("phone", statusUpdateModel.getAuthor());
-                    Bundle bndlanimation =
-                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                    context.startActivity(slideactivity, bndlanimation);
-                }
+                Intent slideactivity = new Intent(context, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", commentUser[position].getProfilePic());
+                context.startActivity(slideactivity);
             }
         });
 
