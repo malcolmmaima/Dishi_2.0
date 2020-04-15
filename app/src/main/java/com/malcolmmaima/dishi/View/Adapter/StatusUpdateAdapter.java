@@ -46,7 +46,6 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
 
-
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
         this.context = context;
@@ -67,6 +66,11 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone = user.getPhoneNumber(); //Current logged in user phone number
         UserModel [] postUser = new UserModel[listdata.size()];
+
+        /**
+         * Adapter animation
+         */
+        setAnimation(holder.itemView, position);
 
         //Setup db references
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());

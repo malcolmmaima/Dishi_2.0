@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -10,13 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,22 +29,16 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import static com.crashlytics.android.core.CrashlyticsCore.TAG;
-
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
 
     Context context;
     List<StatusUpdateModel> listdata;
     DatabaseReference postRef, commentAuthorUserDetailsRef;
+    long DURATION = 200;
 
     public CommentAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -64,6 +57,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     public void onBindViewHolder(@NonNull final CommentAdapter.MyHolder holder, final int position) {
 
         final StatusUpdateModel statusUpdateModel = listdata.get(position);
+
+        /**
+         * Adapter animation
+         */
+        setAnimation(holder.itemView, position);
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
         postRef = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo());
@@ -180,5 +179,25 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
         }
+    }
+
+    /**
+     * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
+     */
+    private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
+        if(!on_attach){
+            i = -1;
+        }
+        boolean isNotFirstItem = i == -1;
+        i++;
+        itemView.setAlpha(0.f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
+        ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
+        animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
+        animator.setDuration(500);
+        animatorSet.play(animator);
+        animator.start();
     }
 }

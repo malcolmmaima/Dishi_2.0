@@ -285,6 +285,10 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                             Toast.makeText(ViewStatus.this, "Comment posted!", Toast.LENGTH_SHORT).show();
                             comment.key = commentKey;
                             statusPost.setText("");
+                            list.add(comment);
+
+                            CommentAdapter recycler = new CommentAdapter(ViewStatus.this, list);
+                            recyclerView.setAdapter(recycler);
                         }
                     });
 
@@ -391,11 +395,6 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                         recyclerView.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
-
-                        recyclerView.getItemAnimator().setAddDuration(1000);
-                        recyclerView.getItemAnimator().setRemoveDuration(1000);
-                        recyclerView.getItemAnimator().setMoveDuration(1000);
-                        recyclerView.getItemAnimator().setChangeDuration(1000);
 
                         recyclerView.setAdapter(recycler);
                     } else {
