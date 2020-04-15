@@ -256,32 +256,38 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    //I (logged in user) can delete any comment on any post on my wall as i wish
-                    final AlertDialog addRider = new AlertDialog.Builder(v.getContext())
-                            //set message, title, and icon
-                            .setMessage("Delete post?")
-                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                            //set three option buttons
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+listdata.get(getAdapterPosition()).getPostedTo()+"/"+listdata.get(getAdapterPosition()).key);
-                                    postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            listdata.remove(getAdapterPosition());
-                                            notifyItemRemoved(getAdapterPosition());
-                                        }
-                                    });
-                                }
-                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    //do nothing
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-                                }
-                            })//setNegativeButton
+                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone)){
+                        //I (logged in user) can delete any post on my wall as i wish
+                        final AlertDialog deletePost = new AlertDialog.Builder(v.getContext())
+                                //set message, title, and icon
+                                .setMessage("Delete post?")
+                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                //set three option buttons
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+listdata.get(getAdapterPosition()).getPostedTo()+"/"+listdata.get(getAdapterPosition()).key);
+                                        postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                listdata.remove(getAdapterPosition());
+                                                notifyItemRemoved(getAdapterPosition());
+                                            }
+                                        });
+                                    }
+                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        //do nothing
 
-                            .create();
-                    addRider.show();
+                                    }
+                                })//setNegativeButton
+
+                                .create();
+                        deletePost.show();
+                    }
+
                     return false;
                 }
             });
