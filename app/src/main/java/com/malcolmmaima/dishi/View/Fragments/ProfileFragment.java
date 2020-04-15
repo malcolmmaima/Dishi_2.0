@@ -352,6 +352,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 }
 
                 try {
+                    mSwipeRefreshLayout.setRefreshing(false);
                     if (!statusUpdates.isEmpty()) {
                         emptyTag.setVisibility(View.GONE);
                         Collections.reverse(statusUpdates);
