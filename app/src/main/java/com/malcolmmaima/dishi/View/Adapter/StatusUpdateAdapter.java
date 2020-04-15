@@ -28,6 +28,7 @@ import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
     Context context;
     List<StatusUpdateModel> listdata;
-    UserModel postUser;
+
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -62,7 +63,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         StatusUpdateModel statusUpdateModel = listdata.get(position);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        postUser = new UserModel();
+        UserModel [] postUser = new UserModel[listdata.size()];
 
         //Setup db references
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
@@ -73,15 +74,15 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    postUser = dataSnapshot.getValue(UserModel.class);
+                    postUser[position] = dataSnapshot.getValue(UserModel.class);
 
                     //Set profile pic
-                    Picasso.with(context).load(postUser.getProfilePic()).fit().centerCrop()
+                    Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
                             .placeholder(R.drawable.default_profile)
                             .error(R.drawable.default_profile)
                             .into(holder.profilePic);
 
-                    holder.profileName.setText(postUser.getFirstname() + " " + postUser.getLastname());
+                    holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
                 } catch (Exception e){
                     Log.d(TAG, "onDataChange: "+e.getMessage());
                 }
@@ -140,7 +141,10 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "clicked!", Toast.LENGTH_SHORT).show();
+                Intent slideactivity = new Intent(context, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
+                context.startActivity(slideactivity);
             }
         });
 

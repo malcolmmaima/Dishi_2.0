@@ -98,7 +98,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         postBtn.setVisibility(View.GONE);
         emoji.setVisibility(View.GONE);
 
-        icon = v.findViewById(R.id.menuIcon);
+        icon = v.findViewById(R.id.noPostsIcon);
         emptyTag = v.findViewById(R.id.empty_tag);
 
         // SwipeRefreshLayout
@@ -355,6 +355,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     mSwipeRefreshLayout.setRefreshing(false);
                     if (!statusUpdates.isEmpty()) {
                         emptyTag.setVisibility(View.GONE);
+                        icon.setVisibility(View.GONE);
+                        recyclerview.setVisibility(View.VISIBLE);
                         Collections.reverse(statusUpdates);
                         recyclerview.setVisibility(View.VISIBLE);
                         StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
@@ -372,7 +374,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     } else {
                         emptyTag.setText("NO POSTS");
                         emptyTag.setVisibility(View.VISIBLE);
-                        recyclerview.setVisibility(View.VISIBLE);
+                        icon.setVisibility(View.VISIBLE);
+                        recyclerview.setVisibility(View.INVISIBLE);
                     }
                 }
 
