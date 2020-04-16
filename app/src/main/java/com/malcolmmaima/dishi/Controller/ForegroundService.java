@@ -663,6 +663,7 @@ public class ForegroundService extends Service {
     private void sendChatNotification(int notifId, String type, String title, String message, Class targetActivity, String incomingPhone, String myphone){
 
         if(type.equals("newUnreadMsg")){
+
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
