@@ -79,6 +79,7 @@ public class RestaurantActivity extends AppCompatActivity
     Menu myMenu;
     String myPhone, imageURL;
     private DatabaseReference myRef;
+    private ValueEventListener myRefListener;
     private FirebaseAuth mAuth;
     private String TAG;
     private static final int PERMISSIONS_REQUEST = 100;
@@ -204,11 +205,16 @@ public class RestaurantActivity extends AppCompatActivity
             /**
              * Get logged in user details
              */
-            myRef.addValueEventListener(new ValueEventListener() {
+            myRefListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                        if(!user.getAccount_type().equals("2")){
+                            SafeToast.makeText(RestaurantActivity.this, "Not allowed!", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
 
                         imageURL = user.getProfilePic();
 
@@ -229,7 +235,8 @@ public class RestaurantActivity extends AppCompatActivity
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            });
+            };
+            myRef.addValueEventListener(myRefListener);
         }
 
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -488,5 +495,11 @@ public class RestaurantActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myRef.removeEventListener(myRefListener);
     }
 }

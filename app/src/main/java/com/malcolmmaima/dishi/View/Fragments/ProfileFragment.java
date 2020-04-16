@@ -91,6 +91,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         following = v.findViewById(R.id.following);
         followers = v.findViewById(R.id.followers);
         recyclerview = v.findViewById(R.id.rview);
+        recyclerview.setNestedScrollingEnabled(false);
 
         emoji = v.findViewById(R.id.emoji);
         myStatusUpdate = v.findViewById(R.id.myStatus);

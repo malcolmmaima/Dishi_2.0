@@ -64,6 +64,7 @@ public class ForegroundService extends Service {
     UserModel myUserDetails;
     String restaurantName, lastName;
     final int[] unreadCounter = {0};
+    NotificationManager manager;
 
     //We use this two variables as our notification ID because they are unique and attached to a user phone number
     String lastFourDigits = "";     //substring containing last 4 characters
@@ -81,6 +82,9 @@ public class ForegroundService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
+
+        manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+
         try {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -543,7 +547,6 @@ public class ForegroundService extends Service {
                         .setContentText(message);
             }
 
-            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
             intent.putExtra("phone", restaurantPhone);
             intent.putExtra("name", restaurantName);
@@ -574,7 +577,6 @@ public class ForegroundService extends Service {
                         .setContentText(message);
             }
 
-            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
             intent.putExtra("phone", restaurantPhone);
             intent.putExtra("name", restaurantName);
@@ -609,7 +611,6 @@ public class ForegroundService extends Service {
                         .setContentText(message);
             }
 
-            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
 //            intent.putExtra("phone", customerPhone);
 //            intent.putExtra("name", customerName);
@@ -645,7 +646,6 @@ public class ForegroundService extends Service {
                         .setContentText(message);
             }
 
-            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, targetActivity);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -683,7 +683,7 @@ public class ForegroundService extends Service {
 
             }
 
-            NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+
             Intent intent = new Intent(this, targetActivity);
             intent.putExtra("fromPhone", incomingPhone);
             intent.putExtra("toPhone", myphone);

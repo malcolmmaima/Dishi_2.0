@@ -69,6 +69,7 @@ public class CustomerActivity extends AppCompatActivity
 
     String myPhone;
     private DatabaseReference myRef;
+    private ValueEventListener myRefListener;
     private FirebaseAuth mAuth;
     private String TAG, imageURL;
     Menu myMenu;
@@ -166,11 +167,16 @@ public class CustomerActivity extends AppCompatActivity
             /**
              * Get logged in user details
              */
-            myRef.addValueEventListener(new ValueEventListener() {
+            myRefListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                        if(!user.getAccount_type().equals("1")){ //Consider this our watchman :-D
+                            SafeToast.makeText(CustomerActivity.this, "Not allowed!", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
 
                         //Set username on drawer header
                         navUsername.setText(user.getFirstname() + " " + user.getLastname());
@@ -190,7 +196,8 @@ public class CustomerActivity extends AppCompatActivity
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            });
+            };
+            myRef.addValueEventListener(myRefListener);
         }
 
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -448,5 +455,12 @@ public class CustomerActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        myRef.removeEventListener(myRefListener);
     }
 }

@@ -114,6 +114,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     }
 
     private void fetchMessages() {
+        mSwipeRefreshLayout.setRefreshing(true);
         chatlist.clear();
         contactDm = null;
         chatMessage = null;

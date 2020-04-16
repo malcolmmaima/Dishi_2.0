@@ -256,7 +256,6 @@ public class SetupAccountType extends AppCompatActivity {
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     //Log out
-                                    //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
                                     FirebaseAuth.getInstance().signOut();
                                     startActivity(new Intent(SetupAccountType.this,SplashActivity.class)
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
