@@ -23,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.malcolmmaima.dishi.Controller.ForegroundService;
+import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
 
 import java.text.SimpleDateFormat;
@@ -256,6 +258,8 @@ public class SetupAccountType extends AppCompatActivity {
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     //Log out
+                                    stopService(new Intent(SetupAccountType.this, ForegroundService.class));
+                                    stopService(new Intent(SetupAccountType.this, TrackingService.class));
                                     FirebaseAuth.getInstance().signOut();
                                     startActivity(new Intent(SetupAccountType.this,SplashActivity.class)
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));

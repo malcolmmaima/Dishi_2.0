@@ -376,6 +376,7 @@ public class RiderActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int whichButton) {
                             //Log out
                             //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                            stopService(new Intent(RiderActivity.this, ForegroundService.class));
                             stopService(new Intent(RiderActivity.this, TrackingService.class));
                             FirebaseAuth.getInstance().signOut();
                             startActivity(new Intent(RiderActivity.this,SplashActivity.class)

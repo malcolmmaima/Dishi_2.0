@@ -92,8 +92,10 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         rootView = findViewById(R.id.parentlayout);
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        try {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        } catch (Exception e){}
 
         //keep toolbar pinned at top. push edittext on keyboard load
         new CommentKeyBoardFix(this);

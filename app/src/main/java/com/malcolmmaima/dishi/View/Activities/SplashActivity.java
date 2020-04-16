@@ -130,6 +130,7 @@ public class SplashActivity extends AppCompatActivity {
                                                 if (!android_id.equals(fetchedId)) {
                                                     //Log out
                                                     SafeToast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
+                                                    stopService(new Intent(SplashActivity.this, ForegroundService.class));
                                                     stopService(new Intent(SplashActivity.this, TrackingService.class));
                                                     FirebaseAuth.getInstance().signOut();
                                                     startActivity(new Intent(SplashActivity.this, MainActivity.class)
