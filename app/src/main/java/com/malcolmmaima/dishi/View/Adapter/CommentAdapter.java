@@ -130,33 +130,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             }
         });
 
-        /**
-         *
-         * holder.cardView.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-        if(statusUpdateModel.getAuthor() != null && profileName[position] != null && profilePic[position] != null){
-        Intent slideactivity = new Intent(context, ViewStatus.class)
-        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        slideactivity.putExtra("phone", statusUpdateModel.getAuthor());
-        slideactivity.putExtra("username", profileName[position]);
-        slideactivity.putExtra("update", statusUpdateModel.getStatus());
-        slideactivity.putExtra("profilepic", profilePic[position]);
-        slideactivity.putExtra("key", statusUpdateModel.key);
-        Bundle bndlanimation =
-        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-        context.startActivity(slideactivity, bndlanimation);
-        }
-        else {
-        Toast.makeText(context, "Error fetching data, try again!", Toast.LENGTH_SHORT).show();
-        }
-
-        }
-        });
-         */
-
     }
 
     @Override

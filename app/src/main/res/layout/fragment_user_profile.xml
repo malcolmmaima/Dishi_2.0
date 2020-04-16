@@ -7,27 +7,20 @@
     android:layout_width="match_parent"
     android:background="@color/colorBackroundWhite"
     android:layout_height="match_parent"
-    android:layout_marginBottom="@dimen/actionBarSize"
     tools:context=".View.Fragments.ProfileFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <!-- <ImageView
-                    android:id="@+id/header_cover_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:scaleType="centerCrop" /> -->
+                android:layout_height="wrap_content">
 
                 <com.alexzh.circleimageview.CircleImageView
                     android:id="@+id/user_profile_photo"
@@ -152,102 +145,86 @@
 
                 </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
+                <FrameLayout
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/profile_layout"
+                    android:layout_width="match_parent"
+                    android:id="@+id/frame"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/profile_layout"
-                    android:layout_marginTop="5dp"
-                    android:orientation="vertical">
+                    android:layout_gravity="center_horizontal">
 
+                    <ImageButton
+                        android:id="@+id/emoji"
+                        android:src="@drawable/emoji"
+                        android:background="@drawable/layout_bg1"
+                        android:layout_width="36dp"
+                        android:scaleType="fitCenter"
+                        android:padding="5dp"
+                        android:elevation="1dp"
+                        android:layout_gravity="right|bottom"
+                        android:layout_height="40dp" />
 
-                    <RelativeLayout
+                    <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                        android:id="@+id/myStatus"
+                        android:hint="What's on your mind..."
+                        android:background="@drawable/layout_bg"
+                        android:textSize="18sp"
+                        android:layout_alignParentBottom="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3.2"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:orientation="vertical">
+                        android:maxHeight="100dp"
+                        android:padding="10dp"
+                        android:paddingRight="20dp"
+                        android:inputType="textMultiLine"
+                        android:minHeight="36dp"
+                        android:shadowRadius="10"
+                        emojicon:emojiconSize="28sp"
+                        android:autofillHints="" />
 
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:id="@+id/frame"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal">
+                </FrameLayout>
 
-                            <ImageButton
-                                android:id="@+id/emoji"
-                                android:src="@drawable/emoji"
-                                android:background="@drawable/layout_bg1"
-                                android:layout_width="36dp"
-                                android:scaleType="fitCenter"
-                                android:padding="5dp"
-                                android:elevation="1dp"
-                                android:layout_gravity="right|bottom"
-                                android:layout_height="40dp" />
+                <Button
+                    android:clickable="true"
+                    android:layout_below="@id/frame"
+                    android:id="@+id/postStatus"
+                    android:layout_gravity="right|center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_marginRight="5dp"
+                    android:shadowRadius="5"
+                    android:layout_alignParentRight="true"
+                    android:text="Post" />
 
-                            <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
-                                android:id="@+id/myStatus"
-                                android:hint="What's on your mind..."
-                                android:background="@drawable/layout_bg"
-                                android:textSize="18sp"
-                                android:layout_alignParentBottom="true"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:maxHeight="100dp"
-                                android:padding="10dp"
-                                android:paddingRight="20dp"
-                                android:inputType="textMultiLine"
-                                android:minHeight="36dp"
-                                android:shadowRadius="10"
-                                emojicon:emojiconSize="28sp"
-                                android:autofillHints="" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_below="@id/postStatus"
+                    android:layout_marginTop="50dp"
+                    android:id="@+id/noPostsIcon"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"
+                    android:src="@drawable/post_update"/>
 
-                        </FrameLayout>
+                <TextView
+                    android:layout_below="@id/noPostsIcon"
+                    android:id="@+id/empty_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NO POSTS"
+                    android:textSize="40dp"
+                    android:layout_margin="20dp"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"/>
 
-                        <Button
-                            android:clickable="true"
-                            android:layout_below="@id/frame"
-                            android:id="@+id/postStatus"
-                            android:layout_gravity="right|center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="35dp"
-                            android:layout_marginRight="5dp"
-                            android:shadowRadius="5"
-                            android:layout_alignParentRight="true"
-                            android:text="Post" />
-
-                    </RelativeLayout>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_marginTop="50dp"
-                        android:id="@+id/noPostsIcon"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:layout_gravity="center"
-                        android:visibility="gone"
-                        android:src="@drawable/post_update"/>
-
-                    <TextView
-                        android:id="@+id/empty_tag"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NO POSTS"
-                        android:textSize="40dp"
-                        android:layout_margin="20dp"
-                        android:layout_gravity="center_horizontal"
-                        android:visibility="gone"/>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:layout_below="@id/card_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/rview"
-                        />
-
-
-                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_below="@id/postStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/rview"
+                    />
 
             </RelativeLayout>
+
         </ScrollView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

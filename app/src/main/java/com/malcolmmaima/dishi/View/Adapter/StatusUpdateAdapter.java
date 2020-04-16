@@ -33,6 +33,7 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
@@ -161,7 +162,15 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "clicked!", Toast.LENGTH_SHORT).show();
+                if(!myPhone.equals(statusUpdateModel.getAuthor())){
+                    Intent slideactivity = new Intent(context, ViewProfile.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("phone", statusUpdateModel.getAuthor());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                }
             }
         });
 

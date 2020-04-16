@@ -325,6 +325,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     });
 
                 } else {
+                    mSwipeRefreshLayout.setRefreshing(false);
                     SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -382,7 +383,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         emptyTag.setText("NO POSTS");
                         emptyTag.setVisibility(View.VISIBLE);
                         icon.setVisibility(View.VISIBLE);
-                        recyclerview.setVisibility(View.INVISIBLE);
+                        recyclerview.setVisibility(View.GONE);
                     }
                 }
 
