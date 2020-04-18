@@ -102,15 +102,22 @@
                         android:layout_marginRight="20dp"
                         android:textColor="#666"/>
 
-
-
                 </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/imageShare"
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:layout_below="@id/lin"
+                    android:layout_toRightOf="@id/profilePic"
+                    android:visibility="gone"
+                    />
 
                 <RelativeLayout
                     android:id="@+id/cardActions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/lin"
+                    android:layout_below="@id/imageShare"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
                     android:layout_toRightOf="@id/profilePic"

@@ -57,7 +57,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     DatabaseReference postRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener;
     TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted;
-    ImageView profilePic, deleteBtn, likePost, comments, sharePost;
+    ImageView profilePic, imageShare, likePost, comments, sharePost;
     String myPhone;
     Button postStatus;
     EmojiconEditText statusPost;
@@ -89,7 +89,6 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         profileName = findViewById(R.id.profileName);
         userUpdate = findViewById(R.id.userUpdate);
         profilePic = findViewById(R.id.profilePic);
-        deleteBtn = findViewById(R.id.deleteBtn);
         likePost = findViewById(R.id.likePost);
         comments = findViewById(R.id.comments);
         sharePost = findViewById(R.id.sharePost);
@@ -103,6 +102,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         timePosted = findViewById(R.id.timePosted);
         emoji = findViewById(R.id.emoji);
         emoji.setVisibility(View.GONE);
+        imageShare = findViewById(R.id.imageShare);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -181,6 +181,18 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     try {
                         viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
                         userUpdate.setText(viewPost.getStatus());
+
+                        if(viewPost.getImageShare() != null){
+                            imageShare.setVisibility(View.VISIBLE);
+                            try {
+                                Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
+                                        .placeholder(R.drawable.gray_gradient_background)
+                                        .error(R.drawable.gray_gradient_background)
+                                        .into(imageShare);
+                            } catch (Exception e){}
+                        } else {
+                            imageShare.setVisibility(View.GONE);
+                        }
                     } catch (Exception e) {
                     }
                 }
@@ -193,6 +205,18 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         } catch (Exception e){}
         //Post timestamp
         timePosted.setText("loading...");
+
+        imageShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", viewPost.getImageShare());
+                    startActivity(slideactivity);
+                } catch (Exception e){}
+            }
+        });
 
         profileName.setOnClickListener(new View.OnClickListener() {
             @Override
