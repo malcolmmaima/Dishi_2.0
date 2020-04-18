@@ -56,13 +56,6 @@
             android:layout_alignParentRight="true"
             >
 
-            <ImageView
-                android:id="@+id/deleteBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/ic_delete_black_48dp"
-                android:visibility="invisible"/>
-
         </RelativeLayout>
 
         <TextView
@@ -78,11 +71,20 @@
             android:layout_toEndOf="@id/profilePic"
             android:textColor="#666"/>
 
+        <ImageView
+            android:id="@+id/imageShare"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_below="@id/userUpdate"
+            android:layout_toRightOf="@id/profilePic"
+            android:visibility="gone"
+             />
+
         <RelativeLayout
             android:id="@+id/cardActions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/userUpdate"
+            android:layout_below="@id/imageShare"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_toRightOf="@id/profilePic"

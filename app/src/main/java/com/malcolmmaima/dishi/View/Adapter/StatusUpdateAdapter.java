@@ -108,6 +108,31 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         //set post details
         holder.userUpdate.setText(statusUpdateModel.getStatus());
 
+        //imageShare
+        if(statusUpdateModel.getImageShare() != null){
+            holder.imageShare.setVisibility(View.VISIBLE);
+            try {
+                Picasso.with(context).load(statusUpdateModel.getImageShare()).fit().centerCrop()
+                        .placeholder(R.drawable.gray_gradient_background)
+                        .error(R.drawable.gray_gradient_background)
+                        .into(holder.imageShare);
+            } catch (Exception e){}
+        } else {
+            holder.imageShare.setVisibility(View.GONE);
+        }
+
+        holder.imageShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
+                    context.startActivity(slideactivity);
+                } catch (Exception e){}
+            }
+        });
+
         //Like status (initialize)
         postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -261,7 +286,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted;
-        ImageView profilePic, deleteBtn, likePost, comments, sharePost;
+        ImageView profilePic, imageShare, likePost, comments, sharePost;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -270,7 +295,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             profileName = itemView.findViewById(R.id.profileName);
             userUpdate = itemView.findViewById(R.id.userUpdate);
             profilePic = itemView.findViewById(R.id.profilePic);
-            deleteBtn = itemView.findViewById(R.id.deleteBtn);
+            imageShare = itemView.findViewById(R.id.imageShare);
             likePost = itemView.findViewById(R.id.likePost);
             comments = itemView.findViewById(R.id.comments);
             sharePost = itemView.findViewById(R.id.sharePost);
@@ -286,6 +311,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
+                    //Allow user to delete posts they've authored on their walls or other ppls walls
                     if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone) || listdata.get(getAdapterPosition()).getAuthor().equals(myPhone)){
                         //I (logged in user) can delete any post on my wall as i wish
                         final AlertDialog deletePost = new AlertDialog.Builder(v.getContext())

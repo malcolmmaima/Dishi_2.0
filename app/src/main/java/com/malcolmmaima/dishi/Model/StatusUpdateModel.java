@@ -8,7 +8,7 @@ public class StatusUpdateModel {
     public String author;
     public String postedTo;
     public String commentKey;
-    public String image;
+    public String imageShare;
 
 
     public String getCommentKey() {
@@ -51,11 +51,11 @@ public class StatusUpdateModel {
         return postedTo;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageShare() {
+        return imageShare;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageShare(String imageShare) {
+        this.imageShare = imageShare;
     }
 }
