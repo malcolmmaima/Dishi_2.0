@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,8 +53,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     List<StatusUpdateModel> statusUpdates;
     RecyclerView recyclerview;
 
-    DatabaseReference profileRef, myPostUpdates;
-    ValueEventListener myListener, myPostListener;
+    DatabaseReference profileRef, myPostUpdates, profileFollowers, followersCounterRef;
+    ValueEventListener myListener, profileFollowersListener, followersCounterListener;
     FirebaseUser user;
 
     CircleImageView profilePhoto;
@@ -63,6 +64,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     View rootView;
     EmojIconActions emojIcon;
     Button postBtn;
+    AppCompatButton followBtn;
     UserModel myUserDetails;
 
     TextView emptyTag;
@@ -104,7 +106,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         followers = findViewById(R.id.followers);
         recyclerview = findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
-
+        followBtn = findViewById(R.id.follow);
         emoji = findViewById(R.id.emoji);
         myStatusUpdate = findViewById(R.id.myStatus);
         postBtn = findViewById(R.id.postStatus);
@@ -141,6 +143,63 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
         profileRef = FirebaseDatabase.getInstance().getReference("users/"+phone);
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+phone);
+        profileFollowers = FirebaseDatabase.getInstance().getReference("followers/"+phone);
+        followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+phone);
+
+        //check to see if i am already following this profile
+        profileFollowersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    followBtn.setText("UNFOLLOW");
+                }  else {
+                    followBtn.setText("FOLLOW");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        profileFollowers.child(myPhone).addValueEventListener(profileFollowersListener);
+
+        //Keep track of total followers
+        followersCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int totalFollowers = (int) dataSnapshot.getChildrenCount();
+                profileRef.child("followers").setValue(totalFollowers);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        followersCounterRef.addValueEventListener(followersCounterListener);
+
+
+        followBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(followBtn.getText().toString().equals("FOLLOW")){
+                    profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            followBtn.setText("UNFOLLOW");
+                        }
+                    });
+                } else {
+                    profileFollowers.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            followBtn.setText("FOLLOW");
+                        }
+                    });
+                }
+            }
+        });
 
         myStatusUpdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -418,6 +477,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     public void onDestroy() {
         super.onDestroy();
         profileRef.removeEventListener(myListener);
+        profileFollowers.removeEventListener(profileFollowersListener);
+        followersCounterRef.removeEventListener(followersCounterListener);
     }
 
     @Override

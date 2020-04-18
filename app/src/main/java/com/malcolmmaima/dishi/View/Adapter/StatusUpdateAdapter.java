@@ -108,7 +108,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         //set post details
         holder.userUpdate.setText(statusUpdateModel.getStatus());
 
-        //Like status
+        //Like status (initialize)
         postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -134,6 +134,24 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                 try {
                     int totalLikes = (int) dataSnapshot.getChildrenCount();
                     holder.likesTotal.setText("" + totalLikes);
+
+                    postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(!dataSnapshot.exists()){
+                                holder.likePost.setTag(R.drawable.unliked);
+                                holder.likePost.setImageResource(R.drawable.unliked);
+                            } else {
+                                holder.likePost.setTag(R.drawable.liked);
+                                holder.likePost.setImageResource(R.drawable.liked);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 } catch (Exception e){}
             }
 
@@ -164,7 +182,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             public void onClick(View view) {
                 if(!myPhone.equals(statusUpdateModel.getAuthor())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                     slideactivity.putExtra("phone", statusUpdateModel.getAuthor());
                     Bundle bndlanimation =
