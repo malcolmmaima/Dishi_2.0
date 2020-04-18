@@ -163,7 +163,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                 public boolean onLongClick(View v) {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone)){
+                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone) || listdata.get(getAdapterPosition()).getAuthor().equals(myPhone)){
                         //I (logged in user) can delete any comment on any post on my wall as i wish
                         final AlertDialog deleteComment = new AlertDialog.Builder(v.getContext())
                                 //set message, title, and icon
