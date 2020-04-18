@@ -53,8 +53,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     List<StatusUpdateModel> statusUpdates;
     RecyclerView recyclerview;
 
-    DatabaseReference profileRef, myPostUpdates, profileFollowers, followersCounterRef;
-    ValueEventListener myListener, profileFollowersListener, followersCounterListener;
+    DatabaseReference profileRef, myPostUpdates, profileFollowers, followersCounterRef, followingCounterref;
+    ValueEventListener myListener, profileFollowersListener, followersCounterListener, followingCounterListener;
     FirebaseUser user;
 
     CircleImageView profilePhoto;
@@ -145,6 +145,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+phone);
         profileFollowers = FirebaseDatabase.getInstance().getReference("followers/"+phone);
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+phone);
+        followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+phone);
 
         //check to see if i am already following this profile
         profileFollowersListener = new ValueEventListener() {
@@ -168,8 +169,10 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         followersCounterListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int totalFollowers = (int) dataSnapshot.getChildrenCount();
-                profileRef.child("followers").setValue(totalFollowers);
+                try {
+                    int totalFollowers = (int) dataSnapshot.getChildrenCount();
+                    profileRef.child("followers").setValue(totalFollowers);
+                } catch (Exception e){}
             }
 
             @Override
@@ -179,6 +182,23 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         };
         followersCounterRef.addValueEventListener(followersCounterListener);
 
+        //Keep track of total following
+        followingCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalFollowing = (int) dataSnapshot.getChildrenCount();
+                    profileRef.child("following").setValue(totalFollowing);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        followingCounterref.addValueEventListener(followingCounterListener);
+
 
         followBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,6 +207,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+                            myFollowing.child(phone).setValue("follow");
                             followBtn.setText("UNFOLLOW");
                         }
                     });
@@ -194,6 +216,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     profileFollowers.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+                            myFollowing.child(phone).removeValue();
                             followBtn.setText("FOLLOW");
                         }
                     });
@@ -479,6 +503,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         profileRef.removeEventListener(myListener);
         profileFollowers.removeEventListener(profileFollowersListener);
         followersCounterRef.removeEventListener(followersCounterListener);
+        followingCounterref.removeEventListener(followingCounterListener);
     }
 
     @Override

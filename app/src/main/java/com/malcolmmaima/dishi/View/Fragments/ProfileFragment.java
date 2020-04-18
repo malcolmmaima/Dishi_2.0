@@ -52,8 +52,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference myRef, myPostUpdates;
-    ValueEventListener myListener, myPostListener;
+    DatabaseReference myRef, myPostUpdates, followersCounterRef, followingCounterref;
+    ValueEventListener myListener, followersCounterListener, followingCounterListener;
     FirebaseUser user;
 
     CircleImageView profilePhoto;
@@ -129,6 +129,42 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+myPhone);
+        followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone);
+        followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+
+        //Keep track of total followers
+        followersCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalFollowers = (int) dataSnapshot.getChildrenCount();
+                    myRef.child("followers").setValue(totalFollowers);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        followersCounterRef.addValueEventListener(followersCounterListener);
+
+        //Keep track of total following
+        followingCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalFollowing = (int) dataSnapshot.getChildrenCount();
+                    myRef.child("following").setValue(totalFollowing);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        followingCounterref.addValueEventListener(followingCounterListener);
 
         myStatusUpdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -407,6 +443,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onDestroy() {
         super.onDestroy();
         myRef.removeEventListener(myListener);
+        followersCounterRef.removeEventListener(followersCounterListener);
+        followingCounterref.removeEventListener(followingCounterListener);
     }
 
     @Override
