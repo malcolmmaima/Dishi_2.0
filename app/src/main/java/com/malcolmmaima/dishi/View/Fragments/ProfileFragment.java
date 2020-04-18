@@ -63,6 +63,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     View rootView;
     EmojIconActions emojIcon;
     Button postBtn;
+    ImageButton imageUpload;
     UserModel myUserDetails;
 
     TextView emptyTag;
@@ -90,6 +91,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         profileBio = v.findViewById(R.id.user_profile_short_bio);
         following = v.findViewById(R.id.following);
         followers = v.findViewById(R.id.followers);
+        imageUpload = v.findViewById(R.id.camera);
         recyclerview = v.findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
 
@@ -97,6 +99,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         myStatusUpdate = v.findViewById(R.id.myStatus);
         postBtn = v.findViewById(R.id.postStatus);
         postBtn.setVisibility(View.GONE);
+        imageUpload.setVisibility(View.GONE);
         emoji.setVisibility(View.GONE);
 
         icon = v.findViewById(R.id.noPostsIcon);
@@ -172,14 +175,17 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 if(hasFocus){
                     emoji.setVisibility(View.VISIBLE);
                     postBtn.setVisibility(View.VISIBLE);
+                    imageUpload.setVisibility(View.VISIBLE);
                 }
                 else {
 
                     if(myStatusUpdate.getText().toString().length() > 1){
                         postBtn.setVisibility(View.VISIBLE);
+                        imageUpload.setVisibility(View.VISIBLE);
                         emoji.setVisibility(View.VISIBLE);
                     } else {
                         postBtn.setVisibility(View.GONE);
+                        imageUpload.setVisibility(View.GONE);
                         emoji.setVisibility(View.GONE);
                     }
 
@@ -324,6 +330,13 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         };
         myRef.addValueEventListener(myListener);
+
+        imageUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "load gallery", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
