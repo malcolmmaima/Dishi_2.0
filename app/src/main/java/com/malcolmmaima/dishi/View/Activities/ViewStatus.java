@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -76,6 +77,8 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_status);
 
+        //keep toolbar pinned at top. push edittext on keyboard load
+        new CommentKeyBoardFix(this);
         //Hide keyboard on activity load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -95,6 +98,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postStatus = findViewById(R.id.postStatus);
         statusPost = findViewById(R.id.inputComment);
         recyclerView = findViewById(R.id.rview);
+        recyclerView.setNestedScrollingEnabled(false);
         emptyTag = findViewById(R.id.empty_tag);
         timePosted = findViewById(R.id.timePosted);
         emoji = findViewById(R.id.emoji);
