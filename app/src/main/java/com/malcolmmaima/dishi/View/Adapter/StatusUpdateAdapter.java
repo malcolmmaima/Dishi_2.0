@@ -286,7 +286,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone)){
+                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone) || listdata.get(getAdapterPosition()).getAuthor().equals(myPhone)){
                         //I (logged in user) can delete any post on my wall as i wish
                         final AlertDialog deletePost = new AlertDialog.Builder(v.getContext())
                                 //set message, title, and icon
