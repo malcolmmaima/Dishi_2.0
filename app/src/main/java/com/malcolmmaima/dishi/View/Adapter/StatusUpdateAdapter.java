@@ -106,7 +106,12 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         });
 
         //set post details
-        holder.userUpdate.setText(statusUpdateModel.getStatus());
+        if(statusUpdateModel.getStatus().equals("")){
+            holder.userUpdate.setVisibility(View.GONE);
+        } else {
+            holder.userUpdate.setVisibility(View.VISIBLE);
+            holder.userUpdate.setText(statusUpdateModel.getStatus());
+        }
 
         //imageShare
         if(statusUpdateModel.getImageShare() != null){

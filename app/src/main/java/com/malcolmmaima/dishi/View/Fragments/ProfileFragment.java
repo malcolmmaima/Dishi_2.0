@@ -44,6 +44,7 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
 
@@ -379,9 +380,16 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
 
+                if(myStatusUpdate.getText().toString().equals("") && selectedImage.isShown()){
+                    uploadImage(); //This will upload image then on successful upload call uploadContent()
+                }
 
-                if(!myStatusUpdate.getText().toString().equals("")){
+                else if(myStatusUpdate.getText().toString().equals("") && !selectedImage.isShown()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                }
 
+                else {
                     if(selectedImage.isShown()){
                         uploadImage(); //This will upload image then on successful upload call uploadContent()
                     } else {
@@ -389,9 +397,6 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         uploadContent(imgLink);
                     }
 
-                } else {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

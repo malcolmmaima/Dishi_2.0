@@ -208,7 +208,12 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
-                        userUpdate.setText(viewPost.getStatus());
+                        if(viewPost.getStatus().equals("")){
+                            userUpdate.setVisibility(View.GONE);
+                        } else {
+                            userUpdate.setVisibility(View.VISIBLE);
+                            userUpdate.setText(viewPost.getStatus());
+                        }
 
                         if(viewPost.getImageShare() != null){
                             imageShare.setVisibility(View.VISIBLE);
@@ -334,9 +339,13 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 mSwipeRefreshLayout.setRefreshing(true);
 
 
-                if(statusPost.getText().toString().equals("")){
+                if(statusPost.getText().toString().equals("") && selectedImage.isShown()){
+                    uploadImage(); //This will upload image then on successful upload call uploadContent()
+                }
+
+                else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
-                    SafeToast.makeText(ViewStatus.this, "You must enter something!", Toast.LENGTH_SHORT).show();
+                    SafeToast.makeText(ViewStatus.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
                 else {
@@ -638,7 +647,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 mSwipeRefreshLayout.setRefreshing(false);
                 comment.key = commentKey;
                 statusPost.setText("");
-                list.add(0,comment);
+                list.add(comment);
 
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyTag.setVisibility(View.GONE);

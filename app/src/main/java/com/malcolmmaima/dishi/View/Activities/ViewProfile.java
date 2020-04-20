@@ -434,7 +434,16 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
-                if(!myStatusUpdate.getText().toString().equals("")){
+                if(myStatusUpdate.getText().toString().equals("") && selectedImage.isShown()){
+                    uploadImage(); //This will upload image then on successful upload call uploadContent()
+                }
+
+                else if(myStatusUpdate.getText().toString().equals("") && !selectedImage.isShown()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    SafeToast.makeText(ViewProfile.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                }
+
+                else {
                     if(selectedImage.isShown()){
                         uploadImage(); //This will upload image then on successful upload call uploadContent()
                     } else {
@@ -442,9 +451,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                         uploadContent(imgLink);
                     }
 
-                } else {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    SafeToast.makeText(ViewProfile.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

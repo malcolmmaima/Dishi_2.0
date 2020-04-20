@@ -180,6 +180,8 @@
                     android:layout_marginTop="10dp"
                     android:layout_below="@id/profile_layout"
                     android:layout_width="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
                     android:id="@+id/frame"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal">

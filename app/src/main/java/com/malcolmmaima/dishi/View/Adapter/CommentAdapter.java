@@ -101,7 +101,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         });
 
         //set comment
-        holder.userUpdate.setText(statusUpdateModel.getStatus());
+        if(statusUpdateModel.getStatus().equals("")){
+            holder.userUpdate.setVisibility(View.GONE);
+        } else {
+            holder.userUpdate.setVisibility(View.VISIBLE);
+            holder.userUpdate.setText(statusUpdateModel.getStatus());
+        }
 
         //imageShare
         if(statusUpdateModel.getImageShare() != null){
