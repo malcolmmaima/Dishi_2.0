@@ -444,10 +444,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                 recyclerview.setLayoutManager(layoutmanager);
-                //recycler.notifyDataSetChanged();
                 recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
-
             }
         });
     }

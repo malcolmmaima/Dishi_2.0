@@ -75,7 +75,7 @@
             android:id="@+id/imageShare"
             android:layout_width="match_parent"
             android:layout_height="240dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_below="@id/userUpdate"
             android:layout_toRightOf="@id/profilePic"

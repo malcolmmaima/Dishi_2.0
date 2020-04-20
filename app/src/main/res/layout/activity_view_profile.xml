@@ -214,20 +214,67 @@
 
                 </FrameLayout>
 
-                <Button
-                    android:clickable="true"
+                <RelativeLayout
                     android:layout_below="@id/frame"
-                    android:id="@+id/postStatus"
-                    android:layout_gravity="right|center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:layout_marginRight="5dp"
-                    android:shadowRadius="5"
-                    android:layout_alignParentRight="true"
-                    android:text="Post" />
+                    android:id="@+id/statusActions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:minHeight="20dp"
+                        android:minWidth="200dp"
+                        android:visibility="gone"
+                        android:progress="1" />
+
+
+                    <ImageView
+                        android:layout_below="@id/progressBar"
+                        android:visibility="gone"
+                        android:layout_margin="5dp"
+                        android:layout_alignParentLeft="true"
+                        android:id="@+id/selectedImage"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp" />
+
+                    <ImageButton
+                        android:layout_below="@id/progressBar"
+                        android:layout_toLeftOf="@id/postStatus"
+                        android:visibility="visible"
+                        android:id="@+id/camera"
+                        android:src="@drawable/camera"
+                        android:background="@drawable/layout_bg1"
+                        android:layout_marginLeft="15dp"
+                        android:scaleType="fitCenter"
+                        android:layout_width="30dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="5dp"
+                        android:contentDescription="TODO" />
+
+                    <Button
+                        android:layout_below="@id/progressBar"
+                        android:layout_alignParentRight="true"
+                        android:clickable="true"
+                        android:id="@+id/postStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:shadowRadius="5"
+                        android:text="Post" />
+                </RelativeLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_below="@id/postStatus"
+                    android:layout_below="@id/statusActions"
                     android:layout_marginTop="50dp"
                     android:id="@+id/noPostsIcon"
                     android:layout_width="200dp"
@@ -248,7 +295,7 @@
                     android:visibility="invisible"/>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:layout_below="@id/postStatus"
+                    android:layout_below="@id/statusActions"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/rview"
