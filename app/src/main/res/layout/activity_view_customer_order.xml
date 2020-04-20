@@ -79,7 +79,7 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginRight="60dp"
                         android:layout_marginLeft="60dp"
-                        android:text="Restaurant Name"
+                        android:text="loading..."
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
                         android:gravity="center"

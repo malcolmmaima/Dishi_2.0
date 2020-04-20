@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -635,7 +636,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         serviceIntent.putExtra("title", "Dishi");
         serviceIntent.putExtra("message", "Welcome to Dishi");
-        ContextCompat.startForegroundService(this, serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            ContextCompat.startForegroundService(this, serviceIntent);
+        }
     }
 
     private void startPhoneNumberVerification(String phoneNumber) {

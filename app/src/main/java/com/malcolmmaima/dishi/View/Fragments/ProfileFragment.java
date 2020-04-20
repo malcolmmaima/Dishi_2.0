@@ -2,13 +2,17 @@ package com.malcolmmaima.dishi.View.Fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +33,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -37,6 +43,7 @@ import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +52,8 @@ import java.util.List;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import io.fabric.sdk.android.services.common.SafeToast;
+
+import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "ProfileFragment";
@@ -68,7 +77,18 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     TextView emptyTag;
     AppCompatImageView icon;
+    ImageView selectedImage;
     SwipeRefreshLayout mSwipeRefreshLayout;
+
+    // instance for firebase storage and StorageReference
+    FirebaseStorage storage;
+    StorageReference storageReference;
+
+    // Uri indicates, where the image will be picked from
+    private Uri filePath;
+
+    // request code
+    private final int PICK_IMAGE_REQUEST = 22;
 
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
@@ -92,6 +112,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         following = v.findViewById(R.id.following);
         followers = v.findViewById(R.id.followers);
         imageUpload = v.findViewById(R.id.camera);
+        selectedImage = v.findViewById(R.id.selectedImage);
         recyclerview = v.findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
 
@@ -134,6 +155,10 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+myPhone);
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone);
         followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+
+        // get the Firebase  storage reference
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         //Keep track of total followers
         followersCounterListener = new ValueEventListener() {
@@ -334,9 +359,11 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         imageUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "load gallery", Toast.LENGTH_SHORT).show();
+                //https://www.geeksforgeeks.org/android-how-to-upload-an-image-on-firebase-storage/
+                SelectImage();
             }
         });
+
 
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -400,6 +427,63 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         });
         return  v;
+    }
+
+    // Select Image method
+    private void SelectImage()
+    {
+
+        // Defining Implicit Intent to mobile gallery
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(
+                Intent.createChooser(
+                        intent,
+                        "Select Image from here..."),
+                PICK_IMAGE_REQUEST);
+    }
+
+    // Override onActivityResult method
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode,
+                                 Intent data)
+    {
+
+        super.onActivityResult(requestCode,
+                resultCode,
+                data);
+
+        // checking request code and result code
+        // if request code is PICK_IMAGE_REQUEST and
+        // resultCode is RESULT_OK
+        // then set image in the image view
+        if (requestCode == PICK_IMAGE_REQUEST
+                && resultCode == RESULT_OK
+                && data != null
+                && data.getData() != null) {
+
+            // Get the Uri of data
+            filePath = data.getData();
+            try {
+
+                // Setting image on image view using Bitmap
+                Bitmap bitmap = MediaStore
+                        .Images
+                        .Media
+                        .getBitmap(getContext().getContentResolver(),
+                                filePath);
+                selectedImage.setVisibility(View.VISIBLE);
+                selectedImage.setImageBitmap(bitmap);
+            }
+
+            catch (IOException e) {
+                // Log the exception
+                selectedImage.setVisibility(View.GONE);
+                e.printStackTrace();
+            }
+        }
     }
 
     private void fetchPosts() {

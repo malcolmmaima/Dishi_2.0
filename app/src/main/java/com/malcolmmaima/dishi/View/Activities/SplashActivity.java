@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -329,7 +330,12 @@ public class SplashActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         serviceIntent.putExtra("title", "Dishi");
         serviceIntent.putExtra("message", "Welcome to Dishi");
-        ContextCompat.startForegroundService(this, serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            ContextCompat.startForegroundService(this, serviceIntent);
+
+        }
     }
 
     public void stopNotificationService() {

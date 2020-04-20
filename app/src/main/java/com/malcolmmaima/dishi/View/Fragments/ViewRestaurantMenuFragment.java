@@ -121,6 +121,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
 
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
+        recyclerview.setNestedScrollingEnabled(false);
         emptyTag = v.findViewById(R.id.empty_tag);
 
         //Get my user details
