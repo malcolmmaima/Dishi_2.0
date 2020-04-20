@@ -193,7 +193,24 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginLeft="10dp"
                     android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:minHeight="20dp"
+                        android:minWidth="200dp"
+                        android:visibility="visible"
+                        android:progress="1" />
+
+
                     <ImageView
+                        android:layout_below="@id/progressBar"
                         android:visibility="gone"
                         android:layout_margin="5dp"
                         android:layout_alignParentLeft="true"
@@ -202,6 +219,7 @@
                         android:layout_height="70dp" />
 
                     <ImageButton
+                        android:layout_below="@id/progressBar"
                         android:layout_toLeftOf="@id/postStatus"
                         android:visibility="visible"
                         android:id="@+id/camera"
@@ -216,6 +234,7 @@
                         android:contentDescription="TODO" />
 
                     <Button
+                        android:layout_below="@id/progressBar"
                         android:layout_alignParentRight="true"
                         android:clickable="true"
                         android:id="@+id/postStatus"

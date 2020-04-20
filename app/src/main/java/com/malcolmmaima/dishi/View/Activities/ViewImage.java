@@ -39,28 +39,28 @@ public class ViewImage extends AppCompatActivity {
         final String imageURL = getIntent().getStringExtra("imageURL");
 
 
-        Picasso.with(this)
-                .load(imageURL)
+        try {
+            Picasso.with(this)
+                    .load(imageURL)
 
-                .into(viewImage, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        loading.setVisibility(View.INVISIBLE);
-                    }
-
-                    @Override
-                    public void onError() {
-                        loading.setVisibility(View.INVISIBLE);
-                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentLayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                        snackbar.show();
-
-                        if(snackbar.isShown()){
-                            finish();
+                    .into(viewImage, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            loading.setVisibility(View.INVISIBLE);
                         }
-                    }
-                });
 
+                        @Override
+                        public void onError() {
+                            loading.setVisibility(View.INVISIBLE);
+                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentLayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                            snackbar.show();
 
+                            if (snackbar.isShown()) {
+                                finish();
+                            }
+                        }
+                    });
+        } catch (Exception e){}
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

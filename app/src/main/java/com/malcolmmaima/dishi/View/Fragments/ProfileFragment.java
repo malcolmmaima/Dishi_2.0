@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,6 +89,9 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     FirebaseStorage storage;
     StorageReference storageReference;
 
+    private ProgressBar progressBar;
+    private int progressStatus = 0;
+
     // Uri indicates, where the image will be picked from
     private Uri filePath;
 
@@ -117,6 +121,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         followers = v.findViewById(R.id.followers);
         imageUpload = v.findViewById(R.id.camera);
         selectedImage = v.findViewById(R.id.selectedImage);
+        progressBar = v.findViewById(R.id.progressBar);
         recyclerview = v.findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
 
@@ -373,44 +378,16 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
-                //Get current date
-                GetCurrentDate currentDate = new GetCurrentDate();
-                String postDate = currentDate.getDate();
+
 
                 if(!myStatusUpdate.getText().toString().equals("")){
 
                     if(selectedImage.isShown()){
-                        Toast.makeText(getContext(), "image set", Toast.LENGTH_SHORT).show();
-                        uploadImage();
+                        uploadImage(); //This will upload image then on successful upload call uploadContent()
                     } else {
-                        Toast.makeText(getContext(), "no image", Toast.LENGTH_SHORT).show();
+                        String imgLink = null;
+                        uploadContent(imgLink);
                     }
-                    StatusUpdateModel statusUpdate = new StatusUpdateModel();
-                    statusUpdate.setStatus(myStatusUpdate.getText().toString());
-                    statusUpdate.setAuthor(myPhone);
-                    statusUpdate.setPostedTo(myPhone);
-                    statusUpdate.setTimePosted(postDate);
-                    String key = myPostUpdates.push().getKey();
-                    myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            mSwipeRefreshLayout.setRefreshing(false);
-                            myStatusUpdate.setText("");
-                            myStatusUpdate.clearFocus();
-                            statusUpdate.key = key;
-                            statusUpdates.add(statusUpdate);
-
-                            emptyTag.setVisibility(View.GONE);
-                            icon.setVisibility(View.GONE);
-                            recyclerview.setVisibility(View.VISIBLE);
-                            Collections.reverse(statusUpdates);
-                            StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                            recyclerview.setLayoutManager(layoutmanager);
-                            recycler.notifyDataSetChanged();
-                            recyclerview.setAdapter(recycler);
-                        }
-                    });
 
                 } else {
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -438,6 +415,40 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         });
         return  v;
+    }
+
+    private void uploadContent(String imgLink) {
+        //Get current date
+        GetCurrentDate currentDate = new GetCurrentDate();
+        String postDate = currentDate.getDate();
+
+        StatusUpdateModel statusUpdate = new StatusUpdateModel();
+        statusUpdate.setStatus(myStatusUpdate.getText().toString());
+        statusUpdate.setAuthor(myPhone);
+        statusUpdate.setPostedTo(myPhone);
+        statusUpdate.setTimePosted(postDate);
+        statusUpdate.setImageShare(imgLink);
+        String key = myPostUpdates.push().getKey();
+        myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                mSwipeRefreshLayout.setRefreshing(false);
+                myStatusUpdate.setText("");
+                myStatusUpdate.clearFocus();
+                statusUpdate.key = key;
+                statusUpdates.add(statusUpdate);
+
+                emptyTag.setVisibility(View.GONE);
+                icon.setVisibility(View.GONE);
+                recyclerview.setVisibility(View.VISIBLE);
+                Collections.reverse(statusUpdates);
+                StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
+                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                recyclerview.setLayoutManager(layoutmanager);
+                recycler.notifyDataSetChanged();
+                recyclerview.setAdapter(recycler);
+            }
+        });
     }
 
     // Select Image method
@@ -503,16 +514,13 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (filePath != null) {
 
             // Code for showing progressDialog while uploading
-            ProgressDialog progressDialog
-                    = new ProgressDialog(getContext());
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+            progressBar.setVisibility(View.VISIBLE);
 
             // Defining the child of storageReference
             StorageReference ref
                     = storageReference
                     .child(
-                            "images/"
+                            "Users/"+myPhone+"/"
                                     + UUID.randomUUID().toString());
 
             // adding listeners on upload
@@ -522,21 +530,22 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                             new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
                                 @Override
-                                public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot)
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
                                 {
+                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener() {
+                                        @Override
+                                        public void onSuccess(Object o) {
+                                            // Image uploaded successfully
+                                            // Dismiss dialog
+                                            selectedImage.setVisibility(View.GONE);
+                                            progressBar.setVisibility(View.GONE);
 
-                                    // Image uploaded successfully
-                                    // Dismiss dialog
-                                    selectedImage.setVisibility(View.GONE);
-                                    progressDialog.dismiss();
-                                    try {
-                                        Toast
-                                                .makeText(getContext(),
-                                                        "Image Uploaded!!",
-                                                        Toast.LENGTH_SHORT)
-                                                .show();
-                                    } catch (Exception e){}
+                                            String imgLink = o.toString();
+                                            uploadContent(imgLink); //Now upload the status text content
+                                        }
+                                    });
+
+
                                 }
                             })
 
@@ -546,12 +555,14 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         {
 
                             // Error, Image not uploaded
-                            progressDialog.dismiss();
-                            Toast
-                                    .makeText(getContext(),
-                                            "Failed " + e.getMessage(),
-                                            Toast.LENGTH_SHORT)
-                                    .show();
+                            progressBar.setVisibility(View.GONE);
+                            try {
+                                Toast
+                                        .makeText(getContext(),
+                                                "Failed " + e.getMessage(),
+                                                Toast.LENGTH_SHORT)
+                                        .show();
+                            } catch (Exception er){}
                         }
                     })
                     .addOnProgressListener(
@@ -567,9 +578,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                             = (100.0
                                             * taskSnapshot.getBytesTransferred()
                                             / taskSnapshot.getTotalByteCount());
-                                    progressDialog.setMessage(
-                                            "Uploaded "
-                                                    + (int)progress + "%");
+
+                                    progressBar.setProgress((int)progress);
                                 }
                             });
         }
