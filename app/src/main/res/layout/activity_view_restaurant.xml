@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".View.Activities.ViewRestaurant">
+    tools:context=".View.Activities.ViewRestaurant"
+    android:id="@+id/parentlayout">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusableInTouchMode="true"
         tools:ignore="NotSibling">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -171,6 +173,7 @@
             </com.google.android.material.tabs.TabLayout>
 
         <androidx.viewpager.widget.ViewPager
+            android:nestedScrollingEnabled="false"
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_below="@id/tablayout"
@@ -180,9 +183,6 @@
 
         </androidx.viewpager.widget.ViewPager>
 
-
     </RelativeLayout>
-
-
 
 </ScrollView>
