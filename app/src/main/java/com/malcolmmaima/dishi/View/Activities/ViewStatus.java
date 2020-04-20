@@ -2,7 +2,10 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -10,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +33,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
@@ -36,13 +45,11 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CommentAdapter;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.UUID;
 
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
@@ -61,16 +68,29 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     String myPhone;
     Button postStatus;
     EmojiconEditText statusPost;
+    ImageView selectedImage;
     RecyclerView recyclerView;
     List<StatusUpdateModel> list;
-    String phone;
     UserModel authorUser;
     StatusUpdateModel viewPost;
-    ImageButton emoji;
+    ImageButton emoji, imageUpload;
     EmojIconActions emojIcon;
     View rootView;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    String key, postedTo, author;
+    String key, postedTo;
+
+    // instance for firebase storage and StorageReference
+    FirebaseStorage storage;
+    StorageReference storageReference;
+
+    private ProgressBar progressBar;
+    private int progressStatus = 0;
+
+    // Uri indicates, where the image will be picked from
+    private Uri filePath;
+
+    // request code
+    private final int PICK_IMAGE_REQUEST = 22;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +116,10 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         commentsTotal = findViewById(R.id.commentsTotal);
         postStatus = findViewById(R.id.postStatus);
         statusPost = findViewById(R.id.inputComment);
+        imageUpload = findViewById(R.id.camera);
+        imageUpload.setVisibility(View.GONE);
+        selectedImage = findViewById(R.id.selectedImage);
+        progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.rview);
         recyclerView.setNestedScrollingEnabled(false);
         emptyTag = findViewById(R.id.empty_tag);
@@ -128,6 +152,10 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
         postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo);
         authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
+
+        // get the Firebase  storage reference
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
@@ -258,14 +286,17 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 if(hasFocus){
                     emoji.setVisibility(View.VISIBLE);
                     postStatus.setVisibility(View.VISIBLE);
+                    imageUpload.setVisibility(View.VISIBLE);
                 }
                 else {
 
                     if(statusPost.getText().toString().length() > 1){
                         postStatus.setVisibility(View.VISIBLE);
+                        imageUpload.setVisibility(View.VISIBLE);
                         emoji.setVisibility(View.VISIBLE);
                     } else {
                         postStatus.setVisibility(View.GONE);
+                        imageUpload.setVisibility(View.GONE);
                         emoji.setVisibility(View.GONE);
                     }
 
@@ -289,20 +320,19 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             }
         });
 
+        imageUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //https://www.geeksforgeeks.org/android-how-to-upload-an-image-on-firebase-storage/
+                SelectImage();
+            }
+        });
+
         postStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
-                GetCurrentDate getCurrentDate = new GetCurrentDate();
-                String time = getCurrentDate.getDate();
 
-                final StatusUpdateModel comment = new StatusUpdateModel();
-                comment.setStatus(statusPost.getText().toString());
-                comment.setTimePosted(time);
-                comment.setAuthor(myPhone);
-                comment.setPostedTo(postedTo);
-
-                String commentKey = postRef.push().getKey();
 
                 if(statusPost.getText().toString().equals("")){
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -310,23 +340,12 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 }
 
                 else {
-                    postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            mSwipeRefreshLayout.setRefreshing(false);
-                            comment.key = commentKey;
-                            statusPost.setText("");
-                            list.add(comment);
-
-                            recyclerView.setVisibility(View.VISIBLE);
-                            emptyTag.setVisibility(View.GONE);
-                            CommentAdapter recycler = new CommentAdapter(ViewStatus.this, list);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewStatus.this);
-                            recyclerView.setLayoutManager(layoutmanager);
-                            recycler.notifyDataSetChanged();
-                            recyclerView.setAdapter(recycler);
-                        }
-                    });
+                    if(selectedImage.isShown()){
+                        uploadImage(); //This will upload image then on successful upload call uploadContent()
+                    } else {
+                        String imgLink = null;
+                        uploadContent(imgLink);
+                    }
 
                 }
 
@@ -464,6 +483,172 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             }
         };
         postRef.child(key).child("comments").addListenerForSingleValueEvent(commentsListener);
+    }
+
+    // Select Image method
+    private void SelectImage()
+    {
+
+        // Defining Implicit Intent to mobile gallery
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(
+                Intent.createChooser(
+                        intent,
+                        "Select Image from here..."),
+                PICK_IMAGE_REQUEST);
+    }
+
+    // Override onActivityResult method
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode,
+                                 Intent data)
+    {
+
+        super.onActivityResult(requestCode,
+                resultCode,
+                data);
+
+        // checking request code and result code
+        // if request code is PICK_IMAGE_REQUEST and
+        // resultCode is RESULT_OK
+        // then set image in the image view
+        if (requestCode == PICK_IMAGE_REQUEST
+                && resultCode == RESULT_OK
+                && data != null
+                && data.getData() != null) {
+
+            // Get the Uri of data
+            filePath = data.getData();
+            try {
+
+                // Setting image on image view using Bitmap
+                Bitmap bitmap = MediaStore
+                        .Images
+                        .Media
+                        .getBitmap(ViewStatus.this.getContentResolver(),
+                                filePath);
+                selectedImage.setVisibility(View.VISIBLE);
+                selectedImage.setImageBitmap(bitmap);
+            }
+
+            catch (IOException e) {
+                // Log the exception
+                selectedImage.setVisibility(View.GONE);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // UploadImage method
+    private void uploadImage()
+    {
+        if (filePath != null) {
+
+            // Code for showing progressDialog while uploading
+            progressBar.setVisibility(View.VISIBLE);
+
+            // Defining the child of storageReference
+            StorageReference ref
+                    = storageReference
+                    .child(
+                            "Users/"+myPhone+"/"
+                                    + UUID.randomUUID().toString()); //switched from 'phone' to 'myPhone' ...
+            // since we'll be limiting account quotas we dont want to charge someone's account for something they didn't upload
+
+            // adding listeners on upload
+            // or failure of image
+            ref.putFile(filePath)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
+                                {
+                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener() {
+                                        @Override
+                                        public void onSuccess(Object o) {
+                                            // Image uploaded successfully
+                                            // Dismiss dialog
+                                            selectedImage.setVisibility(View.GONE);
+                                            progressBar.setVisibility(View.GONE);
+
+                                            String imgLink = o.toString();
+                                            uploadContent(imgLink); //Now upload the status text content
+                                        }
+                                    });
+
+
+                                }
+                            })
+
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+
+                            // Error, Image not uploaded
+                            progressBar.setVisibility(View.GONE);
+                            try {
+                                Toast
+                                        .makeText(ViewStatus.this,
+                                                "Failed " + e.getMessage(),
+                                                Toast.LENGTH_SHORT)
+                                        .show();
+                            } catch (Exception er){}
+                        }
+                    })
+                    .addOnProgressListener(
+                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+
+                                // Progress Listener for loading
+                                // percentage on the dialog box
+                                @Override
+                                public void onProgress(
+                                        UploadTask.TaskSnapshot taskSnapshot)
+                                {
+                                    double progress
+                                            = (100.0
+                                            * taskSnapshot.getBytesTransferred()
+                                            / taskSnapshot.getTotalByteCount());
+
+                                    progressBar.setProgress((int)progress);
+                                }
+                            });
+        }
+    }
+
+    private void uploadContent(String imgLink) {
+        GetCurrentDate getCurrentDate = new GetCurrentDate();
+        String time = getCurrentDate.getDate();
+
+        final StatusUpdateModel comment = new StatusUpdateModel();
+        comment.setStatus(statusPost.getText().toString());
+        comment.setTimePosted(time);
+        comment.setAuthor(myPhone);
+        comment.setPostedTo(postedTo);
+        comment.setImageShare(imgLink);
+
+        String commentKey = postRef.push().getKey();
+        postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                mSwipeRefreshLayout.setRefreshing(false);
+                comment.key = commentKey;
+                statusPost.setText("");
+                list.add(0,comment);
+
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyTag.setVisibility(View.GONE);
+                CommentAdapter recycler = new CommentAdapter(ViewStatus.this, list);
+                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewStatus.this);
+                recyclerView.setLayoutManager(layoutmanager);
+                recycler.notifyDataSetChanged();
+                recyclerView.setAdapter(recycler);
+            }
+        });
     }
 
     @Override

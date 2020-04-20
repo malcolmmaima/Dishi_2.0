@@ -434,10 +434,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
-                //Get current date
-                GetCurrentDate currentDate = new GetCurrentDate();
-                String postDate = currentDate.getDate();
-
                 if(!myStatusUpdate.getText().toString().equals("")){
                     if(selectedImage.isShown()){
                         uploadImage(); //This will upload image then on successful upload call uploadContent()

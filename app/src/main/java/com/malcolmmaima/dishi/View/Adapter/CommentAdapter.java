@@ -103,6 +103,31 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         //set comment
         holder.userUpdate.setText(statusUpdateModel.getStatus());
 
+        //imageShare
+        if(statusUpdateModel.getImageShare() != null){
+            holder.imageShare.setVisibility(View.VISIBLE);
+            try {
+                Picasso.with(context).load(statusUpdateModel.getImageShare()).fit().centerCrop()
+                        .placeholder(R.drawable.gray_gradient_background)
+                        .error(R.drawable.gray_gradient_background)
+                        .into(holder.imageShare);
+            } catch (Exception e){}
+        } else {
+            holder.imageShare.setVisibility(View.GONE);
+        }
+
+        holder.imageShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
+                    context.startActivity(slideactivity);
+                } catch (Exception e){}
+            }
+        });
+
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,7 +164,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted;
-        ImageView profilePic, deleteBtn, likePost, comments, sharePost;
+        ImageView profilePic, deleteBtn, likePost, comments, sharePost, imageShare;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -152,6 +177,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             likePost = itemView.findViewById(R.id.likePost);
             comments = itemView.findViewById(R.id.comments);
             sharePost = itemView.findViewById(R.id.sharePost);
+            imageShare = itemView.findViewById(R.id.imageShare);
             likesTotal = itemView.findViewById(R.id.likesTotal);
             commentsTotal = itemView.findViewById(R.id.commentsTotal);
             cardView = itemView.findViewById(R.id.card_view);
