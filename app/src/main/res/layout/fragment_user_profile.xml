@@ -205,7 +205,7 @@
                         android:max="100"
                         android:minHeight="20dp"
                         android:minWidth="200dp"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         android:progress="1" />
 
 

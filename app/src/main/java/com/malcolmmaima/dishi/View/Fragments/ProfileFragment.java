@@ -436,17 +436,18 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 myStatusUpdate.setText("");
                 myStatusUpdate.clearFocus();
                 statusUpdate.key = key;
-                statusUpdates.add(statusUpdate);
+                statusUpdates.add(0,statusUpdate);
 
                 emptyTag.setVisibility(View.GONE);
                 icon.setVisibility(View.GONE);
                 recyclerview.setVisibility(View.VISIBLE);
-                Collections.reverse(statusUpdates);
                 StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                 recyclerview.setLayoutManager(layoutmanager);
-                recycler.notifyDataSetChanged();
+                //recycler.notifyDataSetChanged();
+                recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
+
             }
         });
     }
