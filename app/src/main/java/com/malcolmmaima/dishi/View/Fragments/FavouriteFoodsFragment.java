@@ -40,26 +40,22 @@ import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
-public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag, distanceShow;
+    TextView emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
     LiveLocation liveLocation;
-    SeekBar seekBar;
 
-    DatabaseReference dbRef, menusRef, myLocationRef;
+    DatabaseReference dbRef, favouriteRestaurantsRef, myLocationRef;
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener locationListener;
 
-    int location_filter;
-
-
-    public static FragmentFood newInstance() {
-        FragmentFood fragment = new FragmentFood();
+    public static FavouriteFoodsFragment newInstance() {
+        FavouriteFoodsFragment fragment = new FavouriteFoodsFragment();
         return fragment;
     }
 
@@ -78,82 +74,18 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_food, container, false);
-
-        location_filter = 0; // initialize distance filter
+        final View v = inflater.inflate(R.layout.fragment_favourite_foods, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         db = FirebaseDatabase.getInstance();
         dbRef = db.getReference("users/"+myPhone);
         myLocationRef = db.getReference("location/"+myPhone);
-        menusRef = db.getReference("menus");
+        favouriteRestaurantsRef = db.getReference("my_food_favourites/"+myPhone);
 
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
-        seekBar = v.findViewById(R.id.seekBar);
-        distanceShow = v.findViewById(R.id.distanceShow);
-
-        //Fetch location filter value from database
-        dbRef.child("location-filter").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-
-                    location_filter = dataSnapshot.getValue(Integer.class);
-                    seekBar.setProgress(location_filter);
-                    distanceShow.setText("("+location_filter+"km)");
-
-                } catch (Exception e){
-
-                    //Doesn't exist in the database, lets set value in node
-                    dbRef.child("location-filter").setValue(0);
-                    location_filter = 0;
-                    seekBar.setProgress(location_filter);
-                    distanceShow.setText("("+location_filter+"km)");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        //Distance filter seekbar
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
-                dbRef.child("location-filter").setValue(progress).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        location_filter = progress;
-                        distanceShow.setText("("+progress+"km)");
-                        //SafeToast.makeText(getContext(), "filter posted", Toast.LENGTH_SHORT).show();
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                // Write failed
-                                SafeToast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                mSwipeRefreshLayout.setRefreshing(true);
-                fetchFood();
-            }
-        });
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -204,13 +136,12 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     private void fetchFood() {
 
         //Fetch restaurants
-        menusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        favouriteRestaurantsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull final DataSnapshot datasnapshot) {
 
                 list = new ArrayList<>();
                 for(final DataSnapshot restaurants : datasnapshot.getChildren()){
-
                     /**
                      * Create new database reference for each restaurant and fetch user data
                      */
@@ -229,11 +160,11 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
 
                             try {
                                 if (user.getLiveStatus() == true) {
-
                                     /**
                                      * Now check "locationType" so as to decide which location node to fetch, live or static
                                      */
                                     if (user.getLocationType().equals("default")) {
+
                                         //if location type is default then fetch static location
                                         DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey() + "/my_location");
 
@@ -254,22 +185,15 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
 
                                                 //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * if distance meets parameters set fetch menu
-                                                 */
-
-                                                if (dist < location_filter) {
-                                                    //Fetch menu items of restaurants that have passed distance parameter
-
-                                                    for (DataSnapshot menu : restaurants.getChildren()) {
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                        ProductDetails product = menu.getValue(ProductDetails.class);
-                                                        product.setKey(menu.getKey());
-                                                        product.setDistance(dist);
-                                                        product.accountType = "1"; //This fragment belongs to account type 1 (customer)
-                                                        list.add(product);
-                                                    }
+                                                for (DataSnapshot menu : restaurants.getChildren()) {
+                                                    SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                    ProductDetails product = menu.getValue(ProductDetails.class);
+                                                    product.setKey(menu.getKey());
+                                                    product.setDistance(dist);
+                                                    product.accountType = "1"; //This fragment belongs to account type 1 (customer)
+                                                    list.add(product);
                                                 }
+
 
                                                 if (!list.isEmpty()) {
                                                     /**
@@ -332,57 +256,61 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                             liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
                                                     //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                    for (DataSnapshot menu : restaurants.getChildren()) {
+                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
 
-                                                    /**
-                                                     * if distance meets parameters set then fetch menu
-                                                     */
+                                                        DatabaseReference productDetails = FirebaseDatabase.getInstance().getReference("menus/"+restaurants.getKey()+"/"+menu.getKey());
+                                                        productDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                ProductDetails product = dataSnapshot.getValue(ProductDetails.class);
+                                                                product.setKey(menu.getKey());
+                                                                product.setDistance(dist);
+                                                                product.accountType = "1"; //this fragment belongs to account type 1
+                                                                list.add(product);
 
-                                                    if (dist < location_filter) {
-                                                        //Fetch menu items of restaurants that have passed distance parameter
+                                                                if (!list.isEmpty()) {
+                                                                    /**
+                                                                     * https://howtodoinjava.com/sort/collections-sort/
+                                                                     * We want to sort from nearest to furthest location
+                                                                     */
+                                                                    Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                                    //Collections.reverse(list);
+                                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                    recycler.notifyDataSetChanged();
+                                                                    recyclerview.setAdapter(recycler);
+                                                                    emptyTag.setVisibility(View.INVISIBLE);
+                                                                    icon.setVisibility(View.INVISIBLE);
+                                                                } else {
 
-                                                        for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetails product = menu.getValue(ProductDetails.class);
-                                                            product.setKey(menu.getKey());
-                                                            product.setDistance(dist);
-                                                            product.accountType = "1"; //this fragment belongs to account type 1
-                                                            list.add(product);
-                                                        }
+                                                                    mSwipeRefreshLayout.setRefreshing(false);
+
+                                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                    recyclerview.setAdapter(recycler);
+                                                                    emptyTag.setVisibility(View.VISIBLE);
+                                                                    icon.setVisibility(View.VISIBLE);
+
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+
                                                     }
 
-                                                    if (!list.isEmpty()) {
-                                                        /**
-                                                         * https://howtodoinjava.com/sort/collections-sort/
-                                                         * We want to sort from nearest to furthest location
-                                                         */
-                                                        Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-                                                        //Collections.reverse(list);
-                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recycler.notifyDataSetChanged();
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.INVISIBLE);
-                                                        icon.setVisibility(View.INVISIBLE);
-                                                    } else {
-
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-
-                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.VISIBLE);
-                                                        icon.setVisibility(View.VISIBLE);
-
-                                                    }
                                                 } catch (Exception e){
 
                                                 }
-
 
                                             }
 

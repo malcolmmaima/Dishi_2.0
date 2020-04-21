@@ -116,7 +116,7 @@ public class MyFavourites extends Fragment {
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getChildFragmentManager());
-        adapter.addFragment(new FragmentFood(), "Food");
+        adapter.addFragment(new FavouriteFoodsFragment(), "Food");
         adapter.addFragment(new FavouriteRestaurantsFragment(), "Restaurants");
         viewPager.setAdapter(adapter);
     }
