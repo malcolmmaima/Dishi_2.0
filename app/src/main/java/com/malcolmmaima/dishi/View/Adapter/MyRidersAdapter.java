@@ -71,14 +71,13 @@ public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHold
 
         holder.riderName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
 
-
         /**
          * Click listener on our card
          */
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SafeToast.makeText(context, "Load rider details/options", Toast.LENGTH_SHORT).show();
+                //SafeToast.makeText(context, "Load rider details/options", Toast.LENGTH_SHORT).show();
             }
         });
 

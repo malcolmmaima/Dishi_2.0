@@ -254,11 +254,11 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if(!myPhone.equals(author)){
                     Intent slideactivity = new Intent(ViewStatus.this, ViewProfile.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    slideactivity.putExtra("phone", myPhone);
+                    slideactivity.putExtra("phone", viewPost.getAuthor());
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(ViewStatus.this, R.anim.animation,R.anim.animation2).toBundle();
                     startActivity(slideactivity, bndlanimation);

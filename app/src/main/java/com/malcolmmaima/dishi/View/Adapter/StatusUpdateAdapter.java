@@ -210,7 +210,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!myPhone.equals(statusUpdateModel.getAuthor())){
+                if(!myPhone.equals(statusUpdateModel.getAuthor()) && !statusUpdateModel.getPostedTo().equals(statusUpdateModel.getAuthor())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
