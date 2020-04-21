@@ -28,12 +28,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.TimeAgo;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static com.crashlytics.android.core.CrashlyticsCore.TAG;
@@ -160,6 +166,37 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             }
         });
 
+        /**
+         * date string conversion to Date:
+         * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+         */
+        //Format both current date and date status update was posted
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+        try {
+            //Get today's date
+            GetCurrentDate currentDate = new GetCurrentDate();
+            String currDate = currentDate.getDate();
+
+            //Get date status update was posted
+            String dtEnd = currDate;
+            String dtStart = statusUpdateModel.getTimePosted();
+
+            //Convert String date values to Date values
+            Date dateEnd = format.parse(dtStart);
+            Date dateStart = format.parse(dtEnd);
+
+            /**
+             * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
+             */
+            //Now compute timeAgo duration
+            TimeAgo timeAgo = new TimeAgo();
+            timeAgo.toRelative(dateStart, dateEnd);
+
+            holder.timePosted.setText(timeAgo.toRelative(dateEnd, dateStart, 1));
+            //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
