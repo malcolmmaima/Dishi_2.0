@@ -220,7 +220,7 @@ public class ViewRestaurant extends AppCompatActivity {
         }
 
         restaurantRef = FirebaseDatabase.getInstance().getReference("users/"+restaurantPhone);
-        myFavourites = FirebaseDatabase.getInstance().getReference("my_favourites/"+myPhone);
+        myFavourites = FirebaseDatabase.getInstance().getReference("my_restaurant_favourites/"+myPhone);
         providerFavs = FirebaseDatabase.getInstance().getReference("restaurant_favourites/"+ restaurantPhone);
 
         providerFavsListener = new ValueEventListener() {

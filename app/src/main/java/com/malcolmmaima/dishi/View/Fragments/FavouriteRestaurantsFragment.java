@@ -82,7 +82,7 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
         db = FirebaseDatabase.getInstance();
         dbRef = db.getReference("users/"+myPhone);
         myLocationRef = db.getReference("location/"+myPhone);
-        favouriteRestaurantsRef = db.getReference("my_favourites/"+myPhone);
+        favouriteRestaurantsRef = db.getReference("my_restaurant_favourites/"+myPhone);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);

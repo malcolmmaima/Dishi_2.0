@@ -21,10 +21,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,15 +43,17 @@ public class ViewProduct extends AppCompatActivity {
 
     String key, restaurant, restaurantName_,product, description, price, imageUrl, myPhone, accType;
     Double distance;
+    ImageView addToFavourites;
     AppCompatTextView productName, productPrice, itemCount;
-    TextView distanceAway, restaurantName, productDescription, subTotal;
+    TextView distanceAway, restaurantName, productDescription, subTotal, favouritesTotal;
     CircleImageView foodPic;
     FloatingActionButton add, minus;
     int count;
     Menu myMenu;
-    DatabaseReference myCart;
-    ValueEventListener cartListener;
+    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites;
+    ValueEventListener cartListener, favouritesTotalListener, myFoodFavouritesListener;
     FloatingActionButton fab;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,8 @@ public class ViewProduct extends AppCompatActivity {
         productDescription = findViewById(R.id.productDescription);
         subTotal = findViewById(R.id.subTotal);
         fab = findViewById(R.id.fab);
+        addToFavourites = findViewById(R.id.favourite);
+        favouritesTotal = findViewById(R.id.favouritesTotal);
 
         /**
          * Receive values from product adapter via intent
@@ -88,6 +94,99 @@ public class ViewProduct extends AppCompatActivity {
         distance = getIntent().getDoubleExtra("distance", 0.0);
         restaurantName_ = getIntent().getStringExtra("restaurantName");
         accType = getIntent().getStringExtra("accType");
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key+"/likes");
+        myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
+
+        myFoodFavouritesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String productKey = dataSnapshot.getValue(String.class);
+                try {
+                    if (productKey.equals("fav")) {
+                        addToFavourites.setTag(R.drawable.ic_liked);
+                        addToFavourites.setImageResource(R.drawable.ic_liked);
+                    } else {
+                        addToFavourites.setTag(R.drawable.ic_like);
+                        addToFavourites.setImageResource(R.drawable.ic_like);
+                    }
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myFoodFavourites.child(restaurant).child(key).addValueEventListener(myFoodFavouritesListener);
+
+        //Fetch total likes
+        favouritesTotalListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalLikes = (int) dataSnapshot.getChildrenCount();
+                    favouritesTotal.setText("" + totalLikes);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        favouritesTotalRef.addValueEventListener(favouritesTotalListener);
+
+        addToFavourites.setTag(R.drawable.ic_like);
+        addToFavourites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = (int)addToFavourites.getTag();
+                if( id == R.drawable.ic_like){
+                    //Add to my favourites
+                    myFoodFavourites.child(restaurant).child(key).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            //Add to global restaurant likes
+                            favouritesTotalRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //Add favourite to restaurant's node as well
+                                    addToFavourites.setTag(R.drawable.ic_liked);
+                                    addToFavourites.setImageResource(R.drawable.ic_liked);
+                                }
+                            });
+                            //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                } else{
+                    //Remove from my favourites
+                    myFoodFavourites.child(restaurant).child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                            favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //remove favourite from restaurant's node as well
+                                    addToFavourites.setTag(R.drawable.ic_like);
+                                    addToFavourites.setImageResource(R.drawable.ic_like);
+                                }
+                            });
+                            //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+        });
 
         setTitle("Order Now"); //Set title
 
@@ -331,7 +430,8 @@ public class ViewProduct extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        myFoodFavourites.child(restaurant).child(key).removeEventListener(myFoodFavouritesListener);
+        favouritesTotalRef.removeEventListener(favouritesTotalListener);
         myCart.removeEventListener(cartListener);
     }
 }

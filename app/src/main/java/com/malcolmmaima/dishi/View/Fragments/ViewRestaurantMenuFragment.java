@@ -75,7 +75,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         menusRef = db.getReference("menus/"+ phone);
 
         restaurantRef = db.getReference( "restaurant_favourites/"+ phone);
-        myFavourites = db.getReference("my_favourites/"+myPhone);
+        myFavourites = db.getReference("my_restaurant_favourites/"+myPhone);
         myRef = db.getReference("users/"+myPhone);
 
         myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);

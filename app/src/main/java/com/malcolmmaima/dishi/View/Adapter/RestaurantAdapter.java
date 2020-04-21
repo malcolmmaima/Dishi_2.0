@@ -78,7 +78,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
 
         db = FirebaseDatabase.getInstance();
         restaurantRef = db.getReference( "restaurant_favourites");
-        myFavourites = db.getReference("my_favourites/"+myPhone);
+        myFavourites = db.getReference("my_restaurant_favourites/"+myPhone);
 
         /**
          * Load image url onto imageview
@@ -101,7 +101,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
 
         }
 
-        //On laoding adapter fetch the like status
+        //On loading adapter fetch the like status
         myFavourites.child(restaurantDetails.getPhone()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
