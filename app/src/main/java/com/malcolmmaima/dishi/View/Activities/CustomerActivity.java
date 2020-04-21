@@ -36,7 +36,9 @@ import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
+import com.malcolmmaima.dishi.View.Fragments.HistoryFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
+import com.malcolmmaima.dishi.View.Fragments.MyFavourites;
 import com.malcolmmaima.dishi.View.Fragments.MyOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.OrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
@@ -347,16 +349,14 @@ public class CustomerActivity extends AppCompatActivity
         }
 
         else if (id == R.id.menu2) {
-            setTitle("Menu2");
-            SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            setTitle("Favourites");
+            fragmentClass[0] = MyFavourites.class;
         }
 
         else if (id == R.id.menu3) {
-            setTitle("Menu3");
-            SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
-        } //else if (id == R.id.menu4) {
-        //fragmentClass[0] = FragmentFour.class;
-        //}
+            setTitle("History");
+            fragmentClass[0] = HistoryFragment.class;
+        }
 
         else if (id == R.id.nav_settings) {
 

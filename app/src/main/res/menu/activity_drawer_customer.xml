@@ -10,12 +10,12 @@
             android:title="My Orders" />
         <item
             android:id="@+id/menu2"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="Menu 2" />
+            android:icon="@drawable/ic_folder_special_black_48dp"
+            android:title="Favourites" />
         <item
             android:id="@+id/menu3"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="Menu 3" />
+            android:icon="@drawable/ic_history_black_48dp"
+            android:title="History" />
 
         <!--
         <item
