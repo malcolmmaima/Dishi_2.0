@@ -381,9 +381,9 @@ public class MyCart extends AppCompatActivity {
                         itemCount = itemCount + list.get(i).getQuantity();
                         totalItems.setText("" + itemCount);
                     }
-                } catch (Exception e){}
-
-
+                } catch (Exception e){
+                    totalItems.setText("0");
+                }
             }
 
             @Override

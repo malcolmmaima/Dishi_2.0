@@ -242,9 +242,15 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                          * https://howtodoinjava.com/sort/collections-sort/
                                                          * We want to sort from nearest to furthest location
                                                          */
+                                                        //Sort by distance to restaurant offering the particular food item... from closest to furthest
                                                         //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                         mSwipeRefreshLayout.setRefreshing(false);
-                                                        Collections.reverse(list);
+                                                        //Collections.reverse(list); //Filter by order it appears in db.. collect then reverse
+
+                                                        try {
+                                                            //filter by time ordered ... from most recent to oldest
+                                                            Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
+                                                        } catch (Exception e){}
                                                         ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
                                                         RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
@@ -312,7 +318,11 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                              */
                                                             //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                             mSwipeRefreshLayout.setRefreshing(false);
-                                                            Collections.reverse(list);
+                                                            //Collections.reverse(list);
+
+                                                            try {
+                                                                Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
+                                                            } catch (Exception e){}
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
                                                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
