@@ -50,8 +50,8 @@ public class ViewProduct extends AppCompatActivity {
     FloatingActionButton add, minus;
     int count;
     Menu myMenu;
-    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites;
-    ValueEventListener cartListener, favouritesTotalListener, myFoodFavouritesListener;
+    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef;
+    ValueEventListener cartListener, favouritesTotalListener, myFoodFavouritesListener, existsListener;
     FloatingActionButton fab;
     FirebaseUser user;
 
@@ -101,6 +101,23 @@ public class ViewProduct extends AppCompatActivity {
         favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key+"/likes");
         myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
 
+        menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key);
+        existsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){ //Does not exist!
+                    finish();
+                    SafeToast.makeText(ViewProduct.this, "Item no longer exists", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        menuExistRef.addValueEventListener(existsListener);
+
         myFoodFavouritesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -123,7 +140,14 @@ public class ViewProduct extends AppCompatActivity {
 
             }
         };
-        myFoodFavourites.child(restaurant).child(key).addValueEventListener(myFoodFavouritesListener);
+
+        //if the history item no longer exists in restaurant's menu, an exception is bound to be generated
+        try {
+            myFoodFavourites.child(restaurant).child(key).addValueEventListener(myFoodFavouritesListener);
+        } catch (Exception e){
+            finish();
+            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+        }
 
         //Fetch total likes
         favouritesTotalListener = new ValueEventListener() {
@@ -146,45 +170,61 @@ public class ViewProduct extends AppCompatActivity {
         addToFavourites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = (int)addToFavourites.getTag();
-                if( id == R.drawable.ic_like){
-                    //Add to my favourites
-                    myFoodFavourites.child(restaurant).child(key).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            //Add to global restaurant likes
-                            favouritesTotalRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    //Add favourite to restaurant's node as well
-                                    addToFavourites.setTag(R.drawable.ic_liked);
-                                    addToFavourites.setImageResource(R.drawable.ic_liked);
-                                }
-                            });
-                            //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                //First lets check if the restaurant still has this particular product in their menu
+                DatabaseReference menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key);
+                menuExistRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.exists()){ //Does not exist!
+                            Snackbar.make(v, "No longer exists!", Snackbar.LENGTH_LONG).show();
+                        } else {
+                            int id = (int)addToFavourites.getTag();
+                            if( id == R.drawable.ic_like){
+                                //Add to my favourites
+                                myFoodFavourites.child(restaurant).child(key).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //Add to global restaurant likes
+                                        favouritesTotalRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                //Add favourite to restaurant's node as well
+                                                addToFavourites.setTag(R.drawable.ic_liked);
+                                                addToFavourites.setImageResource(R.drawable.ic_liked);
+                                            }
+                                        });
+                                        //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+
+                            } else{
+                                //Remove from my favourites
+                                myFoodFavourites.child(restaurant).child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                //remove favourite from restaurant's node as well
+                                                addToFavourites.setTag(R.drawable.ic_like);
+                                                addToFavourites.setImageResource(R.drawable.ic_like);
+                                            }
+                                        });
+                                        //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
                         }
-                    });
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                } else{
-                    //Remove from my favourites
-                    myFoodFavourites.child(restaurant).child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-
-                            favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    //remove favourite from restaurant's node as well
-                                    addToFavourites.setTag(R.drawable.ic_like);
-                                    addToFavourites.setImageResource(R.drawable.ic_like);
-                                }
-                            });
-                            //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                }
+                    }
+                });
             }
         });
 
@@ -433,5 +473,6 @@ public class ViewProduct extends AppCompatActivity {
         myFoodFavourites.child(restaurant).child(key).removeEventListener(myFoodFavouritesListener);
         favouritesTotalRef.removeEventListener(favouritesTotalListener);
         myCart.removeEventListener(cartListener);
+        menuExistRef.removeEventListener(existsListener);
     }
 }
