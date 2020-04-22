@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +45,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag;
+    TextView emptyTag, clearAll;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
     LiveLocation liveLocation;
@@ -85,6 +87,37 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        clearAll = v.findViewById(R.id.clearAll);
+
+        clearAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog deletePost = new AlertDialog.Builder(v.getContext())
+                        //set message, title, and icon
+                        .setMessage("Clear all?")
+                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                DatabaseReference itemDetails = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
+                                itemDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        fetchFood();
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //do nothing
+
+                            }
+                        })//setNegativeButton
+
+                        .create();
+                deletePost.show();
+            }
+        });
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -141,8 +174,8 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 list = new ArrayList<>();
                 if(!datasnapshot.exists()){
+                    clearAll.setVisibility(View.GONE);
                     mSwipeRefreshLayout.setRefreshing(false);
-
                     ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
                     RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
@@ -203,6 +236,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                     list.add(product);
 
                                                     if (!list.isEmpty()) {
+                                                        clearAll.setVisibility(View.VISIBLE);
                                                         /**
                                                          * https://howtodoinjava.com/sort/collections-sort/
                                                          * We want to sort from nearest to furthest location
@@ -220,6 +254,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                         icon.setVisibility(View.INVISIBLE);
                                                     } else {
 
+                                                        clearAll.setVisibility(View.GONE);
                                                         mSwipeRefreshLayout.setRefreshing(false);
 
                                                         ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
@@ -269,6 +304,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                         list.add(product);
 
                                                         if (!list.isEmpty()) {
+                                                            clearAll.setVisibility(View.VISIBLE);
                                                             /**
                                                              * https://howtodoinjava.com/sort/collections-sort/
                                                              * We want to sort from nearest to furthest location
@@ -285,7 +321,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             emptyTag.setVisibility(View.INVISIBLE);
                                                             icon.setVisibility(View.INVISIBLE);
                                                         } else {
-
+                                                            clearAll.setVisibility(View.GONE);
                                                             mSwipeRefreshLayout.setRefreshing(false);
 
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
