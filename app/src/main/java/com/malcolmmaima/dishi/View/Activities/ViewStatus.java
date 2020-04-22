@@ -65,7 +65,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
     private static final String TAG = "ViewStatus";
     DatabaseReference postRef, authorUserDetailsRef;
-    ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener;
+    ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
     TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted;
     ImageView profilePic, imageShare, likePost, comments, sharePost;
     String myPhone;
@@ -206,72 +206,80 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
         //Get post details
         try {
-            postRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+            postRefListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    try {
-                        viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
-
-                        /**
-                         * date string conversion to Date:
-                         * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                         */
-                        //Format both current date and date status update was posted
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                    if(!dataSnapshot.exists()){
+                        finish();
+                        SafeToast.makeText(ViewStatus.this, "Post no longer exists!", Toast.LENGTH_LONG).show();
+                    } else {
                         try {
-
-                            //Get today's date
-                            GetCurrentDate currentDate = new GetCurrentDate();
-                            String currDate = currentDate.getDate();
-
-                            //Get date status update was posted
-                            String dtEnd = currDate;
-                            String dtStart = viewPost.getTimePosted();
-
-                            //Convert String date values to Date values
-                            Date dateEnd = format.parse(dtStart);
-                            Date dateStart = format.parse(dtEnd);
+                            viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
 
                             /**
-                             * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                             * date string conversion to Date:
+                             * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
                              */
-                            //Now compute timeAgo duration
-                            TimeAgo timeAgo = new TimeAgo();
-                            timeAgo.toRelative(dateStart, dateEnd);
-
-                            timePosted.setText(timeAgo.toRelative(dateEnd, dateStart, 1));
-                            //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
-                        if(viewPost.getStatus().equals("")){
-                            userUpdate.setVisibility(View.GONE);
-                        } else {
-                            userUpdate.setVisibility(View.VISIBLE);
-                            userUpdate.setText(viewPost.getStatus());
-                        }
-
-                        if(viewPost.getImageShare() != null){
-                            imageShare.setVisibility(View.VISIBLE);
+                            //Format both current date and date status update was posted
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
                             try {
-                                Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
-                                        .placeholder(R.drawable.gray_gradient_background)
-                                        .error(R.drawable.gray_gradient_background)
-                                        .into(imageShare);
-                            } catch (Exception e){}
-                        } else {
-                            imageShare.setVisibility(View.GONE);
+
+                                //Get today's date
+                                GetCurrentDate currentDate = new GetCurrentDate();
+                                String currDate = currentDate.getDate();
+
+                                //Get date status update was posted
+                                String dtEnd = currDate;
+                                String dtStart = viewPost.getTimePosted();
+
+                                //Convert String date values to Date values
+                                Date dateEnd = format.parse(dtStart);
+                                Date dateStart = format.parse(dtEnd);
+
+                                /**
+                                 * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                 */
+                                //Now compute timeAgo duration
+                                TimeAgo timeAgo = new TimeAgo();
+                                timeAgo.toRelative(dateStart, dateEnd);
+
+                                timePosted.setText(timeAgo.toRelative(dateEnd, dateStart, 1));
+                                //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            if(viewPost.getStatus().equals("")){
+                                userUpdate.setVisibility(View.GONE);
+                            } else {
+                                userUpdate.setVisibility(View.VISIBLE);
+                                userUpdate.setText(viewPost.getStatus());
+                            }
+
+                            if(viewPost.getImageShare() != null){
+                                imageShare.setVisibility(View.VISIBLE);
+                                try {
+                                    Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
+                                            .placeholder(R.drawable.gray_gradient_background)
+                                            .error(R.drawable.gray_gradient_background)
+                                            .into(imageShare);
+                                } catch (Exception e){}
+                            } else {
+                                imageShare.setVisibility(View.GONE);
+                            }
+                        } catch (Exception e) {
                         }
-                    } catch (Exception e) {
                     }
+
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            });
+            };
+            postRef.child(key).addValueEventListener(postRefListener);
+
         } catch (Exception e){}
 
         imageShare.setOnClickListener(new View.OnClickListener() {
@@ -701,6 +709,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
         postRef.removeEventListener(likesListener);
         postRef.removeEventListener(commentsListener);
+        postRef.child(key).removeEventListener(postRefListener);
     }
 
     @Override
