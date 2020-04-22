@@ -137,6 +137,29 @@
         <ImageButton
             android:layout_below="@id/locationTag"
             android:layout_toRightOf="@id/foodPic"
+            android:id="@+id/cartIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/cart_48dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/itemQuantity"
+            android:layout_below="@id/locationTag"
+            android:layout_toRightOf="@id/locationTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Quantity: 0"
+            android:layout_marginLeft="-8dp"
+            android:layout_marginRight="5dp"/>
+
+        <ImageButton
+            android:layout_below="@id/cartIcon"
+            android:layout_toRightOf="@id/foodPic"
             android:id="@+id/orderIcon"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -148,7 +171,7 @@
 
         <TextView
             android:id="@+id/orderedOn"
-            android:layout_below="@id/locationTag"
+            android:layout_below="@id/cartIcon"
             android:layout_toRightOf="@id/locationTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -156,6 +179,7 @@
             android:text="orderd x days ago"
             android:layout_marginLeft="-8dp"
             android:layout_marginRight="5dp"/>
+
 
         <RelativeLayout
             android:layout_width="wrap_content"

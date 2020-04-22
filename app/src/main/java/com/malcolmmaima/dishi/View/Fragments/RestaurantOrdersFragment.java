@@ -2,7 +2,6 @@ package com.malcolmmaima.dishi.View.Fragments;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,10 +12,8 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -28,7 +25,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,16 +34,11 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
 import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
-import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
-public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     List<UserModel> orders = new ArrayList<>();
 
@@ -68,8 +59,8 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public static OrdersFragment newInstance() {
-        OrdersFragment fragment = new OrdersFragment();
+    public static RestaurantOrdersFragment newInstance() {
+        RestaurantOrdersFragment fragment = new RestaurantOrdersFragment();
         return fragment;
     }
 
@@ -82,7 +73,7 @@ public class OrdersFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_orders, container, false);
+        final View v = inflater.inflate(R.layout.fragment_restaurant_orders, container, false);
 //        progressDialog = new ProgressDialog(getContext());
 
         orders.clear();

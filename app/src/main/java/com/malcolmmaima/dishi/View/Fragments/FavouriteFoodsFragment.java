@@ -1,6 +1,7 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -294,11 +295,16 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                             productDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                                                                 @Override
                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                    ProductDetails product = dataSnapshot.getValue(ProductDetails.class);
-                                                                    product.setKey(menu.getKey());
-                                                                    product.setDistance(dist);
-                                                                    product.accountType = "1"; //this fragment belongs to account type 1
-                                                                    list.add(product);
+
+                                                                    try {
+                                                                        ProductDetails product = dataSnapshot.getValue(ProductDetails.class);
+                                                                        product.setKey(menu.getKey());
+                                                                        product.setDistance(dist);
+                                                                        product.accountType = "1"; //this fragment belongs to account type 1
+                                                                        list.add(product);
+                                                                    } catch (Exception e){
+                                                                        Log.d("FavouriteFoodsFragment", "onDataChange: error " + e.getMessage());
+                                                                    }
 
                                                                     if (!list.isEmpty()) {
                                                                         /**

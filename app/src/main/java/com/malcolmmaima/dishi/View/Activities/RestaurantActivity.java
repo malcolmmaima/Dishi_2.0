@@ -37,15 +37,12 @@ import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
 import com.malcolmmaima.dishi.View.Fragments.FragmentStats;
-import com.malcolmmaima.dishi.View.Fragments.HistoryFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MenuFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyRidersFragment;
-import com.malcolmmaima.dishi.View.Fragments.OrdersFragment;
+import com.malcolmmaima.dishi.View.Fragments.RestaurantOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
-import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.Nullable;
@@ -66,8 +63,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,7 +89,7 @@ public class RestaurantActivity extends AppCompatActivity
             switch (item.getItemId()) {
                 case R.id.navigation_orders:
                     setTitle("Orders");
-                    selectedFragment = OrdersFragment.newInstance();
+                    selectedFragment = RestaurantOrdersFragment.newInstance();
                     break;
                 case R.id.navigation_home:
                     setTitle("Home");
@@ -173,7 +168,7 @@ public class RestaurantActivity extends AppCompatActivity
          */
         setTitle("Orders");
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flContent, OrdersFragment.newInstance());
+        transaction.replace(R.id.flContent, RestaurantOrdersFragment.newInstance());
         transaction.commit();
 
         //Used to select an item programmatically

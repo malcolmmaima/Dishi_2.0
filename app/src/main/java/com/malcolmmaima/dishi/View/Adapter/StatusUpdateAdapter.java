@@ -84,6 +84,25 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
         DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
 
+        postDetails.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    try {
+                        listdata.remove(position);
+                        notifyItemRemoved(position);
+                    } catch (Exception e){
+                        Log.d(TAG, "statusUpdate: error " + e.getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //fetch post User Details
         postUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

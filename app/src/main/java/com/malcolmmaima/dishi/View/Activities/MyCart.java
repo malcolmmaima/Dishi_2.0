@@ -55,7 +55,7 @@ public class MyCart extends AppCompatActivity {
     Boolean multipleRestaurants;
     DatabaseReference myCartRef, myLocationRef;
     FirebaseDatabase db;
-    ValueEventListener locationListener, cartListener;
+    ValueEventListener locationListener, cartListener, totalItemsListener;
     FirebaseUser user;
     int itemCount;
 
@@ -64,7 +64,7 @@ public class MyCart extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_cart);
 
-        itemCount = 0;
+
 
         icon = findViewById(R.id.menuIcon);
         recyclerview = findViewById(R.id.rview);
@@ -124,11 +124,13 @@ public class MyCart extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 total[0] = 0;
+
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
                     ProductDetails prod = cart.getValue(ProductDetails.class);
 
                     int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
                     total[0] = total[0] + adapterTotal;
+
                 }
                 totalPrice.setText("Ksh "+total[0]);
             }
@@ -150,6 +152,7 @@ public class MyCart extends AppCompatActivity {
                 finish();
             }
         });
+
 
         /**
          * Checkout
@@ -320,25 +323,6 @@ public class MyCart extends AppCompatActivity {
                      */
 
                     final DatabaseReference[] restRef = new DatabaseReference[list.size()];
-
-                    restaurantName = list.get(0).getOwner();
-                    for(int i=0; i<list.size(); i++){
-
-                        //Compare other providers in the list with the first index
-
-                        if(!restaurantName.equals(list.get(i).getOwner())){
-                            //SafeToast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
-                            multipleRestaurants = true;
-                        }
-
-                        else {
-                            multipleRestaurants = false;
-                        }
-
-                        itemCount = itemCount + list.get(i).getQuantity();
-                        totalItems.setText(""+itemCount);
-                    }
-
                 }
 
                 else {
@@ -362,12 +346,61 @@ public class MyCart extends AppCompatActivity {
 
             }
         });
+
+        /**
+         * Listener to keep track of total items in cart
+         */
+        totalItemsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                list = new ArrayList<>();
+                list.clear();
+                itemCount = 0;
+                for(DataSnapshot cart : dataSnapshot.getChildren()){
+                    try {
+                        final ProductDetails product = cart.getValue(ProductDetails.class);
+                        product.setKey(cart.getKey());
+                        list.add(product);
+                    } catch (Exception e){ }
+                }
+
+                try {
+                    restaurantName = list.get(0).getOwner();
+                    for (int i = 0; i < list.size(); i++) {
+
+                        //Compare other providers in the list with the first index
+
+                        if (!restaurantName.equals(list.get(i).getOwner())) {
+                            //SafeToast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                            multipleRestaurants = true;
+                        } else {
+                            multipleRestaurants = false;
+                        }
+
+                        itemCount = itemCount + list.get(i).getQuantity();
+                        totalItems.setText("" + itemCount);
+                    }
+                } catch (Exception e){}
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myCartRef.addValueEventListener(totalItemsListener);
+
     }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         myLocationRef.removeEventListener(locationListener);
         myCartRef.removeEventListener(cartListener);
+        myCartRef.removeEventListener(totalItemsListener);
     }
 }

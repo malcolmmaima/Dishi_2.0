@@ -88,6 +88,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
         clearAll = v.findViewById(R.id.clearAll);
+        clearAll.setVisibility(View.GONE);
 
         clearAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,7 +231,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                     //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                     ProductDetails product = products.getValue(ProductDetails.class);
-                                                    product.setKey(products.getKey());
+                                                    //product.setKey(products.getKey());
                                                     product.setDistance(dist);
                                                     product.accountType = "1"; //This fragment belongs to account type 1 (customer)
                                                     list.add(product);
@@ -298,7 +299,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                                 liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
                                                         ProductDetails product = products.getValue(ProductDetails.class);
-                                                        product.setKey(products.getKey());
+                                                        //product.setKey(products.getKey());
                                                         product.setDistance(dist);
                                                         product.accountType = "1"; //this fragment belongs to account type 1
                                                         list.add(product);

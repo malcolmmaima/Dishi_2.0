@@ -80,6 +80,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
 
         holder.foodPrice.setText("Ksh "+productDetails.getPrice());
         holder.foodName.setText(productDetails.getName());
+        holder.itemQuantity.setText("Quantity: " + productDetails.getQuantity());
 
         //Fetch restaurant user details
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+productDetails.getOwner());
@@ -119,7 +120,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewProduct.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("key", productDetails.getKey());
+                slideactivity.putExtra("key", productDetails.getOriginalKey());
                 slideactivity.putExtra("restaurant", productDetails.getOwner());
                 slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
                 slideactivity.putExtra("product", productDetails.getName());
@@ -167,6 +168,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                 cartProduct.setDescription(productDetails.getDescription());
                 cartProduct.setImageURL(productDetails.getImageURL());
                 cartProduct.setOwner(productDetails.getOwner());
+                cartProduct.setOriginalKey(productDetails.getKey());
                 cartProduct.setQuantity(1);
                 cartProduct.setDistance(productDetails.getDistance());
                 cartProduct.setUploadDate(cartDate);
@@ -201,7 +203,6 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             holder.distanceAway.setText(productDetails.getDistance()*1000 + "m away");
         } else {
             holder.distanceAway.setText(productDetails.getDistance() + "km away");
-
         }
 
         /**
@@ -248,7 +249,6 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
         } catch (Exception e){
 
         }
-
     }
 
     /**
@@ -277,7 +277,8 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway,orderedOn;
+        TextView foodPrice, foodDescription, foodName,
+                restaurantName,distanceAway,orderedOn, itemQuantity;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;
@@ -293,6 +294,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             distanceAway = itemView.findViewById(R.id.distanceAway);
             addToCart = itemView.findViewById(R.id.addToCart);
             orderedOn = itemView.findViewById(R.id.orderedOn);
+            itemQuantity = itemView.findViewById(R.id.itemQuantity);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number

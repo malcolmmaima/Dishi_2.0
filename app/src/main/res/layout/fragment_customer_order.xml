@@ -45,6 +45,7 @@
             android:layout_gravity="bottom|end"
             android:layout_marginRight="@dimen/fab_margin"
             android:layout_marginBottom="65dp"
+            android:visibility="gone"
             app:srcCompat="@drawable/ic_shopping_cart_white_48dp" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

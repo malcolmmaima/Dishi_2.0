@@ -13,10 +13,18 @@ public class ProductDetails {
     String uploadDate;
     Double distance;
     public String accountType; //Not an exclusive part of the product model. Just a temprary data holder for passing values between different states
-
     //below values are for our cart and orders, values from customer to restaurant
     public String paymentMethod;
     public String address;
+    public String originalKey; //Always keep track of the original key of the menu item from restaurant
+
+    public String getOriginalKey() {
+        return originalKey;
+    }
+
+    public void setOriginalKey(String originalKey) {
+        this.originalKey = originalKey;
+    }
 
     //below values are from restaurant back to customer (setting order statu to confirmed or decline
     public Boolean confirmed;

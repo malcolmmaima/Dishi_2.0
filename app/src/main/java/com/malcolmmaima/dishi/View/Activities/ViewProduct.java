@@ -34,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
 
@@ -248,6 +249,23 @@ public class ViewProduct extends AppCompatActivity {
         restaurantName.setText(restaurantName_);
         itemCount.setText(""+count);
 
+        //Since this activity is receiving the restaurant name from adapter, in the case activity transitions to this without having fetched name, then fetch a fresh
+        DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getInstance().getReference("users/"+restaurant);
+        restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    UserModel restDetails = dataSnapshot.getValue(UserModel.class);
+                    restaurantName.setText(restDetails.getFirstname()+" "+restDetails.getLastname());
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         if(distance < 1.0){
             distanceAway.setText(distance*1000 + "m away"); //convert KM to meters
         } else {
@@ -368,17 +386,18 @@ public class ViewProduct extends AppCompatActivity {
                 GetCurrentDate currentDate = new GetCurrentDate();
                 String cartDate = currentDate.getDate();
 
-                String key = myCartRef.push().getKey();
+                String newKey = myCartRef.push().getKey();
                 ProductDetails cartProduct = new ProductDetails();
                 cartProduct.setName(product);
                 cartProduct.setPrice(price);
                 cartProduct.setDescription(description);
                 cartProduct.setImageURL(imageUrl);
                 cartProduct.setOwner(restaurant);
+                cartProduct.setOriginalKey(key);
                 cartProduct.setQuantity(count);
                 cartProduct.setUploadDate(cartDate);
 
-                myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                myCartRef.child(newKey).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Snackbar.make(view, "Added to cart", Snackbar.LENGTH_LONG).show();
@@ -408,13 +427,9 @@ public class ViewProduct extends AppCompatActivity {
         inflater.inflate(R.menu.view_product_menu, menu);
         myMenu = menu;
         MenuItem item = menu.findItem(R.id.myCart);
-        if (item != null) {
-            item.setVisible(true);
-        }
-
-        else {
+        try {
             item.setVisible(false);
-        }
+        } catch (Exception e){}
 
         /**
          * Hide / show cart icon if has items or not

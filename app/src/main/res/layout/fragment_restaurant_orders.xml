@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Fragments.OrdersFragment">
+    tools:context=".View.Fragments.RestaurantOrdersFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"

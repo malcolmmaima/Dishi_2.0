@@ -40,7 +40,6 @@ import com.malcolmmaima.dishi.View.Fragments.HistoryFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyFavourites;
 import com.malcolmmaima.dishi.View.Fragments.MyOrdersFragment;
-import com.malcolmmaima.dishi.View.Fragments.OrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
 import com.squareup.picasso.Picasso;
 
