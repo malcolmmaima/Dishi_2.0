@@ -132,31 +132,11 @@
                         android:textColor="#666"/>
 
                     <LinearLayout
+                        android:id="@+id/cardActions1"
                         android:layout_below="@id/productDescription"
                         android:layout_width="match_parent"
                         android:orientation="horizontal"
                         android:layout_height="wrap_content">
-
-                        <ImageButton
-                            android:layout_below="@id/restaurantTag"
-                            android:layout_toRightOf="@id/foodPic"
-                            android:id="@+id/locationTag"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginTop="10dp"
-                            android:scaleType="centerCrop"
-                            android:background="@drawable/location_pin"
-                            />
-                        <TextView
-                            android:id="@+id/distanceAway"
-                            android:layout_below="@id/restaurantName"
-                            android:layout_toRightOf="@id/locationTag"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:text=" 0 m away"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginRight="10dp"/>
 
                         <ImageButton
                             android:layout_below="@id/foodDescription"
@@ -193,6 +173,33 @@
                             android:id="@+id/favouritesTotal"
                             />
 
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cardActions2"
+                        android:layout_below="@id/cardActions1"
+                        android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content">
+
+                        <ImageButton
+                            android:layout_below="@id/restaurantTag"
+                            android:layout_toRightOf="@id/foodPic"
+                            android:id="@+id/locationTag"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:scaleType="centerCrop"
+                            android:background="@drawable/location_pin"
+                            />
+                        <TextView
+                            android:id="@+id/distanceAway"
+                            android:layout_below="@id/restaurantName"
+                            android:layout_toRightOf="@id/locationTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" 0 m away"
+                            android:layout_marginLeft="0dp"
+                            android:layout_marginRight="10dp"/>
                     </LinearLayout>
 
                 </RelativeLayout>

@@ -212,7 +212,7 @@ public class ViewRestaurant extends AppCompatActivity {
         try {
             //Load food image
             Picasso.with(ViewRestaurant.this).load(profilePic).fit().centerCrop()
-                    //.placeholder(R.drawable.shop)
+                    .placeholder(R.drawable.shop)
                     .error(R.drawable.shop)
                     .into(coverImageView);
         } catch (Exception e){
