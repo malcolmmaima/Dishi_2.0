@@ -118,6 +118,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Toast.makeText(context, "key: " + productDetails.getOriginalKey(), Toast.LENGTH_SHORT).show(); //for debug purposes only
                 Intent slideactivity = new Intent(context, ViewProduct.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("key", productDetails.getOriginalKey());
@@ -168,7 +169,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                 cartProduct.setDescription(productDetails.getDescription());
                 cartProduct.setImageURL(productDetails.getImageURL());
                 cartProduct.setOwner(productDetails.getOwner());
-                cartProduct.setOriginalKey(productDetails.getKey());
+                cartProduct.setOriginalKey(productDetails.getOriginalKey());
                 cartProduct.setQuantity(1);
                 cartProduct.setDistance(productDetails.getDistance());
                 cartProduct.setUploadDate(cartDate);
