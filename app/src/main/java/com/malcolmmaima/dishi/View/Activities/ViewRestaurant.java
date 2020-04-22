@@ -110,8 +110,42 @@ public class ViewRestaurant extends AppCompatActivity {
         distAway = findViewById(R.id.distanceAway);
         likes = findViewById(R.id.likesTotal);
 
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
         myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
         restaurantLocationRef = FirebaseDatabase.getInstance().getReference("location/"+restaurantPhone);
+
+        restaurantRef = FirebaseDatabase.getInstance().getReference("users/"+restaurantPhone);
+        myFavourites = FirebaseDatabase.getInstance().getReference("my_restaurant_favourites/"+myPhone);
+        providerFavs = FirebaseDatabase.getInstance().getReference("restaurant_favourites/"+ restaurantPhone);
+
+        //Fetch the restauant basic info
+        restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    finish();
+                    SafeToast.makeText(ViewRestaurant.this, "Restaurant no longer exists!", Toast.LENGTH_LONG).show();
+                } else {
+                    UserModel restaurantDetails = dataSnapshot.getValue(UserModel.class);
+                    //restaurantDetails.phone = restaurantPhone;
+
+                    try {
+                        RestaurantName = restaurantDetails.getFirstname() + " " + restaurantDetails.getLastname();
+                        restaurantName.setText(RestaurantName);
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //Get my location coordinates
         mylocationListener = new ValueEventListener() {
@@ -194,9 +228,6 @@ public class ViewRestaurant extends AppCompatActivity {
             }
         });
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
         distAway.setText(distanceAway + "");
 
         if(distanceAway < 1.0){
@@ -219,9 +250,6 @@ public class ViewRestaurant extends AppCompatActivity {
 
         }
 
-        restaurantRef = FirebaseDatabase.getInstance().getReference("users/"+restaurantPhone);
-        myFavourites = FirebaseDatabase.getInstance().getReference("my_restaurant_favourites/"+myPhone);
-        providerFavs = FirebaseDatabase.getInstance().getReference("restaurant_favourites/"+ restaurantPhone);
 
         providerFavsListener = new ValueEventListener() {
             @Override
@@ -286,26 +314,6 @@ public class ViewRestaurant extends AppCompatActivity {
             }
         });
 
-        //Fetch the restauant basic info
-        restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserModel restaurantDetails = dataSnapshot.getValue(UserModel.class);
-                //restaurantDetails.phone = restaurantPhone;
-
-                try {
-                    RestaurantName = restaurantDetails.getFirstname() + " " + restaurantDetails.getLastname();
-                    restaurantName.setText(RestaurantName);
-                } catch (Exception e){
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         callBtn.setOnClickListener(new View.OnClickListener() {
             @Override
