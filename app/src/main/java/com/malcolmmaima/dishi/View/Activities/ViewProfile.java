@@ -182,6 +182,132 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+        myListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mSwipeRefreshLayout.setRefreshing(false);
+
+                //Does this user exist or nah
+                if(!dataSnapshot.exists()){
+                    finish();
+                    SafeToast.makeText(ViewProfile.this, "User does not exist!", Toast.LENGTH_LONG).show();
+                } else {
+                    try {
+                        myUserDetails = dataSnapshot.getValue(UserModel.class);
+                        profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
+                        profileBio.setText(myUserDetails.getBio());
+
+                        Double totalFollowers = Double.valueOf(myUserDetails.getFollowers());
+                        Double totalFollowing = Double.valueOf(myUserDetails.getFollowing());
+                        /**
+                         * Followers counter
+                         */
+
+                        //below 1000
+                        if(totalFollowers < 1000){
+                            DecimalFormat value = new DecimalFormat("#");
+                            followers.setText(""+value.format(totalFollowers));
+                        }
+
+                        // 1000 to 999,999
+                        else if(totalFollowers >= 1000 && totalFollowers <= 999999){
+                            if(totalFollowers % 1000 == 0){ //No remainder
+                                DecimalFormat value = new DecimalFormat("#####");
+                                followers.setText(""+value.format(totalFollowers/1000)+"K");
+                            }
+
+                            else { //Has remainder 999.9K
+                                DecimalFormat value = new DecimalFormat("######.#");
+                                Double divided = totalFollowers/1000;
+                                if(value.format(divided).equals("1000")){
+                                    followers.setText("1M"); //if rounded off
+                                } else {
+                                    followers.setText(""+value.format(divided)+"K");
+                                }
+                            }
+                        }
+
+                        // 1,000,0000 to 999,999,999
+                        else if(totalFollowers >= 1000000 && totalFollowers <= 999999999){
+                            if(totalFollowers % 1000000 == 0) { //No remainder
+                                DecimalFormat value = new DecimalFormat("#");
+                                followers.setText(""+value.format(totalFollowers/1000000)+"M");
+                            }
+
+                            else { //Has remainder 9.9M, 999.9M etc
+                                DecimalFormat value = new DecimalFormat("#.#");
+                                if(value.format(totalFollowers/1000000).equals("1000")){
+                                    followers.setText("1B"); //if rounded off
+                                } else {
+                                    followers.setText(""+value.format(totalFollowers/1000000)+"M");
+                                }
+                            }
+                        }
+
+                        /**
+                         * Following counter
+                         */
+                        //below 1000
+                        if(totalFollowing < 1000){
+                            DecimalFormat value = new DecimalFormat("#");
+                            following.setText(""+value.format(totalFollowing));
+                        }
+
+                        // 1000 to 999,999
+                        else if(totalFollowing >= 1000 && totalFollowing <= 999999){
+                            if(totalFollowing % 1000 == 0){ //No remainder
+                                DecimalFormat value = new DecimalFormat("#####");
+                                following.setText(""+value.format(totalFollowing/1000)+"K");
+                            }
+
+                            else { //Has remainder 999.9K
+                                DecimalFormat value = new DecimalFormat("######.#");
+                                Double divided = totalFollowing/1000;
+                                if(value.format(divided).equals("1000")){
+                                    following.setText("1M"); //if rounded off
+                                } else {
+                                    following.setText(""+value.format(divided)+"K");
+                                }
+                            }
+                        }
+
+                        // 1,000,0000 to 999,999,999
+                        else if(totalFollowing >= 1000000 && totalFollowing <= 999999999){
+                            if(totalFollowing % 1000000 == 0) { //No remainder
+                                DecimalFormat value = new DecimalFormat("#");
+                                following.setText(""+value.format(totalFollowing/1000000)+"M");
+                            }
+
+                            else { //Has remainder 9.9M, 999.9M etc
+                                DecimalFormat value = new DecimalFormat("#.#");
+                                if(value.format(totalFollowing/1000000).equals("1000")){
+                                    following.setText("1B"); //if rounded off
+                                } else {
+                                    following.setText(""+value.format(totalFollowing/1000000)+"M");
+                                }
+                            }
+                        }
+
+                    } catch (Exception e){}
+
+                    try {
+                        //Load food image
+                        Picasso.with(ViewProfile.this).load(myUserDetails.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePhoto);
+                    } catch (Exception e){}
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        profileRef.addValueEventListener(myListener);
+
         //check to see if i am already following this profile
         profileFollowersListener = new ValueEventListener() {
             @Override
@@ -300,127 +426,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             }
         });
 
-        myListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mSwipeRefreshLayout.setRefreshing(false);
-                try {
-                    myUserDetails = dataSnapshot.getValue(UserModel.class);
-                    profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
-                    profileBio.setText(myUserDetails.getBio());
 
-                    Double totalFollowers = Double.valueOf(myUserDetails.getFollowers());
-                    Double totalFollowing = Double.valueOf(myUserDetails.getFollowing());
-                    /**
-                     * Followers counter
-                     */
-
-                    //below 1000
-                    if(totalFollowers < 1000){
-                        DecimalFormat value = new DecimalFormat("#");
-                        followers.setText(""+value.format(totalFollowers));
-                    }
-
-                    // 1000 to 999,999
-                    else if(totalFollowers >= 1000 && totalFollowers <= 999999){
-                        if(totalFollowers % 1000 == 0){ //No remainder
-                            DecimalFormat value = new DecimalFormat("#####");
-                            followers.setText(""+value.format(totalFollowers/1000)+"K");
-                        }
-
-                        else { //Has remainder 999.9K
-                            DecimalFormat value = new DecimalFormat("######.#");
-                            Double divided = totalFollowers/1000;
-                            if(value.format(divided).equals("1000")){
-                                followers.setText("1M"); //if rounded off
-                            } else {
-                                followers.setText(""+value.format(divided)+"K");
-                            }
-                        }
-                    }
-
-                    // 1,000,0000 to 999,999,999
-                    else if(totalFollowers >= 1000000 && totalFollowers <= 999999999){
-                        if(totalFollowers % 1000000 == 0) { //No remainder
-                            DecimalFormat value = new DecimalFormat("#");
-                            followers.setText(""+value.format(totalFollowers/1000000)+"M");
-                        }
-
-                        else { //Has remainder 9.9M, 999.9M etc
-                            DecimalFormat value = new DecimalFormat("#.#");
-                            if(value.format(totalFollowers/1000000).equals("1000")){
-                                followers.setText("1B"); //if rounded off
-                            } else {
-                                followers.setText(""+value.format(totalFollowers/1000000)+"M");
-                            }
-                        }
-                    }
-
-                    /**
-                     * Following counter
-                     */
-                    //below 1000
-                    if(totalFollowing < 1000){
-                        DecimalFormat value = new DecimalFormat("#");
-                        following.setText(""+value.format(totalFollowing));
-                    }
-
-                    // 1000 to 999,999
-                    else if(totalFollowing >= 1000 && totalFollowing <= 999999){
-                        if(totalFollowing % 1000 == 0){ //No remainder
-                            DecimalFormat value = new DecimalFormat("#####");
-                            following.setText(""+value.format(totalFollowing/1000)+"K");
-                        }
-
-                        else { //Has remainder 999.9K
-                            DecimalFormat value = new DecimalFormat("######.#");
-                            Double divided = totalFollowing/1000;
-                            if(value.format(divided).equals("1000")){
-                                following.setText("1M"); //if rounded off
-                            } else {
-                                following.setText(""+value.format(divided)+"K");
-                            }
-                        }
-                    }
-
-                    // 1,000,0000 to 999,999,999
-                    else if(totalFollowing >= 1000000 && totalFollowing <= 999999999){
-                        if(totalFollowing % 1000000 == 0) { //No remainder
-                            DecimalFormat value = new DecimalFormat("#");
-                            following.setText(""+value.format(totalFollowing/1000000)+"M");
-                        }
-
-                        else { //Has remainder 9.9M, 999.9M etc
-                            DecimalFormat value = new DecimalFormat("#.#");
-                            if(value.format(totalFollowing/1000000).equals("1000")){
-                                following.setText("1B"); //if rounded off
-                            } else {
-                                following.setText(""+value.format(totalFollowing/1000000)+"M");
-                            }
-                        }
-                    }
-
-
-
-                } catch (Exception e){}
-
-                try {
-                    //Load food image
-                    Picasso.with(ViewProfile.this).load(myUserDetails.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePhoto);
-                } catch (Exception e){
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        profileRef.addValueEventListener(myListener);
 
         imageUpload.setOnClickListener(new View.OnClickListener() {
             @Override
