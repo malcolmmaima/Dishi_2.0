@@ -104,6 +104,24 @@ public class ViewMyOrders extends AppCompatActivity {
         riderIcon = findViewById(R.id.riderIcon);
 
         /**
+         * On loading this module check to see if it exists. this is a one time check
+         */
+        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        /**
          * Initialize cart items total and keep track of items
          */
         customerOrderItemsListener = new ValueEventListener() {
@@ -111,7 +129,6 @@ public class ViewMyOrders extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if(!dataSnapshot.exists()){
-                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
                     finish();
                 }
 
@@ -448,24 +465,6 @@ public class ViewMyOrders extends AppCompatActivity {
 
                                     }
                                 });
-                                /**
-                                 * Listen to the node and make sure all order items have been transferred to history node
-                                 */
-                                customerOrderItems.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if(!dataSnapshot.exists()){
-                                            finish();
-                                            SafeToast.makeText(ViewMyOrders.this, "Order Complete", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-
 
                             }
                         })//setPositiveButton
