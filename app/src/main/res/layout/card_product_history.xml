@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginTop="5dp"
+    android:elevation="8dp"
+    card_view:cardCornerRadius="5dp"
+    android:focusableInTouchMode="false"
+    android:padding="10dp"
+    card_view:view_shadowDx="5dp"
+    card_view:view_shadowDy="0dp"
+    card_view:view_borderWidth="2dp"
+    card_view:view_borderColor="#cccccc"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical"
+        android:padding="5dp"
+        >
+
+        <com.alexzh.circleimageview.CircleImageView
+            android:id="@+id/foodPic"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/menu"
+            app:view_shadowRadius="2dp"
+            app:view_shadowDx="2dp"
+            app:view_shadowDy="0dp"
+            app:view_borderWidth="2dp"
+            app:view_borderColor="#cccccc"
+            android:scaleType="fitXY"
+            android:background="@color/pureWhite"
+            android:foregroundGravity="center_vertical"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Food name"
+            android:fontFamily="sans-serif"
+            android:id="@+id/foodName"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/foodPic"
+            android:layout_toLeftOf="@+id/foodPrice"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Ksh 0"
+            android:textSize="25dp"
+            android:id="@+id/foodPrice"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/colorAccent"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="15dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Food Description"
+            android:fontFamily="sans-serif-light"
+            android:id="@+id/foodDescription"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@id/foodName"
+            android:layout_toRightOf="@id/foodPic"
+            android:layout_toEndOf="@id/foodPic"
+            android:textColor="#666"/>
+
+        <ImageButton
+            android:layout_below="@id/foodDescription"
+            android:layout_toRightOf="@id/foodPic"
+            android:id="@+id/restaurantTag"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/online_store"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/restaurantName"
+            android:layout_below="@id/foodDescription"
+            android:layout_toRightOf="@id/locationTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="loading..."
+            android:layout_marginLeft="-10dp"
+            android:layout_marginRight="5dp"/>
+
+        <ImageButton
+            android:layout_below="@id/restaurantTag"
+            android:layout_toRightOf="@id/foodPic"
+            android:id="@+id/locationTag"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/location_pin"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/distanceAway"
+            android:layout_below="@id/restaurantTag"
+            android:layout_toRightOf="@id/locationTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text=" 0 m away"
+            android:layout_marginLeft="-10dp"
+            android:layout_marginRight="5dp"/>
+
+        <ImageButton
+            android:layout_below="@id/locationTag"
+            android:layout_toRightOf="@id/foodPic"
+            android:id="@+id/orderIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/deliver_nduthi_48dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/orderedOn"
+            android:layout_below="@id/locationTag"
+            android:layout_toRightOf="@id/locationTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="orderd x days ago"
+            android:layout_marginLeft="-8dp"
+            android:layout_marginRight="5dp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/foodDescription">
+
+            <ImageButton
+                android:id="@+id/addToCart"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:scaleType="centerCrop"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:background="@drawable/ic_add_shopping_cart_white_48dp"
+                android:layout_marginRight="10dp"
+
+                />
+        </RelativeLayout>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

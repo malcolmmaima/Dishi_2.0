@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -39,30 +40,33 @@ import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder>{
+public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAdapter.MyHolder>{
 
     Context context;
     List<ProductDetails> listdata;
     long DURATION = 200;
 
-    public ProductAdapter(Context context, List<ProductDetails> listdata) {
+    public ProductHistoryAdapter(Context context, List<ProductDetails> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
 
 
     @Override
-    public ProductAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_product,parent,false);
+    public ProductHistoryAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_product_history,parent,false);
 
-        ProductAdapter.MyHolder myHolder = new ProductAdapter.MyHolder(view);
+        ProductHistoryAdapter.MyHolder myHolder = new ProductHistoryAdapter.MyHolder(view);
         return myHolder;
     }
 
-    public void onBindViewHolder(final ProductAdapter.MyHolder holder, final int position) {
+    public void onBindViewHolder(final ProductHistoryAdapter.MyHolder holder, final int position) {
         final ProductDetails productDetails = listdata.get(position);
 
         /**
@@ -201,6 +205,38 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         }
 
         /**
+         * date string conversion to Date:
+         * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+         */
+        //Format both current date and date status update was posted
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+        try {
+            //Get today's date
+            GetCurrentDate currentDate = new GetCurrentDate();
+            String currDate = currentDate.getDate();
+
+            //Get date status update was posted
+            String dtEnd = currDate;
+            String dtStart = productDetails.getUploadDate();
+
+            //Convert String date values to Date values
+            Date dateEnd = format.parse(dtStart);
+            Date dateStart = format.parse(dtEnd);
+
+            /**
+             * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
+             */
+            //Now compute timeAgo duration
+            TimeAgo timeAgo = new TimeAgo();
+            timeAgo.toRelative(dateStart, dateEnd);
+
+            holder.orderedOn.setText("ordered "+timeAgo.toRelative(dateEnd, dateStart, 1));
+            //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        /**
          * Load image url onto imageview
          */
         try {
@@ -241,7 +277,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway;
+        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway,orderedOn;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;
@@ -256,6 +292,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             restaurantName = itemView.findViewById(R.id.restaurantName);
             distanceAway = itemView.findViewById(R.id.distanceAway);
             addToCart = itemView.findViewById(R.id.addToCart);
+            orderedOn = itemView.findViewById(R.id.orderedOn);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
