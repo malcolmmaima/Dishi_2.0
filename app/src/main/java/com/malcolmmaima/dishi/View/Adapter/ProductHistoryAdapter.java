@@ -302,6 +302,32 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                 @Override
                 public boolean onLongClick(View v) {
 
+                        final AlertDialog deletePost = new AlertDialog.Builder(v.getContext())
+                                //set message, title, and icon
+                                .setMessage("Remove item?")
+                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                //set three option buttons
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        DatabaseReference itemDetails = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone+"/"+listdata.get(getAdapterPosition()).getKey());
+                                        itemDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                listdata.remove(getAdapterPosition());
+                                                notifyItemRemoved(getAdapterPosition());
+                                            }
+                                        });
+                                    }
+                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        //do nothing
+
+                                    }
+                                })//setNegativeButton
+
+                                .create();
+                        deletePost.show();
+
                     return false;
                 }
             });
