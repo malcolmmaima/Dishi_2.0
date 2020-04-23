@@ -35,7 +35,7 @@ import java.util.List;
 
 public class NewChat extends AppCompatActivity {
 
-    List<UserModel> usersFollowing = new ArrayList<>();
+
     DatabaseReference followingRef;
     ProgressBar progressBar;
     EditText searchPhone;
@@ -43,9 +43,6 @@ public class NewChat extends AppCompatActivity {
     TextView emptyTag;
     String myPhone;
     FirebaseUser user;
-    UserModel userFound = new UserModel();
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +98,7 @@ public class NewChat extends AppCompatActivity {
     }
 
     private void searchUser(final String names) {
-        userFound = null;
-        usersFollowing.clear();
+        List<UserModel> usersFollowing = new ArrayList<>();
         followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -111,14 +107,14 @@ public class NewChat extends AppCompatActivity {
                     userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            userFound = dataSnapshot.getValue(UserModel.class);
+                            UserModel userFound = dataSnapshot.getValue(UserModel.class);
                             userFound.setPhone(user.getKey());
 
                             /**
                              * Compare search parameter with value returned from db
                              */
                             String userName = userFound.getFirstname()+" "+userFound.getLastname();
-                            if(userName.toLowerCase().contains(names.toLowerCase()) && !usersFollowing.contains(userFound)){
+                            if(userName.toLowerCase().contains(names.toLowerCase()) && !usersFollowing.contains(userFound.getPhone())){
                                 usersFollowing.add(userFound);
                             }
 
