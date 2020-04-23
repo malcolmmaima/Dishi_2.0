@@ -234,7 +234,6 @@ public class ViewRestaurant extends AppCompatActivity {
             distAway.setText(distanceAway*1000 + "m away");
         } else {
             distAway.setText(distanceAway + "km away");
-
         }
 
         /**
