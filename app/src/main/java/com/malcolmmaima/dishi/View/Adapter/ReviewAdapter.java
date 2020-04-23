@@ -36,6 +36,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
@@ -324,7 +325,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(context, ViewStatus.class)
+                Intent slideactivity = new Intent(context, ViewReview.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("author", statusUpdateModel.getAuthor());
                 slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
