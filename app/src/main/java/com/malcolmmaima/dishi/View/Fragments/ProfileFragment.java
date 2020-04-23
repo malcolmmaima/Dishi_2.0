@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,7 @@ import com.malcolmmaima.dishi.View.Activities.FollowersFollowing;
 import com.malcolmmaima.dishi.View.Activities.Inbox;
 import com.malcolmmaima.dishi.View.Activities.NewChat;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
@@ -75,7 +77,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     FirebaseUser user;
 
     CircleImageView profilePhoto;
-    TextView profileName, profileBio, following, followers, followingTitle, followersTitle;
+    TextView profileName, profileBio, following, followers;
+    LinearLayout followingLayout, followersLayout;
     ImageButton emoji;
     EmojiconEditText myStatusUpdate;
     View rootView;
@@ -123,8 +126,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         profileBio = v.findViewById(R.id.user_profile_short_bio);
         following = v.findViewById(R.id.following);
         followers = v.findViewById(R.id.followers);
-        followingTitle = v.findViewById(R.id.followingTitle);
-        followersTitle = v.findViewById(R.id.followersTitle);
+        followingLayout = v.findViewById(R.id.followingLayout);
+        followersLayout = v.findViewById(R.id.followersLayout);
         imageUpload = v.findViewById(R.id.camera);
         selectedImage = v.findViewById(R.id.selectedImage);
         progressBar = v.findViewById(R.id.progressBar);
@@ -171,7 +174,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone);
         followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
 
-        following.setOnClickListener(new View.OnClickListener() {
+        followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
@@ -182,34 +185,12 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         });
 
-        followers.setOnClickListener(new View.OnClickListener() {
+        followersLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
                 mainActivity.putExtra("phone", myPhone);
                 mainActivity.putExtra("target", "followers");
-                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(mainActivity);
-            }
-        });
-
-        followersTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
-                mainActivity.putExtra("phone", myPhone);
-                mainActivity.putExtra("target", "followers");
-                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(mainActivity);
-            }
-        });
-
-        followingTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
-                mainActivity.putExtra("phone", myPhone);
-                mainActivity.putExtra("target", "following");
                 mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(mainActivity);
             }
