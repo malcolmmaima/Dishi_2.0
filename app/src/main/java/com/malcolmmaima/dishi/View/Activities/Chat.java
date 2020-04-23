@@ -66,9 +66,10 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
     private static final String TAG = "ChatActivity";
-    DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef;
-    ValueEventListener recipientListener, myMessagesListener;
+    DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef, followingRef, followerRef;
+    ValueEventListener recipientListener, myMessagesListener, followingListener, followerListener, accountTypeListener;
     UserModel recipientUser;
+    Menu myMenu;
     MessageModel chatMessage;
     ArrayList<MessageModel> messages;
     ImageButton emoji;
@@ -107,6 +108,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         //For debugging purposes
         //Toast.makeText(this, "from => "+fromPhone +" to => " +toPhone, Toast.LENGTH_LONG).show();
 
+        //May God be with you as you try to understand some of my code... there are times i didn't know what i was doing ;-D
+
         //This is a bugfix since i noticed on clicking message notification i was getting some very innacurate/dirty data sent to the wrong nodes
         if(toPhone.equals(myPhone)){
             //For debugging purposes
@@ -114,12 +117,16 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             recipientRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone);
             recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
             myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
+            followingRef = FirebaseDatabase.getInstance().getReference("following/"+toPhone+"/"+fromPhone);
+            followerRef = FirebaseDatabase.getInstance().getReference("followers/"+toPhone+"/"+fromPhone);
         }
 
         else {
             recipientRef = FirebaseDatabase.getInstance().getReference("users/"+toPhone);
             recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
             myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
+            followingRef = FirebaseDatabase.getInstance().getReference("following/"+fromPhone+"/"+toPhone);
+            followerRef = FirebaseDatabase.getInstance().getReference("followers/"+fromPhone+"/"+toPhone);
         }
 
         //You never know :-D ... you can't message yourself
@@ -301,7 +308,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
             }
         };
-        recipientRef.addListenerForSingleValueEvent(recipientListener);
+        recipientRef.addValueEventListener(recipientListener);
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,6 +396,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         recipientRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone_);
         recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone_+"/"+fromPhone_);
         myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone_+"/"+toPhone_);
+        followingRef = FirebaseDatabase.getInstance().getReference("following/"+fromPhone_+"/"+toPhone_);
+        followerRef = FirebaseDatabase.getInstance().getReference("followers/"+fromPhone_+"/"+toPhone_);
 
         myMessagesListener = new ValueEventListener() {
             @Override
@@ -523,7 +532,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
             }
         };
-        recipientRef.addListenerForSingleValueEvent(recipientListener);
+        recipientRef.addValueEventListener(recipientListener);
 
     }
 
@@ -540,7 +549,99 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.chat_menu, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_menu, menu);
+        myMenu = menu;
+        MenuItem item = menu.findItem(R.id.chat_call);
+        try {
+            item.setVisible(false);
+        } catch (Exception e){}
+
+        /**
+         * Get recipient's account type
+         */
+        accountTypeListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    UserModel recipientUser_ = dataSnapshot.getValue(UserModel.class);
+                    if(recipientUser_.getAccount_type().equals("2")){
+
+                        //Automatically show phone for restaurant accounts
+                        try {
+                            myMenu.findItem(R.id.chat_call).setVisible(true);
+                            myMenu.findItem(R.id.chat_call).setEnabled(true);
+                        } catch (Exception e){ }
+                    } else { //Rider and customer accounts
+                        /**
+                         * As a privacy concern, we don't want to expose people's phone numbers under chat ... only show phone if following/follower is mutual
+                         */
+                        followingListener = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    //Toast.makeText(Chat.this, "Following => true", Toast.LENGTH_SHORT).show();
+                                    followerListener = new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(dataSnapshot.exists()){
+                                                //Toast.makeText(Chat.this, "Follower => true", Toast.LENGTH_SHORT).show();
+                                                try {
+                                                    myMenu.findItem(R.id.chat_call).setVisible(true);
+                                                    myMenu.findItem(R.id.chat_call).setEnabled(true);
+                                                } catch (Exception e){
+
+                                                }
+                                            } else {
+                                                //Toast.makeText(Chat.this, "Follower => false", Toast.LENGTH_SHORT).show();
+                                                try {
+                                                    myMenu.findItem(R.id.chat_call).setVisible(false);
+                                                    myMenu.findItem(R.id.chat_call).setEnabled(false);
+                                                } catch (Exception e){
+
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    };
+                                    try {
+                                        followerRef.addValueEventListener(followerListener);
+                                    } catch (Exception e){}
+                                } else {
+                                    //Toast.makeText(Chat.this, "Following => false", Toast.LENGTH_SHORT).show();
+                                    try {
+                                        myMenu.findItem(R.id.chat_call).setVisible(false);
+                                        myMenu.findItem(R.id.chat_call).setEnabled(false);
+                                    } catch (Exception e){
+
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        };
+
+                        followingRef.addValueEventListener(followingListener);
+                    }
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        recipientRef.addValueEventListener(accountTypeListener);
+
         return true;
     }
 
@@ -664,5 +765,15 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     protected void onDestroy() {
         super.onDestroy();
         myMessagedRef.removeEventListener(myMessagesListener);
+
+        try {
+            //there may be instances where these two listeners are not triggered
+            followerRef.removeEventListener(followerListener);
+            followingRef.removeEventListener(followingListener);
+        } catch (Exception e){
+
+        }
+        recipientRef.removeEventListener(recipientListener);
+        recipientRef.removeEventListener(accountTypeListener);
     }
 }

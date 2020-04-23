@@ -470,7 +470,8 @@ public class ViewProduct extends AppCompatActivity {
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
         case R.id.myCart:
 
             Intent slideactivity = new Intent(ViewProduct.this, MyCart.class)
