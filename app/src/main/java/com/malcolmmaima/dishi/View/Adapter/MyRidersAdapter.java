@@ -162,8 +162,10 @@ public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHold
                                     myRidersRef.child(listdata.get(getAdapterPosition()).getPhone()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            listdata.remove(getAdapterPosition());
-                                            notifyItemRemoved(getAdapterPosition());
+                                            try {
+                                                listdata.remove(getAdapterPosition());
+                                                notifyItemRemoved(getAdapterPosition());
+                                            } catch (Exception e){}
                                         }
                                     });
                                 }

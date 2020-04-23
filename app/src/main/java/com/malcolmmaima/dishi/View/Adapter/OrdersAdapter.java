@@ -99,8 +99,10 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     //SafeToast.makeText(context, "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
                     if(orderDetails.getPhone().equals(dataSnapshot.getKey())){
-                        listdata.remove(holder.getLayoutPosition());
-                        notifyItemRemoved(holder.getLayoutPosition());
+                        try {
+                            listdata.remove(holder.getLayoutPosition());
+                            notifyItemRemoved(holder.getLayoutPosition());
+                        } catch (Exception e){}
                     }
                 }
 

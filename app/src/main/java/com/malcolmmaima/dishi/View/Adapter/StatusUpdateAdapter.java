@@ -382,8 +382,10 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                         postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                listdata.remove(getAdapterPosition());
-                                                notifyItemRemoved(getAdapterPosition());
+                                                try {
+                                                    listdata.remove(getAdapterPosition());
+                                                    notifyItemRemoved(getAdapterPosition());
+                                                } catch(Exception e){}
                                             }
                                         });
                                     }

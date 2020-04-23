@@ -106,10 +106,12 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
                                                 myRestaurantsRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        listdata.remove(position);
-                                                        notifyItemRemoved(position);
-                                                        Snackbar snackbar = Snackbar.make(v.getRootView(), "Removed Successfully", Snackbar.LENGTH_LONG);
-                                                        snackbar.show();
+                                                        try {
+                                                            listdata.remove(position);
+                                                            notifyItemRemoved(position);
+                                                            Snackbar snackbar = Snackbar.make(v.getRootView(), "Removed Successfully", Snackbar.LENGTH_LONG);
+                                                            snackbar.show();
+                                                        } catch (Exception e){}
                                                     }
                                                 });
                                             }
@@ -165,10 +167,12 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
                                         myRestaurantsRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                listdata.remove(position);
-                                                notifyItemRemoved(position);
-                                                Snackbar snackbar = Snackbar.make(v.getRootView(), "Request Declined", Snackbar.LENGTH_LONG);
-                                                snackbar.show();
+                                                try {
+                                                    listdata.remove(position);
+                                                    notifyItemRemoved(position);
+                                                    Snackbar snackbar = Snackbar.make(v.getRootView(), "Request Declined", Snackbar.LENGTH_LONG);
+                                                    snackbar.show();
+                                                } catch (Exception e){}
                                             }
                                         });
                                     }

@@ -178,8 +178,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
                                     menuRef.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            notifyItemRemoved(getAdapterPosition());
-                                            Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
+                                            try {
+                                                notifyItemRemoved(getAdapterPosition());
+                                                Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
+                                            } catch (Exception e){}
                                         }
                                     });
 

@@ -243,8 +243,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                                         postRef.child(listdata.get(getAdapterPosition()).getCommentKey()).child("comments").child(listdata.get(getAdapterPosition()).key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                listdata.remove(getAdapterPosition());
-                                                notifyItemRemoved(getAdapterPosition());
+                                                try {
+                                                    listdata.remove(getAdapterPosition());
+                                                    notifyItemRemoved(getAdapterPosition());
+                                                } catch (Exception e){}
                                             }
                                         });
                                     }

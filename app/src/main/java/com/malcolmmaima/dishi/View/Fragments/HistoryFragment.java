@@ -238,6 +238,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                                                     if (!list.isEmpty()) {
                                                         clearAll.setVisibility(View.VISIBLE);
+                                                        clearAll.setText("CLEAR ALL ("+list.size()+")");
                                                         /**
                                                          * https://howtodoinjava.com/sort/collections-sort/
                                                          * We want to sort from nearest to furthest location
@@ -312,6 +313,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                                                         if (!list.isEmpty()) {
                                                             clearAll.setVisibility(View.VISIBLE);
+                                                            clearAll.setText("CLEAR ALL ("+list.size()+")");
                                                             /**
                                                              * https://howtodoinjava.com/sort/collections-sort/
                                                              * We want to sort from nearest to furthest location

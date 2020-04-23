@@ -202,6 +202,7 @@ public class CustomerActivity extends AppCompatActivity
             myRef.addValueEventListener(myRefListener);
         }
 
+
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
