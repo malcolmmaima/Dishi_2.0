@@ -176,6 +176,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
                 mainActivity.putExtra("phone", myPhone);
+                mainActivity.putExtra("target", "following");
                 mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(mainActivity);
             }
@@ -186,6 +187,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
                 mainActivity.putExtra("phone", myPhone);
+                mainActivity.putExtra("target", "followers");
                 mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(mainActivity);
             }
@@ -196,6 +198,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
                 mainActivity.putExtra("phone", myPhone);
+                mainActivity.putExtra("target", "followers");
                 mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(mainActivity);
             }
@@ -206,6 +209,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
                 mainActivity.putExtra("phone", myPhone);
+                mainActivity.putExtra("target", "following");
                 mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(mainActivity);
             }

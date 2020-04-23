@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,12 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewPagerAdapter;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
@@ -26,7 +33,8 @@ import java.util.List;
 
 public class FollowersFollowing extends AppCompatActivity {
 
-    String phone;
+    String phone, target;
+    DatabaseReference userDetails;
 
     //This is our tablayout
     private TabLayout tabLayout;
@@ -44,17 +52,45 @@ public class FollowersFollowing extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_followers_following);
 
+        setTitle("");
         phone = getIntent().getStringExtra("phone");
+        target = getIntent().getStringExtra("target");
+
+        userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
+        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    UserModel userModel = dataSnapshot.getValue(UserModel.class);
+                    setTitle(userModel.getFirstname() + " " + userModel.getLastname());
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle(phone);
+
 
         // Setting ViewPager for each Tabs
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
+
+        //Navigate to specific fragment based on what target user clicked on in profile
+        if(target.equals("following")){
+            viewPager.setCurrentItem(0);
+        } else {
+            viewPager.setCurrentItem(1);
+        }
+
+
         // Set Tabs inside Toolbar
         TabLayout tabs = (TabLayout) findViewById(R.id.result_tabs);
         tabs.setupWithViewPager(viewPager);

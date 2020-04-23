@@ -75,7 +75,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     FirebaseUser user;
 
     CircleImageView profilePhoto;
-    TextView profileName, profileBio, following, followers;
+    TextView profileName, profileBio, following, followers, followingTitle, followersTitle;
     ImageButton emoji;
     EmojiconEditText myStatusUpdate;
     View rootView;
@@ -136,6 +136,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         profileBio = findViewById(R.id.user_profile_short_bio);
         following = findViewById(R.id.following);
         followers = findViewById(R.id.followers);
+        followingTitle = findViewById(R.id.followingTitle);
+        followersTitle = findViewById(R.id.followersTitle);
         recyclerview = findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
         followBtn = findViewById(R.id.follow);
@@ -148,6 +150,50 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         postBtn = findViewById(R.id.postStatus);
         postBtn.setVisibility(View.GONE);
         emoji.setVisibility(View.GONE);
+
+        following.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(ViewProfile.this, FollowersFollowing.class);
+                mainActivity.putExtra("phone", phone);
+                mainActivity.putExtra("target", "following");
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
+
+        followers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(ViewProfile.this, FollowersFollowing.class);
+                mainActivity.putExtra("phone", phone);
+                mainActivity.putExtra("target", "followers");
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
+
+        followersTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(ViewProfile.this, FollowersFollowing.class);
+                mainActivity.putExtra("phone", phone);
+                mainActivity.putExtra("target", "followers");
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
+
+        followingTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(ViewProfile.this, FollowersFollowing.class);
+                mainActivity.putExtra("phone", phone);
+                mainActivity.putExtra("target", "following");
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
 
         icon = findViewById(R.id.noPostsIcon);
         emptyTag = findViewById(R.id.empty_tag);

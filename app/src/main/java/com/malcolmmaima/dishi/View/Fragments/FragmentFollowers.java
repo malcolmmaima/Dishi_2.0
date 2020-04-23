@@ -9,11 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.malcolmmaima.dishi.R;
 
 public class FragmentFollowers extends Fragment {
 
     String phone;
+    DatabaseReference followersRef;
 
     public FragmentFollowers() {
         // Required empty public constructor
@@ -27,7 +30,7 @@ public class FragmentFollowers extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_followers, container, false);
 
         phone = getArguments().getString("phone");
-        Toast.makeText(getContext(), "phone: " + phone, Toast.LENGTH_SHORT).show();
+        followersRef = FirebaseDatabase.getInstance().getReference("following/"+phone);
 
         return  view;
     }
