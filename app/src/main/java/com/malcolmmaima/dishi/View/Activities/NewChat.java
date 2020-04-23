@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -49,6 +50,9 @@ public class NewChat extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
 
+        //Hide keyboard on activity load
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
@@ -74,6 +78,8 @@ public class NewChat extends AppCompatActivity {
             }
         });
 
+        searchUser(" "); //Initialize search
+
         searchPhone.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -97,7 +103,7 @@ public class NewChat extends AppCompatActivity {
         });
     }
 
-    private void searchUser(final String names) {
+    private void searchUser(final String search) {
         List<UserModel> usersFollowing = new ArrayList<>();
         followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -114,7 +120,7 @@ public class NewChat extends AppCompatActivity {
                              * Compare search parameter with value returned from db
                              */
                             String userName = userFound.getFirstname()+" "+userFound.getLastname();
-                            if(userName.toLowerCase().contains(names.toLowerCase()) && !usersFollowing.contains(userFound.getPhone())){
+                            if(userName.toLowerCase().contains(search.toLowerCase())){
                                 usersFollowing.add(userFound);
                             }
 
@@ -155,10 +161,9 @@ public class NewChat extends AppCompatActivity {
         });
     }
 
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
+    protected void onPause() {
+        super.onPause();
+        finish();
     }
 }

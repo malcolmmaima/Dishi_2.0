@@ -95,6 +95,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<NewChatAdapter.MyHolder
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                                     context.startActivity(slideactivity, bndlanimation);
                                 }
+
                             }
                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
