@@ -43,6 +43,9 @@ import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.FollowersFollowing;
+import com.malcolmmaima.dishi.View.Activities.Inbox;
+import com.malcolmmaima.dishi.View.Activities.NewChat;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
@@ -72,7 +75,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     FirebaseUser user;
 
     CircleImageView profilePhoto;
-    TextView profileName, profileBio, following, followers;
+    TextView profileName, profileBio, following, followers, followingTitle, followersTitle;
     ImageButton emoji;
     EmojiconEditText myStatusUpdate;
     View rootView;
@@ -120,6 +123,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         profileBio = v.findViewById(R.id.user_profile_short_bio);
         following = v.findViewById(R.id.following);
         followers = v.findViewById(R.id.followers);
+        followingTitle = v.findViewById(R.id.followingTitle);
+        followersTitle = v.findViewById(R.id.followersTitle);
         imageUpload = v.findViewById(R.id.camera);
         selectedImage = v.findViewById(R.id.selectedImage);
         progressBar = v.findViewById(R.id.progressBar);
@@ -165,6 +170,46 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+myPhone);
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone);
         followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+
+        following.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
+                mainActivity.putExtra("phone", myPhone);
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
+
+        followers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
+                mainActivity.putExtra("phone", myPhone);
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
+
+        followersTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
+                mainActivity.putExtra("phone", myPhone);
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
+
+        followingTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(getContext(), FollowersFollowing.class);
+                mainActivity.putExtra("phone", myPhone);
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
+            }
+        });
 
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();

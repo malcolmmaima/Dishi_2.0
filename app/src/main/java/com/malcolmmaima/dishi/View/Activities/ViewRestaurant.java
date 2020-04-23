@@ -245,10 +245,7 @@ public class ViewRestaurant extends AppCompatActivity {
                     .placeholder(R.drawable.shop)
                     .error(R.drawable.shop)
                     .into(coverImageView);
-        } catch (Exception e){
-
-        }
-
+        } catch (Exception e){ }
 
         providerFavsListener = new ValueEventListener() {
             @Override
@@ -312,7 +309,6 @@ public class ViewRestaurant extends AppCompatActivity {
                 }
             }
         });
-
 
         callBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -394,7 +390,6 @@ public class ViewRestaurant extends AppCompatActivity {
 
             }
         });
-
 
     }
 
