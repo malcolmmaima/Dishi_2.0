@@ -677,7 +677,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         String time = getCurrentDate.getDate();
 
         final StatusUpdateModel comment = new StatusUpdateModel();
-        comment.setStatus(statusPost.getText().toString());
+        comment.setStatus(statusPost.getText().toString().trim());
         comment.setTimePosted(time);
         comment.setAuthor(myPhone);
         comment.setPostedTo(postedTo);

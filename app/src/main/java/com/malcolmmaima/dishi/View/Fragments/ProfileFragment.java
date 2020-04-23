@@ -428,7 +428,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         String postDate = currentDate.getDate();
 
         StatusUpdateModel statusUpdate = new StatusUpdateModel();
-        statusUpdate.setStatus(myStatusUpdate.getText().toString());
+        statusUpdate.setStatus(myStatusUpdate.getText().toString().trim());
         statusUpdate.setAuthor(myPhone);
         statusUpdate.setPostedTo(myPhone);
         statusUpdate.setTimePosted(postDate);

@@ -246,7 +246,7 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         String postDate = currentDate.getDate();
 
         StatusUpdateModel statusUpdate = new StatusUpdateModel();
-        statusUpdate.setStatus(myReview.getText().toString());
+        statusUpdate.setStatus(myReview.getText().toString().trim());
         statusUpdate.setAuthor(myPhone);
         statusUpdate.setPostedTo(phone);
         statusUpdate.setTimePosted(postDate);

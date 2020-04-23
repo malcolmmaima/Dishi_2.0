@@ -672,7 +672,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         String postDate = currentDate.getDate();
 
         StatusUpdateModel statusUpdate = new StatusUpdateModel();
-        statusUpdate.setStatus(myStatusUpdate.getText().toString());
+        statusUpdate.setStatus(myStatusUpdate.getText().toString().trim());
         statusUpdate.setAuthor(myPhone);
         statusUpdate.setPostedTo(phone);
         statusUpdate.setTimePosted(postDate);
