@@ -9,12 +9,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -60,7 +65,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     String phone, myPhone;
-
+    Menu myMenu;
     private static final String TAG = "ProfileActivity";
     List<StatusUpdateModel> statusUpdates;
     RecyclerView recyclerview;
@@ -479,6 +484,38 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 } catch (Exception e){}
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_profile_view, menu);
+        myMenu = menu;
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) { switch(item.getItemId()) {
+
+        case R.id.sendMessage:
+            Intent slideactivity = new Intent(ViewProfile.this, Chat.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            slideactivity.putExtra("fromPhone", myPhone);
+            slideactivity.putExtra("toPhone", phone);
+            Bundle bndlanimation =
+                    null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                bndlanimation = ActivityOptions.makeCustomAnimation(ViewProfile.this, R.anim.animation,R.anim.animation2).toBundle();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                startActivity(slideactivity, bndlanimation);
+            }
+            return  (true);
+
+    }
+        return(super.onOptionsItemSelected(item));
     }
 
     private void fetchPosts() {
