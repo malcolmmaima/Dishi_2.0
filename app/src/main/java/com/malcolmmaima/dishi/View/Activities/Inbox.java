@@ -277,7 +277,9 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.newChat:
-                SafeToast.makeText(this, "New chat", Toast.LENGTH_SHORT).show();
+                Intent mainActivity = new Intent(Inbox.this, NewChat.class);
+                mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivity);
                 return(true);
 
         }

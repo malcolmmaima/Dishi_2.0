@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.ViewReview"></activity>
+        <activity android:name=".View.Activities.NewChat"></activity>
+        <activity android:name=".View.Activities.ViewReview" />
         <activity android:name=".View.Activities.ViewStatus" />
         <activity
             android:name=".View.Activities.Chat"
