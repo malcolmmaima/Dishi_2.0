@@ -83,7 +83,7 @@ public class ForegroundService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
-
+        Log.d("ForeGroundService", "ForegroundService: started");
         manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         try {
@@ -250,34 +250,36 @@ public class ForegroundService extends Service {
                                 incomingUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        UserModel incomingUser = dataSnapshot.getValue(UserModel.class);
 
-                                        //compose our notification and send
-                                        String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
-                                        String msg;
-                                        if(finalUnreadCounter != 1){
-                                            msg = finalUnreadCounter + " new messages";
+                                        if(dataSnapshot.exists()){
+                                            UserModel incomingUser = dataSnapshot.getValue(UserModel.class);
 
-                                        } else {
-                                            msg = messages.getMessage();
+                                            //compose our notification and send
+                                            String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
+                                            String msg;
+                                            if(finalUnreadCounter != 1){
+                                                msg = finalUnreadCounter + " new messages";
+
+                                            } else {
+                                                msg = messages.getMessage();
+                                            }
+
+                                            //We want to check if user is currently in Chat activity, no need to send notification if
+                                            //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
+                                            ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+                                            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+                                            Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
+                                            ComponentName componentInfo = taskInfo.get(0).topActivity;
+                                            componentInfo.getPackageName();
+                                            Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
+
+                                            if(!taskInfo.get(0).topActivity.getClassName().equals("com.malcolmmaima.dishi.View.Activities.Chat")){
+
+                                                //TODO find a way to get data from Chat activity and compare to new notification data.
+                                                //If i am actively in chat don't fire up notification
+                                                sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+                                            }
                                         }
-
-                                        //We want to check if user is currently in Chat activity, no need to send notification if
-                                        //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
-                                        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-                                        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-                                        Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
-                                        ComponentName componentInfo = taskInfo.get(0).topActivity;
-                                        componentInfo.getPackageName();
-                                        Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
-
-                                        if(!taskInfo.get(0).topActivity.getClassName().equals("com.malcolmmaima.dishi.View.Activities.Chat")){
-
-                                            //TODO find a way to get data from Chat activity and compare to new notification data.
-                                            //If i am actively in chat don't fire up notification
-                                            sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
-                                        }
-
                                     }
 
                                     @Override
@@ -796,7 +798,7 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        Log.d("ForeGroundService", "ForegroundService: stopped");
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
             myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);

@@ -188,6 +188,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     likePost.setEnabled(false);
                     statusPost.setEnabled(false);
                     imageUpload.setEnabled(false);
+                    imageUpload.setVisibility(View.GONE);
                     postStatus.setEnabled(false);
                     profilePic.setEnabled(false);
                     emoji.setEnabled(false);

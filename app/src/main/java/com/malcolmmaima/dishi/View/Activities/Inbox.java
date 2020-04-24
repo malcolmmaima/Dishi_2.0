@@ -149,14 +149,16 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                                         for(DataSnapshot message : dataSnapshot.getChildren()){
-                                            chatMessage = message.getValue(MessageModel.class);
-                                            chatMessage.setKey(message.getKey());
+                                            try {
+                                                chatMessage = message.getValue(MessageModel.class);
+                                                chatMessage.setKey(message.getKey());
 
-                                            contactDm = users.getValue(UserModel.class);
-                                            contactDm.setPhone(userDm.getKey());
-                                            contactDm.timeStamp = chatMessage.getTimeStamp();
-                                            contactDm.message = chatMessage.getMessage();
-                                            chatlist.add(contactDm);
+                                                contactDm = users.getValue(UserModel.class);
+                                                contactDm.setPhone(userDm.getKey());
+                                                contactDm.timeStamp = chatMessage.getTimeStamp();
+                                                contactDm.message = chatMessage.getMessage();
+                                                chatlist.add(contactDm);
+                                            } catch (Exception e){}
                                         }
 
                                         if(!chatlist.isEmpty()){
