@@ -58,7 +58,7 @@ public class NewChat extends AppCompatActivity {
         followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
 
         progressBar = findViewById(R.id.progressBar);
-        searchPhone = findViewById(R.id.riderPhone);
+        searchPhone = findViewById(R.id.userSearch);
         recyclerview = findViewById(R.id.rview);
         emptyTag = findViewById(R.id.empty_tag);
 

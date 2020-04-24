@@ -89,7 +89,7 @@
                         android:id="@+id/follow"
                         android:layout_width="100dp"
                         android:layout_margin="10dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="30dp"
                         android:background="@drawable/login_button"
                         android:fontFamily="sans-serif-medium"
                         android:text="follow"
