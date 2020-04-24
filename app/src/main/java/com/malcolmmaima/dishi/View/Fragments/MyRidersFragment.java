@@ -1,10 +1,7 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
 import android.app.ActivityOptions;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,10 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddRider;
-import com.malcolmmaima.dishi.View.Activities.LocationSettings;
-import com.malcolmmaima.dishi.View.Adapter.MyOrdersAdapter;
 import com.malcolmmaima.dishi.View.Adapter.MyRidersAdapter;
-import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +48,8 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
     SwipeRefreshLayout mSwipeRefreshLayout;
 
 
-    public static RiderFragment newInstance() {
-        RiderFragment fragment = new RiderFragment();
+    public static RiderRequestsFragment newInstance() {
+        RiderRequestsFragment fragment = new RiderRequestsFragment();
         return fragment;
     }
 

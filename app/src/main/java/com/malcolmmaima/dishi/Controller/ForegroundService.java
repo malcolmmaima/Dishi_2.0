@@ -58,7 +58,9 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, myMessages;
+    DatabaseReference myRideOrderRequests;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
+    ValueEventListener myRideOrderRequestsListener;
     String myPhone;
     FirebaseUser user;
     UserModel myUserDetails;
@@ -74,7 +76,6 @@ public class ForegroundService extends Service {
     // thus an arraylist that keeps trach of restaurant notifications. One notification for each confirmed order
     // item(s) since the listener that calls this function of type "orderConfirmed"
     //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
-
 
     @Override
     public void onCreate() {
@@ -113,6 +114,93 @@ public class ForegroundService extends Service {
 
                     if(myUserDetails.getAccount_type().equals("3")){
                         startRiderNotifications();
+
+                        /**
+                         * We need to keep track of my active status and whether i (rider) have any orders in progress
+                         */
+                        myRideOrderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone);
+                        myRideOrderRequestsListener = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                //if node my_ride_requests/myPhone does not exist then it simply means i have no ride requests ata all
+                                if(!dataSnapshot.exists()){
+                                    Log.d("RiderRequestsService", myPhone+": no ride requests");
+                                    DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
+                                    myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            for(DataSnapshot restaurants : dataSnapshot.getChildren()){
+                                                //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
+                                                restaurantRidersRef.setValue("inactive");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+
+                                else {
+                                    Log.d("RiderRequestsService", myPhone+": active ride requests");
+                                    for(DataSnapshot restaurantRequest : dataSnapshot.getChildren()){
+                                        //SafeToast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
+                                        for(DataSnapshot assignedCustomer : restaurantRequest.getChildren()){
+                                            /**
+                                             * we just need 1 'accepted' order request to keep rider status active otherwise if none then inactive
+                                             */
+                                            if(assignedCustomer.getValue().equals("accepted")){
+                                                DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
+                                                myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for(DataSnapshot restaurants : dataSnapshot.getChildren()){
+                                                            //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                            DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
+                                                            restaurantRidersRef.setValue("active");
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+
+                                            else {
+                                                DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
+                                                myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for(DataSnapshot restaurants : dataSnapshot.getChildren()){
+                                                            //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                            DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurants.getKey()+"/"+myPhone);
+                                                            restaurantRidersRef.setValue("inactive");
+
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        };
+                        myRideOrderRequests.addValueEventListener(myRideOrderRequestsListener);
                     }
 
 
@@ -711,6 +799,7 @@ public class ForegroundService extends Service {
 
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
+            myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
             databaseReference.removeEventListener(databaseListener);
             databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
         } catch(Exception e){}

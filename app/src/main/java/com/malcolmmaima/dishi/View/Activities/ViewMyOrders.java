@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -69,6 +70,8 @@ public class ViewMyOrders extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_my_orders);
 
+        final String[] tempRiderPhoneHolder = new String[1];
+
         //Initialize variables
         deliveryCharge = 0.0;
         totalAmount = 0.0;
@@ -77,7 +80,12 @@ public class ViewMyOrders extends AppCompatActivity {
         phone = getIntent().getStringExtra("phone"); //From adapters
         restaurantName = getIntent().getStringExtra("name");
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        try {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+        } catch (Exception e){
+            SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+        }
+
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
         myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
@@ -138,6 +146,7 @@ public class ViewMyOrders extends AppCompatActivity {
 
                     try {
                         riderPhone = dataSnapshot.child("rider").getValue(String.class);
+
                     } catch (Exception e){
 
                     }
@@ -157,6 +166,9 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
 
                                                     try {
+                                                        tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                    } catch (Exception e){}
+                                                    try {
                                                         ProductDetails prod = items.getValue(ProductDetails.class);
                                                         prod.setKey(items.getKey());
 
@@ -172,7 +184,7 @@ public class ViewMyOrders extends AppCompatActivity {
 
                                                                         myOrders.child(phone).removeValue();
                                                                         DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                                ("my_ride_requests/"+riderPhone+"/"+phone+"/"+myPhone);
+                                                                                ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
 
                                                                         rider.removeValue();
 
@@ -428,7 +440,11 @@ public class ViewMyOrders extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
-
+                                            try {
+                                                //We need to capture the rider phone before the node is removed. this will allow us to
+                                                //update rider status below on deletion
+                                                tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                            } catch (Exception e){}
                                             try {
                                                 ProductDetails prod = items.getValue(ProductDetails.class);
                                                 prod.setKey(items.getKey());
@@ -443,9 +459,10 @@ public class ViewMyOrders extends AppCompatActivity {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
 
+                                                                Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
                                                                 myOrders.child(phone).removeValue();
                                                                 DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                        ("my_ride_requests/"+riderPhone+"/"+phone+"/"+myPhone);
+                                                                        ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
 
                                                                 rider.removeValue();
 

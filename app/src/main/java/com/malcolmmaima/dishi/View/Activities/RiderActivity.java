@@ -38,7 +38,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyRestaurantsFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
-import com.malcolmmaima.dishi.View.Fragments.RiderFragment;
+import com.malcolmmaima.dishi.View.Fragments.RiderRequestsFragment;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.Nullable;
@@ -86,7 +86,7 @@ public class RiderActivity extends AppCompatActivity
             switch (item.getItemId()) {
                 case R.id.navigation_rider:
                     setTitle("Ride Requests");
-                    selectedFragment = RiderFragment.newInstance();
+                    selectedFragment = RiderRequestsFragment.newInstance();
                     break;
                 case R.id.navigation_home:
                     setTitle("Home");
@@ -135,7 +135,7 @@ public class RiderActivity extends AppCompatActivity
          * Manually displaying the first fragment - one time only
          */
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flContent, RiderFragment.newInstance());
+        transaction.replace(R.id.flContent, RiderRequestsFragment.newInstance());
         transaction.commit();
 
         //Used to select an item programmatically
