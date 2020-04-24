@@ -81,6 +81,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
         holder.foodPrice.setText("Ksh "+productDetails.getPrice());
         holder.foodName.setText(productDetails.getName());
         holder.itemQuantity.setText("Quantity: " + productDetails.getQuantity());
+        holder.confirmOrd.setText("Delivered: "+productDetails.getConfirmed());
 
         //Fetch restaurant user details
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+productDetails.getOwner());
@@ -279,7 +280,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView foodPrice, foodDescription, foodName,
-                restaurantName,distanceAway,orderedOn, itemQuantity;
+                restaurantName,distanceAway,orderedOn, itemQuantity, confirmOrd;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;
@@ -296,6 +297,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             addToCart = itemView.findViewById(R.id.addToCart);
             orderedOn = itemView.findViewById(R.id.orderedOn);
             itemQuantity = itemView.findViewById(R.id.itemQuantity);
+            confirmOrd = itemView.findViewById(R.id.confirmOrd);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
