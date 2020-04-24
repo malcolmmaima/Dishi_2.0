@@ -59,6 +59,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -157,6 +158,7 @@ public class RiderActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         final CircleImageView profilePic = headerView.findViewById(R.id.profilePic);
         final TextView navUsername = headerView.findViewById(R.id.userName);
+        final ImageButton notificationIcon = headerView.findViewById(R.id.notifications);
 
         //Set header data
         navUsername.setText("");
@@ -215,6 +217,16 @@ public class RiderActivity extends AppCompatActivity
                     Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
+            }
+        });
+
+        notificationIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(RiderActivity.this, MyNotifications.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(slideactivity);
+
             }
         });
 
