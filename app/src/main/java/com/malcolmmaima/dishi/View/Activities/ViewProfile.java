@@ -369,10 +369,26 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         followersCounterListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    int totalFollowers = (int) dataSnapshot.getChildrenCount();
-                    profileRef.child("followers").setValue(totalFollowers);
-                } catch (Exception e){}
+                profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.exists()){
+                            //don't do anything
+                        }
+
+                        else {
+                            try {
+                                int totalFollowers = (int) dataSnapshot.getChildrenCount();
+                                profileRef.child("followers").setValue(totalFollowers);
+                            } catch (Exception e){}
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
 
             @Override
@@ -386,10 +402,24 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         followingCounterListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    int totalFollowing = (int) dataSnapshot.getChildrenCount();
-                    profileRef.child("following").setValue(totalFollowing);
-                } catch (Exception e){}
+                profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.exists()){
+                            //Dont do anything
+                        } else {
+                            try {
+                                int totalFollowing = (int) dataSnapshot.getChildrenCount();
+                                profileRef.child("following").setValue(totalFollowing);
+                            } catch (Exception e){}
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
 
             @Override

@@ -302,12 +302,11 @@
                             android:contentDescription="TODO" />
 
                         <Button
-                            android:layout_below="@id/progressBar"
-                            android:layout_alignParentRight="true"
-                            android:clickable="true"
                             android:id="@+id/postStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="35dp"
+                            android:layout_alignParentRight="true"
+                            android:clickable="true"
                             android:shadowRadius="5"
                             android:text="Post" />
                     </RelativeLayout>

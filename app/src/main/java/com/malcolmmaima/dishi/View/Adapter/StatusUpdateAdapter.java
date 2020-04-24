@@ -45,6 +45,8 @@ import java.util.Date;
 import java.util.List;
 
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
 
@@ -107,20 +109,24 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         postUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    postUser[position] = dataSnapshot.getValue(UserModel.class);
+                if(!dataSnapshot.exists()){
+                    holder.likePost.setEnabled(false);
+                    holder.profilePic.setEnabled(false);
+                } else {
+                    try {
+                        postUser[position] = dataSnapshot.getValue(UserModel.class);
 
-                    //Set profile pic
-                    Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(holder.profilePic);
+                        //Set profile pic
+                        Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
 
-                    holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
-                } catch (Exception e){
-                    Log.d(TAG, "onDataChange: "+e.getMessage());
+                        holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
+                    } catch (Exception e){
+                        Log.d(TAG, "onDataChange: "+e.getMessage());
+                    }
                 }
-
             }
 
             @Override
@@ -277,10 +283,14 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
-                context.startActivity(slideactivity);
+                try {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
+                    context.startActivity(slideactivity);
+                } catch (Exception e){
+
+                }
             }
         });
 
@@ -329,8 +339,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                 slideactivity.putExtra("author", statusUpdateModel.getAuthor());
                 slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
                 slideactivity.putExtra("key", statusUpdateModel.key);
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                 context.startActivity(slideactivity, bndlanimation);
             }
         });

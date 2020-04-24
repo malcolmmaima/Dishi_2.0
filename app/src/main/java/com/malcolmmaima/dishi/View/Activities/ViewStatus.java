@@ -184,17 +184,26 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         authorUserDetailsRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    authorUser = dataSnapshot.getValue(UserModel.class);
-                    profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
-
-                    Picasso.with(ViewStatus.this).load(authorUser.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePic);
-                } catch (Exception e){
-
+                if(!dataSnapshot.exists()){
+                    likePost.setEnabled(false);
+                    statusPost.setEnabled(false);
+                    imageUpload.setEnabled(false);
+                    postStatus.setEnabled(false);
+                    profilePic.setEnabled(false);
+                    emoji.setEnabled(false);
                 }
+                else {
+                    try {
+                        authorUser = dataSnapshot.getValue(UserModel.class);
+                        profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
+
+                        Picasso.with(ViewStatus.this).load(authorUser.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    } catch (Exception e){ }
+                }
+
             }
 
             @Override
