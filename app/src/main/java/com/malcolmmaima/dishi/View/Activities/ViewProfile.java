@@ -131,6 +131,13 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         });
 
         phone = getIntent().getStringExtra("phone");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        if(myPhone.equals(phone)){
+            finish();
+            Toast.makeText(this, "Not allowed!", Toast.LENGTH_SHORT).show();
+        }
 
         rootView = findViewById(R.id.activity_main);
         profilePhoto = findViewById(R.id.user_profile_photo);
@@ -200,8 +207,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             }
         });
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         profileRef = FirebaseDatabase.getInstance().getReference("users/"+phone);
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+phone);

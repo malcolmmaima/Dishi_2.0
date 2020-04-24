@@ -168,13 +168,15 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Intent slideactivity = new Intent(context, ViewProfile.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                if(!myPhone.equals(userModel.getPhone())){
+                    Intent slideactivity = new Intent(context, ViewProfile.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                slideactivity.putExtra("phone", userModel.getPhone());
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                context.startActivity(slideactivity, bndlanimation);
+                    slideactivity.putExtra("phone", userModel.getPhone());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                }
             }
         });
 
