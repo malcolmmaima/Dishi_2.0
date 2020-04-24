@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -158,7 +159,9 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                                 contactDm.timeStamp = chatMessage.getTimeStamp();
                                                 contactDm.message = chatMessage.getMessage();
                                                 chatlist.add(contactDm);
-                                            } catch (Exception e){}
+                                            } catch (Exception e){
+                                                Log.d("Inbox", "Error: "+ e.getMessage());
+                                            }
                                         }
 
                                         if(!chatlist.isEmpty()){

@@ -219,6 +219,83 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+        //check to see if i am already following this profile
+        profileFollowersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                    followBtn.setText("UNFOLLOW");
+                }  else {
+                    followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                    followBtn.setText("FOLLOW");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        //Keep track of total followers
+        followersCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalFollowers = (int) dataSnapshot.getChildrenCount();
+                    profileRef.child("followers").setValue(totalFollowers);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        //Keep track of total following
+        followingCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int totalFollowing = (int) dataSnapshot.getChildrenCount();
+                    profileRef.child("following").setValue(totalFollowing);
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        followBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(followBtn.getText().toString().equals("FOLLOW")){
+                    profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+                            myFollowing.child(phone).setValue("follow");
+                            followBtn.setText("UNFOLLOW");
+                        }
+                    });
+                } else {
+                    profileFollowers.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+                            myFollowing.child(phone).removeValue();
+                            followBtn.setText("FOLLOW");
+                        }
+                    });
+                }
+            }
+        });
+
+
         myListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -229,6 +306,10 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     finish();
                     SafeToast.makeText(ViewProfile.this, "User does not exist!", Toast.LENGTH_LONG).show();
                 } else {
+                    profileFollowers.child(myPhone).addValueEventListener(profileFollowersListener);
+                    followersCounterRef.addValueEventListener(followersCounterListener);
+                    followingCounterref.addValueEventListener(followingCounterListener);
+
                     try {
                         myUserDetails = dataSnapshot.getValue(UserModel.class);
                         profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
@@ -345,116 +426,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         };
         profileRef.addValueEventListener(myListener);
 
-        //check to see if i am already following this profile
-        profileFollowersListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                    followBtn.setText("UNFOLLOW");
-                }  else {
-                    followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                    followBtn.setText("FOLLOW");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        profileFollowers.child(myPhone).addValueEventListener(profileFollowersListener);
-
-        //Keep track of total followers
-        followersCounterListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
-                            //don't do anything
-                        }
-
-                        else {
-                            try {
-                                int totalFollowers = (int) dataSnapshot.getChildrenCount();
-                                profileRef.child("followers").setValue(totalFollowers);
-                            } catch (Exception e){}
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        followersCounterRef.addValueEventListener(followersCounterListener);
-
-        //Keep track of total following
-        followingCounterListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
-                            //Dont do anything
-                        } else {
-                            try {
-                                int totalFollowing = (int) dataSnapshot.getChildrenCount();
-                                profileRef.child("following").setValue(totalFollowing);
-                            } catch (Exception e){}
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        followingCounterref.addValueEventListener(followingCounterListener);
-
-
-        followBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(followBtn.getText().toString().equals("FOLLOW")){
-                    profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
-                            myFollowing.child(phone).setValue("follow");
-                            followBtn.setText("UNFOLLOW");
-                        }
-                    });
-                } else {
-                    profileFollowers.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
-                            myFollowing.child(phone).removeValue();
-                            followBtn.setText("FOLLOW");
-                        }
-                    });
-                }
-            }
-        });
-
         myStatusUpdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -494,8 +465,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 Log.e(TAG, "Keyboard closed");
             }
         });
-
-
 
         imageUpload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -649,10 +618,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
     // Override onActivityResult method
     @Override
-    public void onActivityResult(int requestCode,
-                                 int resultCode,
-                                 Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         super.onActivityResult(requestCode,
                 resultCode,
@@ -690,8 +656,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     }
 
     // UploadImage method
-    private void uploadImage()
-    {
+    private void uploadImage() {
         if (filePath != null) {
 
             // Code for showing progressDialog while uploading
