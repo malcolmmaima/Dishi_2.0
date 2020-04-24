@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,12 +29,13 @@ import com.malcolmmaima.dishi.View.Adapter.NewChatAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentFollowing extends Fragment {
+public class FragmentFollowing extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     String phone;
     DatabaseReference followingRef;
     RecyclerView recyclerview;
     TextView emptyTag;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public FragmentFollowing() {
         // Required empty public constructor
@@ -46,50 +48,88 @@ public class FragmentFollowing extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_following, container, false);
 
+        phone = getArguments().getString("phone");
+
         recyclerview = view.findViewById(R.id.rview);
         emptyTag = view.findViewById(R.id.empty_tag);
 
-        phone = getArguments().getString("phone");
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
 
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+                fetchFollowing();
+            }
+        });
+
+        return view;
+    }
+
+    private void fetchFollowing() {
         followingRef = FirebaseDatabase.getInstance().getReference("following/"+phone);
         List<UserModel> usersFollowing = new ArrayList<>();
         followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot user : dataSnapshot.getChildren()){
-                    DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+user.getKey());
-                    userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            UserModel userFound = dataSnapshot.getValue(UserModel.class);
-                            userFound.setPhone(user.getKey());
-                            usersFollowing.add(userFound);
+                if(!dataSnapshot.exists()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFollowing);
+                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                    recyclerview.setLayoutManager(layoutmanager);
+                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                    recyclerview.setAdapter(recycler);
+                    emptyTag.setVisibility(View.VISIBLE);
+                } else {
+                    for(DataSnapshot user : dataSnapshot.getChildren()){
+                        DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+user.getKey());
+                        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                UserModel userFound = dataSnapshot.getValue(UserModel.class);
+                                userFound.setPhone(user.getKey());
+                                usersFollowing.add(userFound);
 
 
-                            if (!usersFollowing.isEmpty()) {
-                                //Collections.reverse(orders);
-                                FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFollowing);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                recyclerview.setLayoutManager(layoutmanager);
-                                recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                recycler.notifyDataSetChanged();
-                                recyclerview.setAdapter(recycler);
-                                emptyTag.setVisibility(View.GONE);
-                            } else {
-                                FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFollowing);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                recyclerview.setLayoutManager(layoutmanager);
-                                recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                recyclerview.setAdapter(recycler);
-                                emptyTag.setVisibility(View.VISIBLE);
+                                if (!usersFollowing.isEmpty()) {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    //Collections.reverse(orders);
+                                    FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFollowing);
+                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                    recyclerview.setLayoutManager(layoutmanager);
+                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                    recycler.notifyDataSetChanged();
+                                    recyclerview.setAdapter(recycler);
+                                    emptyTag.setVisibility(View.GONE);
+                                } else {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFollowing);
+                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                    recyclerview.setLayoutManager(layoutmanager);
+                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                    recyclerview.setAdapter(recycler);
+                                    emptyTag.setVisibility(View.VISIBLE);
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             }
 
@@ -98,7 +138,10 @@ public class FragmentFollowing extends Fragment {
 
             }
         });
+    }
 
-        return view;
+    @Override
+    public void onRefresh() {
+        fetchFollowing();
     }
 }
