@@ -269,7 +269,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
          */
         emojIcon = new EmojIconActions(this, rootView, emojiconEditText, emoji);
         emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
-        emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
+        //                              ic.action_keyboard //inbuilt in library
+        emojIcon.setIconsIds(R.drawable.ic_keyboard_white_48dp, R.drawable.ic_sentiment_satisfied_white_48dp);
         emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
             @Override
             public void onKeyboardOpen() {

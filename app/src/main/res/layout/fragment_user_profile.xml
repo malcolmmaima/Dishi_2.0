@@ -6,6 +6,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:background="@color/colorBackroundWhite"
+    android:paddingBottom="@dimen/actionBarSize"
     android:layout_height="match_parent"
     tools:context=".View.Fragments.ProfileFragment">
 
@@ -273,7 +274,6 @@
                     android:layout_height="match_parent"
                     android:id="@+id/rview"
                     android:layout_below="@id/statusActions"
-                    android:paddingBottom="40dp"
                     />
 
             </RelativeLayout>

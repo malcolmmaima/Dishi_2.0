@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="@color/colorBackroundWhite"
+    android:background="@drawable/chat_background"
     android:id="@+id/parentlayout"
     tools:context=".View.Activities.Chat">
 
@@ -61,7 +61,7 @@
 
         <ImageButton
             android:id="@+id/emoji"
-            android:src="@drawable/emoji"
+            android:src="@drawable/ic_sentiment_satisfied_white_48dp"
             android:background="@drawable/layout_bg1"
             android:layout_width="36dp"
             android:scaleType="fitCenter"
