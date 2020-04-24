@@ -41,6 +41,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder>{
 
@@ -142,42 +144,63 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                try {
-                    Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
-                } catch(Exception e){
-
-                }
-
-                String myPhone;
-                myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
-                DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
-
-                //Get current date
-                GetCurrentDate currentDate = new GetCurrentDate();
-                String cartDate = currentDate.getDate();
-
-                String key = myCartRef.push().getKey();
-                ProductDetails cartProduct = new ProductDetails();
-                cartProduct.setName(productDetails.getName());
-                cartProduct.setPrice(productDetails.getPrice());
-                cartProduct.setDescription(productDetails.getDescription());
-                cartProduct.setImageURL(productDetails.getImageURL());
-                cartProduct.setOwner(productDetails.getOwner());
-                cartProduct.setOriginalKey(productDetails.getKey());
-                cartProduct.setQuantity(1);
-                cartProduct.setDistance(productDetails.getDistance());
-                cartProduct.setUploadDate(cartDate);
-
-                myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                DatabaseReference menuExistRef = FirebaseDatabase.getInstance()
+                        .getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey());
+                ValueEventListener existsListener = new ValueEventListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        try {
-                            Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
-                        } catch (Exception e){
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.exists()){ //Does not exist!
 
+                            SafeToast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
+                        }
+
+                        else {
+                            try {
+                                Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
+                            } catch(Exception e){
+
+                            }
+
+                            String myPhone;
+                            myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+                            DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+
+                            //Get current date
+                            GetCurrentDate currentDate = new GetCurrentDate();
+                            String cartDate = currentDate.getDate();
+
+                            String key = myCartRef.push().getKey();
+                            ProductDetails cartProduct = new ProductDetails();
+                            cartProduct.setName(productDetails.getName());
+                            cartProduct.setPrice(productDetails.getPrice());
+                            cartProduct.setDescription(productDetails.getDescription());
+                            cartProduct.setImageURL(productDetails.getImageURL());
+                            cartProduct.setOwner(productDetails.getOwner());
+                            cartProduct.setOriginalKey(productDetails.getKey());
+                            cartProduct.setQuantity(1);
+                            cartProduct.setDistance(productDetails.getDistance());
+                            cartProduct.setUploadDate(cartDate);
+
+                            myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    try {
+                                        Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
+                                    } catch (Exception e){
+
+                                    }
+                                }
+                            });
                         }
                     }
-                });
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                menuExistRef.addListenerForSingleValueEvent(existsListener);
+
             }
         });
 
