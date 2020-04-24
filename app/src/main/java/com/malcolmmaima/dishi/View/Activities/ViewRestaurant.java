@@ -40,6 +40,8 @@ import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
 import com.malcolmmaima.dishi.View.Fragments.ViewRestaurantMenuFragment;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewRestaurant extends AppCompatActivity {
@@ -251,8 +253,49 @@ public class ViewRestaurant extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    int likesTotal = (int) dataSnapshot.getChildrenCount();
-                    likes.setText(""+likesTotal);
+                    int total = (int) dataSnapshot.getChildrenCount();
+                    Double totalLikes = Double.valueOf(total);
+
+                    //below 1000
+                    if(totalLikes < 1000){
+                        DecimalFormat value = new DecimalFormat("#");
+                        likes.setText(""+value.format(totalLikes));
+                    }
+
+                    // 1000 to 999,999
+                    else if(totalLikes >= 1000 && totalLikes <= 999999){
+                        if(totalLikes % 1000 == 0){ //No remainder
+                            DecimalFormat value = new DecimalFormat("#####");
+                            likes.setText(""+value.format(total/1000)+"K");
+                        }
+
+                        else { //Has remainder 999.9K
+                            DecimalFormat value = new DecimalFormat("######.#");
+                            Double divided = totalLikes/1000;
+                            if(value.format(divided).equals("1000")){
+                                likes.setText("1M"); //if rounded off
+                            } else {
+                                likes.setText(""+value.format(divided)+"K");
+                            }
+                        }
+                    }
+
+                    // 1,000,0000 to 999,999,999
+                    else if(totalLikes >= 1000000 && totalLikes <= 999999999){
+                        if(totalLikes % 1000000 == 0) { //No remainder
+                            DecimalFormat value = new DecimalFormat("#");
+                            likes.setText(""+value.format(totalLikes/1000000)+"M");
+                        }
+
+                        else { //Has remainder 9.9M, 999.9M etc
+                            DecimalFormat value = new DecimalFormat("#.#");
+                            if(value.format(totalLikes/1000000).equals("1000")){
+                                likes.setText("1B"); //if rounded off
+                            } else {
+                                likes.setText(""+value.format(totalLikes/1000000)+"M");
+                            }
+                        }
+                    }
                 } catch (Exception e){
 
                 }
