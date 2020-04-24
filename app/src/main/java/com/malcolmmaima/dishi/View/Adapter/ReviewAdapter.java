@@ -40,6 +40,7 @@ import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -62,7 +63,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
 
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_status_update,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_review,parent,false);
 
         MyHolder myHolder = new MyHolder(view);
         return myHolder;
@@ -215,8 +216,49 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    int totalLikes = (int) dataSnapshot.getChildrenCount();
-                    holder.likesTotal.setText("" + totalLikes);
+                    int total = (int) dataSnapshot.getChildrenCount();
+                    Double totalLikes = Double.valueOf(total);
+
+                    //below 1000
+                    if(totalLikes < 1000){
+                        DecimalFormat value = new DecimalFormat("#");
+                        holder.likesTotal.setText(""+value.format(totalLikes));
+                    }
+
+                    // 1000 to 999,999
+                    else if(totalLikes >= 1000 && totalLikes <= 999999){
+                        if(totalLikes % 1000 == 0){ //No remainder
+                            DecimalFormat value = new DecimalFormat("#####");
+                            holder.likesTotal.setText(""+value.format(total/1000)+"K");
+                        }
+
+                        else { //Has remainder 999.9K
+                            DecimalFormat value = new DecimalFormat("######.#");
+                            Double divided = totalLikes/1000;
+                            if(value.format(divided).equals("1000")){
+                                holder.likesTotal.setText("1M"); //if rounded off
+                            } else {
+                                holder.likesTotal.setText(""+value.format(divided)+"K");
+                            }
+                        }
+                    }
+
+                    // 1,000,0000 to 999,999,999
+                    else if(totalLikes >= 1000000 && totalLikes <= 999999999){
+                        if(totalLikes % 1000000 == 0) { //No remainder
+                            DecimalFormat value = new DecimalFormat("#");
+                            holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                        }
+
+                        else { //Has remainder 9.9M, 999.9M etc
+                            DecimalFormat value = new DecimalFormat("#.#");
+                            if(value.format(totalLikes/1000000).equals("1000")){
+                                holder.likesTotal.setText("1B"); //if rounded off
+                            } else {
+                                holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                            }
+                        }
+                    }
 
                     postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -249,8 +291,49 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    int totalComments = (int) dataSnapshot.getChildrenCount();
-                    holder.commentsTotal.setText("" + totalComments);
+                    int total = (int) dataSnapshot.getChildrenCount();
+                    Double totalComments = Double.valueOf(total);
+
+                    //below 1000
+                    if(totalComments < 1000){
+                        DecimalFormat value = new DecimalFormat("#");
+                        holder.commentsTotal.setText(""+value.format(totalComments));
+                    }
+
+                    // 1000 to 999,999
+                    else if(totalComments >= 1000 && totalComments <= 999999){
+                        if(totalComments % 1000 == 0){ //No remainder
+                            DecimalFormat value = new DecimalFormat("#####");
+                            holder.commentsTotal.setText(""+value.format(total/1000)+"K");
+                        }
+
+                        else { //Has remainder 999.9K
+                            DecimalFormat value = new DecimalFormat("######.#");
+                            Double divided = totalComments/1000;
+                            if(value.format(divided).equals("1000")){
+                                holder.commentsTotal.setText("1M"); //if rounded off
+                            } else {
+                                holder.commentsTotal.setText(""+value.format(divided)+"K");
+                            }
+                        }
+                    }
+
+                    // 1,000,0000 to 999,999,999
+                    else if(totalComments >= 1000000 && totalComments <= 999999999){
+                        if(totalComments % 1000000 == 0) { //No remainder
+                            DecimalFormat value = new DecimalFormat("#");
+                            holder.commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
+                        }
+
+                        else { //Has remainder 9.9M, 999.9M etc
+                            DecimalFormat value = new DecimalFormat("#.#");
+                            if(value.format(totalComments/1000000).equals("1000")){
+                                holder.commentsTotal.setText("1B"); //if rounded off
+                            } else {
+                                holder.commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
+                            }
+                        }
+                    }
                 } catch (Exception e){}
             }
 
