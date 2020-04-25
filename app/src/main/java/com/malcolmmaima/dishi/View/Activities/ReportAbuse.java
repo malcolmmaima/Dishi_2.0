@@ -8,7 +8,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import android.app.ProgressDialog;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,15 +21,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.core.Repo;
 import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Model.ProductAbuseReportModel;
+import com.malcolmmaima.dishi.Model.AbuseReportModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ReportAbuse extends AppCompatActivity {
     RelativeLayout option1, option2, option3, option4;
@@ -38,7 +34,7 @@ public class ReportAbuse extends AppCompatActivity {
     AppCompatButton reportBtn;
     AppCompatImageView option1Tick, option2Tick, option3Tick, option4Tick;
     int selectedOption;
-    String reportType, productOwner, productKey, myPhone;
+    String reportType, productOwner, productKey, author, postedTo, statusKey, myPhone;
     FirebaseUser user;
     String [] reportOptions = {"It's suspicious or spam","It displays abusive content", "Copyright infringement", "Other"};
 
@@ -73,9 +69,17 @@ public class ReportAbuse extends AppCompatActivity {
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         reportType = getIntent().getStringExtra("type");
 
+        //Report products
         if(reportType.equals("product")){
             productOwner = getIntent().getStringExtra("owner");
             productKey = getIntent().getStringExtra("productKey");
+        }
+
+        //Report status updates
+        if(reportType.equals("statusUpdate")){
+            author = getIntent().getStringExtra("author");
+            postedTo = getIntent().getStringExtra("postedTo");
+            statusKey = getIntent().getStringExtra("statusKey");
         }
 
         //keep toolbar pinned at top. push edittext on keyboard load
@@ -137,7 +141,7 @@ public class ReportAbuse extends AppCompatActivity {
                     GetCurrentDate currentDate = new GetCurrentDate();
 
                     //Bundle our report into a model (POJO)
-                    ProductAbuseReportModel newReport = new ProductAbuseReportModel();
+                    AbuseReportModel newReport = new AbuseReportModel();
                     newReport.setDescription(describe.getText().toString().trim());
                     newReport.setComplaint(reportOptions[selectedOption-1]);
                     newReport.setReportedOn(currentDate.getDate());
@@ -147,6 +151,45 @@ public class ReportAbuse extends AppCompatActivity {
 
                     //Now create a new unique reference and post the report POJO then exit
                     DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/products/"+productKey+"/userReports/"+myPhone);
+                    userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            try {
+                                progressDialog.dismiss();
+                                finish();
+                                Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
+                            } catch (Exception e){}
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            try {
+                                progressDialog.dismiss();
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                            } catch (Exception err){}
+                        }
+                    });
+                }
+
+                if(reportType.equals("statusUpdate")){
+                    DatabaseReference statusUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/statusUpdates/"+statusKey);
+
+                    //Get today's date
+                    GetCurrentDate currentDate = new GetCurrentDate();
+
+                    //Bundle our report into a model (POJO)
+                    AbuseReportModel newReport = new AbuseReportModel();
+                    newReport.setDescription(describe.getText().toString().trim());
+                    newReport.setComplaint(reportOptions[selectedOption-1]);
+                    newReport.setReportedOn(currentDate.getDate());
+
+                    //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
+                    statusUpdateReportsRef.child("author").setValue(author);
+                    statusUpdateReportsRef.child("postedTo").setValue(postedTo);
+
+                    //Now create a new unique reference and post the report POJO then exit
+                    DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/statusUpdates/"+statusKey+"/userReports/"+myPhone);
                     userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

@@ -1,6 +1,6 @@
 package com.malcolmmaima.dishi.Model;
 
-public class ProductAbuseReportModel {
+public class AbuseReportModel {
     String reportedOn;
     String complaint;
     String description;
