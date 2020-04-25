@@ -442,7 +442,8 @@ public class ViewMyOrders extends AppCompatActivity {
                                         for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
                                             try {
                                                 //We need to capture the rider phone before the node is removed. this will allow us to
-                                                //update rider status below on deletion
+                                                //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
+                                                //which would mean in turn we are unable to update the rider status
                                                 tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
                                             } catch (Exception e){}
                                             try {
