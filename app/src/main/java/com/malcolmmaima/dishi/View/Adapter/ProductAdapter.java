@@ -125,8 +125,57 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.favourite:
-                                //handle menu1 click
-                                Toast.makeText(context, "clicked option 1", Toast.LENGTH_SHORT).show();
+                                FirebaseUser  user = FirebaseAuth.getInstance().getCurrentUser();
+                                String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+                                //First lets check if the restaurant still has this particular product in their menu
+                                DatabaseReference menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey());
+                                menuExistRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(!dataSnapshot.exists()){ //Does not exist!
+                                            Snackbar.make(view.getRootView(), "No longer exists", Snackbar.LENGTH_LONG).show();
+                                        } else {
+                                            //Add to my favourites
+                                            DatabaseReference myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
+                                            myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //Add to global restaurant likes
+                                                    DatabaseReference favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey()+"/likes");
+                                                    favouritesTotalRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Snackbar.make(view.getRootView(), "Added", Snackbar.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                                    //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                            ////Remove from my favourites
+                                            //                                                myFoodFavourites.child(restaurant).child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            //                                                    @Override
+                                            //                                                    public void onSuccess(Void aVoid) {
+                                            //
+                                            //                                                        favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            //                                                            @Override
+                                            //                                                            public void onSuccess(Void aVoid) {
+                                            //                                                                //remove favourite from restaurant's node as well
+                                            //                                                                addToFavourites.setTag(R.drawable.ic_like);
+                                            //                                                                addToFavourites.setImageResource(R.drawable.ic_like);
+                                            //                                                            }
+                                            //                                                        });
+                                            //                                                        //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                                            //                                                    }
+                                            //                                                });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                                 return true;
                             case R.id.report:
                                 //handle menu2 click
