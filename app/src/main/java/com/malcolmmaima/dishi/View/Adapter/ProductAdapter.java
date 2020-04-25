@@ -37,6 +37,9 @@ import com.malcolmmaima.dishi.Model.ProductDetails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
+import com.malcolmmaima.dishi.View.Activities.CustomerActivity;
+import com.malcolmmaima.dishi.View.Activities.MyNotifications;
+import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
@@ -178,8 +181,27 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                                 });
                                 return true;
                             case R.id.report:
-                                //handle menu2 click
-                                Toast.makeText(context, "clicked option 2", Toast.LENGTH_SHORT).show();
+                                final AlertDialog reportProduct = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Report "+ productDetails.getName()+"?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                slideactivity.putExtra("type", "product");
+                                                slideactivity.putExtra("owner", productDetails.getOwner());
+                                                slideactivity.putExtra("productKey", productDetails.getKey());
+                                                context.startActivity(slideactivity);
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                reportProduct.show();
                                 return true;
                             default:
                                 return false;
