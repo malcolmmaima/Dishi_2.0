@@ -78,11 +78,12 @@
                 android:layout_below="@id/subTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="5dp"
                 card_view:cardCornerRadius="5dp"
                 android:focusableInTouchMode="false"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
+                android:elevation="8dp"
                 card_view:view_borderWidth="2dp"
                 card_view:view_borderColor="#ffffff" >
 

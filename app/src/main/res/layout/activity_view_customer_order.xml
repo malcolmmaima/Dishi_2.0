@@ -39,7 +39,7 @@
                 android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="5dp"
                 card_view:cardCornerRadius="5dp"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
@@ -107,7 +107,7 @@
                 android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="5dp"
                 card_view:cardCornerRadius="5dp"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
@@ -118,10 +118,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="20dp"
-                    android:paddingLeft="25dp"
-                    android:paddingRight="25dp"
-                    android:paddingBottom="20dp"
+                    android:padding="10dp"
                     >
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -317,9 +314,7 @@
                 android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginLeft="15dp"
+                android:layout_margin="5dp"
                 card_view:cardCornerRadius="5dp"
                 card_view:view_shadowDx="2dp"
                 card_view:view_shadowDy="0dp"
@@ -331,30 +326,25 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:padding="10dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/locationIcon"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:layout_margin="20dp"
-                        android:layout_gravity="start"
-                        android:layout_marginTop="40dp"
                         app:tint="@color/colorPrimary"
                         android:src="@drawable/location_pin"
                         />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_marginTop="20dp"
+                        android:layout_toRightOf="@id/locationIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_gravity="start"
-                        android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:text="Delivery Address"
-                        android:fontFamily="sans-serif"
-                        android:layout_marginStart="60dp"
-                        android:layout_marginEnd="10dp" />
+                        android:fontFamily="sans-serif" />
 
                 </RelativeLayout>
 

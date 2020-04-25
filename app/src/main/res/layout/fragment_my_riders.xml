@@ -40,10 +40,7 @@
         android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_margin="5dp"
         android:elevation="8dp"
         card_view:cardCornerRadius="5dp"
         android:focusableInTouchMode="false"
@@ -67,8 +64,7 @@
                 android:id="@+id/liveStatus"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/deliver_nduthi_48dp"
-                android:tint="@color/colorPrimary"
+                android:src="@drawable/delivery_bike"
                 android:scaleType="fitXY"
                 android:foregroundGravity="center_vertical"
                 />
@@ -95,8 +91,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/ic_add_black_48dp"
-                android:backgroundTint="@color/colorPrimary"/>
+                android:background="@drawable/ic_add_black_48dp"/>
 
 
         </RelativeLayout>

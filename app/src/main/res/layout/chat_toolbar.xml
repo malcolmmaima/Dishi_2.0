@@ -29,6 +29,7 @@
             android:layout_height="50dp"
             android:src="@drawable/default_profile"
             app:view_shadowRadius="2dp"
+            android:layout_marginLeft="5dp"
             app:view_shadowDx="2dp"
             app:view_shadowDy="0dp"
             app:view_borderWidth="2dp"

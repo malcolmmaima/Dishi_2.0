@@ -12,7 +12,6 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/actionBarSize"
         android:layout_height="wrap_content">
 
         <ScrollView
@@ -150,9 +149,7 @@
                 </RelativeLayout>
 
                 <FrameLayout
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_margin="5dp"
                     android:layout_below="@id/profile_layout"
                     android:layout_width="match_parent"
                     android:id="@+id/frame"

@@ -459,7 +459,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
 
-                                                                Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
+                                                                //Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
                                                                 myOrders.child(phone).removeValue();
                                                                 DatabaseReference rider = FirebaseDatabase.getInstance().getReference
                                                                         ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
