@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +35,7 @@ import com.malcolmmaima.dishi.Controller.TimeAgo;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
@@ -41,6 +44,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import io.fabric.sdk.android.services.common.SafeToast;
 
 import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
@@ -127,6 +132,58 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             holder.imageShare.setVisibility(View.GONE);
         }
 
+        holder.commentOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //creating a popup menu
+                PopupMenu popup = new PopupMenu(context, holder.commentOptions);
+                //inflating menu from xml resource
+                popup.inflate(R.menu.comment_options_menu);
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.report:
+                                if(!myPhone.equals(statusUpdateModel.getAuthor())){
+                                    final AlertDialog reportStatus = new AlertDialog.Builder(context)
+                                            //set message, title, and icon
+                                            .setMessage("Report this comment?")
+                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                            //set three option buttons
+                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    slideactivity.putExtra("type", "commentUpdate");
+                                                    slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                                                    slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                                                    slideactivity.putExtra("commentKey", statusUpdateModel.key);
+                                                    context.startActivity(slideactivity);
+                                                }
+                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    //do nothing
+                                                }
+                                            })//setNegativeButton
+
+                                            .create();
+                                    reportStatus.show();
+                                } else {
+                                    SafeToast.makeText(context, "Not allowed!", Toast.LENGTH_SHORT).show();
+                                }
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
+
         holder.imageShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,7 +262,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted;
+        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, commentOptions;
         ImageView profilePic, deleteBtn, likePost, comments, sharePost, imageShare;
         CardView cardView;
 
@@ -224,6 +281,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             commentsTotal = itemView.findViewById(R.id.commentsTotal);
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
+            commentOptions = itemView.findViewById(R.id.commentOptions);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {

@@ -2,12 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- TODO Hopefully add more status options later -->
-    <item
-        android:id="@+id/delete"
-        app:showAsAction="never"
-        android:title="Delete"/>
-
+    <!-- TODO Hopefully add more comment options later -->
     <item
         android:id="@+id/report"
         app:showAsAction="never"

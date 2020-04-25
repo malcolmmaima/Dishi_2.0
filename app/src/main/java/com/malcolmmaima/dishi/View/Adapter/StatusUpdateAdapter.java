@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -352,42 +353,92 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             }
         });
 
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(context, holder.statusOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.status_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+
+        //delete posts
+        if(statusUpdateModel.getPostedTo().equals(myPhone) || statusUpdateModel.getAuthor().equals(myPhone)){
+            try {
+                deleteOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+
+        //status options
         holder.statusOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(context, holder.statusOptions);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.status_options_menu);
                 //adding click listener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.report:
-                                final AlertDialog reportProduct = new AlertDialog.Builder(context)
+                            case R.id.delete:
+                                final AlertDialog deletePost = new AlertDialog.Builder(context)
                                         //set message, title, and icon
-                                        .setMessage("Report this status update?")
+                                        .setMessage("Delete post?")
                                         //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                                         //set three option buttons
-                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
-                                                Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                slideactivity.putExtra("type", "statusUpdate");
-                                                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
-                                                slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
-                                                slideactivity.putExtra("statusKey", statusUpdateModel.key);
-                                                context.startActivity(slideactivity);
+                                                DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        try {
+                                                            listdata.remove(position);
+                                                            notifyItemRemoved(position);
+                                                        } catch(Exception e){}
+                                                    }
+                                                });
                                             }
                                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                 //do nothing
+
                                             }
                                         })//setNegativeButton
 
                                         .create();
-                                reportProduct.show();
+                                deletePost.show();
+                                return (true);
+                            case R.id.report:
+                                if(!myPhone.equals(statusUpdateModel.getAuthor())){
+                                    final AlertDialog reportStatus = new AlertDialog.Builder(context)
+                                            //set message, title, and icon
+                                            .setMessage("Report this status?")
+                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                            //set three option buttons
+                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    slideactivity.putExtra("type", "statusUpdate");
+                                                    slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                                                    slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                                                    slideactivity.putExtra("statusKey", statusUpdateModel.key);
+                                                    context.startActivity(slideactivity);
+                                                }
+                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    //do nothing
+                                                }
+                                            })//setNegativeButton
+
+                                            .create();
+                                    reportStatus.show();
+                                } else {
+                                    SafeToast.makeText(context, "Not allowed!", Toast.LENGTH_SHORT).show();
+                                }
                                 return true;
                             default:
                                 return false;
@@ -399,6 +450,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
             }
         });
+
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

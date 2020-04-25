@@ -62,6 +62,7 @@
                 android:layout_marginRight="3dp"/>
 
             <TextView
+                android:layout_gravity="start"
                 android:id="@+id/timePosted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,6 +70,17 @@
                 android:textColor="#666"
                 android:textSize="10sp"
                 android:text="loading..."/>
+
+            <TextView
+                android:id="@+id/commentOptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="3dp"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:text="&#8942;"
+                android:textAppearance="?android:textAppearanceLarge" />
 
         </LinearLayout>
 
@@ -94,11 +106,12 @@
                 android:id="@+id/imageShare"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_below="@id/userUpdate"
-                android:visibility="gone"
+                android:visibility="visible"
                 />
 
         </RelativeLayout>
