@@ -125,7 +125,6 @@ public class ReportAbuse extends AppCompatActivity {
             public void onClick(View v) {
 
                 ProgressDialog progressDialog = new ProgressDialog(ReportAbuse.this);
-
                 progressDialog.setMessage("Sending...");
                 progressDialog.setCancelable(false);
                 progressDialog.show();

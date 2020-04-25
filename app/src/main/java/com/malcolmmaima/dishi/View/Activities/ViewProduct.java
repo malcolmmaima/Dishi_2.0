@@ -517,11 +517,19 @@ public class ViewProduct extends AppCompatActivity {
         switch(item.getItemId()) {
         case R.id.myCart:
             finish();
-            Intent slideactivity = new Intent(ViewProduct.this, MyCart.class)
+            Intent cartActivity = new Intent(ViewProduct.this, MyCart.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(slideactivity);
+            startActivity(cartActivity);
 
             return(true);
+
+            case R.id.reportProduct:
+                Intent reportActivity = new Intent(ViewProduct.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                reportActivity.putExtra("type", "product");
+                reportActivity.putExtra("owner", restaurant);
+                reportActivity.putExtra("productKey", key);
+                startActivity(reportActivity);
+                return (true);
     }
         return(super.onOptionsItemSelected(item));
     }
