@@ -99,14 +99,14 @@
                 android:id="@+id/userUpdate"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="5dp"
                 android:textColor="#666"/>
 
             <ImageView
                 android:id="@+id/imageShare"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginLeft="5dp"

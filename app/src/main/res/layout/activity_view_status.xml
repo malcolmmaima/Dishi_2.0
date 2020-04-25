@@ -120,6 +120,7 @@
                         android:layout_marginRight="3dp"/>
 
                     <TextView
+                        android:layout_gravity="start"
                         android:id="@+id/timePosted"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -127,6 +128,17 @@
                         android:textColor="#666"
                         android:textSize="10sp"
                         android:text="loading..."/>
+
+                    <TextView
+                        android:id="@+id/statusOptions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="3dp"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:text="&#8942;"
+                        android:textAppearance="?android:textAppearanceLarge" />
 
                 </LinearLayout>
 

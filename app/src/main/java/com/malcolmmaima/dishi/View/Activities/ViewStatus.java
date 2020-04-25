@@ -1,12 +1,16 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,7 +72,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     private static final String TAG = "ViewStatus";
     DatabaseReference postRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
-    TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted;
+    TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted, statusOptions;
     ImageView profilePic, imageShare, likePost, comments, sharePost;
     String myPhone;
     Button postStatus;
@@ -131,6 +136,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         emoji = findViewById(R.id.emoji);
         emoji.setVisibility(View.GONE);
         imageShare = findViewById(R.id.imageShare);
+        statusOptions = findViewById(R.id.statusOptions);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -292,6 +298,102 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             postRef.child(key).addValueEventListener(postRefListener);
 
         } catch (Exception e){}
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(ViewStatus.this, statusOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.status_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+
+        //delete posts
+        if(postedTo.equals(myPhone) || author.equals(myPhone)){
+            try {
+                deleteOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+
+        //status options
+        statusOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete:
+                                final AlertDialog deletePost = new AlertDialog.Builder(ViewStatus.this)
+                                        //set message, title, and icon
+                                        .setMessage("Delete post?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+postedTo+"/"+key);
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        finish();
+                                                        Toast.makeText(ViewStatus.this, "Deleted!", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                deletePost.show();
+                                return (true);
+                            case R.id.report:
+                                if(!myPhone.equals(author)){
+                                    final AlertDialog reportStatus = new AlertDialog.Builder(ViewStatus.this)
+                                            //set message, title, and icon
+                                            .setMessage("Report this status?")
+                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                            //set three option buttons
+                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    Intent slideactivity = new Intent(ViewStatus.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    slideactivity.putExtra("type", "statusUpdate");
+                                                    slideactivity.putExtra("author", author);
+                                                    slideactivity.putExtra("postedTo", postedTo);
+                                                    slideactivity.putExtra("statusKey", key);
+                                                    startActivity(slideactivity);
+                                                }
+                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    //do nothing
+                                                }
+                                            })//setNegativeButton
+
+                                            .create();
+                                    reportStatus.show();
+                                } else {
+                                    SafeToast.makeText(ViewStatus.this, "Not allowed!", Toast.LENGTH_SHORT).show();
+                                }
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
 
         imageShare.setOnClickListener(new View.OnClickListener() {
             @Override

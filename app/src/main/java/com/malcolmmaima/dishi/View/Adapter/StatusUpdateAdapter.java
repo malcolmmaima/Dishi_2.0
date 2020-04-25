@@ -360,8 +360,9 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         Menu myMenu = popup.getMenu();
         MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
 
-        //delete posts
+        //Can only delete posts on my wall or i've authored
         if(statusUpdateModel.getPostedTo().equals(myPhone) || statusUpdateModel.getAuthor().equals(myPhone)){
             try {
                 deleteOption.setVisible(true);
@@ -369,6 +370,17 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         } else {
             try {
                 deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        //Can only report posts that i havent authored
+        if(!myPhone.equals(statusUpdateModel.getAuthor())){
+            try {
+                reportOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                reportOption.setVisible(false);
             } catch (Exception e){}
         }
 
@@ -413,13 +425,12 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                 deletePost.show();
                                 return (true);
                             case R.id.report:
-                                if(!myPhone.equals(statusUpdateModel.getAuthor())){
-                                    final AlertDialog reportStatus = new AlertDialog.Builder(context)
-                                            //set message, title, and icon
-                                            .setMessage("Report this status?")
-                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                            //set three option buttons
-                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                final AlertDialog reportStatus = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Report this status?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
                                                     Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                     slideactivity.putExtra("type", "statusUpdate");
@@ -428,7 +439,8 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                                     slideactivity.putExtra("statusKey", statusUpdateModel.key);
                                                     context.startActivity(slideactivity);
                                                 }
-                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            })
+                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
                                                     //do nothing
                                                 }
@@ -436,9 +448,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
                                             .create();
                                     reportStatus.show();
-                                } else {
-                                    SafeToast.makeText(context, "Not allowed!", Toast.LENGTH_SHORT).show();
-                                }
+
                                 return true;
                             default:
                                 return false;
