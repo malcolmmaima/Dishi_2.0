@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -108,6 +110,38 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         } catch (Exception e){
 
         }
+
+        holder.productOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //creating a popup menu
+                PopupMenu popup = new PopupMenu(context, holder.productOptions);
+                //inflating menu from xml resource
+                popup.inflate(R.menu.product_options_menu);
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.favourite:
+                                //handle menu1 click
+                                Toast.makeText(context, "clicked option 1", Toast.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.report:
+                                //handle menu2 click
+                                Toast.makeText(context, "clicked option 2", Toast.LENGTH_SHORT).show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
 
         /**
          * Click listener on our card
@@ -265,7 +299,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway;
+        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway, productOptions;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;
@@ -280,6 +314,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             restaurantName = itemView.findViewById(R.id.restaurantName);
             distanceAway = itemView.findViewById(R.id.distanceAway);
             addToCart = itemView.findViewById(R.id.addToCart);
+            productOptions = itemView.findViewById(R.id.productOptions);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number

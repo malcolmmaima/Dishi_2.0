@@ -40,11 +40,12 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginRight="@dimen/fab_margin"
-            android:layout_marginBottom="65dp"
+            android:layout_marginBottom="10dp"
             app:srcCompat="@drawable/ic_shopping_cart_white_48dp" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
