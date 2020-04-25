@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,21 +133,76 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             holder.imageShare.setVisibility(View.GONE);
         }
 
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(context, holder.commentOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.comment_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
+
+        //Can only delete comments that i have authored or on my posts
+        if(statusUpdateModel.getPostedTo().equals(myPhone) || statusUpdateModel.getAuthor().equals(myPhone)){
+            try {
+                deleteOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        //Can only report comments that i havent authored
+        if(!myPhone.equals(statusUpdateModel.getAuthor())){
+            try {
+                reportOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                reportOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
         holder.commentOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(context, holder.commentOptions);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.comment_options_menu);
-                //adding click listener
+
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
+
+                            case R.id.delete:
+                                final AlertDialog deleteComment = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Delete comment?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                postRef.child(statusUpdateModel.getCommentKey()).child("comments").child(statusUpdateModel.key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        try {
+                                                            listdata.remove(position);
+                                                            notifyItemRemoved(position);
+                                                        } catch (Exception e){}
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                deleteComment.show();
+                                return (true);
                             case R.id.report:
-                                if(!myPhone.equals(statusUpdateModel.getAuthor())){
                                     final AlertDialog reportStatus = new AlertDialog.Builder(context)
                                             //set message, title, and icon
                                             .setMessage("Report this comment?")
@@ -169,9 +225,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
 
                                             .create();
                                     reportStatus.show();
-                                } else {
-                                    SafeToast.makeText(context, "Not allowed!", Toast.LENGTH_SHORT).show();
-                                }
                                 return true;
                             default:
                                 return false;

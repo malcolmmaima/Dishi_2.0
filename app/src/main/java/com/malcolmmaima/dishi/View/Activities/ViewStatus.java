@@ -306,6 +306,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
         Menu myMenu = popup.getMenu();
         MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
 
         //delete posts
         if(postedTo.equals(myPhone) || author.equals(myPhone)){
@@ -315,6 +316,17 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         } else {
             try {
                 deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        //Can only report posts that i havent authored
+        if(!myPhone.equals(author)){
+            try {
+                reportOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                reportOption.setVisible(false);
             } catch (Exception e){}
         }
 

@@ -38,6 +38,7 @@ import com.malcolmmaima.dishi.Controller.TimeAgo;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.Chat;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
@@ -571,41 +572,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-                    //Allow user to delete posts they've authored on their walls or other ppls walls
-                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone) || listdata.get(getAdapterPosition()).getAuthor().equals(myPhone)){
-                        //I (logged in user) can delete any post on my wall as i wish
-                        final AlertDialog deletePost = new AlertDialog.Builder(v.getContext())
-                                //set message, title, and icon
-                                .setMessage("Delete post?")
-                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                //set three option buttons
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+listdata.get(getAdapterPosition()).getPostedTo()+"/"+listdata.get(getAdapterPosition()).key);
-                                        postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                try {
-                                                    listdata.remove(getAdapterPosition());
-                                                    notifyItemRemoved(getAdapterPosition());
-                                                } catch(Exception e){}
-                                            }
-                                        });
-                                    }
-                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        //do nothing
-
-                                    }
-                                })//setNegativeButton
-
-                                .create();
-                        deletePost.show();
-                    }
-
+                    setClipboard(context, listdata.get(getAdapterPosition()).getStatus());
                     return false;
                 }
             });
@@ -630,5 +597,19 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         animator.setDuration(500);
         animatorSet.play(animator);
         animator.start();
+    }
+
+    private void setClipboard(Context context, String text) {
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
