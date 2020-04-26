@@ -8,6 +8,11 @@
         android:title="Add to favourites"/>
 
     <item
+        android:id="@+id/removefavourite"
+        app:showAsAction="never"
+        android:title="Remove from favourites"/>
+
+    <item
         android:id="@+id/report"
         app:showAsAction="never"
         android:title="Report"/>

@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,22 +115,59 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
 
         }
 
+        FirebaseUser  user = FirebaseAuth.getInstance().getCurrentUser();
+        String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(context, holder.productOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.product_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem favouriteOption = myMenu.findItem(R.id.favourite);
+        MenuItem removeFavourite = myMenu.findItem(R.id.removefavourite);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
+
+        try {
+            reportOption.setVisible(true);
+        } catch (Exception e){}
+
+        DatabaseReference myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
+        myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        removeFavourite.setVisible(true);
+                        favouriteOption.setVisible(false);
+                    } catch (Exception e){}
+                }
+                else {
+                    try {
+                        removeFavourite.setVisible(false);
+                        favouriteOption.setVisible(true);
+                    } catch (Exception e){}
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         holder.productOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(context, holder.productOptions);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.product_options_menu);
                 //adding click listener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.favourite:
-                                FirebaseUser  user = FirebaseAuth.getInstance().getCurrentUser();
-                                String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
                                 //First lets check if the restaurant still has this particular product in their menu
                                 DatabaseReference menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey());
                                 menuExistRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -148,6 +186,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                                                     favouritesTotalRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
+                                                            try {
+                                                                removeFavourite.setVisible(true);
+                                                                favouriteOption.setVisible(false);
+                                                            } catch (Exception e){}
                                                             Snackbar.make(view.getRootView(), "Added", Snackbar.LENGTH_LONG).show();
                                                         }
                                                     });
@@ -155,22 +197,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                                                 }
                                             });
 
-                                            ////Remove from my favourites
-                                            //                                                myFoodFavourites.child(restaurant).child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            //                                                    @Override
-                                            //                                                    public void onSuccess(Void aVoid) {
-                                            //
-                                            //                                                        favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            //                                                            @Override
-                                            //                                                            public void onSuccess(Void aVoid) {
-                                            //                                                                //remove favourite from restaurant's node as well
-                                            //                                                                addToFavourites.setTag(R.drawable.ic_like);
-                                            //                                                                addToFavourites.setImageResource(R.drawable.ic_like);
-                                            //                                                            }
-                                            //                                                        });
-                                            //                                                        //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
-                                            //                                                    }
-                                            //                                                });
                                         }
                                     }
 
@@ -180,6 +206,27 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                                     }
                                 });
                                 return true;
+
+                            case R.id.removefavourite:
+                                ////Remove from my favourites
+                                myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        DatabaseReference favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey()+"/likes");
+                                        favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                //remove favourite from restaurant's node as well
+                                                try {
+                                                    removeFavourite.setVisible(false);
+                                                    favouriteOption.setVisible(true);
+                                                } catch (Exception e){}
+                                                Snackbar.make(view.getRootView(), "Removed", Snackbar.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                });
+                                return (true);
                             case R.id.report:
                                 final AlertDialog reportProduct = new AlertDialog.Builder(context)
                                         //set message, title, and icon
