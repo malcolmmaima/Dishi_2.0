@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -433,6 +434,14 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 } else {
                     finish();
                 }
+            }
+        });
+
+        userUpdate.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                setClipboard(ViewStatus.this, userUpdate.getText().toString());
+                return false;
             }
         });
 
@@ -910,6 +919,20 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 recyclerView.setAdapter(recycler);
             }
         });
+    }
+
+    private void setClipboard(Context context, String text) {
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

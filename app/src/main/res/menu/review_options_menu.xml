@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- TODO Hopefully add more review options later -->
+
+    <item
+        android:id="@+id/delete"
+        app:showAsAction="never"
+        android:title="Delete"/>
+
+    <item
+        android:id="@+id/report"
+        app:showAsAction="never"
+        android:title="Report"/>
+
+</menu>

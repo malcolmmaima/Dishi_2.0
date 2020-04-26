@@ -405,15 +405,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                 DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
-                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        try {
-                                                            listdata.remove(position);
-                                                            notifyItemRemoved(position);
-                                                        } catch(Exception e){}
-                                                    }
-                                                });
+                                                postDetails.removeValue();
                                             }
                                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -432,23 +424,23 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                         //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                                         //set three option buttons
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int whichButton) {
-                                                    Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    slideactivity.putExtra("type", "statusUpdate");
-                                                    slideactivity.putExtra("author", statusUpdateModel.getAuthor());
-                                                    slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
-                                                    slideactivity.putExtra("statusKey", statusUpdateModel.key);
-                                                    context.startActivity(slideactivity);
-                                                }
-                                            })
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                slideactivity.putExtra("type", "statusUpdate");
+                                                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                                                slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                                                slideactivity.putExtra("statusKey", statusUpdateModel.key);
+                                                context.startActivity(slideactivity);
+                                            }
+                                        })
                                         .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int whichButton) {
-                                                    //do nothing
-                                                }
-                                            })//setNegativeButton
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+                                            }
+                                        })//setNegativeButton
 
-                                            .create();
-                                    reportStatus.show();
+                                        .create();
+                                reportStatus.show();
 
                                 return true;
                             default:

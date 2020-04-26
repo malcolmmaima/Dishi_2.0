@@ -167,8 +167,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         holder.commentOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -182,15 +180,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                                         //set three option buttons
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
-                                                postRef.child(statusUpdateModel.getCommentKey()).child("comments").child(statusUpdateModel.key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        try {
-                                                            listdata.remove(position);
-                                                            notifyItemRemoved(position);
-                                                        } catch (Exception e){}
-                                                    }
-                                                });
+                                                try {
+                                                    postRef.child(statusUpdateModel.getCommentKey())
+                                                            .child("comments").child(statusUpdateModel.key)
+                                                            .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            try {
+                                                                listdata.remove(position);
+                                                                notifyItemRemoved(position);
+                                                            } catch (Exception e) {
+                                                            }
+                                                        }
+                                                    });
+                                                } catch (Exception e){}
                                             }
                                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -340,37 +343,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone) || listdata.get(getAdapterPosition()).getAuthor().equals(myPhone)){
-                        //I (logged in user) can delete any comment on any post on my wall as i wish
-                        final AlertDialog deleteComment = new AlertDialog.Builder(v.getContext())
-                                //set message, title, and icon
-                                .setMessage("Delete comment?")
-                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                //set three option buttons
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        postRef.child(listdata.get(getAdapterPosition()).getCommentKey()).child("comments").child(listdata.get(getAdapterPosition()).key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                try {
-                                                    listdata.remove(getAdapterPosition());
-                                                    notifyItemRemoved(getAdapterPosition());
-                                                } catch (Exception e){}
-                                            }
-                                        });
-                                    }
-                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        //do nothing
-
-                                    }
-                                })//setNegativeButton
-
-                                .create();
-                        deleteComment.show();
-                    }
+                    setClipboard(context, listdata.get(getAdapterPosition()).getStatus());
                     return false;
                 }
             });
@@ -397,5 +370,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         animator.setDuration(500);
         animatorSet.play(animator);
         animator.start();
+    }
+
+    private void setClipboard(Context context, String text) {
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +37,7 @@ import com.malcolmmaima.dishi.Controller.TimeAgo;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewReview;
@@ -179,6 +183,106 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
         } else {
             holder.imageShare.setVisibility(View.GONE);
         }
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(context, holder.reviewOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.review_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
+
+        //Can only delete reviews that i have authored or on my posts
+        if(statusUpdateModel.getPostedTo().equals(myPhone) || statusUpdateModel.getAuthor().equals(myPhone)){
+            try {
+                deleteOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        //Can only report comments that i havent authored
+        if(!myPhone.equals(statusUpdateModel.getAuthor())){
+            try {
+                reportOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                reportOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        holder.reviewOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+
+                            case R.id.delete:
+                                final AlertDialog deletePost = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Delete Review?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("reviews/"+listdata.get(position).getPostedTo()+"/"+listdata.get(position).key);
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        //do nothing since there's a listener that will check to see if review still exists
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                deletePost.show();
+                                return (true);
+                            case R.id.report:
+                                final AlertDialog reportStatus = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Report this review?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                slideactivity.putExtra("type", "reviewUpdate");
+                                                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                                                slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                                                slideactivity.putExtra("reviewKey", statusUpdateModel.key);
+                                                context.startActivity(slideactivity);
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                reportStatus.show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
 
         holder.imageShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -426,7 +530,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted;
+        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, reviewOptions;
         ImageView profilePic, imageShare, likePost, comments, sharePost;
         CardView cardView;
 
@@ -444,45 +548,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
             commentsTotal = itemView.findViewById(R.id.commentsTotal);
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
+            reviewOptions = itemView.findViewById(R.id.reviewOptions);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    String myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-                    //Allow user to delete posts they've authored on their walls or other ppls walls
-                    if(listdata.get(getAdapterPosition()).getPostedTo().equals(myPhone) || listdata.get(getAdapterPosition()).getAuthor().equals(myPhone)){
-                        //I (logged in user) can delete any post on my wall as i wish
-                        final AlertDialog deletePost = new AlertDialog.Builder(v.getContext())
-                                //set message, title, and icon
-                                .setMessage("Delete post?")
-                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                //set three option buttons
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("reviews/"+listdata.get(getAdapterPosition()).getPostedTo()+"/"+listdata.get(getAdapterPosition()).key);
-                                        postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                try {
-                                                    listdata.remove(getAdapterPosition());
-                                                    notifyItemRemoved(getAdapterPosition());
-                                                } catch(Exception e){}
-                                            }
-                                        });
-                                    }
-                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        //do nothing
-
-                                    }
-                                })//setNegativeButton
-
-                                .create();
-                        deletePost.show();
-                    }
 
                     return false;
                 }

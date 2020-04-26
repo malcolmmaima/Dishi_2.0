@@ -1,12 +1,16 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,7 +72,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     private static final String TAG = "ViewReview";
     DatabaseReference reviewsRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, reviewsRefListener;
-    TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted;
+    TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted, reviewOptions;
     ImageView profilePic, imageShare, likePost, comments, sharePost;
     String myPhone;
     Button postStatus;
@@ -131,6 +136,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
         emoji = findViewById(R.id.emoji);
         emoji.setVisibility(View.GONE);
         imageShare = findViewById(R.id.imageShare);
+        reviewOptions = findViewById(R.id.reviewOptions);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -282,6 +288,106 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
             reviewsRef.child(key).addValueEventListener(reviewsRefListener);
 
         } catch (Exception e){}
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(ViewReview.this, reviewOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.review_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
+
+        //Can only delete reviews that i have authored or on my posts
+        if(postedTo.equals(myPhone) || author.equals(myPhone)){
+            try {
+                deleteOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                deleteOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        //Can only report comments that i havent authored
+        if(!myPhone.equals(author)){
+            try {
+                reportOption.setVisible(true);
+            } catch (Exception e){}
+        } else {
+            try {
+                reportOption.setVisible(false);
+            } catch (Exception e){}
+        }
+
+        reviewOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+
+                            case R.id.delete:
+                                final AlertDialog deletePost = new AlertDialog.Builder(ViewReview.this)
+                                        //set message, title, and icon
+                                        .setMessage("Delete Review?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("reviews/"+postedTo+"/"+key);
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        //do nothing since there's a listener that will check to see if review still exists
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                deletePost.show();
+                                return (true);
+                            case R.id.report:
+                                final AlertDialog reportStatus = new AlertDialog.Builder(ViewReview.this)
+                                        //set message, title, and icon
+                                        .setMessage("Report this review?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Intent slideactivity = new Intent(ViewReview.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                slideactivity.putExtra("type", "reviewUpdate");
+                                                slideactivity.putExtra("author", author);
+                                                slideactivity.putExtra("postedTo", postedTo);
+                                                slideactivity.putExtra("reviewKey", key);
+                                                startActivity(slideactivity);
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                reportStatus.show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
 
         imageShare.setOnClickListener(new View.OnClickListener() {
             @Override
