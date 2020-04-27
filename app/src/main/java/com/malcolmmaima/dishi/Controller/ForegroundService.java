@@ -80,6 +80,21 @@ public class ForegroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        //Bug fix for android 8.0+
+        //https://stackoverflow.com/questions/44425584/context-startforegroundservice-did-not-then-call-service-startforeground
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                    "Dishi",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("Dishi")
+                    .setContentText("Welcome to Dishi").build();
+
+            startForeground(1, notification);
+        }
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {

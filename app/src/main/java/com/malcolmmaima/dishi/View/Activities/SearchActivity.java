@@ -512,7 +512,7 @@ public class SearchActivity extends AppCompatActivity {
 
         }
 
-        /** if(selectedPreference.equals("Restaurants")){
+        if(selectedPreference.equals("Restaurants")){
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -597,7 +597,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 }
             });
-        } */
+        }
     }
 
     public static boolean isStringNullOrWhiteSpace(String value) {

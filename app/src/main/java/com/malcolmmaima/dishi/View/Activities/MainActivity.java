@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getSupportActionBar().setTitle("Dishi");
+        startNotificationService();
 
         TAG = "MainActivity";
         // Assigning Id to ProgressDialog.
