@@ -318,6 +318,7 @@ public class ViewProduct extends AppCompatActivity {
 
         if(!accType.equals("1")){
             add.setEnabled(false);
+            minus.setEnabled(false);
             fab.setEnabled(false);
 
             add.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));

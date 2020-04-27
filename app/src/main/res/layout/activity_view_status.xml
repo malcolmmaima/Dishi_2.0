@@ -314,6 +314,7 @@
                             android:contentDescription="TODO" />
 
                         <Button
+                            android:layout_below="@id/progressBar"
                             android:id="@+id/postStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="35dp"

@@ -90,7 +90,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
     TextView emptyTag;
     AppCompatImageView icon;
-    ImageView selectedImage;
+    ImageView selectedImage,viewRestaurant;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     // instance for firebase storage and StorageReference
@@ -160,6 +160,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         postBtn = findViewById(R.id.postStatus);
         postBtn.setVisibility(View.GONE);
         emoji.setVisibility(View.GONE);
+        viewRestaurant = findViewById(R.id.viewRestaurant);
+        viewRestaurant.setVisibility(View.GONE);
 
         followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -315,6 +317,12 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                         profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
                         profileBio.setText(myUserDetails.getBio());
 
+                        if(myUserDetails.getAccount_type().equals("2")){
+                            viewRestaurant.setVisibility(View.VISIBLE);
+                        } else {
+                            viewRestaurant.setVisibility(View.GONE);
+                        }
+
                         Double totalFollowers = Double.valueOf(myUserDetails.getFollowers());
                         Double totalFollowing = Double.valueOf(myUserDetails.getFollowing());
                         /**
@@ -466,6 +474,26 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             }
         });
 
+        viewRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent slideactivity = new Intent(ViewProfile.this, ViewRestaurant.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                slideactivity.putExtra("restaurant_phone", phone);
+                slideactivity.putExtra("distance", 0.0);
+                slideactivity.putExtra("profilePic", myUserDetails.getProfilePic());
+                Bundle bndlanimation =
+                        null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    bndlanimation = ActivityOptions.makeCustomAnimation(ViewProfile.this, R.anim.animation, R.anim.animation2).toBundle();
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    startActivity(slideactivity, bndlanimation);
+                }
+            }
+        });
         imageUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

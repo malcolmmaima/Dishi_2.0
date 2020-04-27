@@ -337,6 +337,7 @@ public class ViewRestaurant extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(!myPhone.equals(restaurantPhone)){
+                    finish();
                     Intent slideactivity = new Intent(ViewRestaurant.this, ViewProfile.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
