@@ -133,20 +133,44 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         } catch (Exception e){}
 
         DatabaseReference myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
-        myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+
+        myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    try {
-                        removeFavourite.setVisible(true);
-                        favouriteOption.setVisible(false);
-                    } catch (Exception e){}
-                }
-                else {
-                    try {
+                try {
+                    UserModel user = dataSnapshot.getValue(UserModel.class);
+                    //Hide these two options if account type of logged in user is not 1 (customer)
+                    if(!user.getAccount_type().equals("1")){
                         removeFavourite.setVisible(false);
-                        favouriteOption.setVisible(true);
-                    } catch (Exception e){}
+                        favouriteOption.setVisible(false);
+                    } else {
+                        myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    try {
+                                        removeFavourite.setVisible(true);
+                                        favouriteOption.setVisible(false);
+                                    } catch (Exception e){}
+                                }
+                                else {
+                                    try {
+                                        removeFavourite.setVisible(false);
+                                        favouriteOption.setVisible(true);
+                                    } catch (Exception e){}
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+
+                } catch (Exception e){
                 }
             }
 
@@ -155,7 +179,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
 
             }
         });
-
 
         holder.productOptions.setOnClickListener(new View.OnClickListener() {
             @Override
