@@ -580,6 +580,7 @@ public class SearchActivity extends AppCompatActivity {
                                                     }
 
                                                     if (!restaurantsList.isEmpty()) {
+                                                        progressBar.setVisibility(View.GONE);
                                                         Log.d("Restaurants", "list: ["+restaurantsList.size()+"]");
                                                         recyclerView.setVisibility(VISIBLE);
                                                         /**
@@ -659,6 +660,7 @@ public class SearchActivity extends AppCompatActivity {
                                                     }
 
                                                     if (!restaurantsList.isEmpty()) {
+                                                        progressBar.setVisibility(View.GONE);
                                                         Log.d("Restaurants", "list: ["+restaurantsList.size()+"]");
                                                         recyclerView.setVisibility(VISIBLE);
                                                         /**
