@@ -436,16 +436,18 @@ public class CustomerActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Bundle bndlanimation =
+                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
         switch(item.getItemId()) {
             case R.id.search:
-                SafeToast.makeText(this, "Search", Toast.LENGTH_SHORT).show();
+                Intent searchActivity = new Intent(CustomerActivity.this, SearchActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(searchActivity, bndlanimation);
                 return(true);
 
             case R.id.sendDM:
                 Intent slideactivity = new Intent(CustomerActivity.this, Inbox.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
                 startActivity(slideactivity, bndlanimation);
                 return(true);
         }

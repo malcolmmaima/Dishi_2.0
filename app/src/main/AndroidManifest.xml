@@ -9,7 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.ReportAbuse"></activity>
+        <activity
+            android:name=".View.Activities.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".View.Activities.ReportAbuse" />
         <activity android:name=".View.Activities.MyNotifications" />
         <activity android:name=".View.Activities.FollowersFollowing" />
         <activity android:name=".View.Activities.NewChat" />

@@ -7,8 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".View.Fragments.ReviewsFragment">
 
-
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
