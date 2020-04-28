@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
     Context context;
     List<ProductDetails> listdata;
     long DURATION = 200;
+    private String TAG = "ProductHistory";
 
     public ProductHistoryAdapter(Context context, List<ProductDetails> listdata) {
         this.listdata = listdata;
@@ -227,36 +229,66 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             holder.distanceAway.setText(productDetails.getDistance() + "km away");
         }
 
-        /**
-         * date string conversion to Date:
-         * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-         */
+        //Get today's date
+        GetCurrentDate currentDate = new GetCurrentDate();
+        String currDate = currentDate.getDate();
+
+        //Get date status update was posted
+        String dtEnd = currDate;
+        String dtStart = productDetails.getUploadDate();
+
+        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
         //Format both current date and date status update was posted
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
         try {
-            //Get today's date
-            GetCurrentDate currentDate = new GetCurrentDate();
-            String currDate = currentDate.getDate();
-
-            //Get date status update was posted
-            String dtEnd = currDate;
-            String dtStart = productDetails.getUploadDate();
 
             //Convert String date values to Date values
-            Date dateEnd = format.parse(dtStart);
-            Date dateStart = format.parse(dtEnd);
+            Date dateStart;
+            Date dateEnd;
+
+            //Date dateStart = format.parse(dtStart);
+            String[] timeS = Split(productDetails.getUploadDate());
+            String[] timeT = Split(currDate);
 
             /**
-             * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
+             * timeS[0] = date
+             * timeS[1] = hr
+             * timeS[2] = min
+             * timeS[3] = seconds
+             * timeS[4] = timezone
              */
+
+            //post timeStamp
+            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                timeS[4] = "GMT+03:00";
+
+                //2020-04-27:20:37:32:GMT+03:00
+                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                dateStart = format.parse(dtStart);
+            } else {
+                dateStart = format.parse(dtStart);
+            }
+
+            //my device current date
+            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                timeT[4] = "GMT+03:00";
+
+                //2020-04-27:20:37:32:GMT+03:00
+                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                dateEnd = format.parse(dtEnd);
+            } else {
+                dateEnd = format.parse(dtEnd);
+            }
+
+            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
             //Now compute timeAgo duration
             TimeAgo timeAgo = new TimeAgo();
-            timeAgo.toRelative(dateStart, dateEnd);
 
-            holder.orderedOn.setText("ordered "+timeAgo.toRelative(dateEnd, dateStart, 1));
-            //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
+            holder.orderedOn.setText("ordered "+timeAgo.toRelative(dateStart, dateEnd, 1));
+
         } catch (ParseException e) {
             e.printStackTrace();
+            Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
         /**
@@ -362,5 +394,11 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
         }
     }
 
+    public String[] Split(String timeStamp){
+
+        String[] arrSplit = timeStamp.split(":");
+
+        return arrSplit;
+    }
 
 }
