@@ -70,9 +70,19 @@
             android:layout_width="wrap_content"
             android:visibility="gone"
             android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/readReceipt"
+            android:layout_below="@+id/contact_name"
+            android:layout_marginTop="3dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="3dp"
+            android:src="@drawable/ic_done_black_48dp"/>
         <TextView
             android:id="@+id/message"
             android:layout_below="@+id/contact_name"
+            android:layout_toRightOf="@id/readReceipt"
             android:textSize="15dp"
             android:text="message sent"
             android:layout_width="wrap_content"

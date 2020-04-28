@@ -80,6 +80,8 @@ public class ChatListAdapter extends BaseAdapter {
         TextView message=view.findViewById(R.id.message);
         CircleImageView picture =  view.findViewById(R.id.user_dp);
         ImageView mute = view.findViewById(R.id.mute);
+        ImageView readReceipt = view.findViewById(R.id.readReceipt);
+        readReceipt.setVisibility(View.GONE);
         name.setText(data.get(position).getFirstname()+" "+data.get(position).getLastname());
 
         /**
@@ -105,8 +107,22 @@ public class ChatListAdapter extends BaseAdapter {
                             } else {
                                 message.setText(message_.getMessage());
                             }
+
                         } else {
                             unread.setVisibility(View.GONE);
+                        }
+
+                        //Check if last sent message was from me and show read receipt else dont
+                        if(message_.getSender().equals(myPhone)){
+                            readReceipt.setVisibility(View.VISIBLE);
+
+                            if(message_.getRead() == true){
+                                readReceipt.setImageResource(R.drawable.ic_done_all_black_48dp);
+                            } else {
+                                readReceipt.setImageResource(R.drawable.ic_done_black_48dp);
+                            }
+                        } else {
+                            readReceipt.setVisibility(View.GONE);
                         }
                     } catch (Exception e){}
 
@@ -141,8 +157,6 @@ public class ChatListAdapter extends BaseAdapter {
 
 
         } catch (Exception e){}
-
-
 
         try {
             //Load food image
