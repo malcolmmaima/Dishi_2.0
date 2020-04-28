@@ -804,7 +804,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 postedOnWall.setFrom(myPhone);
                 postedOnWall.setType("postedwall");
                 postedOnWall.setImage(imgLink);
-                postedOnWall.setSeen(true); // will set this to true for now since the new post will be on top of the posts stack in user's ProfileFragment
+                postedOnWall.setSeen(false);
                 postedOnWall.setTimeStamp(postDate);
                 postedOnWall.setMessage(myStatusUpdate.getText().toString().trim());
 

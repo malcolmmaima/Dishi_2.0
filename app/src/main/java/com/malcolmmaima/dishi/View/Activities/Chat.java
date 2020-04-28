@@ -675,20 +675,22 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                 return  true;
             case R.id.chat_view_profile:
-                if(recipientUser.getPhone() != null){
-                    Intent slideactivity = new Intent(Chat.this, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+               try {
+                   Intent slideactivity = new Intent(Chat.this, ViewProfile.class)
+                           .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    slideactivity.putExtra("phone", recipientUser.getPhone());
-                    Bundle bndlanimation =
-                            null;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        bndlanimation = ActivityOptions.makeCustomAnimation(Chat.this, R.anim.animation,R.anim.animation2).toBundle();
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        startActivity(slideactivity, bndlanimation);
-                    }
-                }
+                   slideactivity.putExtra("phone", recipientUser.getPhone());
+                   Bundle bndlanimation =
+                           null;
+                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                       bndlanimation = ActivityOptions.makeCustomAnimation(Chat.this, R.anim.animation,R.anim.animation2).toBundle();
+                   }
+                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                       startActivity(slideactivity, bndlanimation);
+                   }
+               } catch(Exception e){
+                   Log.e(TAG, "onOptionsItemSelected: ", e);
+               }
                 return true;
             /**case R.id.chat_media:
                 return true; */

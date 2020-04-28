@@ -34,6 +34,7 @@ import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
@@ -947,6 +948,7 @@ public class ForegroundService extends Service {
                                     .setContentTitle(fromUser.getFirstname()+" posted on your wall:")
                                     .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                                     .setSound(soundUri)
+                                    .setTimeoutAfter(40000) //40s
                                     .setOnlyAlertOnce(true)
                                     .setContentText(newNotification.getMessage())
                                     .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
@@ -1052,6 +1054,91 @@ public class ForegroundService extends Service {
                     notification.icon |= Notification.BADGE_ICON_LARGE;
                     manager.notify(notifId, notification);
 
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        if(newNotification.getType().equals("likedstatus")){
+            Class targetActivity = MyNotifications.class;
+            DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+newNotification.getFrom());
+            userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    //get the 'from' user details first
+                    UserModel fromUser = dataSnapshot.getValue(UserModel.class);
+
+                    DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+newNotification.getPostedTo()+"/"+newNotification.getMessage());
+                    postDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            try {
+                                StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class);
+
+                                Notification.Builder builder = null;
+                                Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        //https://stackoverflow.com/questions/44443690/notificationcompat-with-api-26
+                                        builder = new Notification.Builder(getApplicationContext(), CHANNEL_ID)
+                                                .setGroupSummary(true)
+                                                //.setOnlyAlertOnce(true)
+                                                .setGroup(String.valueOf(notifId))
+                                                .setSmallIcon(R.drawable.logo_notification)
+                                                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                                                .setContentTitle(fromUser.getFirstname() + " " + fromUser.getLastname() + " liked:")
+                                                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                                                .setSound(soundUri)
+                                                .setTimeoutAfter(40000) //40s
+                                                .setOnlyAlertOnce(true)
+                                                .setContentText(statusUpdate.getStatus())
+                                                .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                                        .bigText(statusUpdate.getStatus()));
+                                    } else {
+                                        builder = new Notification.Builder(getApplicationContext())
+                                                .setGroupSummary(true)
+                                                //.setOnlyAlertOnce(true)
+                                                .setGroup(String.valueOf(notifId))
+                                                .setSmallIcon(R.drawable.logo_notification)
+                                                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                                                .setContentTitle(fromUser.getFirstname() + " " + fromUser.getLastname() + " liked:")
+                                                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                                                .setSound(soundUri)
+                                                .setAutoCancel(true)
+                                                .setOnlyAlertOnce(true)
+                                                .setPriority(Notification.PRIORITY_MAX)
+                                                .setContentText(statusUpdate.getStatus())
+                                                .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                                        .bigText(statusUpdate.getStatus()));
+                                    }
+
+
+                                }
+
+                                Intent intent = new Intent(getApplicationContext(), targetActivity);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                builder.setContentIntent(contentIntent);
+                                Notification notification = builder.build();
+                                notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                                notification.defaults |= Notification.DEFAULT_SOUND;
+                                notification.icon |= Notification.BADGE_ICON_LARGE;
+                                manager.notify(notifId, notification);
+                            } catch (Exception e){}
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
                 @Override

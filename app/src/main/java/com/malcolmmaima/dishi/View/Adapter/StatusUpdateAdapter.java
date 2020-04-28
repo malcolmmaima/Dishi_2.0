@@ -35,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TimeAgo;
+import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -525,6 +526,25 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                     postDetails.child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            if(!statusUpdateModel.getAuthor().equals(myPhone)){
+                                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+statusUpdateModel.getAuthor());
+
+                                String notifKey = notificationRef.push().getKey();
+                                GetCurrentDate currentDate = new GetCurrentDate();
+
+                                //send notification
+                                NotificationModel liked = new NotificationModel();
+                                liked.setFrom(myPhone);
+                                liked.setType("likedstatus");
+                                liked.setImage("");
+                                liked.setSeen(false);
+                                liked.setTimeStamp(currentDate.getDate());
+                                liked.setMessage(statusUpdateModel.key);
+                                liked.setAuthor(statusUpdateModel.getAuthor());
+                                liked.setPostedTo(statusUpdateModel.getPostedTo());
+
+                                notificationRef.child(notifKey).setValue(liked); //send to db
+                            }
                             holder.likePost.setTag(R.drawable.liked);
                             holder.likePost.setImageResource(R.drawable.liked);
                             //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();

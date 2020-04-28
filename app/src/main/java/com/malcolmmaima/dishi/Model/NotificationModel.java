@@ -8,6 +8,8 @@ public class NotificationModel {
     public String message;
     public String timeStamp;
     public Boolean seen;
+    public String author; //This applies to status updates
+    public String postedTo; //This applies to status updates
 
     public String getFrom() {
         return from;
@@ -23,6 +25,22 @@ public class NotificationModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getPostedTo() {
+        return postedTo;
+    }
+
+    public void setPostedTo(String postedTo) {
+        this.postedTo = postedTo;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getType() {
