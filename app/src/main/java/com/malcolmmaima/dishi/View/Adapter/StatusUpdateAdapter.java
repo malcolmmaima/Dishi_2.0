@@ -54,14 +54,13 @@ import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
-import static com.crashlytics.android.core.CrashlyticsCore.TAG;
-
 
 public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapter.MyHolder> {
 
     Context context;
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
+    String TAG = "StatusAdapter";
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -156,18 +155,19 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         try {
 
             //Convert String date values to Date values
-            Date dateEnd = format.parse(dtStart);
-            Date dateStart = format.parse(dtEnd);
+            Date dateStart = format.parse(dtStart);
+            Date dateEnd = format.parse(dtEnd);
 
             //https://memorynotfound.com/calculate-relative-time-time-ago-java/
             //Now compute timeAgo duration
             TimeAgo timeAgo = new TimeAgo();
-            timeAgo.toRelative(dateStart, dateEnd);
 
-            holder.timePosted.setText(timeAgo.toRelative(dateEnd, dateStart, 1));
-            //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
+            holder.timePosted.setText(timeAgo.toRelative(dateStart, dateEnd, 1));
+
         } catch (ParseException e) {
             e.printStackTrace();
+            Log.d(TAG, "StatusAdapter: "+ e.getMessage());
+
         }
 
         //set post details
@@ -603,5 +603,16 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             clipboard.setPrimaryClip(clip);
             SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public String[] Split(String timeStamp){
+
+        String[] arrSplit = timeStamp.split(":");
+//        for (int i=0; i < arrSplit.length; i++)
+//        {
+//            //Toast.makeText(activity, "val: " + arrSplit[1i, Toast.LENGTH_SHORT).show();
+//        }
+
+        return arrSplit;
     }
 }
