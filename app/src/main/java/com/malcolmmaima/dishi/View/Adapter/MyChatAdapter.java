@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -112,12 +113,19 @@ public class MyChatAdapter extends BaseAdapter {
                 view = activity.getLayoutInflater().inflate(R.layout.chat_row_left, null);
             } else {
                 view = activity.getLayoutInflater().inflate(R.layout.chat_row_right, null);
+
+                ImageView readReceipt = view.findViewById(R.id.readReceipt);
+                if(data.get(position).getRead() == true){
+                    readReceipt.setImageResource(R.drawable.ic_done_all_black_48dp);
+                } else {
+                    readReceipt.setImageResource(R.drawable.ic_done_black_48dp);
+                }
             }
 
             TextView text = view.findViewById(R.id.text);
-            TextView timeStamp = view.findViewById(R.id.timeStamp);
-
             text.setText(data.get(position).getMessage());
+
+            TextView timeStamp = view.findViewById(R.id.timeStamp);
 
             //2020-04-03:23:22:00:GMT+03:00
             String[] timeS = Split(data.get(position).getTimeStamp());
