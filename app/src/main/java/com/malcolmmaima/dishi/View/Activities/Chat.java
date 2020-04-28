@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +62,7 @@ import java.util.TimeZone;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconsPopup;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
@@ -284,6 +286,25 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         });
 
+        emojiconEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    //got focus
+                    Log.d(TAG, "onFocusChange: keyboard open => "+hasFocus);
+
+                    //Scroll to bottom, most recent chat on keyboard load
+                    try {
+                        arrayAdapter.notifyDataSetChanged();
+                    } catch(Exception e){
+                        Log.e(TAG, "onFocusChange: ", e);
+                    }
+                } else {
+                    //lost focus
+                }
+            }
+        });
+
         /**
          * Get recipient's user details
          */
@@ -300,7 +321,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                             .error(R.drawable.default_profile)
                             .into(profilePic);
                 } catch (Exception e){
-
+                    Log.e(TAG, "onDataChange: ", e);
                 }
             }
 
@@ -524,7 +545,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                             .error(R.drawable.default_profile)
                             .into(profilePic);
                 } catch (Exception e){
-
+                    Log.e(TAG, "onDataChange: ", e);
                 }
             }
 
@@ -650,7 +671,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.chat_call:
-                if(recipientUser.getPhone() != null){
+                try {
                     final AlertDialog callAlert = new AlertDialog.Builder(Chat.this)
                             //set message, title, and icon
                             .setMessage("Call " + recipientUser.getFirstname() + " " + recipientUser.getLastname() + "?")
@@ -671,8 +692,9 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                             .create();
                     callAlert.show();
+                } catch (Exception e){
+                    Log.e(TAG, "onOptionsItemSelected: ", e);
                 }
-
                 return  true;
             case R.id.chat_view_profile:
                try {
