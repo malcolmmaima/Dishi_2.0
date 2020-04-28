@@ -37,6 +37,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -255,6 +256,22 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         myReviewsRef.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
+
+                String notifKey = notificationRef.push().getKey();
+
+                //send notification
+                NotificationModel review = new NotificationModel();
+                review.setFrom(myPhone);
+                review.setType("postedreview");
+                review.setImage(imgLink);
+                review.setSeen(false);
+                review.setTimeStamp(postDate);
+                review.setMessage(key); // the reference to that particular review
+
+                notificationRef.child(notifKey).setValue(review); //send to db
+
                 mSwipeRefreshLayout.setRefreshing(false);
                 myReview.setText("");
                 myReview.clearFocus();

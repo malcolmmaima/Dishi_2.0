@@ -1252,6 +1252,76 @@ public class ForegroundService extends Service {
                 }
             });
         }
+
+        if(newNotification.getType().equals("postedreview") && newNotification.getSeen() == false){
+            Class targetActivity = MyNotifications.class;
+            DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+newNotification.getFrom());
+            userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    try {
+                        //get the 'from' user details first
+                        UserModel fromUser = dataSnapshot.getValue(UserModel.class);
+
+                        Notification.Builder builder = null;
+                        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                //https://stackoverflow.com/questions/44443690/notificationcompat-with-api-26
+                                builder = new Notification.Builder(getApplicationContext(), CHANNEL_ID)
+                                        .setGroupSummary(true)
+                                        //.setOnlyAlertOnce(true)
+                                        .setGroup(String.valueOf(notifId))
+                                        .setSmallIcon(R.drawable.logo_notification)
+                                        .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                                        .setContentTitle(fromUser.getFirstname()+" "+fromUser.getLastname())
+                                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                                        .setSound(soundUri)
+                                        .setTimeoutAfter(40000) //40s
+                                        .setOnlyAlertOnce(true)
+                                        .setContentText("Just posted a review");
+                            } else {
+                                builder = new Notification.Builder(getApplicationContext())
+                                        .setGroupSummary(true)
+                                        //.setOnlyAlertOnce(true)
+                                        .setGroup(String.valueOf(notifId))
+                                        .setSmallIcon(R.drawable.logo_notification)
+                                        .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                                        .setContentTitle(fromUser.getFirstname()+" "+fromUser.getLastname())
+                                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                                        .setSound(soundUri)
+                                        .setAutoCancel(true)
+                                        .setOnlyAlertOnce(true)
+                                        .setPriority(Notification.PRIORITY_MAX)
+                                        .setContentText("Just posted a review");
+                            }
+
+
+                        }
+
+                        Intent intent = new Intent(getApplicationContext(), targetActivity);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+                        builder.setContentIntent(contentIntent);
+                        Notification notification = builder.build();
+                        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                        notification.defaults |= Notification.DEFAULT_SOUND;
+                        notification.icon |= Notification.BADGE_ICON_LARGE;
+                        manager.notify(notifId, notification);
+                    } catch (Exception er){
+                        Log.e(TAG, "onDataChange: ", er);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
     /**
      * End of notification builders
