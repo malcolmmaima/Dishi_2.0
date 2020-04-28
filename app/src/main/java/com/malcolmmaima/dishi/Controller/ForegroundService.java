@@ -243,7 +243,7 @@ public class ForegroundService extends Service {
     }
 
     /**
-     * Initialize Chat listener
+     * Initialize Chat listener: this is a global listener for all account types
      */
     private void startChatNotifications() {
         myMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
@@ -649,14 +649,24 @@ public class ForegroundService extends Service {
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                builder = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.dish)
-                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                        .setContentTitle(title)
-                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                        .setSound(soundUri)
-                        .setContentText(message);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    builder = new Notification.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.dish)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                } else {
+                    builder = new Notification.Builder(this)
+                            .setSmallIcon(R.drawable.dish)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                }
             }
 
             Intent intent = new Intent(this, targetActivity);
@@ -679,14 +689,24 @@ public class ForegroundService extends Service {
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                builder = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.logo_notification)
-                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                        .setContentTitle(title)
-                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                        .setSound(soundUri)
-                        .setContentText(message);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    builder = new Notification.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.logo_notification)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                } else {
+                    builder = new Notification.Builder(this)
+                            .setSmallIcon(R.drawable.logo_notification)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                }
             }
 
             Intent intent = new Intent(this, targetActivity);
@@ -713,14 +733,24 @@ public class ForegroundService extends Service {
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                builder = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.dish)
-                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                        .setContentTitle(title)
-                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                        .setSound(soundUri)
-                        .setContentText(message);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    builder = new Notification.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.dish)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                } else {
+                    builder = new Notification.Builder(this)
+                            .setSmallIcon(R.drawable.dish)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                }
             }
 
             Intent intent = new Intent(this, targetActivity);
@@ -748,14 +778,24 @@ public class ForegroundService extends Service {
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                builder = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.deliver_nduthi_48dp)
-                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                        .setContentTitle(title)
-                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                        .setSound(soundUri)
-                        .setContentText(message);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    builder = new Notification.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.deliver_nduthi_48dp)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                } else {
+                    builder = new Notification.Builder(this)
+                            .setSmallIcon(R.drawable.deliver_nduthi_48dp)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message);
+                }
             }
 
             Intent intent = new Intent(this, targetActivity);
