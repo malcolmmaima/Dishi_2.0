@@ -88,7 +88,7 @@ public class ForegroundService extends Service {
         if (Build.VERSION.SDK_INT >= 26) {
             channel = new NotificationChannel(CHANNEL_ID,
                     "Dishi",
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_HIGH);
 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
 
@@ -665,6 +665,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
+                            .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message);
                 }
             }
@@ -749,6 +750,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
+                            .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message);
                 }
             }
@@ -794,6 +796,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
+                            .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message);
                 }
             }
@@ -844,6 +847,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
+                            .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message)
                             .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
                                     .bigText(message));
