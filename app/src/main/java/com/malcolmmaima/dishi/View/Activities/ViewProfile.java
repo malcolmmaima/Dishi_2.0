@@ -47,6 +47,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -775,6 +776,22 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
+
+                String notifKey = notificationRef.push().getKey();
+
+                //send notification
+                NotificationModel postedOnWall = new NotificationModel();
+                postedOnWall.setFrom(myPhone);
+                postedOnWall.setType("postedwall");
+                postedOnWall.setImage(imgLink);
+                postedOnWall.setSeen(true); // will set this to true for now since the new post will be on top of the posts stack in user's ProfileFragment
+                postedOnWall.setTimeStamp(postDate);
+                postedOnWall.setMessage(myStatusUpdate.getText().toString().trim());
+
+                notificationRef.child(notifKey).setValue(postedOnWall); //send to db
+
                 mSwipeRefreshLayout.setRefreshing(false);
                 myStatusUpdate.setText("");
                 myStatusUpdate.clearFocus();
