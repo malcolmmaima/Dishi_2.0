@@ -77,13 +77,16 @@ public class ForegroundService extends Service {
     // item(s) since the listener that calls this function of type "orderConfirmed"
     //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
 
+    NotificationChannel channel;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
         //Bug fix for android 8.0+
         //https://stackoverflow.com/questions/44425584/context-startforegroundservice-did-not-then-call-service-startforeground
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+            channel = new NotificationChannel(CHANNEL_ID,
                     "Dishi",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
@@ -99,7 +102,11 @@ public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
         Log.d("ForeGroundService", "ForegroundService: started");
-        manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager = ((NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            manager.createNotificationChannel(channel);
+        }
 
         try {
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -772,19 +779,35 @@ public class ForegroundService extends Service {
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                builder = new Notification.Builder(this)
-                        .setGroupSummary(true)
-                        //.setOnlyAlertOnce(true)
-                        .setGroup(String.valueOf(notifId))
-                        .setSmallIcon(R.drawable.logo_notification)
-                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                        .setContentTitle(title)
-                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                        .setSound(soundUri)
-                        .setContentText(message)
-                        .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
-                                .bigText(message));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    //https://stackoverflow.com/questions/44443690/notificationcompat-with-api-26
+                    builder = new Notification.Builder(this, CHANNEL_ID)
+                            .setGroupSummary(true)
+                            //.setOnlyAlertOnce(true)
+                            .setGroup(String.valueOf(notifId))
+                            .setSmallIcon(R.drawable.logo_notification)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message)
+                            .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                    .bigText(message));
+                } else {
+                    builder = new Notification.Builder(this)
+                            .setGroupSummary(true)
+                            //.setOnlyAlertOnce(true)
+                            .setGroup(String.valueOf(notifId))
+                            .setSmallIcon(R.drawable.logo_notification)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setContentText(message)
+                            .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                    .bigText(message));
+                }
 
 
             }
