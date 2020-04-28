@@ -46,6 +46,7 @@ import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TimeAgo;
+import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -75,7 +76,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
     TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted, statusOptions;
     ImageView profilePic, imageShare, likePost, comments, sharePost;
-    String myPhone;
+    String myPhone, author;
     Button postStatus;
     EmojiconEditText statusPost;
     ImageView selectedImage;
@@ -157,7 +158,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         //topToolBar.setLogo(R.drawable.logo);
         //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
-        String author = getIntent().getStringExtra("author");
+        author = getIntent().getStringExtra("author");
         postedTo = getIntent().getStringExtra("postedTo");
         key = getIntent().getStringExtra("key");
 
@@ -713,6 +714,35 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     postRef.child(key).child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+
+                            if(!author.equals(myPhone)){
+                                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+author);
+
+                                String notifKey = notificationRef.push().getKey();
+                                GetCurrentDate currentDate = new GetCurrentDate();
+
+                                //send notification
+                                NotificationModel liked = new NotificationModel();
+                                liked.setFrom(myPhone);
+                                liked.setType("likedstatus");
+                                liked.setImage("");
+                                liked.setSeen(false);
+                                liked.setTimeStamp(currentDate.getDate());
+                                liked.setMessage(key);
+                                liked.setAuthor(author);
+                                liked.setPostedTo(postedTo);
+
+                                notificationRef.child(notifKey).setValue(liked); //send to db
+
+                                //Also send the notification to the person's wall where this status update appears
+                                if(!postedTo.equals(myPhone) && !postedTo.equals(author)){
+                                    DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+postedTo);
+                                    String notif2key = notificationRef2.push().getKey();
+
+                                    notificationRef2.child(notif2key).setValue(liked); //send to db
+                                }
+                            }
+
                             likePost.setTag(R.drawable.liked);
                             likePost.setImageResource(R.drawable.liked);
                             //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
@@ -934,6 +964,34 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                if(!author.equals(myPhone)){
+                    //Send notification to author
+                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+author);
+
+                    String notifKey = notificationRef.push().getKey();
+
+                    //send notification
+                    NotificationModel commentedStatus = new NotificationModel();
+                    commentedStatus.setFrom(myPhone);
+                    commentedStatus.setType("commentedstatus");
+                    commentedStatus.setImage(imgLink);
+                    commentedStatus.setSeen(false);
+                    commentedStatus.setTimeStamp(time);
+                    commentedStatus.setMessage(commentKey);
+                    commentedStatus.setPostedTo(postedTo);
+                    commentedStatus.setStatusKey(key); //The status key
+
+                    notificationRef.child(notifKey).setValue(commentedStatus); //send to db
+
+                    //Also send the notification to the person's wall where this status update appears
+                    if(!postedTo.equals(myPhone)){
+                        DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+postedTo);
+                        String notif2key = notificationRef2.push().getKey();
+
+                        notificationRef2.child(notif2key).setValue(commentedStatus); //send to db
+                    }
+                }
+
                 mSwipeRefreshLayout.setRefreshing(false);
                 comment.key = commentKey;
                 statusPost.setText("");

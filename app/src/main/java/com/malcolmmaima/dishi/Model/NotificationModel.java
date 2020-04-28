@@ -10,6 +10,15 @@ public class NotificationModel {
     public Boolean seen;
     public String author; //This applies to status updates
     public String postedTo; //This applies to status updates
+    public String statusKey;
+
+    public String getStatusKey() {
+        return statusKey;
+    }
+
+    public void setStatusKey(String statusKey) {
+        this.statusKey = statusKey;
+    }
 
     public String getFrom() {
         return from;

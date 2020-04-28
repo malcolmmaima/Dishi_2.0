@@ -544,6 +544,14 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                 liked.setPostedTo(statusUpdateModel.getPostedTo());
 
                                 notificationRef.child(notifKey).setValue(liked); //send to db
+
+                                //Also send the notification to the person's wall where this status update appears
+                                if(!statusUpdateModel.getPostedTo().equals(myPhone) && !statusUpdateModel.postedTo.equals(statusUpdateModel.getAuthor())){
+                                    DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+statusUpdateModel.getPostedTo());
+                                    String notif2key = notificationRef2.push().getKey();
+
+                                    notificationRef2.child(notif2key).setValue(liked); //send to db
+                                }
                             }
                             holder.likePost.setTag(R.drawable.liked);
                             holder.likePost.setImageResource(R.drawable.liked);
