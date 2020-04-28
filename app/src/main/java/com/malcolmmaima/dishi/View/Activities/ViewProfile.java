@@ -280,6 +280,24 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+
+                            DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
+
+                            String notifKey = notificationRef.push().getKey();
+                            GetCurrentDate currentDate = new GetCurrentDate();
+
+                            //send notification
+                            NotificationModel followed = new NotificationModel();
+                            followed.setFrom(myPhone);
+                            followed.setType("followedwall");
+                            followed.setImage("");
+                            followed.setSeen(false);
+                            followed.setTimeStamp(currentDate.getDate());
+                            followed.setMessage("followed you");
+
+                            notificationRef.child(notifKey).setValue(followed); //send to db
+
+
                             DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
                             myFollowing.child(phone).setValue("follow");
                             followBtn.setText("UNFOLLOW");

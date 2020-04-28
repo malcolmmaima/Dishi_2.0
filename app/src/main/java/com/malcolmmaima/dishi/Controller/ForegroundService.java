@@ -38,6 +38,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
 import com.malcolmmaima.dishi.View.Activities.Inbox;
+import com.malcolmmaima.dishi.View.Activities.MyNotifications;
 import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.RiderActivity;
 import com.malcolmmaima.dishi.View.Activities.SplashActivity;
@@ -59,6 +60,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
+    String TAG = "ForeGroundService";
     DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, notificationRef, myMessages;
     DatabaseReference myRideOrderRequests;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
@@ -396,7 +398,11 @@ public class ForegroundService extends Service {
 
             }
         };
-        notificationRef.addChildEventListener(notificationsListener);
+        try {
+            notificationRef.addChildEventListener(notificationsListener);
+        } catch (Exception e){
+            Log.e(TAG, "startSocialNotifications: ", e);
+        }
     }
 
     /**
@@ -918,7 +924,7 @@ public class ForegroundService extends Service {
     private void sendSocialNotification(int notifId, NotificationModel newNotification) {
 
         if(newNotification.getType().equals("postedwall")){
-            Class targetActivity = SplashActivity.class;
+            Class targetActivity = MyNotifications.class;
             DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+newNotification.getFrom());
             userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -941,6 +947,7 @@ public class ForegroundService extends Service {
                                     .setContentTitle(fromUser.getFirstname()+" posted on your wall:")
                                     .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                                     .setSound(soundUri)
+                                    .setOnlyAlertOnce(true)
                                     .setContentText(newNotification.getMessage())
                                     .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
                                             .bigText(newNotification.getMessage()));
@@ -955,6 +962,7 @@ public class ForegroundService extends Service {
                                     .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                                     .setSound(soundUri)
                                     .setAutoCancel(true)
+                                    .setOnlyAlertOnce(true)
                                     .setPriority(Notification.PRIORITY_MAX)
                                     .setContentText(newNotification.getMessage())
                                     .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
@@ -982,7 +990,75 @@ public class ForegroundService extends Service {
 
                 }
             });
+        }
 
+        if(newNotification.getType().equals("followedwall")){
+            Class targetActivity = MyNotifications.class;
+            DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+newNotification.getFrom());
+            userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    //get the 'from' user details first
+                    UserModel fromUser = dataSnapshot.getValue(UserModel.class);
+
+                    Notification.Builder builder = null;
+                    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            //https://stackoverflow.com/questions/44443690/notificationcompat-with-api-26
+                            builder = new Notification.Builder(getApplicationContext(), CHANNEL_ID)
+                                    .setGroupSummary(true)
+                                    //.setOnlyAlertOnce(true)
+                                    .setGroup(String.valueOf(notifId))
+                                    .setSmallIcon(R.drawable.logo_notification)
+                                    .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                                    .setContentTitle(fromUser.getFirstname()+" "+fromUser.getLastname())
+                                    .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                                    .setSound(soundUri)
+                                    .setOnlyAlertOnce(true)
+                                    .setContentText(newNotification.getMessage())
+                                    .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                            .bigText(newNotification.getMessage()));
+                        } else {
+                            builder = new Notification.Builder(getApplicationContext())
+                                    .setGroupSummary(true)
+                                    //.setOnlyAlertOnce(true)
+                                    .setGroup(String.valueOf(notifId))
+                                    .setSmallIcon(R.drawable.logo_notification)
+                                    .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                                    .setContentTitle(fromUser.getFirstname()+" "+fromUser.getLastname())
+                                    .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                                    .setSound(soundUri)
+                                    .setAutoCancel(true)
+                                    .setOnlyAlertOnce(true)
+                                    .setPriority(Notification.PRIORITY_MAX)
+                                    .setContentText(newNotification.getMessage())
+                                    .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                            .bigText(newNotification.getMessage()));
+                        }
+
+
+                    }
+
+                    Intent intent = new Intent(getApplicationContext(), targetActivity);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(contentIntent);
+                    Notification notification = builder.build();
+                    notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                    notification.defaults |= Notification.DEFAULT_SOUND;
+                    notification.icon |= Notification.BADGE_ICON_LARGE;
+                    manager.notify(notifId, notification);
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
     }
     /**
