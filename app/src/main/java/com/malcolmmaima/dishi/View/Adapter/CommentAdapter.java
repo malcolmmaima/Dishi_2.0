@@ -343,6 +343,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
         } catch (ParseException e) {
             e.printStackTrace();
+            Log.d(TAG, "timeStamp: "+e.getMessage());
         }
     }
 
