@@ -155,8 +155,42 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         try {
 
             //Convert String date values to Date values
-            Date dateStart = format.parse(dtStart);
-            Date dateEnd = format.parse(dtEnd);
+            Date dateStart;
+            Date dateEnd;
+
+            //Date dateStart = format.parse(dtStart);
+            String[] timeS = Split(statusUpdateModel.getTimePosted());
+            String[] timeT = Split(currDate);
+
+            /**
+             * timeS[0] = date
+             * timeS[1] = hr
+             * timeS[2] = min
+             * timeS[3] = seconds
+             * timeS[4] = timezone
+             */
+
+            //post timeStamp
+            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                timeS[4] = "GMT+03:00";
+
+                //2020-04-27:20:37:32:GMT+03:00
+                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                dateStart = format.parse(dtStart);
+            } else {
+                dateStart = format.parse(dtStart);
+            }
+
+            //my device current date
+            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                timeT[4] = "GMT+03:00";
+
+                //2020-04-27:20:37:32:GMT+03:00
+                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                dateEnd = format.parse(dtEnd);
+            } else {
+                dateEnd = format.parse(dtEnd);
+            }
 
             //https://memorynotfound.com/calculate-relative-time-time-ago-java/
             //Now compute timeAgo duration
@@ -166,8 +200,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "StatusAdapter: "+ e.getMessage());
-
+            Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
         //set post details
@@ -608,10 +641,6 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     public String[] Split(String timeStamp){
 
         String[] arrSplit = timeStamp.split(":");
-//        for (int i=0; i < arrSplit.length; i++)
-//        {
-//            //Toast.makeText(activity, "val: " + arrSplit[1i, Toast.LENGTH_SHORT).show();
-//        }
 
         return arrSplit;
     }
