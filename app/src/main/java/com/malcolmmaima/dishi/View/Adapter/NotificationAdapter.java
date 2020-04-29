@@ -332,7 +332,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     try {
                         Intent slideactivity = new Intent(context, ViewStatus.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        slideactivity.putExtra("author", my_notification.getAuthor());
+                        slideactivity.putExtra("author", my_notification.getFrom());
                         slideactivity.putExtra("postedTo", my_notification.getPostedTo());
                         slideactivity.putExtra("key", my_notification.getStatusKey());
                         Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
@@ -410,14 +410,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Intent slideactivity = new Intent(context, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", my_notification.getFrom());
-                    context.startActivity(slideactivity);
-                } catch (Exception e){
-                    Log.e(TAG, "onClick: ", e);
-                }
+                DatabaseReference profileP = FirebaseDatabase.getInstance().getReference("users/"+my_notification.getFrom());
+                profileP.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try {
+                            UserModel thisUser = dataSnapshot.getValue(UserModel.class);
+
+                            Intent slideactivity = new Intent(context, ViewImage.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            slideactivity.putExtra("imageURL", thisUser.getProfilePic());
+                            context.startActivity(slideactivity);
+                        } catch (Exception e){
+                            Log.e(TAG, "onClick: ", e);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
