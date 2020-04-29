@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -155,9 +156,32 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot notifs : dataSnapshot.getChildren()){
+                    String notifKey = notifs.getKey();
+                    notificationsRef.child(notifKey).child("seen").setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        notificationsRef.removeEventListener(notificationListener);
+        try {
+            notificationsRef.removeEventListener(notificationListener);
+        } catch (Exception e){
+            Log.e("MyNotifications", "onDestroy: ", e);
+        }
     }
 
     @Override

@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -75,57 +76,77 @@ public class SetupAccountType extends AppCompatActivity {
             customer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //SafeToast.makeText(SetupAccountType.this, "Customer account", Toast.LENGTH_SHORT).show();
-                    accountType = "1";
+                    final AlertDialog proceedAcc = new AlertDialog.Builder(SetupAccountType.this)
+                            .setMessage("Proceed as customer?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //SafeToast.makeText(SetupAccountType.this, "Customer account", Toast.LENGTH_SHORT).show();
+                                    accountType = "1";
 
-                    try {
-                        progressDialog.setTitle("Saving...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
-                    } catch (Exception e){
+                                    try {
+                                        progressDialog.setTitle("Saving...");
+                                        progressDialog.setCancelable(false);
+                                        progressDialog.show();
+                                    } catch (Exception e){
 
-                    }
-                    //Set account type in database under logged in user's node
-                    myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                            } catch (Exception e){
-
-                            }
-
-                            //Set signup date and make sure it is posted to the database before loading customer account
-                            String date = getDate();
-                            myRef.child(myPhone).child("signupDate").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    //Load customer account
-                                    Intent slideactivity = new Intent(SetupAccountType.this, CustomerActivity.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    Bundle bndlanimation =
-                                            null;
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                                     }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        try {
-                                            startActivity(slideactivity, bndlanimation);
-                                        } catch (Exception e){
+                                    //Set account type in database under logged in user's node
+                                    myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            try {
+                                                progressDialog.dismiss();
+                                            } catch (Exception e){
 
+                                            }
+
+                                            //Set signup date and make sure it is posted to the database before loading customer account
+                                            String date = getDate();
+                                            myRef.child(myPhone).child("signupDate").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //Load customer account
+                                                    Intent slideactivity = new Intent(SetupAccountType.this, CustomerActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            null;
+                                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                    }
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                        try {
+                                                            startActivity(slideactivity, bndlanimation);
+                                                        } catch (Exception e){
+
+                                                        }
+                                                    }
+                                                }
+                                            });
                                         }
-                                    }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            //error
+                                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
+                                        }
+                                    });
+
                                 }
-                            });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //error
-                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                        }
-                    });
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
+                            .create();
+                    proceedAcc.show();
+
                 }
 
             });
@@ -137,53 +158,71 @@ public class SetupAccountType extends AppCompatActivity {
             restaurant.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //SafeToast.makeText(SetupAccountType.this, "Restaurant account", Toast.LENGTH_SHORT).show();
-                    accountType = "2";
 
-                    try {
-                        progressDialog.setTitle("Saving...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
-                    } catch (Exception e){
+                    final AlertDialog proceedAcc = new AlertDialog.Builder(SetupAccountType.this)
+                            //set message, title, and icon
+                            .setMessage("Proceed as restaurant?")
+                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //SafeToast.makeText(SetupAccountType.this, "Restaurant account", Toast.LENGTH_SHORT).show();
+                                    accountType = "2";
 
-                    }
-                    //Set account type in database under logged in user's node
-                    myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                            } catch (Exception e){
+                                    try {
+                                        progressDialog.setTitle("Saving...");
+                                        progressDialog.setCancelable(false);
+                                        progressDialog.show();
+                                    } catch (Exception e){
 
-                            }
+                                    }
+                                    //Set account type in database under logged in user's node
+                                    myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            try {
+                                                progressDialog.dismiss();
+                                            } catch (Exception e){
 
-                            //Set signup date and make sure it is posted to the database before loading customer account
-                            String date = getDate();
-                            myRef.child(myPhone).child("signupDate").setValue(date);
-                            //Load account
-                            Intent slideactivity = new Intent(SetupAccountType.this, RestaurantActivity.class)
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            Bundle bndlanimation =
-                                    null;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                            }
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                try {
-                                    startActivity(slideactivity, bndlanimation);
-                                } catch (Exception e){
+                                            }
+
+                                            //Set signup date and make sure it is posted to the database before loading customer account
+                                            String date = getDate();
+                                            myRef.child(myPhone).child("signupDate").setValue(date);
+                                            //Load account
+                                            Intent slideactivity = new Intent(SetupAccountType.this, RestaurantActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            Bundle bndlanimation =
+                                                    null;
+                                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                try {
+                                                    startActivity(slideactivity, bndlanimation);
+                                                } catch (Exception e){
+
+                                                }
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            //error
+                                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
+                                        }
+                                    });
+                                }
+                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //do nothing
 
                                 }
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //error
-                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                        }
-                    });
+                            })//setNegativeButton
+
+                            .create();
+                    proceedAcc.show();
                 }
             });
 
@@ -193,57 +232,76 @@ public class SetupAccountType extends AppCompatActivity {
             rider.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //SafeToast.makeText(SetupAccountType.this, "Rider account", Toast.LENGTH_SHORT).show();
-                    accountType = "3";
 
-                    try {
-                        progressDialog.setTitle("Saving...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
-                    } catch (Exception e){
+                    final AlertDialog proceedAcc = new AlertDialog.Builder(SetupAccountType.this)
+                            //set message, title, and icon
+                            .setMessage("Proceed as rider?")
+                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                            //set three option buttons
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //SafeToast.makeText(SetupAccountType.this, "Rider account", Toast.LENGTH_SHORT).show();
+                                    accountType = "3";
 
-                    }
-                    //Set account type in database under logged in user's node
-                    myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                            } catch (Exception e){
+                                    try {
+                                        progressDialog.setTitle("Saving...");
+                                        progressDialog.setCancelable(false);
+                                        progressDialog.show();
+                                    } catch (Exception e){
 
-                            }
-
-                            //Set signup date and make sure it is posted to the database before loading customer account
-                            String date = getDate();
-                            myRef.child(myPhone).child("signupDate").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    //Load customer account
-                                    Intent slideactivity = new Intent(SetupAccountType.this, RiderActivity.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    Bundle bndlanimation =
-                                            null;
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                                     }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        try {
-                                            startActivity(slideactivity, bndlanimation);
-                                        } catch (Exception e){
+                                    //Set account type in database under logged in user's node
+                                    myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            try {
+                                                progressDialog.dismiss();
+                                            } catch (Exception e){
 
+                                            }
+
+                                            //Set signup date and make sure it is posted to the database before loading customer account
+                                            String date = getDate();
+                                            myRef.child(myPhone).child("signupDate").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //Load customer account
+                                                    Intent slideactivity = new Intent(SetupAccountType.this, RiderActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    Bundle bndlanimation =
+                                                            null;
+                                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                    }
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                        try {
+                                                            startActivity(slideactivity, bndlanimation);
+                                                        } catch (Exception e){
+
+                                                        }
+                                                    }
+                                                }
+                                            });
                                         }
-                                    }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            //error
+                                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //error
-                            SafeToast.makeText(SetupAccountType.this, "Something wrong occurred", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                        }
-                    });
+                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //do nothing
+
+                                }
+                            })//setNegativeButton
+
+                            .create();
+                    proceedAcc.show();
+
                 }
             });
 

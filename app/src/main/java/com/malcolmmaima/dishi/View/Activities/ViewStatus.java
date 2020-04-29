@@ -339,28 +339,36 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         MenuItem deleteOption = myMenu.findItem(R.id.delete);
         MenuItem reportOption = myMenu.findItem(R.id.report);
 
-        //delete posts
-        if(postedTo.equals(myPhone) || author.equals(myPhone)){
-            try {
-                deleteOption.setVisible(true);
-            } catch (Exception e){}
-        } else {
-            try {
-                deleteOption.setVisible(false);
-            } catch (Exception e){}
-        }
+        try {
+            //delete posts
+            if (postedTo.equals(myPhone) || author.equals(myPhone)) {
+                try {
+                    deleteOption.setVisible(true);
+                } catch (Exception e) {
+                }
+            } else {
+                try {
+                    deleteOption.setVisible(false);
+                } catch (Exception e) {
+                }
+            }
 
-        //Can only report posts that i havent authored
-        if(!myPhone.equals(author)){
-            try {
-                reportOption.setVisible(true);
-            } catch (Exception e){}
-        } else {
-            try {
-                reportOption.setVisible(false);
-            } catch (Exception e){}
-        }
+            //Can only report posts that i havent authored
+            if (!myPhone.equals(author)) {
+                try {
+                    reportOption.setVisible(true);
+                } catch (Exception e) {
+                }
+            } else {
+                try {
+                    reportOption.setVisible(false);
+                } catch (Exception e) {
+                }
+            }
 
+        } catch (Exception e){
+            Log.e(TAG, "onCreate: ", e);
+        }
 
         //status options
         statusOptions.setOnClickListener(new View.OnClickListener() {

@@ -212,13 +212,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         if(my_notification.getType().equals("likedstatus")){
+            holder.liked.setVisibility(View.VISIBLE);
             DatabaseReference postDetailsRef = FirebaseDatabase.getInstance().getReference("posts/"+my_notification.getPostedTo()+"/"+my_notification.getMessage());
             postDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class);
-                    holder.liked.setVisibility(View.VISIBLE);
-                    holder.notificationMessage.setText("liked: "+statusUpdate.getStatus());
+                    if(!dataSnapshot.exists()){
+                        holder.notificationMessage.setText("no longer exists");
+                    } else {
+                        try {
+                            StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class);
+                            holder.notificationMessage.setText("liked: " + statusUpdate.getStatus());
+                            Log.d(TAG, "onDataChange: liked"+statusUpdate.getStatus());
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                            holder.liked.setVisibility(View.GONE);
+                        }
+                    }
                 }
 
                 @Override
@@ -227,6 +237,63 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 }
             });
         }
+
+        if(my_notification.getType().equals("commentedstatus")){
+            DatabaseReference postDetailsRef = FirebaseDatabase.getInstance().getReference("posts/"+my_notification.getPostedTo()+"/"+my_notification.getStatusKey());
+            postDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class); //the actual status
+                        DatabaseReference userDataRef = FirebaseDatabase.getInstance().getReference("users/"+my_notification.getFrom());
+                        userDataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                UserModel userModel = dataSnapshot.getValue(UserModel.class);
+
+                                postDetailsRef.child("comments").child(my_notification.getMessage()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                        if(!dataSnapshot.exists()){
+                                            holder.notificationMessage.setText("no longer exists");
+                                        } else {
+                                            try {
+                                                StatusUpdateModel comment = dataSnapshot.getValue(StatusUpdateModel.class); //the comment reply to above mentioned status
+
+                                                holder.notificationMessage.setText("commented: " + comment.getStatus());
+                                            } catch (Exception e){
+                                                holder.notificationMessage.setText("...");
+                                                Log.e(TAG, "onDataChange: ", e);
+                                            }
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
         /**
          * Click listener on our card
          */
@@ -254,6 +321,20 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         slideactivity.putExtra("author", my_notification.getAuthor());
                         slideactivity.putExtra("postedTo", my_notification.getPostedTo());
                         slideactivity.putExtra("key", my_notification.getMessage());
+                        Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                        context.startActivity(slideactivity, bndlanimation);
+                    } catch (Exception e){
+                        Log.e(TAG, "onClick: ", e);
+                    }
+                }
+
+                if(my_notification.getType().equals("commentedstatus")){
+                    try {
+                        Intent slideactivity = new Intent(context, ViewStatus.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("author", my_notification.getAuthor());
+                        slideactivity.putExtra("postedTo", my_notification.getPostedTo());
+                        slideactivity.putExtra("key", my_notification.getStatusKey());
                         Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
                         context.startActivity(slideactivity, bndlanimation);
                     } catch (Exception e){
