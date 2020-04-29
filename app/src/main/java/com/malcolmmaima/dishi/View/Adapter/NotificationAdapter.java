@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
@@ -37,18 +38,22 @@ import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Controller.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TimeAgo;
 import com.malcolmmaima.dishi.Model.NotificationModel;
+import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import io.fabric.sdk.android.services.common.SafeToast;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.MyHolder>{
     String TAG = "NotificationAdapter";
@@ -85,6 +90,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         holder.followUnfollow.setVisibility(View.GONE);
+        holder.liked.setVisibility(View.GONE);
+
         holder.contact_name.setText("loading...");
         DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+my_notification.getFrom());
         DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone+"/"+my_notification.getFrom());
@@ -200,6 +207,26 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             });
         }
 
+        if(my_notification.getType().equals("postedwall")){
+            holder.notificationMessage.setText("posted on your wall");
+        }
+
+        if(my_notification.getType().equals("likedstatus")){
+            DatabaseReference postDetailsRef = FirebaseDatabase.getInstance().getReference("posts/"+my_notification.getPostedTo()+"/"+my_notification.getMessage());
+            postDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class);
+                    holder.liked.setVisibility(View.VISIBLE);
+                    holder.notificationMessage.setText("liked: "+statusUpdate.getStatus());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
         /**
          * Click listener on our card
          */
@@ -214,6 +241,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                     context.startActivity(slideactivity, bndlanimation);
+                }
+
+                if(my_notification.getType().equals("postedwall")){
+                    //Do somthing
+                }
+
+                if(my_notification.getType().equals("likedstatus")){
+                    try {
+                        Intent slideactivity = new Intent(context, ViewStatus.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("author", my_notification.getAuthor());
+                        slideactivity.putExtra("postedTo", my_notification.getPostedTo());
+                        slideactivity.putExtra("key", my_notification.getMessage());
+                        Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                        context.startActivity(slideactivity, bndlanimation);
+                    } catch (Exception e){
+                        Log.e(TAG, "onClick: ", e);
+                    }
                 }
             }
         });
@@ -338,7 +383,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView contact_name, notificationMessage, notificationTime;
-        ImageView profilePic;
+        ImageView profilePic, liked;
         LinearLayout cardView;
         AppCompatButton followUnfollow;
 
@@ -350,6 +395,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             notificationMessage = itemView.findViewById(R.id.message);
             followUnfollow = itemView.findViewById(R.id.followUnfollow);
             notificationTime = itemView.findViewById(R.id.notificationTime);
+            liked = itemView.findViewById(R.id.liked);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {

@@ -115,7 +115,10 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
                         if (!notifications.isEmpty()) {
 
                             mSwipeRefreshLayout.setRefreshing(false);
-                            //Collections.reverse(list);
+                            //Collections.reverse(notifications);
+                            try {
+                                Collections.sort(notifications, (not1, not2) -> (not2.timeStamp.compareTo(not1.timeStamp)));
+                            } catch (Exception e){}
                             NotificationAdapter recycler = new NotificationAdapter(MyNotifications.this, notifications);
                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyNotifications.this);
                             recyclerView.setLayoutManager(layoutmanager);
