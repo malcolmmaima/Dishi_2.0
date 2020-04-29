@@ -158,6 +158,8 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
     @Override
     protected void onStop() {
         super.onStop();
+
+        //update all notifications status to seen = true
         notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

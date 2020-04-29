@@ -542,66 +542,65 @@ public class SearchActivity extends AppCompatActivity {
                                             defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + staticLocation.getLatitude() + ","
-//                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                            liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
-
-                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                    String restaurantName = user.getFirstname()+" "+user.getLastname();
-                                                    if(!myPhone.equals(user.getPhone())){
-                                                        if (restaurantName.toLowerCase().contains(word.toLowerCase())) {
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-                                                        else if(word.toLowerCase().contains(restaurantName.toLowerCase())){
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-                                                        //search if word is equal to user name object
-                                                        else if(word.toLowerCase() == restaurantName.toLowerCase()){
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-                                                        else if(restaurantName.toLowerCase().equals(word.toLowerCase())) {
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-
-                                                        Log.d("Restaurants", "added: "+user.getFirstname());
-                                                    }
-
-                                                    if (!restaurantsList.isEmpty()) {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        Log.d("Restaurants", "list: ["+restaurantsList.size()+"]");
-                                                        recyclerView.setVisibility(VISIBLE);
+                                                    try {
+                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
                                                         /**
-                                                         * https://howtodoinjava.com/sort/collections-sort/
-                                                         * We want to sort from nearest to furthest location
+                                                         * Now lets compute distance of each restaurant with customer location
                                                          */
-                                                        //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        //Collections.reverse(list);
-                                                        RestaurantAdapter recycler = new RestaurantAdapter(SearchActivity.this, restaurantsList);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                        recyclerView.setLayoutManager(layoutmanager);
-                                                        //recyclerView.setItemAnimator(new SlideInLeftAnimator());
-                                                        recycler.notifyDataSetChanged();
-                                                        recyclerView.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.GONE);
-                                                    } else {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        recyclerView.setVisibility(INVISIBLE);
-                                                        emptyTag.setVisibility(VISIBLE);
-                                                        recyclerView.setVisibility(View.GONE);
-                                                        emptyTag.setText("Nothing found");
+                                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+
+                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+
+                                                        String restaurantName = user.getFirstname() + " " + user.getLastname();
+                                                        if (!myPhone.equals(user.getPhone())) {
+                                                            if (restaurantName.toLowerCase().contains(word.toLowerCase())) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            } else if (word.toLowerCase().contains(restaurantName.toLowerCase())) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            }
+                                                            //search if word is equal to user name object
+                                                            else if (word.toLowerCase() == restaurantName.toLowerCase()) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            } else if (restaurantName.toLowerCase().equals(word.toLowerCase())) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            }
+
+                                                            Log.d("Restaurants", "added: " + user.getFirstname());
+                                                        }
+
+                                                        if (!restaurantsList.isEmpty()) {
+                                                            progressBar.setVisibility(View.GONE);
+                                                            Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
+                                                            recyclerView.setVisibility(VISIBLE);
+                                                            /**
+                                                             * https://howtodoinjava.com/sort/collections-sort/
+                                                             * We want to sort from nearest to furthest location
+                                                             */
+                                                            //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                            //Collections.reverse(list);
+                                                            RestaurantAdapter recycler = new RestaurantAdapter(SearchActivity.this, restaurantsList);
+                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
+                                                            recyclerView.setLayoutManager(layoutmanager);
+                                                            //recyclerView.setItemAnimator(new SlideInLeftAnimator());
+                                                            recycler.notifyDataSetChanged();
+                                                            recyclerView.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.GONE);
+                                                        } else {
+                                                            progressBar.setVisibility(View.GONE);
+                                                            recyclerView.setVisibility(INVISIBLE);
+                                                            emptyTag.setVisibility(VISIBLE);
+                                                            recyclerView.setVisibility(View.GONE);
+                                                            emptyTag.setText("Nothing found");
+                                                        }
+                                                    } catch (Exception e){
+                                                        Log.e("SearchActivity", "onDataChange: ", e);
                                                     }
 
                                                 }
@@ -621,67 +620,67 @@ public class SearchActivity extends AppCompatActivity {
                                             restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + restLiveLoc.getLatitude() + ","
-//                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                                    try {
+                                                        LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
 
-                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                        /**
+                                                         * Now lets compute distance of each restaurant with customer location
+                                                         */
+                                                        CalculateDistance calculateDistance = new CalculateDistance();
+
+                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
                                                                 liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
                                                         //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                    String restaurantName = user.getFirstname()+" "+user.getLastname();
-                                                    if(!myPhone.equals(user.getPhone())){
-                                                        if (restaurantName.toLowerCase().contains(word.toLowerCase())) {
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-                                                        else if(word.toLowerCase().contains(restaurantName.toLowerCase())){
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-                                                        //search if word is equal to user name object
-                                                        else if(word.toLowerCase() == restaurantName.toLowerCase()){
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
-                                                        }
-                                                        else if(restaurantName.toLowerCase().equals(word.toLowerCase())) {
-                                                            user.setDistance(dist);
-                                                            restaurantsList.add(user);
+                                                        String restaurantName = user.getFirstname() + " " + user.getLastname();
+                                                        if (!myPhone.equals(user.getPhone())) {
+                                                            if (restaurantName.toLowerCase().contains(word.toLowerCase())) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            } else if (word.toLowerCase().contains(restaurantName.toLowerCase())) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            }
+                                                            //search if word is equal to user name object
+                                                            else if (word.toLowerCase() == restaurantName.toLowerCase()) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            } else if (restaurantName.toLowerCase().equals(word.toLowerCase())) {
+                                                                user.setDistance(dist);
+                                                                restaurantsList.add(user);
+                                                            }
+
+                                                            Log.d("Restaurants", "added: " + user.getFirstname());
                                                         }
 
-                                                        Log.d("Restaurants", "added: "+user.getFirstname());
-                                                    }
-
-                                                    if (!restaurantsList.isEmpty()) {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        Log.d("Restaurants", "list: ["+restaurantsList.size()+"]");
-                                                        recyclerView.setVisibility(VISIBLE);
-                                                        /**
-                                                         * https://howtodoinjava.com/sort/collections-sort/
-                                                         * We want to sort from nearest to furthest location
-                                                         */
-                                                        //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        //Collections.reverse(list);
-                                                        RestaurantAdapter recycler = new RestaurantAdapter(SearchActivity.this, restaurantsList);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                        recyclerView.setLayoutManager(layoutmanager);
-                                                        recyclerView.setItemAnimator(new DefaultItemAnimator());
-                                                        recycler.notifyDataSetChanged();
-                                                        recyclerView.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.INVISIBLE);
-                                                    } else {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        recyclerView.setVisibility(INVISIBLE);
-                                                        emptyTag.setVisibility(VISIBLE);
-                                                        recyclerView.setVisibility(View.GONE);
-                                                        emptyTag.setText("Nothing found");
+                                                        if (!restaurantsList.isEmpty()) {
+                                                            progressBar.setVisibility(View.GONE);
+                                                            Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
+                                                            recyclerView.setVisibility(VISIBLE);
+                                                            /**
+                                                             * https://howtodoinjava.com/sort/collections-sort/
+                                                             * We want to sort from nearest to furthest location
+                                                             */
+                                                            //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                            //Collections.reverse(list);
+                                                            RestaurantAdapter recycler = new RestaurantAdapter(SearchActivity.this, restaurantsList);
+                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
+                                                            recyclerView.setLayoutManager(layoutmanager);
+                                                            recyclerView.setItemAnimator(new DefaultItemAnimator());
+                                                            recycler.notifyDataSetChanged();
+                                                            recyclerView.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.INVISIBLE);
+                                                        } else {
+                                                            progressBar.setVisibility(View.GONE);
+                                                            recyclerView.setVisibility(INVISIBLE);
+                                                            emptyTag.setVisibility(VISIBLE);
+                                                            recyclerView.setVisibility(View.GONE);
+                                                            emptyTag.setText("Nothing found");
+                                                        }
+                                                    } catch (Exception e){
+                                                        Log.e("SearchActivity", "onDataChange: ", e);
                                                     }
 
                                                 }
