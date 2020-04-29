@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,7 +57,7 @@ import java.util.List;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewCustomerOrder extends AppCompatActivity implements OnOrderChecked {
-
+    String TAG = "ViewCustomerOrder";
     List<ProductDetails> list;
     String myPhone, phone, customerName, restaurantPhone;
     FirebaseUser user;
@@ -356,10 +357,15 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            riderUser = dataSnapshot.getValue(UserModel.class);
 
-                            myRiders.add(rider.getKey());
-                            ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
+                            try {
+                                riderUser = dataSnapshot.getValue(UserModel.class);
+
+                                myRiders.add(rider.getKey());
+                                ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
                         }
 
                         @Override

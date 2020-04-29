@@ -48,7 +48,7 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 public class SearchActivity extends AppCompatActivity {
-
+    String TAG = "SearchActivity";
     ProgressBar progressBar;
     EditText searchWord;
     TextView emptyTag;
@@ -324,65 +324,64 @@ public class SearchActivity extends AppCompatActivity {
                                             defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + staticLocation.getLatitude() + ","
-//                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                                                    try {
+                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
 
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                            liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                        /**
+                                                         * Now lets compute distance of each restaurant with customer location
+                                                         */
+                                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
 
-                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                    for (DataSnapshot menu : restaurants.getChildren()) {
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                        ProductDetails product = menu.getValue(ProductDetails.class);
-                                                        product.setKey(menu.getKey());
-                                                        product.setDistance(dist);
-                                                        product.accountType = myDetails.getAccount_type();
+                                                        for (DataSnapshot menu : restaurants.getChildren()) {
+                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            ProductDetails product = menu.getValue(ProductDetails.class);
+                                                            product.setKey(menu.getKey());
+                                                            product.setDistance(dist);
+                                                            product.accountType = myDetails.getAccount_type();
 
-                                                        //Don't show my menu items in the search
-                                                        if(!myPhone.equals(product.getOwner())){
-                                                            if (product.getName().toLowerCase().contains(word.toLowerCase())) {
-                                                                foods.add(product);
-                                                            }
-                                                            else if(word.toLowerCase().contains(product.getName().toLowerCase())){
-                                                                foods.add(product);
-                                                            }
-                                                            //search if word is equal to user name object
-                                                            else if(word.toLowerCase() == product.getName().toLowerCase()){
-                                                                foods.add(product);
-                                                            }
-                                                            else if(product.getName().toLowerCase().equals(word.toLowerCase())) {
-                                                                foods.add(product);
+                                                            //Don't show my menu items in the search
+                                                            if (!myPhone.equals(product.getOwner())) {
+                                                                if (product.getName().toLowerCase().contains(word.toLowerCase())) {
+                                                                    foods.add(product);
+                                                                } else if (word.toLowerCase().contains(product.getName().toLowerCase())) {
+                                                                    foods.add(product);
+                                                                }
+                                                                //search if word is equal to user name object
+                                                                else if (word.toLowerCase() == product.getName().toLowerCase()) {
+                                                                    foods.add(product);
+                                                                } else if (product.getName().toLowerCase().equals(word.toLowerCase())) {
+                                                                    foods.add(product);
+                                                                }
                                                             }
                                                         }
-                                                    }
 
-                                                    if (!foods.isEmpty()) {
-                                                        //Collections.sort(foods, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        recyclerView.setVisibility(View.VISIBLE);
-                                                        progressBar.setVisibility(View.GONE);
-                                                        recyclerView.setVisibility(VISIBLE);
-                                                        ProductAdapter recycler = new ProductAdapter(SearchActivity.this, foods);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                        recyclerView.setLayoutManager(layoutmanager);
-                                                        //recyclerView.setItemAnimator(new SlideInLeftAnimator());
+                                                        if (!foods.isEmpty()) {
+                                                            //Collections.sort(foods, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                            recyclerView.setVisibility(View.VISIBLE);
+                                                            progressBar.setVisibility(View.GONE);
+                                                            recyclerView.setVisibility(VISIBLE);
+                                                            ProductAdapter recycler = new ProductAdapter(SearchActivity.this, foods);
+                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
+                                                            recyclerView.setLayoutManager(layoutmanager);
+                                                            //recyclerView.setItemAnimator(new SlideInLeftAnimator());
 
-                                                        recycler.notifyDataSetChanged();
+                                                            recycler.notifyDataSetChanged();
 
-                                                        recyclerView.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.GONE);
-                                                    } else {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        recyclerView.setVisibility(INVISIBLE);
-                                                        emptyTag.setVisibility(VISIBLE);
-                                                        recyclerView.setVisibility(View.GONE);
-                                                        emptyTag.setText("Nothing found");
+                                                            recyclerView.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.GONE);
+                                                        } else {
+                                                            progressBar.setVisibility(View.GONE);
+                                                            recyclerView.setVisibility(INVISIBLE);
+                                                            emptyTag.setVisibility(VISIBLE);
+                                                            recyclerView.setVisibility(View.GONE);
+                                                            emptyTag.setText("Nothing found");
+                                                        }
+                                                    } catch (Exception e){
+                                                        Log.e(TAG, "onDataChange: ", e);
                                                     }
                                                 }
 
@@ -401,15 +400,11 @@ public class SearchActivity extends AppCompatActivity {
                                             restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + restLiveLoc.getLatitude() + ","
-//                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
-
                                                     /**
                                                      * Now lets compute distance of each restaurant with customer location
                                                      */
                                                     try {
+                                                        LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
                                                         CalculateDistance calculateDistance = new CalculateDistance();
                                                         Double dist = calculateDistance.distance(liveLocation.getLatitude(),
                                                                 liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
@@ -463,9 +458,8 @@ public class SearchActivity extends AppCompatActivity {
                                                             emptyTag.setText("Nothing found");
                                                         }
                                                     } catch (Exception e){
-
+                                                        Log.e(TAG, "onDataChange: ", e);
                                                     }
-
 
                                                 }
 

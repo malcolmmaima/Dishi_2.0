@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.View.Fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import java.util.List;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+    String TAG = "FragmentRestaurants";
     List<UserModel> list;
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
@@ -247,28 +249,27 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                         defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + staticLocation.getLatitude() + ","
-//                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * Now lets compute distance of each restaurant with customer location
-                                                 */
-                                                CalculateDistance calculateDistance = new CalculateDistance();
-                                                Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                        liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                try {
+                                                    StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
 
-                                                //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                    /**
+                                                     * Now lets compute distance of each restaurant with customer location
+                                                     */
+                                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                            liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
 
-                                                /**
-                                                 * if distance meets parameters set fetch menu
-                                                 */
+                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                if (dist < location_filter) {
-                                                    //Fetch menu items of restaurants that have passed distance parameter
-                                                    user.setDistance(dist);
-                                                    list.add(user);
+                                                    /**
+                                                     * if distance meets parameters set fetch menu
+                                                     */
+
+                                                    if (dist < location_filter) {
+                                                        //Fetch menu items of restaurants that have passed distance parameter
+                                                        user.setDistance(dist);
+                                                        list.add(user);
 
 //                                                    for (DataSnapshot menu : restaurants.getChildren()) {
 //                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
@@ -277,35 +278,38 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
 //                                                        product.setDistance(dist);
 //                                                        list.add(product);
 //                                                    }
-                                                }
+                                                    }
 
-                                                if (!list.isEmpty()) {
-                                                    /**
-                                                     * https://howtodoinjava.com/sort/collections-sort/
-                                                     * We want to sort from nearest to furthest location
-                                                     */
-                                                    Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                    mSwipeRefreshLayout.setRefreshing(false);
-                                                    //Collections.reverse(list);
-                                                    RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                    recyclerview.setLayoutManager(layoutmanager);
-                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                    recycler.notifyDataSetChanged();
-                                                    recyclerview.setAdapter(recycler);
-                                                    emptyTag.setVisibility(View.INVISIBLE);
-                                                    icon.setVisibility(View.INVISIBLE);
-                                                } else {
+                                                    if (!list.isEmpty()) {
+                                                        /**
+                                                         * https://howtodoinjava.com/sort/collections-sort/
+                                                         * We want to sort from nearest to furthest location
+                                                         */
+                                                        Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                        mSwipeRefreshLayout.setRefreshing(false);
+                                                        //Collections.reverse(list);
+                                                        RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
+                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                        recyclerview.setLayoutManager(layoutmanager);
+                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                        recycler.notifyDataSetChanged();
+                                                        recyclerview.setAdapter(recycler);
+                                                        emptyTag.setVisibility(View.INVISIBLE);
+                                                        icon.setVisibility(View.INVISIBLE);
+                                                    } else {
 
-                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                        mSwipeRefreshLayout.setRefreshing(false);
 
-                                                    RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                    recyclerview.setLayoutManager(layoutmanager);
-                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                    recyclerview.setAdapter(recycler);
-                                                    emptyTag.setVisibility(View.VISIBLE);
-                                                    icon.setVisibility(View.VISIBLE);
+                                                        RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
+                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                        recyclerview.setLayoutManager(layoutmanager);
+                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                        recyclerview.setAdapter(recycler);
+                                                        emptyTag.setVisibility(View.VISIBLE);
+                                                        icon.setVisibility(View.VISIBLE);
+                                                    }
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onDataChange: ", e);
                                                 }
 
                                             }
@@ -325,16 +329,14 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                         restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + restLiveLoc.getLatitude() + ","
-//                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
-
-                                                /**
-                                                 * Now lets compute distance of each restaurant with customer location
-                                                 */
-                                                CalculateDistance calculateDistance = new CalculateDistance();
                                                 try {
+
+                                                    LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
+
+                                                    /**
+                                                     * Now lets compute distance of each restaurant with customer location
+                                                     */
+                                                    CalculateDistance calculateDistance = new CalculateDistance();
                                                     Double dist = calculateDistance.distance(liveLocation.getLatitude(),
                                                             liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
@@ -349,17 +351,10 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
 
                                                         user.setDistance(dist);
                                                         list.add(user);
-//                                                    for (DataSnapshot menu : restaurants.getChildren()) {
-//                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-//                                                        ProductDetails product = menu.getValue(ProductDetails.class);
-//                                                        product.setKey(menu.getKey());
-//                                                        product.setDistance(dist);
-//                                                        list.add(product);
-//                                                    }
                                                     }
 
                                                 } catch (Exception e){
-
+                                                    Log.e(TAG, "onDataChange: ", e);
                                                 }
                                                 if (!list.isEmpty()) {
                                                     /**

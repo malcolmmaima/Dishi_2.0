@@ -3,6 +3,7 @@ package com.malcolmmaima.dishi.View.Fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import java.util.List;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+    String TAG = "HistoryFragment";
     List<ProductDetails> list;
     RecyclerView recyclerview;
     String myPhone;
@@ -216,63 +218,66 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                             defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + staticLocation.getLatitude() + ","
-//                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                            liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                    try {
+                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
 
-                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                    ProductDetails product = products.getValue(ProductDetails.class);
-                                                    //product.setKey(products.getKey());
-                                                    product.setDistance(dist);
-                                                    product.accountType = "1"; //This fragment belongs to account type 1 (customer)
-                                                    list.add(product);
-
-                                                    if (!list.isEmpty()) {
-                                                        clearAll.setVisibility(View.VISIBLE);
-                                                        clearAll.setText("CLEAR ALL ("+list.size()+")");
                                                         /**
-                                                         * https://howtodoinjava.com/sort/collections-sort/
-                                                         * We want to sort from nearest to furthest location
+                                                         * Now lets compute distance of each restaurant with customer location
                                                          */
-                                                        //Sort by distance to restaurant offering the particular food item... from closest to furthest
-                                                        //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-                                                        //Collections.reverse(list); //Filter by order it appears in db.. collect then reverse
+                                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
 
-                                                        try {
-                                                            //filter by time ordered ... from most recent to oldest
-                                                            Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
-                                                        } catch (Exception e){}
-                                                        ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recycler.notifyDataSetChanged();
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.INVISIBLE);
-                                                        icon.setVisibility(View.INVISIBLE);
-                                                    } else {
+                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                        clearAll.setVisibility(View.GONE);
-                                                        mSwipeRefreshLayout.setRefreshing(false);
+                                                        ProductDetails product = products.getValue(ProductDetails.class);
+                                                        //product.setKey(products.getKey());
+                                                        product.setDistance(dist);
+                                                        product.accountType = "1"; //This fragment belongs to account type 1 (customer)
+                                                        list.add(product);
 
-                                                        ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.VISIBLE);
-                                                        icon.setVisibility(View.VISIBLE);
+                                                        if (!list.isEmpty()) {
+                                                            clearAll.setVisibility(View.VISIBLE);
+                                                            clearAll.setText("CLEAR ALL (" + list.size() + ")");
+                                                            /**
+                                                             * https://howtodoinjava.com/sort/collections-sort/
+                                                             * We want to sort from nearest to furthest location
+                                                             */
+                                                            //Sort by distance to restaurant offering the particular food item... from closest to furthest
+                                                            //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                            //Collections.reverse(list); //Filter by order it appears in db.. collect then reverse
 
+                                                            try {
+                                                                //filter by time ordered ... from most recent to oldest
+                                                                Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
+                                                            } catch (Exception e) {
+                                                            }
+                                                            ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
+                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                            recyclerview.setLayoutManager(layoutmanager);
+                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                            recycler.notifyDataSetChanged();
+                                                            recyclerview.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.INVISIBLE);
+                                                            icon.setVisibility(View.INVISIBLE);
+                                                        } else {
+
+                                                            clearAll.setVisibility(View.GONE);
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+
+                                                            ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
+                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                            recyclerview.setLayoutManager(layoutmanager);
+                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                            recyclerview.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.VISIBLE);
+                                                            icon.setVisibility(View.VISIBLE);
+
+                                                        }
+                                                    } catch (Exception e){
+                                                        Log.e("HistoryFragment", "onDataChange: ", e);
                                                     }
 
                                                 }
@@ -292,10 +297,9 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                             restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                    try {
                                                     LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + restLiveLoc.getLatitude() + ","
-//                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
 
                                                     /**
                                                      * Now lets compute distance of each restaurant with customer location
@@ -313,7 +317,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                                                         if (!list.isEmpty()) {
                                                             clearAll.setVisibility(View.VISIBLE);
-                                                            clearAll.setText("CLEAR ALL ("+list.size()+")");
+                                                            clearAll.setText("CLEAR ALL (" + list.size() + ")");
                                                             /**
                                                              * https://howtodoinjava.com/sort/collections-sort/
                                                              * We want to sort from nearest to furthest location
@@ -324,7 +328,8 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                                                             try {
                                                                 Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
-                                                            } catch (Exception e){}
+                                                            } catch (Exception e) {
+                                                            }
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
                                                             RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
@@ -346,6 +351,9 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             icon.setVisibility(View.VISIBLE);
 
                                                         }
+                                                    } catch (Exception e){
+                                                        Log.e(TAG, "onDataChange: ", e);
+                                                    }
 
                                                     } catch (Exception e){
 

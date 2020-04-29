@@ -413,7 +413,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 try {
                     Intent slideactivity = new Intent(context, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", userData.getProfilePic());
+                    slideactivity.putExtra("imageURL", my_notification.getFrom());
                     context.startActivity(slideactivity);
                 } catch (Exception e){
                     Log.e(TAG, "onClick: ", e);

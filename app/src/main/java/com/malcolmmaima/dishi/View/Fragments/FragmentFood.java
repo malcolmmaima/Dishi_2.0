@@ -1,6 +1,7 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -240,65 +241,67 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                         defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + staticLocation.getLatitude() + ","
-//                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * Now lets compute distance of each restaurant with customer location
-                                                 */
-                                                CalculateDistance calculateDistance = new CalculateDistance();
-                                                Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                        liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                try {
+                                                    StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
 
-                                                //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                /**
-                                                 * if distance meets parameters set fetch menu
-                                                 */
-
-                                                if (dist < location_filter) {
-                                                    //Fetch menu items of restaurants that have passed distance parameter
-
-                                                    for (DataSnapshot menu : restaurants.getChildren()) {
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                        ProductDetails product = menu.getValue(ProductDetails.class);
-                                                        product.setKey(menu.getKey());
-                                                        product.setDistance(dist);
-                                                        product.accountType = "1"; //This fragment belongs to account type 1 (customer)
-                                                        list.add(product);
-                                                    }
-                                                }
-
-                                                if (!list.isEmpty()) {
                                                     /**
-                                                     * https://howtodoinjava.com/sort/collections-sort/
-                                                     * We want to sort from nearest to furthest location
+                                                     * Now lets compute distance of each restaurant with customer location
                                                      */
-                                                    Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                    mSwipeRefreshLayout.setRefreshing(false);
-                                                    //Collections.reverse(list);
-                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                    recyclerview.setLayoutManager(layoutmanager);
-                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                    recycler.notifyDataSetChanged();
-                                                    recyclerview.setAdapter(recycler);
-                                                    emptyTag.setVisibility(View.INVISIBLE);
-                                                    icon.setVisibility(View.INVISIBLE);
-                                                } else {
+                                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                                    Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                            liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
 
-                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                    ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                    recyclerview.setLayoutManager(layoutmanager);
-                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                    recyclerview.setAdapter(recycler);
-                                                    emptyTag.setVisibility(View.VISIBLE);
-                                                    icon.setVisibility(View.VISIBLE);
+                                                    /**
+                                                     * if distance meets parameters set fetch menu
+                                                     */
 
+                                                    if (dist < location_filter) {
+                                                        //Fetch menu items of restaurants that have passed distance parameter
+
+                                                        for (DataSnapshot menu : restaurants.getChildren()) {
+                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            ProductDetails product = menu.getValue(ProductDetails.class);
+                                                            product.setKey(menu.getKey());
+                                                            product.setDistance(dist);
+                                                            product.accountType = "1"; //This fragment belongs to account type 1 (customer)
+                                                            list.add(product);
+                                                        }
+                                                    }
+
+                                                    if (!list.isEmpty()) {
+                                                        /**
+                                                         * https://howtodoinjava.com/sort/collections-sort/
+                                                         * We want to sort from nearest to furthest location
+                                                         */
+                                                        Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                        mSwipeRefreshLayout.setRefreshing(false);
+                                                        //Collections.reverse(list);
+                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                        recyclerview.setLayoutManager(layoutmanager);
+                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                        recycler.notifyDataSetChanged();
+                                                        recyclerview.setAdapter(recycler);
+                                                        emptyTag.setVisibility(View.INVISIBLE);
+                                                        icon.setVisibility(View.INVISIBLE);
+                                                    } else {
+
+                                                        mSwipeRefreshLayout.setRefreshing(false);
+
+                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                        recyclerview.setLayoutManager(layoutmanager);
+                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                        recyclerview.setAdapter(recycler);
+                                                        emptyTag.setVisibility(View.VISIBLE);
+                                                        icon.setVisibility(View.VISIBLE);
+
+                                                    }
+                                                } catch (Exception e){
+                                                    Log.e("FragmentFood", "onDataChange: ", e);
                                                 }
 
                                             }

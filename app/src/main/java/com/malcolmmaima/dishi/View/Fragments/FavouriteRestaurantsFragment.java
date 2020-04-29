@@ -43,6 +43,7 @@ import java.util.List;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+    String TAG = "FavouriteRestaurantsFragment";
     List<UserModel> list;
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
@@ -176,9 +177,6 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                 else {
                                     final UserModel user = dataSnapshot.getValue(UserModel.class);
                                     user.setPhone(restaurants.getKey());
-//                            SafeToast.makeText(getContext(), "Name: " + user.getFirstname()
-//                                    + "\nliveStatus: " + user.getLiveStatus()
-//                                    + "\nlocationType: " + user.getLocationType(), Toast.LENGTH_SHORT).show();
 
                                     /**
                                      * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
@@ -197,54 +195,56 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                                 defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + staticLocation.getLatitude() + ","
-//                                                    + staticLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                        /**
-                                                         * Now lets compute distance of each restaurant with customer location
-                                                         */
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                        try {
+                                                            StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                        user.setDistance(dist);
-                                                        list.add(user);
-
-                                                        /**
-                                                         * if distance meets parameters set fetch menu
-                                                         */
-
-                                                        if (!list.isEmpty()) {
                                                             /**
-                                                             * https://howtodoinjava.com/sort/collections-sort/
-                                                             * We want to sort from nearest to furthest location
+                                                             * Now lets compute distance of each restaurant with customer location
                                                              */
-                                                            Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            mSwipeRefreshLayout.setRefreshing(false);
-                                                            //Collections.reverse(list);
-                                                            RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                            recyclerview.setLayoutManager(layoutmanager);
-                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                            recycler.notifyDataSetChanged();
-                                                            recyclerview.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.INVISIBLE);
-                                                            icon.setVisibility(View.INVISIBLE);
-                                                        } else {
+                                                            CalculateDistance calculateDistance = new CalculateDistance();
+                                                            Double dist = calculateDistance.distance(liveLocation.getLatitude(),
+                                                                    liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
 
-                                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                            //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                            RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                                            recyclerview.setLayoutManager(layoutmanager);
-                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                            recyclerview.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.VISIBLE);
-                                                            icon.setVisibility(View.VISIBLE);
+                                                            user.setDistance(dist);
+                                                            list.add(user);
+
+                                                            /**
+                                                             * if distance meets parameters set fetch menu
+                                                             */
+
+                                                            if (!list.isEmpty()) {
+                                                                /**
+                                                                 * https://howtodoinjava.com/sort/collections-sort/
+                                                                 * We want to sort from nearest to furthest location
+                                                                 */
+                                                                Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                                //Collections.reverse(list);
+                                                                RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
+                                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                                recyclerview.setLayoutManager(layoutmanager);
+                                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                recycler.notifyDataSetChanged();
+                                                                recyclerview.setAdapter(recycler);
+                                                                emptyTag.setVisibility(View.INVISIBLE);
+                                                                icon.setVisibility(View.INVISIBLE);
+                                                            } else {
+
+                                                                mSwipeRefreshLayout.setRefreshing(false);
+
+                                                                RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
+                                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                                recyclerview.setLayoutManager(layoutmanager);
+                                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                recyclerview.setAdapter(recycler);
+                                                                emptyTag.setVisibility(View.VISIBLE);
+                                                                icon.setVisibility(View.VISIBLE);
+                                                            }
+                                                        } catch (Exception e){
+                                                            Log.e(TAG, "onDataChange: ", e);
                                                         }
 
                                                     }
@@ -264,16 +264,13 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                                 restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
-//                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
-//                                                    + restLiveLoc.getLatitude() + ","
-//                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
-
-                                                        /**
-                                                         * Now lets compute distance of each restaurant with customer location
-                                                         */
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
                                                         try {
+                                                            LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
+
+                                                            /**
+                                                             * Now lets compute distance of each restaurant with customer location
+                                                             */
+                                                            CalculateDistance calculateDistance = new CalculateDistance();
                                                             Double dist = calculateDistance.distance(liveLocation.getLatitude(),
                                                                     liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
