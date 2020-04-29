@@ -218,7 +218,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(!dataSnapshot.exists()){
-                        holder.notificationMessage.setText("no longer exists");
+                        holder.notificationMessage.setText("[Deleted post]");
                     } else {
                         try {
                             StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class);
@@ -256,7 +256,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                         if(!dataSnapshot.exists()){
-                                            holder.notificationMessage.setText("no longer exists");
+                                            holder.notificationMessage.setText("[Deleted post]");
                                         } else {
                                             try {
                                                 StatusUpdateModel comment = dataSnapshot.getValue(StatusUpdateModel.class); //the comment reply to above mentioned status
@@ -332,7 +332,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     try {
                         Intent slideactivity = new Intent(context, ViewStatus.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        slideactivity.putExtra("author", my_notification.getFrom());
+                        slideactivity.putExtra("author", my_notification.getAuthor());
                         slideactivity.putExtra("postedTo", my_notification.getPostedTo());
                         slideactivity.putExtra("key", my_notification.getStatusKey());
                         Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();

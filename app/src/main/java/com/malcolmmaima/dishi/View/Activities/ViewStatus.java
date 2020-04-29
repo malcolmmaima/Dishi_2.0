@@ -71,7 +71,7 @@ import static android.view.View.INVISIBLE;
 
 public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "ViewStatus";
+    private static final String TAG = "ViewStatusActivity";
     DatabaseReference postRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
     TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted, statusOptions;
@@ -774,6 +774,345 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Toast.makeText(this, "onNewIntent()", Toast.LENGTH_LONG).show();
+        FirebaseUser user_ = FirebaseAuth.getInstance().getCurrentUser();
+        String myPhone_ = user_.getPhoneNumber(); //Current logged in user phone number
+
+        String author_ = intent.getStringExtra("author");
+        String postedTo_ = intent.getStringExtra("postedTo");
+        String key_ = intent.getStringExtra("key");
+
+        Log.d(TAG, "onNewIntent: \nauthor: "+author_+"\npostedTo: "+postedTo_+"\nkey: "+key_);
+
+        postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo_);
+        authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author_);
+
+        // get the Firebase  storage reference
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+
+        //Get author's user details
+        authorUserDetailsRefListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    likePost.setEnabled(false);
+                    statusPost.setEnabled(false);
+                    imageUpload.setEnabled(false);
+                    imageUpload.setVisibility(View.GONE);
+                    postStatus.setEnabled(false);
+                    profilePic.setEnabled(false);
+                    emoji.setEnabled(false);
+                }
+                else {
+                    try {
+                        authorUser = dataSnapshot.getValue(UserModel.class);
+                        profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
+
+                        Picasso.with(ViewStatus.this).load(authorUser.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    } catch (Exception e){ }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        authorUserDetailsRef.addValueEventListener(authorUserDetailsRefListener);
+
+        //Get post details
+        try {
+            postRefListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        finish();
+                        SafeToast.makeText(ViewStatus.this, "Post no longer exists!", Toast.LENGTH_LONG).show();
+                    } else {
+                        try {
+                            viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
+
+                            //Get today's date
+                            GetCurrentDate currentDate = new GetCurrentDate();
+                            String currDate = currentDate.getDate();
+
+                            //Get date status update was posted
+                            String dtEnd = currDate;
+                            String dtStart = viewPost.getTimePosted();
+
+                            //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                            //Format both current date and date status update was posted
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                            try {
+
+                                //Convert String date values to Date values
+                                Date dateStart;
+                                Date dateEnd;
+
+                                //Date dateStart = format.parse(dtStart);
+                                String[] timeS = Split(viewPost.getTimePosted());
+                                String[] timeT = Split(currDate);
+
+                                /**
+                                 * timeS[0] = date
+                                 * timeS[1] = hr
+                                 * timeS[2] = min
+                                 * timeS[3] = seconds
+                                 * timeS[4] = timezone
+                                 */
+
+                                //post timeStamp
+                                if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                    timeS[4] = "GMT+03:00";
+
+                                    //2020-04-27:20:37:32:GMT+03:00
+                                    dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                    dateStart = format.parse(dtStart);
+                                } else {
+                                    dateStart = format.parse(dtStart);
+                                }
+
+                                //my device current date
+                                if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                    timeT[4] = "GMT+03:00";
+
+                                    //2020-04-27:20:37:32:GMT+03:00
+                                    dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                    dateEnd = format.parse(dtEnd);
+                                } else {
+                                    dateEnd = format.parse(dtEnd);
+                                }
+
+                                //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                //Now compute timeAgo duration
+                                TimeAgo timeAgo = new TimeAgo();
+
+                                timePosted.setText(timeAgo.toRelative(dateStart, dateEnd, 1));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                Log.d(TAG, "timeStamp: "+ e.getMessage());
+                            }
+
+                            if(viewPost.getStatus().equals("")){
+                                userUpdate.setVisibility(View.GONE);
+                            } else {
+                                userUpdate.setVisibility(View.VISIBLE);
+                                userUpdate.setText(viewPost.getStatus());
+                            }
+
+                            if(viewPost.getImageShare() != null){
+                                imageShare.setVisibility(View.VISIBLE);
+                                try {
+                                    Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
+                                            .placeholder(R.drawable.gray_gradient_background)
+                                            .error(R.drawable.gray_gradient_background)
+                                            .into(imageShare);
+                                } catch (Exception e){}
+                            } else {
+                                imageShare.setVisibility(View.GONE);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            postRef.child(key_).addValueEventListener(postRefListener);
+
+        } catch (Exception e){}
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(ViewStatus.this, statusOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.status_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem reportOption = myMenu.findItem(R.id.report);
+
+        try {
+            //delete posts
+            if (postedTo_.equals(myPhone_) || author_.equals(myPhone_)) {
+                try {
+                    deleteOption.setVisible(true);
+                } catch (Exception e) {
+                }
+            } else {
+                try {
+                    deleteOption.setVisible(false);
+                } catch (Exception e) {
+                }
+            }
+
+            //Can only report posts that i havent authored
+            if (!myPhone_.equals(author_)) {
+                try {
+                    reportOption.setVisible(true);
+                } catch (Exception e) {
+                }
+            } else {
+                try {
+                    reportOption.setVisible(false);
+                } catch (Exception e) {
+                }
+            }
+
+        } catch (Exception e){
+            Log.e(TAG, "onCreate: ", e);
+        }
+
+        //Fetch status update likes
+        likesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    int total = (int) dataSnapshot.getChildrenCount();
+                    Double totalLikes = Double.valueOf(total);
+
+                    //below 1000
+                    if(totalLikes < 1000){
+                        DecimalFormat value = new DecimalFormat("#");
+                        likesTotal.setText(""+value.format(totalLikes));
+                    }
+
+                    // 1000 to 999,999
+                    else if(totalLikes >= 1000 && totalLikes <= 999999){
+                        if(totalLikes % 1000 == 0){ //No remainder
+                            DecimalFormat value = new DecimalFormat("#####");
+                            likesTotal.setText(""+value.format(total/1000)+"K");
+                        }
+
+                        else { //Has remainder 999.9K
+                            DecimalFormat value = new DecimalFormat("######.#");
+                            Double divided = totalLikes/1000;
+                            if(value.format(divided).equals("1000")){
+                                likesTotal.setText("1M"); //if rounded off
+                            } else {
+                                likesTotal.setText(""+value.format(divided)+"K");
+                            }
+                        }
+                    }
+
+                    // 1,000,0000 to 999,999,999
+                    else if(totalLikes >= 1000000 && totalLikes <= 999999999){
+                        if(totalLikes % 1000000 == 0) { //No remainder
+                            DecimalFormat value = new DecimalFormat("#");
+                            likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                        }
+
+                        else { //Has remainder 9.9M, 999.9M etc
+                            DecimalFormat value = new DecimalFormat("#.#");
+                            if(value.format(totalLikes/1000000).equals("1000")){
+                                likesTotal.setText("1B"); //if rounded off
+                            } else {
+                                likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                            }
+                        }
+                    }
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        postRef.child(key_).child("likes").addValueEventListener(likesListener);
+
+        commentsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    try {
+                        int total = (int) dataSnapshot.getChildrenCount();
+                        Double totalComments = Double.valueOf(total);
+
+                        //below 1000
+                        if(totalComments < 1000){
+                            DecimalFormat value = new DecimalFormat("#");
+                            commentsTotal.setText(""+value.format(totalComments));
+                        }
+
+                        // 1000 to 999,999
+                        else if(totalComments >= 1000 && totalComments <= 999999){
+                            if(totalComments % 1000 == 0){ //No remainder
+                                DecimalFormat value = new DecimalFormat("#####");
+                                commentsTotal.setText(""+value.format(total/1000)+"K");
+                            }
+
+                            else { //Has remainder 999.9K
+                                DecimalFormat value = new DecimalFormat("######.#");
+                                Double divided = totalComments/1000;
+                                if(value.format(divided).equals("1000")){
+                                    commentsTotal.setText("1M"); //if rounded off
+                                } else {
+                                    commentsTotal.setText(""+value.format(divided)+"K");
+                                }
+                            }
+                        }
+
+                        // 1,000,0000 to 999,999,999
+                        else if(totalComments >= 1000000 && totalComments <= 999999999){
+                            if(totalComments % 1000000 == 0) { //No remainder
+                                DecimalFormat value = new DecimalFormat("#");
+                                commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
+                            }
+
+                            else { //Has remainder 9.9M, 999.9M etc
+                                DecimalFormat value = new DecimalFormat("#.#");
+                                if(value.format(totalComments/1000000).equals("1000")){
+                                    commentsTotal.setText("1B"); //if rounded off
+                                } else {
+                                    commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
+                                }
+                            }
+                        }
+                    } catch (Exception e){}
+                } catch (Exception e){}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        postRef.child(key_).child("comments").addValueEventListener(commentsListener);
+
+        //On loading adapter fetch the like status
+        postRef.child(key_).child("likes").child(myPhone_).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    likePost.setTag(R.drawable.unliked);
+                    likePost.setImageResource(R.drawable.unliked);
+                } else {
+                    likePost.setTag(R.drawable.liked);
+                    likePost.setImageResource(R.drawable.liked);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void fetchComments() {
         mSwipeRefreshLayout.setRefreshing(true);
         //Fetch the updates from status_updates node
@@ -981,6 +1320,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     //send notification
                     NotificationModel commentedStatus = new NotificationModel();
                     commentedStatus.setFrom(myPhone);
+                    commentedStatus.setAuthor(author);
                     commentedStatus.setType("commentedstatus");
                     commentedStatus.setImage(imgLink);
                     commentedStatus.setSeen(false);

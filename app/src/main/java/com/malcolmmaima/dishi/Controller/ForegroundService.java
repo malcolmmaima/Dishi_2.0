@@ -46,6 +46,7 @@ import com.malcolmmaima.dishi.View.Activities.SplashActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 
 import java.lang.annotation.Target;
 import java.util.ArrayList;
@@ -1164,7 +1165,7 @@ public class ForegroundService extends Service {
         }
 
         if(newNotification.getType().equals("commentedstatus") && newNotification.getSeen() == false){
-            Class targetActivity = MyNotifications.class;
+            Class targetActivity = ViewStatus.class;
             DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+newNotification.getFrom());
             userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -1221,10 +1222,13 @@ public class ForegroundService extends Service {
 
                                     }
 
-                                    Intent intent = new Intent(getApplicationContext(), targetActivity);
+                                    Intent intent = new Intent(ForegroundService.this, targetActivity);
+                                    intent.putExtra("author", newNotification.getAuthor());
+                                    intent.putExtra("postedTo", newNotification.getPostedTo());
+                                    intent.putExtra("key", newNotification.getMessage());
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                    PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                    PendingIntent contentIntent = PendingIntent.getActivity(ForegroundService.this, notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
                                     builder.setContentIntent(contentIntent);
                                     Notification notification = builder.build();
                                     notification.flags |= Notification.FLAG_AUTO_CANCEL;
