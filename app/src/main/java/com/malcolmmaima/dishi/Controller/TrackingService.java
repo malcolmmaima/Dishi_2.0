@@ -82,8 +82,8 @@ public class TrackingService extends Service {
 
     @SuppressLint("NewApi")
     private void startMyOwnForeground(){
-        String NOTIFICATION_CHANNEL_ID = "com.malcolmmaima.dishi";
-        String channelName = "Dishi Tracking Service";
+        String NOTIFICATION_CHANNEL_ID = "TrackingServiceChannel";
+        String channelName = "Tracking";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
@@ -99,7 +99,6 @@ public class TrackingService extends Service {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         Notification notification = notificationBuilder.setOngoing(true)
-                .setSmallIcon(R.drawable.logo)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.tracking_enabled_notif))
                 .setOngoing(true)
@@ -109,7 +108,7 @@ public class TrackingService extends Service {
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
-        startForeground(0, notification);
+        startForeground(1, notification);
 
         stopTracking = false;
     }

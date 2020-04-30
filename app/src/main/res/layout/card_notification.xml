@@ -66,6 +66,7 @@
             android:layout_below="@+id/contact_name"
             android:textSize="15dp"
             android:text="loading..."
+            android:layout_marginRight="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -97,6 +98,30 @@
             android:paddingTop="2dp"
             android:backgroundTint="@color/lightgray"
             android:src="@drawable/liked"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:layout_below="@id/notificationTime"
+            android:layout_alignParentRight="true"
+            android:id="@+id/commented"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:backgroundTint="@color/lightgray"
+            android:src="@drawable/comments"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:layout_below="@id/notificationTime"
+            android:layout_alignParentRight="true"
+            android:id="@+id/postedWall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:backgroundTint="@color/lightgray"
+            android:src="@drawable/profile_64dp"
             android:visibility="gone"/>
 
         <RelativeLayout

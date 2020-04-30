@@ -117,7 +117,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="loading..."
-            android:layout_marginLeft="-10dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="-5dp"
             android:layout_marginRight="5dp"/>
 
         <ImageButton
@@ -140,6 +141,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text=" 0 m away"
+            android:gravity="center_vertical"
             android:layout_marginLeft="-10dp"
             android:layout_marginRight="5dp"/>
 

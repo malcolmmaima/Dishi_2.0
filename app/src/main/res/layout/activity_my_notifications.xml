@@ -35,8 +35,8 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:visibility="invisible"
-            android:src="@drawable/menu"/>
+            android:visibility="gone"
+            android:src="@drawable/notifications_background"/>
 
         <TextView
             android:id="@+id/empty_tag"
@@ -47,7 +47,7 @@
             android:textSize="30sp"
             android:layout_marginTop="20dp"
             android:layout_gravity="center"
-            android:visibility="invisible"/>
+            android:visibility="gone"/>
 
     </LinearLayout>
 

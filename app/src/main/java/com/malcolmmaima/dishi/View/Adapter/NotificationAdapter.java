@@ -89,8 +89,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
+        //Hide notification icon types on load
         holder.followUnfollow.setVisibility(View.GONE);
         holder.liked.setVisibility(View.GONE);
+        holder.commented.setVisibility(View.GONE);
+        holder.postedWall.setVisibility(View.GONE);
 
         holder.contact_name.setText("loading...");
         DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+my_notification.getFrom());
@@ -185,6 +188,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         //Show follow button if type of notification is 'followedwall'
         if(my_notification.getType().equals("followedwall")){
+            holder.liked.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
             holder.followUnfollow.setVisibility(View.VISIBLE);
             holder.notificationMessage.setText(my_notification.getMessage());
             followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -208,10 +214,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         if(my_notification.getType().equals("postedwall")){
+            holder.followUnfollow.setVisibility(View.GONE);
+            holder.liked.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+
+            holder.postedWall.setVisibility(View.VISIBLE);
             holder.notificationMessage.setText("posted on your wall");
         }
 
         if(my_notification.getType().equals("likedstatus")){
+            holder.followUnfollow.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
+
             holder.liked.setVisibility(View.VISIBLE);
             DatabaseReference postDetailsRef = FirebaseDatabase.getInstance().getReference("posts/"+my_notification.getPostedTo()+"/"+my_notification.getMessage());
             postDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -239,6 +254,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         if(my_notification.getType().equals("commentedstatus")){
+            holder.followUnfollow.setVisibility(View.GONE);
+            holder.liked.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
+
+            holder.commented.setVisibility(View.VISIBLE);
+
             DatabaseReference postDetailsRef = FirebaseDatabase.getInstance().getReference("posts/"+my_notification.getPostedTo()+"/"+my_notification.getStatusKey());
             postDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -302,7 +323,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             public void onClick(final View v) {
                 if(my_notification.getType().equals("followedwall") && !myPhone.equals(my_notification.getFrom())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     slideactivity.putExtra("phone", my_notification.getFrom());
                     Bundle bndlanimation =
@@ -477,7 +498,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView contact_name, notificationMessage, notificationTime;
-        ImageView profilePic, liked;
+        ImageView profilePic, liked, commented, postedWall;
         LinearLayout cardView;
         AppCompatButton followUnfollow;
 
@@ -490,6 +511,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             followUnfollow = itemView.findViewById(R.id.followUnfollow);
             notificationTime = itemView.findViewById(R.id.notificationTime);
             liked = itemView.findViewById(R.id.liked);
+            commented = itemView.findViewById(R.id.commented);
+            postedWall = itemView.findViewById(R.id.postedWall);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
