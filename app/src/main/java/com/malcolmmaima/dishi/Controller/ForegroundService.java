@@ -1000,7 +1000,7 @@ public class ForegroundService extends Service {
         }
 
         if(newNotification.getType().equals("followedwall") && newNotification.getSeen() == false){
-            Class targetActivity = MyNotifications.class;
+            Class targetActivity = ViewProfile.class;
             DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+newNotification.getFrom());
             userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -1051,6 +1051,9 @@ public class ForegroundService extends Service {
                         }
 
                         Intent intent = new Intent(getApplicationContext(), targetActivity);
+                        intent.putExtra("phone", newNotification.getFrom());
+                        intent.putExtra("type", "notification");
+                        intent.putExtra("notifKey", newNotification.key);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);

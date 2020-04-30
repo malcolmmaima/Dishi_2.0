@@ -40,7 +40,8 @@
             android:name=".View.Activities.ViewRestaurant"
             android:label="@string/title_activity_view_restaurants"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".View.Activities.ViewProfile" />
+        <activity android:name=".View.Activities.ViewProfile"
+            android:launchMode="singleTask"/>
         <activity android:name=".View.Activities.CheckOut" />
         <activity android:name=".View.Activities.DeliverCharges" />
         <activity android:name=".View.Activities.AccountSettings" />

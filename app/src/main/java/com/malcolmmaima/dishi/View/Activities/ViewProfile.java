@@ -112,6 +112,10 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_profile);
 
+        loadProfile();
+    }
+
+    private void loadProfile() {
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -135,6 +139,29 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         phone = getIntent().getStringExtra("phone");
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        String intentType = getIntent().getStringExtra("type");
+
+        if(intentType != null){
+            //update the notification in db to seen = true
+            if(intentType.equals("notification")){
+                String notifKey = getIntent().getStringExtra("notifKey");
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+
+                //update all notifications status to seen = true
+                notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        notificationRef.child(notifKey).child("seen").setValue(true);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }
 
         if(myPhone.equals(phone)){
             finish();
@@ -564,6 +591,13 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 } catch (Exception e){}
             }
         });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        loadProfile();
     }
 
     @Override
