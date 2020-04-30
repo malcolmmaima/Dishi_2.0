@@ -46,8 +46,34 @@
             android:text="loading..."
             android:id="@+id/profileName"
             android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/profilePic"/>
+
+        <com.alexzh.circleimageview.CircleImageView
+            android:id="@+id/postedToPic"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/default_profile"
+            app:view_shadowRadius="2dp"
+            app:view_shadowDx="2dp"
+            app:view_shadowDy="0dp"
+            app:view_borderWidth="2dp"
+            app:view_borderColor="#cccccc"
+            android:background="@color/pureWhite"
+            android:scaleType="fitXY"
+            android:layout_below="@id/profileName"
             android:layout_toRightOf="@id/profilePic"
-            android:layout_toLeftOf="@+id/foodPrice"/>
+            />
+
+        <TextView
+            android:fontFamily="sans-serif-light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/darkblue"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="loading..."
+            android:id="@+id/postedTo"
+            android:layout_below="@id/profileName"
+            android:layout_toRightOf="@id/postedToPic"/>
 
         <LinearLayout
             android:layout_alignParentRight="true"
@@ -104,9 +130,9 @@
             android:id="@+id/userUpdate"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="25dp"
-            android:layout_below="@id/profileName"
-            android:layout_toRightOf="@id/profilePic"
+            android:layout_toRightOf="@id/postedTo"
             android:layout_toEndOf="@id/profilePic"
+            android:layout_below="@id/postedTo"
             android:textColor="#666"/>
 
         <ImageView

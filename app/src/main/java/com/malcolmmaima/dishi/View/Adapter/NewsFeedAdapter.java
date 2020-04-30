@@ -83,32 +83,85 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone = user.getPhoneNumber(); //Current logged in user phone number
         UserModel [] postUser = new UserModel[listdata.size()];
+        UserModel [] postedTo = new UserModel[listdata.size()];
 
+        holder.postedToPic.setVisibility(View.GONE);
+        holder.postedTo.setVisibility(View.GONE);
         /**
          * Adapter animation
          */
         setAnimation(holder.itemView, position);
 
         //Setup db references
+        DatabaseReference postedToRef = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getPostedTo());
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
         DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
 
-        postDetails.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    try {
-                        listdata.remove(position);
-                        notifyItemRemoved(position);
-                    } catch (Exception e){
-                        Log.d(TAG, "statusUpdate: error " + e.getMessage());
+
+        if(statusUpdateModel.getAuthor().equals(statusUpdateModel.getPostedTo())){
+            holder.postedToPic.setVisibility(View.GONE);
+            holder.postedTo.setVisibility(View.GONE);
+        } else {
+            //fetch post User Details
+            postedToRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        holder.postedToPic.setVisibility(View.VISIBLE);
+                        holder.postedTo.setVisibility(View.VISIBLE);
+                        holder.postedTo.setText("[Deleted user]");
+                        holder.postedToPic.setImageResource(R.drawable.default_profile);
+                    } else {
+                        try {
+                            holder.postedToPic.setVisibility(View.VISIBLE);
+                            holder.postedTo.setVisibility(View.VISIBLE);
+                            postedTo[position] = dataSnapshot.getValue(UserModel.class);
+                            holder.postedTo.setText(postedTo[position].getFirstname() + " " + postedTo[position].getLastname());
+
+                            //Set profile pic
+                            Picasso.with(context).load(postedTo[position].getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(holder.postedToPic);
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
                     }
                 }
-            }
 
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        holder.postedToPic.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onClick(View v) {
+                try {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", postedTo[position].getProfilePic());
+                    context.startActivity(slideactivity);
+                } catch (Exception e){
 
+                }
+            }
+        });
+
+        holder.postedTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!myPhone.equals(statusUpdateModel.getPostedTo())){
+                    Intent slideactivity = new Intent(context, ViewProfile.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                    slideactivity.putExtra("phone", statusUpdateModel.getPostedTo());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                }
             }
         });
 
@@ -257,7 +310,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         });
 
         //likes count
-        postDetails.child("likes").addValueEventListener(new ValueEventListener() {
+        postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -332,7 +385,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         });
 
         //comments count
-        postDetails.child("comments").addValueEventListener(new ValueEventListener() {
+        postDetails.child("comments").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
@@ -596,13 +649,22 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
     }
 
     @Override
+    public void onViewDetachedFromWindow(@NonNull MyHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+
+        Log.d(TAG, "onViewDetachedFromWindow: "+ listdata.get(holder.getAdapterPosition()).getStatus());
+
+    }
+
+    @Override
     public int getItemCount() {
         return listdata.size();
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, statusOptions;
-        ImageView profilePic, imageShare, likePost, comments, sharePost;
+        TextView profileName, userUpdate, likesTotal,
+                commentsTotal, timePosted, statusOptions, postedTo;
+        ImageView profilePic, postedToPic,imageShare, likePost, comments, sharePost;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -620,6 +682,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
             statusOptions = itemView.findViewById(R.id.statusOptions);
+            postedToPic = itemView.findViewById(R.id.postedToPic);
+            postedTo = itemView.findViewById(R.id.postedTo);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
