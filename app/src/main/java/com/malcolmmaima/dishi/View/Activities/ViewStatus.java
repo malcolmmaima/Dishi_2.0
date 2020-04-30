@@ -777,8 +777,8 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
 
-        Toast.makeText(this, "onNewIntent()", Toast.LENGTH_LONG).show();
         FirebaseUser user_ = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone_ = user_.getPhoneNumber(); //Current logged in user phone number
 
@@ -791,6 +791,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo_);
         authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author_);
 
+        fetchComments();
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -1114,6 +1115,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     private void fetchComments() {
+        String cKey = getIntent().getStringExtra("key");
         mSwipeRefreshLayout.setRefreshing(true);
         //Fetch the updates from status_updates node
         commentsListener = new ValueEventListener() {
@@ -1158,7 +1160,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
             }
         };
-        postRef.child(key).child("comments").addListenerForSingleValueEvent(commentsListener);
+        postRef.child(cKey).child("comments").addListenerForSingleValueEvent(commentsListener);
     }
 
     // Select Image method

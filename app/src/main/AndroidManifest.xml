@@ -19,7 +19,7 @@
         <activity android:name=".View.Activities.NewChat" />
         <activity android:name=".View.Activities.ViewReview" />
         <activity android:name=".View.Activities.ViewStatus"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTask"/>
         <activity
             android:name=".View.Activities.Chat"
             android:launchMode="singleTop" />

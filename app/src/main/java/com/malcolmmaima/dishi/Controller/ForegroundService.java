@@ -1222,13 +1222,13 @@ public class ForegroundService extends Service {
 
                                     }
 
-                                    Intent intent = new Intent(ForegroundService.this, targetActivity);
+                                    Intent intent = new Intent(getApplicationContext(), targetActivity);
                                     intent.putExtra("author", newNotification.getAuthor());
                                     intent.putExtra("postedTo", newNotification.getPostedTo());
-                                    intent.putExtra("key", newNotification.getMessage());
+                                    intent.putExtra("key", newNotification.getStatusKey());
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                    PendingIntent contentIntent = PendingIntent.getActivity(ForegroundService.this, notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+                                    PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
                                     builder.setContentIntent(contentIntent);
                                     Notification notification = builder.build();
                                     notification.flags |= Notification.FLAG_AUTO_CANCEL;
