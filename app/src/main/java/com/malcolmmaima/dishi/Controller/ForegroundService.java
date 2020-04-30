@@ -1226,6 +1226,8 @@ public class ForegroundService extends Service {
                                     intent.putExtra("author", newNotification.getAuthor());
                                     intent.putExtra("postedTo", newNotification.getPostedTo());
                                     intent.putExtra("key", newNotification.getStatusKey());
+                                    intent.putExtra("type", "notification");
+                                    intent.putExtra("notifKey", newNotification.key);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                     PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), notifId, intent,PendingIntent.FLAG_UPDATE_CURRENT);
@@ -1335,6 +1337,7 @@ public class ForegroundService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d("ForeGroundService", "ForegroundService: stopped");
+        stopService(new Intent(ForegroundService.this, TrackingService.class));
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
             notificationRef.removeEventListener(notificationsListener);

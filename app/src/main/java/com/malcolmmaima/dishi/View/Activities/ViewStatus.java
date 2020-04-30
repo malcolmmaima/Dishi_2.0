@@ -162,6 +162,29 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postedTo = getIntent().getStringExtra("postedTo");
         key = getIntent().getStringExtra("key");
 
+        String intentType = getIntent().getStringExtra("type");
+
+        if(intentType != null){
+            //update the notification in db to seen = true
+            if(intentType.equals("notification")){
+                String notifKey = getIntent().getStringExtra("notifKey");
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+
+                //update all notifications status to seen = true
+                notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        notificationRef.child(notifKey).child("seen").setValue(true);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }
+
         postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo);
         authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
 
@@ -785,6 +808,28 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         String author_ = intent.getStringExtra("author");
         String postedTo_ = intent.getStringExtra("postedTo");
         String key_ = intent.getStringExtra("key");
+        String type_ = intent.getStringExtra("type");
+
+        if(type_ != null){
+            //update the notification in db as seen
+            if(type_.equals("notification")){
+                String notifKey = intent.getStringExtra("notifKey");
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone_);
+
+                //update all notifications status to seen = true
+                notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        notificationRef.child(notifKey).child("seen").setValue(true);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }
 
         Log.d(TAG, "onNewIntent: \nauthor: "+author_+"\npostedTo: "+postedTo_+"\nkey: "+key_);
 
