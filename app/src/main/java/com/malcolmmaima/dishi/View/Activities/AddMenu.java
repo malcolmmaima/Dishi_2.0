@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
@@ -39,8 +37,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
 
@@ -522,18 +520,18 @@ public class AddMenu extends AppCompatActivity {
                 String price_ = productPrice.getText().toString().trim();
                 String description_ = productDescription.getText().toString().trim();
 
-                ProductDetails productDetails = new ProductDetails();
-                productDetails.setName(name_);
-                productDetails.setPrice(price_);
-                productDetails.setDescription(description_);
-                productDetails.setImageURL(imageLink);
-                productDetails.setOwner(myPhone);
-                productDetails.setStorageLocation(imageLocation);
-                productDetails.setUploadDate(getDate());
+                ProductDetailsModel productDetailsModel = new ProductDetailsModel();
+                productDetailsModel.setName(name_);
+                productDetailsModel.setPrice(price_);
+                productDetailsModel.setDescription(description_);
+                productDetailsModel.setImageURL(imageLink);
+                productDetailsModel.setOwner(myPhone);
+                productDetailsModel.setStorageLocation(imageLocation);
+                productDetailsModel.setUploadDate(getDate());
 
-                Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
+                Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
-                menusRef.child(key).setValue(productDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         // Write was successful!
@@ -573,19 +571,19 @@ public class AddMenu extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Object o) {
 
-                                        ProductDetails productDetails = new ProductDetails();
+                                        ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
-                                        productDetails.setName(name);
-                                        productDetails.setPrice(price);
-                                        productDetails.setDescription(description);
-                                        productDetails.setImageURL(o.toString());
-                                        productDetails.setOwner(myPhone);
-                                        productDetails.setStorageLocation(storageReference2nd.getPath());
-                                        productDetails.setUploadDate(getDate());
+                                        productDetailsModel.setName(name);
+                                        productDetailsModel.setPrice(price);
+                                        productDetailsModel.setDescription(description);
+                                        productDetailsModel.setImageURL(o.toString());
+                                        productDetailsModel.setOwner(myPhone);
+                                        productDetailsModel.setStorageLocation(storageReference2nd.getPath());
+                                        productDetailsModel.setUploadDate(getDate());
 
-                                        Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
+                                        Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
-                                        menusRef.child(key).setValue(productDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 // Write was successful!
@@ -667,19 +665,19 @@ public class AddMenu extends AppCompatActivity {
                 String description = productDescription.getText().toString().trim();
 
                 String key = menusRef.push().getKey(); //The child node in mymenu for storing menu items
-                ProductDetails productDetails = new ProductDetails();
+                ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
-                productDetails.setName(name);
-                productDetails.setPrice(price);
-                productDetails.setDescription(description);
-                productDetails.setImageURL(defaultFood);
-                productDetails.setOwner(myPhone);
-                productDetails.setStorageLocation("default");
-                productDetails.setUploadDate(getDate());
+                productDetailsModel.setName(name);
+                productDetailsModel.setPrice(price);
+                productDetailsModel.setDescription(description);
+                productDetailsModel.setImageURL(defaultFood);
+                productDetailsModel.setOwner(myPhone);
+                productDetailsModel.setStorageLocation("default");
+                productDetailsModel.setUploadDate(getDate());
 
-                Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
+                Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
-                menusRef.child(key).setValue(productDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         // Write was successful!
@@ -733,19 +731,19 @@ public class AddMenu extends AppCompatActivity {
                                         String description = productDescription.getText().toString().trim();
 
                                         String key = menusRef.push().getKey(); //The child node in mymenu for storing menu items
-                                        ProductDetails productDetails = new ProductDetails();
+                                        ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
-                                        productDetails.setName(name);
-                                        productDetails.setPrice(price);
-                                        productDetails.setDescription(description);
-                                        productDetails.setImageURL(o.toString());
-                                        productDetails.setStorageLocation(storageReference2nd.getPath());
-                                        productDetails.setOwner(myPhone);
-                                        productDetails.setUploadDate(getDate());
+                                        productDetailsModel.setName(name);
+                                        productDetailsModel.setPrice(price);
+                                        productDetailsModel.setDescription(description);
+                                        productDetailsModel.setImageURL(o.toString());
+                                        productDetailsModel.setStorageLocation(storageReference2nd.getPath());
+                                        productDetailsModel.setOwner(myPhone);
+                                        productDetailsModel.setUploadDate(getDate());
 
-                                        Log.d("myimage", "onSuccess: product image: " + productDetails.getImageURL());
+                                        Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
-                                        menusRef.child(key).setValue(productDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 // Write was successful!

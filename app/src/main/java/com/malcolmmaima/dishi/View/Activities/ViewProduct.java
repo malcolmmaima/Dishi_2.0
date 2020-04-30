@@ -2,7 +2,6 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -32,8 +31,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
@@ -431,7 +430,7 @@ public class ViewProduct extends AppCompatActivity {
                 String cartDate = currentDate.getDate();
 
                 String newKey = myCartRef.push().getKey();
-                ProductDetails cartProduct = new ProductDetails();
+                ProductDetailsModel cartProduct = new ProductDetailsModel();
                 cartProduct.setName(product);
                 cartProduct.setPrice(price);
                 cartProduct.setDescription(description);

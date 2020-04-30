@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,14 +28,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
-import com.malcolmmaima.dishi.Model.UserModel;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
-import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,12 +39,12 @@ import java.util.List;
 
 public class MyCart extends AppCompatActivity {
 
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     RecyclerView recyclerview;
     String myPhone, restaurantName;
     TextView emptyTag, totalPrice, totalItems;
     AppCompatImageView icon;
-    LiveLocation liveLocation;
+    LiveLocationModel liveLocationModel;
     Button checkoutBtn;
     Boolean multipleRestaurants;
     DatabaseReference myCartRef, myLocationRef;
@@ -98,11 +92,11 @@ public class MyCart extends AppCompatActivity {
 
         myLocationRef = db.getReference("location/"+myPhone);
 
-        liveLocation = null;
+        liveLocationModel = null;
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
                 //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
@@ -126,7 +120,7 @@ public class MyCart extends AppCompatActivity {
                 total[0] = 0;
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
-                    ProductDetails prod = cart.getValue(ProductDetails.class);
+                    ProductDetailsModel prod = cart.getValue(ProductDetailsModel.class);
 
                     int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
                     total[0] = total[0] + adapterTotal;
@@ -171,7 +165,7 @@ public class MyCart extends AppCompatActivity {
                         list = new ArrayList<>();
 
                         for(DataSnapshot cart : dataSnapshot.getChildren()){
-                            final ProductDetails product = cart.getValue(ProductDetails.class);
+                            final ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
                             product.setKey(cart.getKey());
                             list.add(product);
                         }
@@ -300,7 +294,7 @@ public class MyCart extends AppCompatActivity {
                 list = new ArrayList<>();
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
-                    final ProductDetails product = cart.getValue(ProductDetails.class);
+                    final ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
                     product.setKey(cart.getKey());
                     list.add(product);
                 }
@@ -359,7 +353,7 @@ public class MyCart extends AppCompatActivity {
                 itemCount = 0;
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
                     try {
-                        final ProductDetails product = cart.getValue(ProductDetails.class);
+                        final ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
                         product.setKey(cart.getKey());
                         list.add(product);
                     } catch (Exception e){ }

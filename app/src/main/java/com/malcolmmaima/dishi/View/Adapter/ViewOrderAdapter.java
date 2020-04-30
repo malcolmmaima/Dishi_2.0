@@ -2,44 +2,26 @@ package com.malcolmmaima.dishi.View.Adapter;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.ActivityOptions;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Controller.OnOrderChecked;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.UserModel;
+import com.malcolmmaima.dishi.Controller.Interface.OnOrderChecked;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
-import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -47,12 +29,12 @@ import java.util.List;
 public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHolder>{
 
     Context context;
-    List<ProductDetails> listdata;
+    List<ProductDetailsModel> listdata;
     long DURATION = 200;
 
     OnOrderChecked onOrderChecked;
 
-    public ViewOrderAdapter(Context context, List<ProductDetails> listdata, OnOrderChecked onOrderChecked) {
+    public ViewOrderAdapter(Context context, List<ProductDetailsModel> listdata, OnOrderChecked onOrderChecked) {
         this.listdata = listdata;
         this.context = context;
         this.onOrderChecked = onOrderChecked;
@@ -67,9 +49,9 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
     }
 
     public void onBindViewHolder(final ViewOrderAdapter.MyHolder holder, final int position) {
-        final ProductDetails productDetails = listdata.get(position);
+        final ProductDetailsModel productDetailsModel = listdata.get(position);
 
-        if(productDetails.getConfirmed() == true){
+        if(productDetailsModel.getConfirmed() == true){
             holder.checkBox.setVisibility(View.GONE);
         }
 
@@ -82,9 +64,9 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
          * Set widget values
          **/
 
-        int price = productDetails.getQuantity() * Integer.parseInt(productDetails.getPrice());
+        int price = productDetailsModel.getQuantity() * Integer.parseInt(productDetailsModel.getPrice());
         holder.foodPrice.setText("Ksh "+price);
-        holder.foodName.setText(productDetails.getName());
+        holder.foodName.setText(productDetailsModel.getName());
 
         /**
          * Click listener on our card
@@ -105,20 +87,20 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", productDetails.getImageURL());
+                slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
                 context.startActivity(slideactivity);
             }
         });
 
-        holder.quantity.setText("Quantity: "+productDetails.getQuantity() + " x Ksh "+productDetails.getPrice());
+        holder.quantity.setText("Quantity: "+ productDetailsModel.getQuantity() + " x Ksh "+ productDetailsModel.getPrice());
 
-        if(!productDetails.accountType.equals("2")){
+        if(!productDetailsModel.accountType.equals("2")){
             holder.checkBox.setEnabled(false);
         }
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                onOrderChecked.onItemChecked(isChecked, position, productDetails.getPrice(), productDetails.getQuantity());
+                onOrderChecked.onItemChecked(isChecked, position, productDetailsModel.getPrice(), productDetailsModel.getQuantity());
             }
         });
 
@@ -127,7 +109,7 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
+            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
                     .placeholder(R.drawable.menu)
                     .error(R.drawable.menu)
                     .into(holder.foodPic);

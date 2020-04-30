@@ -1,14 +1,10 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
@@ -17,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.MenuAdapter;
 
@@ -35,7 +30,7 @@ import java.util.List;
 
 public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     RecyclerView recyclerview;
     String myPhone;
     TextView emptyTag;
@@ -117,9 +112,9 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                 // StringBuffer stringbuffer = new StringBuffer();
                 for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
-                    ProductDetails productDetails = dataSnapshot1.getValue(ProductDetails.class); //Assign values to model
-                    productDetails.setKey(dataSnapshot1.getKey()); //Get item keys, useful when performing delete operations
-                    list.add(productDetails);
+                    ProductDetailsModel productDetailsModel = dataSnapshot1.getValue(ProductDetailsModel.class); //Assign values to model
+                    productDetailsModel.setKey(dataSnapshot1.getKey()); //Get item keys, useful when performing delete operations
+                    list.add(productDetailsModel);
                     //progressDialog.dismiss();
                 }
 

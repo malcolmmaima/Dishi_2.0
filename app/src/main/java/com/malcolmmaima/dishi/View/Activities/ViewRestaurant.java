@@ -30,12 +30,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocation;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewPagerAdapter;
-import com.malcolmmaima.dishi.View.Fragments.MenuFragment;
 import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
 import com.malcolmmaima.dishi.View.Fragments.ViewRestaurantMenuFragment;
 import com.squareup.picasso.Picasso;
@@ -55,7 +54,7 @@ public class ViewRestaurant extends AppCompatActivity {
     Menu myMenu;
     DatabaseReference myLocationRef, restaurantLocationRef;
     ValueEventListener mylocationListener, restaurantLocationListener;
-    LiveLocation myLocation, restaurantLocation;
+    LiveLocationModel myLocation, restaurantLocation;
     Double dist;
     String myPhone;
     FirebaseUser user;
@@ -154,7 +153,7 @@ public class ViewRestaurant extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    myLocation = dataSnapshot.getValue(LiveLocation.class);
+                    myLocation = dataSnapshot.getValue(LiveLocationModel.class);
                     computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
                 } catch (Exception e){
 
@@ -173,7 +172,7 @@ public class ViewRestaurant extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    restaurantLocation = dataSnapshot.getValue(LiveLocation.class);
+                    restaurantLocation = dataSnapshot.getValue(LiveLocationModel.class);
                     computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
                 }catch (Exception e){
 

@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.Controller;
+package com.malcolmmaima.dishi.Controller.Utils;
 
 import android.app.Activity;
 import android.graphics.Rect;

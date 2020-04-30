@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -40,12 +39,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.malcolmmaima.dishi.Controller.TrackingService;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
-import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -68,8 +65,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     ValueEventListener myRefListener, customerOrderListener, riderLocationListener, deliveryLocationListener, restaurantLocationRefListener, customerLocationRefListener;
     String myPhone, accType, message, callMsg, restaurantPhone, riderPhone, customerPhone;
     ProgressDialog progressDialog;
-    LiveLocation riderLocation;
-    StaticLocation staticDeliveryLocation;
+    LiveLocationModel riderLocation;
+    StaticLocationModel staticDeliveryLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +167,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                             for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
 
                                                 try {
-                                                    ProductDetails prod = items.getValue(ProductDetails.class);
+                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                                                     prod.setKey(items.getKey());
 
                                                     /**
@@ -511,7 +508,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                             riderLocationListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
-                                    riderLocation = location.getValue(LiveLocation.class);
+                                    riderLocation = location.getValue(LiveLocationModel.class);
 //                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
@@ -524,7 +521,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
-                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
 //                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
@@ -595,7 +592,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      * Static address exists
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
-                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
                                         //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**
@@ -699,7 +696,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                             riderLocationListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
-                                    riderLocation = location.getValue(LiveLocation.class);
+                                    riderLocation = location.getValue(LiveLocationModel.class);
 //                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
@@ -712,7 +709,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
-                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
 //                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
@@ -782,7 +779,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      * Static address exists
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
-                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
                                         //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**
@@ -892,7 +889,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                             riderLocationListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
-                                    riderLocation = location.getValue(LiveLocation.class);
+                                    riderLocation = location.getValue(LiveLocationModel.class);
 //                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
@@ -905,7 +902,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
-                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
 //                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
@@ -975,7 +972,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      * Static address exists
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
-                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocation.class);
+                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
                                         //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**

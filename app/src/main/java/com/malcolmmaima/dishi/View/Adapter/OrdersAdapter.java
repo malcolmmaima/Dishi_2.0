@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,14 +25,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
-import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -44,8 +42,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     Context context;
     List<UserModel> listdata;
     long DURATION = 200;
-    LiveLocation liveLocation, customerLive;
-    StaticLocation customerStatic;
+    LiveLocationModel liveLocationModel, customerLive;
+    StaticLocationModel customerStatic;
     Double dist;
     DatabaseReference restaurantUserDetails, myLocationRef, customerLiveLocationRef, customerStaticLocationRef;
     ValueEventListener myLocationRefListener, customerLiveLocationListener,customerStaticLocationListener;
@@ -124,11 +122,11 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
          * On create view fetch my location coordinates
          */
 
-        liveLocation = null;
+        liveLocationModel = null;
         myLocationRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
                 //SafeToast.makeText(context, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
@@ -147,10 +145,10 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    customerLive = dataSnapshot.getValue(LiveLocation.class);
+                    customerLive = dataSnapshot.getValue(LiveLocationModel.class);
 
-                    computeDistance(holder, liveLocation.getLatitude(),
-                            liveLocation.getLongitude(),
+                    computeDistance(holder, liveLocationModel.getLatitude(),
+                            liveLocationModel.getLongitude(),
                             customerLive.getLatitude(),
                             customerLive.getLongitude());
                 } catch (Exception e){
@@ -172,10 +170,10 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 //compute static location coordinates
                 if(dataSnapshot.exists()) {
                     try {
-                        customerStatic = dataSnapshot.getValue(StaticLocation.class);
+                        customerStatic = dataSnapshot.getValue(StaticLocationModel.class);
 
-                        computeDistance(holder, liveLocation.getLatitude(),
-                                liveLocation.getLongitude(),
+                        computeDistance(holder, liveLocationModel.getLatitude(),
+                                liveLocationModel.getLongitude(),
                                 customerStatic.getLatitude(),
                                 customerStatic.getLongitude());
 
@@ -186,8 +184,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
                 // compute live location coordindates
                 else {
                     try {
-                        computeDistance(holder, liveLocation.getLatitude(),
-                                liveLocation.getLongitude(),
+                        computeDistance(holder, liveLocationModel.getLatitude(),
+                                liveLocationModel.getLongitude(),
                                 customerLive.getLatitude(),
                                 customerLive.getLongitude());
                     } catch (Exception e){

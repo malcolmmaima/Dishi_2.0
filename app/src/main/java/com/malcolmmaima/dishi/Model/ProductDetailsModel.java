@@ -1,6 +1,6 @@
 package com.malcolmmaima.dishi.Model;
 
-public class ProductDetails {
+public class ProductDetailsModel {
 
     public String name;
     public String price;

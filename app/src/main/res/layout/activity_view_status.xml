@@ -40,307 +40,329 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 >
-
-            <androidx.cardview.widget.CardView
-            android:id="@+id/card_view"
-            android:clickable="false"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            card_view:cardCornerRadius="5dp"
-            android:focusableInTouchMode="false"
-            card_view:view_shadowDx="2dp"
-            card_view:view_shadowDy="0dp"
-            card_view:view_borderWidth="2dp"
-            card_view:view_borderColor="#cccccc"
-            >
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:id="@+id/update"
-                >
-
                 <com.alexzh.circleimageview.CircleImageView
-                    android:id="@+id/profilePic"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:id="@+id/postedToPic"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:src="@drawable/default_profile"
                     app:view_shadowRadius="2dp"
                     app:view_shadowDx="2dp"
                     app:view_shadowDy="0dp"
                     app:view_borderWidth="2dp"
                     app:view_borderColor="#cccccc"
+                    android:background="@color/pureWhite"
                     android:scaleType="fitXY"
                     />
 
-
-                <LinearLayout
-                    android:id="@+id/lin"
-                    android:layout_toRightOf="@id/profilePic"
+                <TextView
+                    android:fontFamily="sans-serif-light"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:textColor="@color/darkblue"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="loading..."
+                    android:id="@+id/postedToName"
+                    android:layout_toRightOf="@id/postedToPic"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/colorAccent"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="loading..."
-                        android:id="@+id/profileName"
-                        android:layout_marginLeft="5dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:textSize="15sp"
-                        android:text="loading... "
-                        android:id="@+id/userUpdate"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="20dp"
-                        android:textColor="#666"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_alignParentRight="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageButton
-                        android:visibility="gone"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:scaleType="centerCrop"
-                        android:background="@drawable/ic_access_time_black_48dp"
-                        android:layout_marginRight="3dp"/>
-
-                    <TextView
-                        android:layout_gravity="start"
-                        android:id="@+id/timePosted"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:textColor="#666"
-                        android:textSize="10sp"
-                        android:text="loading..."/>
-
-                    <TextView
-                        android:id="@+id/statusOptions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_marginRight="3dp"
-                        android:paddingLeft="@dimen/activity_horizontal_margin"
-                        android:text="&#8942;"
-                        android:textAppearance="?android:textAppearanceLarge" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/imageShare"
-                    android:layout_width="match_parent"
-                    android:layout_height="240dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_view"
+                    android:layout_width="392dp"
+                    android:layout_height="190dp"
+                    android:layout_below="@id/postedToPic"
+                    android:layout_marginStart="5dp"
                     android:layout_marginLeft="5dp"
-                    android:layout_below="@id/lin"
-                    android:layout_toRightOf="@id/profilePic"
-                    android:visibility="gone"
-                    />
-
-                <RelativeLayout
-                    android:id="@+id/cardActions"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/imageShare"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_toRightOf="@id/profilePic"
-                    android:gravity="center|left">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|right"
-                        >
-
-                        <ImageView
-                            android:id="@+id/likePost"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:paddingBottom="2dp"
-                            android:paddingTop="2dp"
-                            android:backgroundTint="@color/lightgray"
-                            android:src="@drawable/unliked" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:id="@+id/likesTotal"
-                            />
-
-                        <ImageView
-                            android:id="@+id/comments"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:padding="6dp"
-                            android:backgroundTint="@color/lightgray"
-                            android:src="@drawable/comment" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:id="@+id/commentsTotal"
-                            />
-
-                        <ImageView
-                            android:id="@+id/sharePost"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:paddingRight="5dp"
-                            android:paddingLeft="5dp"
-                            android:paddingBottom="6dp"
-                            android:visibility="gone"
-                            android:backgroundTint="@color/lightgray"
-                            android:src="@drawable/share" />
-
-                        <ImageView
-                            android:id="@+id/deleteBtn"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/ic_delete_black_48dp"
-                            android:visibility="gone"/>
-
-                    </LinearLayout>
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_below="@id/cardActions"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3.2"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:id="@+id/frame"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal">
-
-                        <ImageButton
-                            android:id="@+id/emoji"
-                            android:src="@drawable/emoji"
-                            android:background="@drawable/layout_bg1"
-                            android:layout_width="36dp"
-                            android:scaleType="fitCenter"
-                            android:padding="5dp"
-                            android:elevation="1dp"
-                            android:layout_gravity="right|bottom"
-                            android:layout_height="40dp" />
-
-                        <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
-                            android:id="@+id/inputComment"
-                            android:hint="Say something..."
-                            android:background="@drawable/layout_bg"
-                            android:textSize="18sp"
-                            android:layout_alignParentBottom="true"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:maxHeight="100dp"
-                            android:padding="10dp"
-                            android:paddingRight="20dp"
-                            android:inputType="textMultiLine"
-                            android:minHeight="36dp"
-                            android:shadowRadius="10"
-                            emojicon:emojiconSize="28sp"
-                            android:autofillHints="" />
-
-                    </FrameLayout>
+                    android:layout_marginTop="-7dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:clickable="false"
+                    android:focusableInTouchMode="false"
+                    card_view:cardCornerRadius="5dp"
+                    card_view:view_borderColor="#cccccc"
+                    card_view:view_borderWidth="2dp"
+                    card_view:view_shadowDx="2dp"
+                    card_view:view_shadowDy="0dp">
 
                     <RelativeLayout
-                        android:layout_below="@id/frame"
-                        android:id="@+id/statusActions"
+                        android:id="@+id/update"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-
-                        android:orientation="horizontal">
-
-                        <ProgressBar
-                            android:id="@+id/progressBar"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentTop="true"
-                            android:indeterminate="false"
-                            android:max="100"
-                            android:minHeight="20dp"
-                            android:minWidth="200dp"
-                            android:visibility="gone"
-                            android:progress="1" />
-
+                        android:layout_height="wrap_content"
+                        android:padding="5dp">
 
                         <ImageView
-                            android:layout_below="@id/progressBar"
-                            android:visibility="gone"
-                            android:layout_margin="5dp"
-                            android:layout_alignParentLeft="true"
-                            android:id="@+id/selectedImage"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp" />
+                            android:id="@+id/imageShare"
+                            android:layout_width="match_parent"
+                            android:layout_height="240dp"
+                            android:layout_below="@id/lin"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_toRightOf="@id/profilePic"
+                            android:visibility="gone" />
 
-                        <ImageButton
-                            android:layout_below="@id/progressBar"
-                            android:layout_toLeftOf="@id/postStatus"
-                            android:visibility="visible"
-                            android:id="@+id/camera"
-                            android:src="@drawable/camera"
-                            android:background="@drawable/layout_bg1"
-                            android:layout_marginLeft="15dp"
-                            android:scaleType="fitCenter"
-                            android:layout_width="30dp"
-                            android:layout_height="40dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginEnd="5dp"
-                            android:contentDescription="TODO" />
 
-                        <Button
-                            android:layout_below="@id/progressBar"
-                            android:id="@+id/postStatus"
+                        <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="35dp"
+                            android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:clickable="true"
-                            android:shadowRadius="5"
-                            android:text="Post" />
+                            android:orientation="horizontal">
+
+                            <ImageButton
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_marginRight="3dp"
+                                android:background="@drawable/ic_access_time_black_48dp"
+                                android:scaleType="centerCrop"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/timePosted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start"
+                                android:fontFamily="sans-serif-light"
+                                android:text="loading..."
+                                android:textColor="#666"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/statusOptions"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginRight="3dp"
+                                android:paddingLeft="@dimen/activity_horizontal_margin"
+                                android:text="&#8942;"
+                                android:textAppearance="?android:textAppearanceLarge" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/lin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/profilePic"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/profileName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:text="loading..."
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorAccent" />
+
+                            <TextView
+                                android:id="@+id/userUpdate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="20dp"
+                                android:fontFamily="sans-serif-light"
+                                android:text="loading... "
+                                android:textColor="#666"
+                                android:textSize="15sp" />
+
+                        </LinearLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/cardActions"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/imageShare"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_toRightOf="@id/profilePic"
+                            android:gravity="center|left">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center|right">
+
+                                <ImageView
+                                    android:id="@+id/likePost"
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:backgroundTint="@color/lightgray"
+                                    android:paddingTop="2dp"
+                                    android:paddingBottom="2dp"
+                                    android:src="@drawable/unliked" />
+
+                                <ImageView
+                                    android:id="@+id/comments"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:backgroundTint="@color/lightgray"
+                                    android:padding="6dp"
+                                    android:src="@drawable/comment" />
+
+                                <ImageView
+                                    android:id="@+id/sharePost"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:backgroundTint="@color/lightgray"
+                                    android:paddingLeft="5dp"
+                                    android:paddingRight="5dp"
+                                    android:paddingBottom="6dp"
+                                    android:src="@drawable/share"
+                                    android:visibility="gone" />
+
+                                <ImageView
+                                    android:id="@+id/deleteBtn"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/ic_delete_black_48dp"
+                                    android:visibility="gone" />
+
+                                <TextView
+                                    android:id="@+id/likesTotal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0" />
+
+                                <TextView
+                                    android:id="@+id/commentsTotal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0" />
+
+                            </LinearLayout>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/cardActions"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="3.2"
+                            android:orientation="vertical">
+
+                            <FrameLayout
+                                android:id="@+id/frame"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal">
+
+                                <ImageButton
+                                    android:id="@+id/emoji"
+                                    android:layout_width="36dp"
+                                    android:layout_height="40dp"
+                                    android:layout_gravity="right|bottom"
+                                    android:background="@drawable/layout_bg1"
+                                    android:elevation="1dp"
+                                    android:padding="5dp"
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/emoji" />
+
+                                <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                                    android:id="@+id/inputComment"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentBottom="true"
+                                    android:autofillHints=""
+                                    android:background="@drawable/layout_bg"
+                                    android:hint="Say something..."
+                                    android:inputType="textMultiLine"
+                                    android:maxHeight="100dp"
+                                    android:minHeight="36dp"
+                                    android:padding="10dp"
+                                    android:paddingRight="20dp"
+                                    android:shadowRadius="10"
+                                    android:textSize="18sp"
+                                    emojicon:emojiconSize="28sp" />
+
+                            </FrameLayout>
+
+                            <RelativeLayout
+                                android:id="@+id/statusActions"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_below="@id/frame"
+
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/postStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="35dp"
+                                    android:layout_below="@id/progressBar"
+                                    android:layout_alignParentRight="true"
+                                    android:clickable="true"
+                                    android:shadowRadius="5"
+                                    android:text="Post" />
+
+
+                                <ImageButton
+                                    android:id="@+id/camera"
+                                    android:layout_width="30dp"
+                                    android:layout_height="40dp"
+                                    android:layout_below="@id/progressBar"
+                                    android:layout_marginStart="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_marginEnd="5dp"
+                                    android:layout_toLeftOf="@id/postStatus"
+                                    android:background="@drawable/layout_bg1"
+                                    android:contentDescription="TODO"
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/camera"
+                                    android:visibility="visible" />
+
+                                <ImageView
+                                    android:id="@+id/selectedImage"
+                                    android:layout_width="70dp"
+                                    android:layout_height="70dp"
+                                    android:layout_below="@id/progressBar"
+                                    android:layout_alignParentLeft="true"
+                                    android:layout_margin="5dp"
+                                    android:visibility="gone" />
+
+                                <ProgressBar
+                                    android:id="@+id/progressBar"
+                                    style="?android:attr/progressBarStyleHorizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentLeft="true"
+                                    android:layout_alignParentTop="true"
+                                    android:indeterminate="false"
+                                    android:max="100"
+                                    android:minWidth="200dp"
+                                    android:minHeight="20dp"
+                                    android:progress="1"
+                                    android:visibility="gone" />
+                            </RelativeLayout>
+
+                        </RelativeLayout>
+
+                        <com.alexzh.circleimageview.CircleImageView
+                            android:id="@+id/profilePic"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/default_profile"
+                            app:view_borderColor="#cccccc"
+                            app:view_borderWidth="2dp"
+                            app:view_shadowDx="2dp"
+                            app:view_shadowDy="0dp"
+                            app:view_shadowRadius="2dp" />
+
                     </RelativeLayout>
 
-                </RelativeLayout>
 
-            </RelativeLayout>
+                </androidx.cardview.widget.CardView>
 
+                <androidx.recyclerview.widget.RecyclerView
 
-
-        </androidx.cardview.widget.CardView>
-
-            <androidx.recyclerview.widget.RecyclerView
-
-            android:layout_below="@+id/card_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/rview"
-            android:divider="@null"
-            android:stackFromBottom="true"
-            />
+                android:layout_below="@+id/card_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/rview"
+                android:divider="@null"
+                android:stackFromBottom="true"
+                />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_below="@id/card_view"

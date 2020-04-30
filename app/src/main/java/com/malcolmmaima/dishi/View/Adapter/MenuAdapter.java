@@ -11,13 +11,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,10 +22,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
@@ -40,10 +36,10 @@ import java.util.List;
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     Context context;
-    List<ProductDetails> listdata;
+    List<ProductDetailsModel> listdata;
     long DURATION = 200;
 
-    public MenuAdapter(Context context, List<ProductDetails> listdata) {
+    public MenuAdapter(Context context, List<ProductDetailsModel> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
@@ -58,7 +54,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
     }
 
     public void onBindViewHolder(final MenuAdapter.MyHolder holder, final int position) {
-        final ProductDetails productDetails = listdata.get(position);
+        final ProductDetailsModel productDetailsModel = listdata.get(position);
 
         setAnimation(holder.itemView, position);
 
@@ -66,13 +62,13 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
          * Set widget values
          **/
 
-        holder.foodPrice.setText("Ksh "+productDetails.getPrice());
-        holder.foodName.setText(productDetails.getName());
+        holder.foodPrice.setText("Ksh "+ productDetailsModel.getPrice());
+        holder.foodName.setText(productDetailsModel.getName());
 
-        if(productDetails.getDescription().length() > 89) {
-            holder.foodDescription.setText(productDetails.getDescription().substring(0, 80) + "...");
+        if(productDetailsModel.getDescription().length() > 89) {
+            holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
         } else {
-            holder.foodDescription.setText(productDetails.getDescription());
+            holder.foodDescription.setText(productDetailsModel.getDescription());
         }
 
         /**
@@ -83,7 +79,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, AddMenu.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("key", productDetails.getKey());
+                slideactivity.putExtra("key", productDetailsModel.getKey());
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                 context.startActivity(slideactivity, bndlanimation);
@@ -98,7 +94,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", productDetails.getImageURL());
+                slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
                 context.startActivity(slideactivity);
             }
         });
@@ -108,7 +104,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
+            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
                     .placeholder(R.drawable.menu)
                     .error(R.drawable.menu)
                     .into(holder.foodPic);

@@ -2,22 +2,16 @@ package com.malcolmmaima.dishi.View.Adapter;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.ActivityOptions;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,13 +24,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
-import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -45,10 +36,10 @@ import java.util.List;
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
 
     Context context;
-    List<ProductDetails> listdata;
+    List<ProductDetailsModel> listdata;
     long DURATION = 200;
 
-    public CartAdapter(Context context, List<ProductDetails> listdata) {
+    public CartAdapter(Context context, List<ProductDetailsModel> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
@@ -63,7 +54,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
     }
 
     public void onBindViewHolder(final CartAdapter.MyHolder holder, final int position) {
-        final ProductDetails productDetails = listdata.get(position);
+        final ProductDetailsModel productDetailsModel = listdata.get(position);
 
         /**
          * Adapter animation
@@ -74,12 +65,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
          * Set widget values
          **/
 
-        int price = productDetails.getQuantity() * Integer.parseInt(productDetails.getPrice());
+        int price = productDetailsModel.getQuantity() * Integer.parseInt(productDetailsModel.getPrice());
         holder.foodPrice.setText("Ksh "+price);
-        holder.foodName.setText(productDetails.getName());
+        holder.foodName.setText(productDetailsModel.getName());
 
         //Fetch restaurant user details
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+productDetails.getOwner());
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+ productDetailsModel.getOwner());
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -98,10 +89,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             }
         });
 
-        if(productDetails.getDescription().length() > 89) {
-            holder.foodDescription.setText(productDetails.getDescription().substring(0, 80) + "...");
+        if(productDetailsModel.getDescription().length() > 89) {
+            holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
         } else {
-            holder.foodDescription.setText(productDetails.getDescription());
+            holder.foodDescription.setText(productDetailsModel.getDescription());
         }
 
         /**
@@ -126,7 +117,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
                 myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
                 DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
 
-                myCartRef.child(productDetails.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                myCartRef.child(productDetailsModel.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         try {
@@ -149,19 +140,19 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", productDetails.getImageURL());
+                slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
                 context.startActivity(slideactivity);
             }
         });
 
-        holder.quantity.setText("Quantity: "+productDetails.getQuantity() + " x Ksh "+productDetails.getPrice());
+        holder.quantity.setText("Quantity: "+ productDetailsModel.getQuantity() + " x Ksh "+ productDetailsModel.getPrice());
 
         /**
          * Load image url onto imageview
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
+            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
                     .placeholder(R.drawable.menu)
                     .error(R.drawable.menu)
                     .into(holder.foodPic);

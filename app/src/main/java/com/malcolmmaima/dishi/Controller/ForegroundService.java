@@ -14,12 +14,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,30 +28,23 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
-import com.malcolmmaima.dishi.View.Activities.Inbox;
 import com.malcolmmaima.dishi.View.Activities.MyNotifications;
 import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.RiderActivity;
-import com.malcolmmaima.dishi.View.Activities.SplashActivity;
-import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import io.fabric.sdk.android.services.common.SafeToast;
 
 /**
  * https://androidwave.com/foreground-service-android-example/
@@ -639,7 +630,7 @@ public class ForegroundService extends Service {
                                     item.addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            ProductDetails prod = snap.getValue(ProductDetails.class);
+                                            ProductDetailsModel prod = snap.getValue(ProductDetailsModel.class);
 
                                             if(prod.getConfirmed() == true){
                                                 databaseReference.child("users").child(prod.getOwner()).addListenerForSingleValueEvent(new ValueEventListener() {

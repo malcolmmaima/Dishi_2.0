@@ -21,8 +21,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.AbuseReportModel;
 import com.malcolmmaima.dishi.R;
 

@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.Controller;
+package com.malcolmmaima.dishi.Controller.Interface;
 
 /**
  * This interface passes data from the product adapter back to the parent activity holding the recyclerview

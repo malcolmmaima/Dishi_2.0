@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,10 +26,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ProductHistoryAdapter;
@@ -44,13 +42,13 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "HistoryFragment";
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     RecyclerView recyclerview;
     String myPhone;
     TextView emptyTag, clearAll;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    LiveLocation liveLocation;
+    LiveLocationModel liveLocationModel;
 
     DatabaseReference dbRef, ordersHistory, myLocationRef;
     FirebaseDatabase db;
@@ -134,11 +132,11 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
          * On create view fetch my location coordinates
          */
 
-        liveLocation = null;
+        liveLocationModel = null;
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
                 //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
@@ -220,18 +218,18 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                                     try {
-                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
+                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
 
                                                         /**
                                                          * Now lets compute distance of each restaurant with customer location
                                                          */
                                                         CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
                                                         //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                        ProductDetails product = products.getValue(ProductDetails.class);
+                                                        ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
                                                         //product.setKey(products.getKey());
                                                         product.setDistance(dist);
                                                         product.accountType = "1"; //This fragment belongs to account type 1 (customer)
@@ -299,17 +297,17 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                                     try {
-                                                    LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
+                                                    LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
 
                                                     /**
                                                      * Now lets compute distance of each restaurant with customer location
                                                      */
                                                     try {
                                                         CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                        ProductDetails product = products.getValue(ProductDetails.class);
+                                                        ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
                                                         //product.setKey(products.getKey());
                                                         product.setDistance(dist);
                                                         product.accountType = "1"; //this fragment belongs to account type 1

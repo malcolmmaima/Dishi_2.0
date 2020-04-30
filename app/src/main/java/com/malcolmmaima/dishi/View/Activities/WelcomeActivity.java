@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.malcolmmaima.dishi.Controller.PreferenceManager;
+import com.malcolmmaima.dishi.Controller.Utils.PreferenceManager;
 import com.malcolmmaima.dishi.R;
 
 

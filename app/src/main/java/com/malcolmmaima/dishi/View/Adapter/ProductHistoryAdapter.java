@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,12 +30,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Controller.TimeAgo;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.squareup.picasso.Picasso;
@@ -52,11 +50,11 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAdapter.MyHolder>{
 
     Context context;
-    List<ProductDetails> listdata;
+    List<ProductDetailsModel> listdata;
     long DURATION = 200;
     private String TAG = "ProductHistory";
 
-    public ProductHistoryAdapter(Context context, List<ProductDetails> listdata) {
+    public ProductHistoryAdapter(Context context, List<ProductDetailsModel> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
@@ -71,7 +69,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
     }
 
     public void onBindViewHolder(final ProductHistoryAdapter.MyHolder holder, final int position) {
-        final ProductDetails productDetails = listdata.get(position);
+        final ProductDetailsModel productDetailsModel = listdata.get(position);
 
         /**
          * Adapter animation
@@ -82,13 +80,13 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
          * Set widget values
          **/
 
-        holder.foodPrice.setText("Ksh "+productDetails.getPrice());
-        holder.foodName.setText(productDetails.getName());
-        holder.itemQuantity.setText("Quantity: " + productDetails.getQuantity());
-        holder.confirmOrd.setText("Delivered: "+productDetails.getConfirmed());
+        holder.foodPrice.setText("Ksh "+ productDetailsModel.getPrice());
+        holder.foodName.setText(productDetailsModel.getName());
+        holder.itemQuantity.setText("Quantity: " + productDetailsModel.getQuantity());
+        holder.confirmOrd.setText("Delivered: "+ productDetailsModel.getConfirmed());
 
         //Fetch restaurant user details
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+productDetails.getOwner());
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+ productDetailsModel.getOwner());
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -108,10 +106,10 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
         });
 
         try {
-            if (productDetails.getDescription().length() > 89) {
-                holder.foodDescription.setText(productDetails.getDescription().substring(0, 80) + "...");
+            if (productDetailsModel.getDescription().length() > 89) {
+                holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
             } else {
-                holder.foodDescription.setText(productDetails.getDescription());
+                holder.foodDescription.setText(productDetailsModel.getDescription());
             }
         } catch (Exception e){
 
@@ -126,15 +124,15 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                 //Toast.makeText(context, "key: " + productDetails.getOriginalKey(), Toast.LENGTH_SHORT).show(); //for debug purposes only
                 Intent slideactivity = new Intent(context, ViewProduct.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("key", productDetails.getOriginalKey());
-                slideactivity.putExtra("restaurant", productDetails.getOwner());
+                slideactivity.putExtra("key", productDetailsModel.getOriginalKey());
+                slideactivity.putExtra("restaurant", productDetailsModel.getOwner());
                 slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
-                slideactivity.putExtra("product", productDetails.getName());
-                slideactivity.putExtra("description", productDetails.getDescription());
-                slideactivity.putExtra("price", productDetails.getPrice());
-                slideactivity.putExtra("imageUrl", productDetails.getImageURL());
-                slideactivity.putExtra("distance", productDetails.getDistance());
-                slideactivity.putExtra("accType", productDetails.accountType);
+                slideactivity.putExtra("product", productDetailsModel.getName());
+                slideactivity.putExtra("description", productDetailsModel.getDescription());
+                slideactivity.putExtra("price", productDetailsModel.getPrice());
+                slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
+                slideactivity.putExtra("distance", productDetailsModel.getDistance());
+                slideactivity.putExtra("accType", productDetailsModel.accountType);
 
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
@@ -146,7 +144,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
          * Add item to cart
          */
 
-        if(!productDetails.accountType.equals("1")){
+        if(!productDetailsModel.accountType.equals("1")){
             holder.addToCart.setVisibility(View.GONE);
         }
 
@@ -155,7 +153,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             public void onClick(final View v) {
 
                 DatabaseReference menuExistRef = FirebaseDatabase
-                        .getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getOriginalKey());
+                        .getInstance().getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getOriginalKey());
                 ValueEventListener existsListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -177,15 +175,15 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                             String cartDate = currentDate.getDate();
 
                             String key = myCartRef.push().getKey();
-                            ProductDetails cartProduct = new ProductDetails();
-                            cartProduct.setName(productDetails.getName());
-                            cartProduct.setPrice(productDetails.getPrice());
-                            cartProduct.setDescription(productDetails.getDescription());
-                            cartProduct.setImageURL(productDetails.getImageURL());
-                            cartProduct.setOwner(productDetails.getOwner());
-                            cartProduct.setOriginalKey(productDetails.getOriginalKey());
+                            ProductDetailsModel cartProduct = new ProductDetailsModel();
+                            cartProduct.setName(productDetailsModel.getName());
+                            cartProduct.setPrice(productDetailsModel.getPrice());
+                            cartProduct.setDescription(productDetailsModel.getDescription());
+                            cartProduct.setImageURL(productDetailsModel.getImageURL());
+                            cartProduct.setOwner(productDetailsModel.getOwner());
+                            cartProduct.setOriginalKey(productDetailsModel.getOriginalKey());
                             cartProduct.setQuantity(1);
-                            cartProduct.setDistance(productDetails.getDistance());
+                            cartProduct.setDistance(productDetailsModel.getDistance());
                             cartProduct.setUploadDate(cartDate);
 
                             myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -218,15 +216,15 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", productDetails.getImageURL());
+                slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
                 context.startActivity(slideactivity);
             }
         });
 
-        if(productDetails.getDistance() < 1.0){
-            holder.distanceAway.setText(productDetails.getDistance()*1000 + "m away");
+        if(productDetailsModel.getDistance() < 1.0){
+            holder.distanceAway.setText(productDetailsModel.getDistance()*1000 + "m away");
         } else {
-            holder.distanceAway.setText(productDetails.getDistance() + "km away");
+            holder.distanceAway.setText(productDetailsModel.getDistance() + "km away");
         }
 
         //Get today's date
@@ -235,7 +233,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
 
         //Get date status update was posted
         String dtEnd = currDate;
-        String dtStart = productDetails.getUploadDate();
+        String dtStart = productDetailsModel.getUploadDate();
 
         //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
         //Format both current date and date status update was posted
@@ -247,7 +245,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             Date dateEnd;
 
             //Date dateStart = format.parse(dtStart);
-            String[] timeS = Split(productDetails.getUploadDate());
+            String[] timeS = Split(productDetailsModel.getUploadDate());
             String[] timeT = Split(currDate);
 
             /**
@@ -296,7 +294,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
+            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
                     .placeholder(R.drawable.menu)
                     .error(R.drawable.menu)
                     .into(holder.foodPic);

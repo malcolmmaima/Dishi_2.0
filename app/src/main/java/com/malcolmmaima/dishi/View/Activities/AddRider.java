@@ -2,9 +2,6 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,11 +26,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.OnRiderSelected;
+import com.malcolmmaima.dishi.Controller.Interface.OnRiderSelected;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.AddRiderAdapter;
-import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

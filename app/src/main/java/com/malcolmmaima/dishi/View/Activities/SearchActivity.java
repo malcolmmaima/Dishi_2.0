@@ -6,7 +6,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -28,10 +27,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.FollowerFollowingAdapter;
@@ -39,7 +38,6 @@ import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 import com.malcolmmaima.dishi.View.Adapter.RestaurantAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
@@ -57,7 +55,7 @@ public class SearchActivity extends AppCompatActivity {
     ValueEventListener locationListener;
     RadioButton usersRd, foodRd, restaurantsRd;
     RadioGroup searchPreference;
-    LiveLocation liveLocation;
+    LiveLocationModel liveLocationModel;
     UserModel myDetails;
     String myPhone, selectedPreference;
     private FirebaseAuth mAuth;
@@ -124,11 +122,11 @@ public class SearchActivity extends AppCompatActivity {
                 //Toast.makeText(SearchActivity.this, "ID: " + i, Toast.LENGTH_SHORT).show();
 
                 int searchPrf = searchPreference.getCheckedRadioButtonId();
-                liveLocation = null;
+                liveLocationModel = null;
                 locationListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                        liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
                         //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -292,7 +290,7 @@ public class SearchActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot datasnapshot) {
 
-                    List <ProductDetails> foods = new ArrayList<>();
+                    List <ProductDetailsModel> foods = new ArrayList<>();
                     for(final DataSnapshot restaurants : datasnapshot.getChildren()){
 
                         /**
@@ -325,20 +323,20 @@ public class SearchActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     try {
-                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
+                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
 
                                                         /**
                                                          * Now lets compute distance of each restaurant with customer location
                                                          */
                                                         CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
                                                         //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         for (DataSnapshot menu : restaurants.getChildren()) {
                                                             //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetails product = menu.getValue(ProductDetails.class);
+                                                            ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
                                                             product.accountType = myDetails.getAccount_type();
@@ -404,16 +402,16 @@ public class SearchActivity extends AppCompatActivity {
                                                      * Now lets compute distance of each restaurant with customer location
                                                      */
                                                     try {
-                                                        LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
+                                                        LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
                                                         CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
                                                         //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         for (DataSnapshot menu : restaurants.getChildren()) {
                                                             //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetails product = menu.getValue(ProductDetails.class);
+                                                            ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
                                                             product.accountType = myDetails.getAccount_type();
@@ -538,13 +536,13 @@ public class SearchActivity extends AppCompatActivity {
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                                     try {
-                                                        StaticLocation staticLocation = dataSnapshot.getValue(StaticLocation.class);
+                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
                                                         /**
                                                          * Now lets compute distance of each restaurant with customer location
                                                          */
                                                         CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), staticLocation.getLatitude(), staticLocation.getLongitude(), "K");
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
                                                         //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
@@ -616,15 +614,15 @@ public class SearchActivity extends AppCompatActivity {
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                                     try {
-                                                        LiveLocation restLiveLoc = dataSnapshot.getValue(LiveLocation.class);
+                                                        LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
 
                                                         /**
                                                          * Now lets compute distance of each restaurant with customer location
                                                          */
                                                         CalculateDistance calculateDistance = new CalculateDistance();
 
-                                                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                                                liveLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
                                                         //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 

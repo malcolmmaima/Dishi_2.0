@@ -21,9 +21,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     RecyclerView recyclerview;
     String myPhone, fullName, phone;
     TextView emptyTag;
@@ -48,7 +48,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
 
     Double dist, distance;
     UserModel userModel;
-    LiveLocation myLocation, restaurantLocation;
+    LiveLocationModel myLocation, restaurantLocation;
 
     public static ViewRestaurantMenuFragment newInstance() {
         ViewRestaurantMenuFragment fragment = new ViewRestaurantMenuFragment();
@@ -86,7 +86,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    myLocation = dataSnapshot.getValue(LiveLocation.class);
+                    myLocation = dataSnapshot.getValue(LiveLocationModel.class);
                      distance = computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
                 } catch (Exception e){
 
@@ -105,7 +105,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    restaurantLocation = dataSnapshot.getValue(LiveLocation.class);
+                    restaurantLocation = dataSnapshot.getValue(LiveLocationModel.class);
                     distance = computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
                 }catch (Exception e){
 
@@ -201,11 +201,11 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
 
                 // StringBuffer stringbuffer = new StringBuffer();
                 for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
-                    ProductDetails productDetails = dataSnapshot1.getValue(ProductDetails.class); //Assign values to model
-                    productDetails.setKey(dataSnapshot1.getKey()); //Get item keys, useful when performing delete operations
-                    productDetails.setDistance(distance);
-                    productDetails.accountType = userModel.getAccount_type();
-                    list.add(productDetails);
+                    ProductDetailsModel productDetailsModel = dataSnapshot1.getValue(ProductDetailsModel.class); //Assign values to model
+                    productDetailsModel.setKey(dataSnapshot1.getKey()); //Get item keys, useful when performing delete operations
+                    productDetailsModel.setDistance(distance);
+                    productDetailsModel.accountType = userModel.getAccount_type();
+                    list.add(productDetailsModel);
                     //progressDialog.dismiss();
                 }
 

@@ -1,6 +1,6 @@
 package com.malcolmmaima.dishi.Model;
 
-public class LiveLocation {
+public class LiveLocationModel {
     Double accuracy;
     Double altitude;
     Integer bearing;

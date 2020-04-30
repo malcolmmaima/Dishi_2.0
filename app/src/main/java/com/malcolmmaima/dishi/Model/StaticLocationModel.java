@@ -1,6 +1,6 @@
 package com.malcolmmaima.dishi.Model;
 
-public class StaticLocation {
+public class StaticLocationModel {
     Double latitude;
     Double longitude;
     String place;

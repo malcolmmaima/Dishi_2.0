@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -43,9 +42,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.malcolmmaima.dishi.Controller.CommentKeyBoardFix;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Controller.TimeAgo;
+import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -74,12 +73,12 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     private static final String TAG = "ViewStatusActivity";
     DatabaseReference postRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
-    TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, statusOptions;
+    TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, statusOptions,postedToName;
     ImageView profilePic, imageShare, likePost, comments, sharePost, commentsIcon;
     String myPhone, author;
     Button postStatus;
     EmojiconEditText statusPost;
-    ImageView selectedImage;
+    ImageView selectedImage, postedToPic;
     RecyclerView recyclerView;
     List<StatusUpdateModel> list;
     UserModel authorUser;
@@ -139,6 +138,8 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         emoji.setVisibility(View.GONE);
         imageShare = findViewById(R.id.imageShare);
         statusOptions = findViewById(R.id.statusOptions);
+        postedToPic = findViewById(R.id.postedToPic);
+        postedToName = findViewById(R.id.postedToName);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -163,6 +164,47 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         key = getIntent().getStringExtra("key");
 
         String intentType = getIntent().getStringExtra("type");
+
+        DatabaseReference postedToRef = FirebaseDatabase.getInstance().getReference("users/"+postedTo);
+
+        if(postedTo.equals(myPhone)){
+            postedToPic.setVisibility(View.GONE);
+            postedToName.setVisibility(View.GONE);
+        } else {
+            postedToPic.setVisibility(View.VISIBLE);
+            postedToName.setVisibility(View.VISIBLE);
+
+            postedToRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    UserModel postedToUser = dataSnapshot.getValue(UserModel.class);
+
+                    postedToName.setText(postedToUser.getFirstname()+" "+postedToUser.getLastname());
+                    //Set profile pic
+                    Picasso.with(ViewStatus.this).load(postedToUser.getProfilePic()).fit().centerCrop()
+                            .placeholder(R.drawable.default_profile)
+                            .error(R.drawable.default_profile)
+                            .into(postedToPic);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        postedToName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(ViewStatus.this, ViewProfile.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
+                slideactivity.putExtra("phone", postedTo);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(ViewStatus.this, R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+            }
+        });
 
         if(intentType != null){
             //update the notification in db to seen = true

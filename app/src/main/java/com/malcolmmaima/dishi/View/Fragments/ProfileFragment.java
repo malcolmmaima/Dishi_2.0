@@ -1,6 +1,5 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,7 +27,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.common.collect.Range;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -42,16 +39,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.FollowersFollowing;
-import com.malcolmmaima.dishi.View.Activities.Inbox;
-import com.malcolmmaima.dishi.View.Activities.NewChat;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
-import com.malcolmmaima.dishi.View.Activities.ViewProfile;
-import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
 

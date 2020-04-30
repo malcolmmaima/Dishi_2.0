@@ -18,7 +18,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,7 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
@@ -50,7 +49,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewMyOrders extends AppCompatActivity {
 
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     String myPhone, phone, restaurantName, riderPhone;
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
@@ -169,7 +168,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                         tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
                                                     } catch (Exception e){}
                                                     try {
-                                                        ProductDetails prod = items.getValue(ProductDetails.class);
+                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                                                         prod.setKey(items.getKey());
 
                                                         /**
@@ -232,7 +231,7 @@ public class ViewMyOrders extends AppCompatActivity {
                 for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
                     try {
-                        ProductDetails prod = items.getValue(ProductDetails.class);
+                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                         prod.setKey(items.getKey());
                         list.add(prod);
 
@@ -447,7 +446,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
                                             } catch (Exception e){}
                                             try {
-                                                ProductDetails prod = items.getValue(ProductDetails.class);
+                                                ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                                                 prod.setKey(items.getKey());
 
                                                 /**
@@ -608,7 +607,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
 
                                                     try {
-                                                        ProductDetails prod = items.getValue(ProductDetails.class);
+                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                                                         prod.setKey(items.getKey());
 
                                                         /**
@@ -671,7 +670,7 @@ public class ViewMyOrders extends AppCompatActivity {
                 for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
                     try {
-                        ProductDetails prod = items.getValue(ProductDetails.class);
+                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                         prod.setKey(items.getKey());
                         list.add(prod);
 

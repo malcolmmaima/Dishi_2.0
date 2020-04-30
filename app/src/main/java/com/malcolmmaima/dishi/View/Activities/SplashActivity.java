@@ -2,16 +2,12 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -22,7 +18,6 @@ import androidx.core.content.ContextCompat;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,7 +29,7 @@ import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
 
-import com.malcolmmaima.dishi.Controller.PreferenceManager;
+import com.malcolmmaima.dishi.Controller.Utils.PreferenceManager;
 
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.services.common.SafeToast;

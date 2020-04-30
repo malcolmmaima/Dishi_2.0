@@ -8,16 +8,11 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
-import androidx.core.widget.TextViewCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,32 +24,27 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TrackingService;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class CheckOut extends AppCompatActivity {
 
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     AppCompatButton orderBtn;
     CardView PaymentMethod, DeliveryAddress;
     EditText remarks;
@@ -199,7 +189,7 @@ public class CheckOut extends AppCompatActivity {
         final String orderDate = currentDate.getDate();
 
         //for static location preference
-        final StaticLocation staticLocation = new StaticLocation();
+        final StaticLocationModel staticLocationModel = new StaticLocationModel();
 
         /**
          * Loop through my cart items and add to list Array before passing to adapter
@@ -218,7 +208,7 @@ public class CheckOut extends AppCompatActivity {
                 }
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
-                    final ProductDetails product = cart.getValue(ProductDetails.class);
+                    final ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
 
                     product.setPaymentMethod(selectedPaymentMethod);
                     product.setAddress(locationSet);
@@ -234,11 +224,11 @@ public class CheckOut extends AppCompatActivity {
                     ordersRef.child(myPhone).child("remarks").setValue(myRemarks);
 
                     if(locationSet.equals("static")){
-                        staticLocation.setLatitude(lat);
-                        staticLocation.setLongitude(lng);
-                        staticLocation.setPlace(placeName);
+                        staticLocationModel.setLatitude(lat);
+                        staticLocationModel.setLongitude(lng);
+                        staticLocationModel.setPlace(placeName);
 
-                        ordersRef.child(myPhone).child("static_address").setValue(staticLocation);
+                        ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel);
                     }
 
                     //Loop has reached the end

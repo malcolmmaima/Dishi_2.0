@@ -37,15 +37,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.CalculateDistance;
-import com.malcolmmaima.dishi.Controller.OnOrderChecked;
-import com.malcolmmaima.dishi.Controller.TrackingService;
-import com.malcolmmaima.dishi.Model.LiveLocation;
-import com.malcolmmaima.dishi.Model.ProductDetails;
-import com.malcolmmaima.dishi.Model.StaticLocation;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Controller.Interface.OnOrderChecked;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 import com.squareup.picasso.Picasso;
@@ -58,7 +56,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewCustomerOrder extends AppCompatActivity implements OnOrderChecked {
     String TAG = "ViewCustomerOrder";
-    List<ProductDetails> list;
+    List<ProductDetailsModel> list;
     String myPhone, phone, customerName, restaurantPhone;
     FirebaseUser user;
     DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
@@ -70,8 +68,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
     CardView DeliveryAddress, OrderStatus;
-    LiveLocation liveLocation;
-    StaticLocation deliveryLocation;
+    LiveLocationModel liveLocationModel;
+    StaticLocationModel deliveryLocation;
     ValueEventListener locationListener;
     Menu myMenu;
     List<String> myRiders, ridersName;
@@ -243,12 +241,12 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
          */
 
         try {
-            liveLocation = null;
+            liveLocationModel = null;
             locationListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
-                        liveLocation = dataSnapshot.getValue(LiveLocation.class);
+                        liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
                         //SafeToast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
                         /**
@@ -256,8 +254,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                          */
 
                         CalculateDistance calculateDistance = new CalculateDistance();
-                        Double dist = calculateDistance.distance(liveLocation.getLatitude(),
-                                liveLocation.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
+                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                liveLocationModel.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
 
                         SafeToast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -303,7 +301,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
                     try {
-                        ProductDetails prod = items.getValue(ProductDetails.class);
+                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
                         prod.setKey(items.getKey());
                         prod.accountType = accType;
                         list.add(prod);

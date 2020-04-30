@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.Controller;
+package com.malcolmmaima.dishi.Controller.Utils;
 
 import java.util.Date;
 import java.util.LinkedHashMap;

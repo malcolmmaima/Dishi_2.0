@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,13 +32,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.GetCurrentDate;
-import com.malcolmmaima.dishi.Model.ProductDetails;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.AddMenu;
-import com.malcolmmaima.dishi.View.Activities.CustomerActivity;
-import com.malcolmmaima.dishi.View.Activities.MyNotifications;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProduct;
@@ -53,10 +49,10 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder>{
 
     Context context;
-    List<ProductDetails> listdata;
+    List<ProductDetailsModel> listdata;
     long DURATION = 200;
 
-    public ProductAdapter(Context context, List<ProductDetails> listdata) {
+    public ProductAdapter(Context context, List<ProductDetailsModel> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
@@ -71,7 +67,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     }
 
     public void onBindViewHolder(final ProductAdapter.MyHolder holder, final int position) {
-        final ProductDetails productDetails = listdata.get(position);
+        final ProductDetailsModel productDetailsModel = listdata.get(position);
 
         /**
          * Adapter animation
@@ -82,11 +78,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
          * Set widget values
          **/
 
-        holder.foodPrice.setText("Ksh "+productDetails.getPrice());
-        holder.foodName.setText(productDetails.getName());
+        holder.foodPrice.setText("Ksh "+ productDetailsModel.getPrice());
+        holder.foodName.setText(productDetailsModel.getName());
 
         //Fetch restaurant user details
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+productDetails.getOwner());
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("users/"+ productDetailsModel.getOwner());
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -106,10 +102,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         });
 
         try {
-            if (productDetails.getDescription().length() > 89) {
-                holder.foodDescription.setText(productDetails.getDescription().substring(0, 80) + "...");
+            if (productDetailsModel.getDescription().length() > 89) {
+                holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
             } else {
-                holder.foodDescription.setText(productDetails.getDescription());
+                holder.foodDescription.setText(productDetailsModel.getDescription());
             }
         } catch (Exception e){
 
@@ -145,7 +141,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                         removeFavourite.setVisible(false);
                         favouriteOption.setVisible(false);
                     } else {
-                        myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        myFoodFavourites.child(productDetailsModel.getOwner()).child(productDetailsModel.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if(dataSnapshot.exists()){
@@ -192,7 +188,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                             case R.id.favourite:
 
                                 //First lets check if the restaurant still has this particular product in their menu
-                                DatabaseReference menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey());
+                                DatabaseReference menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey());
                                 menuExistRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -201,11 +197,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                                         } else {
                                             //Add to my favourites
                                             DatabaseReference myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
-                                            myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            myFoodFavourites.child(productDetailsModel.getOwner()).child(productDetailsModel.getKey()).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     //Add to global restaurant likes
-                                                    DatabaseReference favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey()+"/likes");
+                                                    DatabaseReference favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey()+"/likes");
                                                     favouritesTotalRef.child(myPhone).setValue("fav").addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
@@ -232,10 +228,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
 
                             case R.id.removefavourite:
                                 ////Remove from my favourites
-                                myFoodFavourites.child(productDetails.getOwner()).child(productDetails.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                myFoodFavourites.child(productDetailsModel.getOwner()).child(productDetailsModel.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        DatabaseReference favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey()+"/likes");
+                                        DatabaseReference favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey()+"/likes");
                                         favouritesTotalRef.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
@@ -253,15 +249,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                             case R.id.report:
                                 final AlertDialog reportProduct = new AlertDialog.Builder(context)
                                         //set message, title, and icon
-                                        .setMessage("Report "+ productDetails.getName()+"?")
+                                        .setMessage("Report "+ productDetailsModel.getName()+"?")
                                         //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                                         //set three option buttons
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                 Intent slideactivity = new Intent(context, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 slideactivity.putExtra("type", "product");
-                                                slideactivity.putExtra("owner", productDetails.getOwner());
-                                                slideactivity.putExtra("productKey", productDetails.getKey());
+                                                slideactivity.putExtra("owner", productDetailsModel.getOwner());
+                                                slideactivity.putExtra("productKey", productDetailsModel.getKey());
                                                 context.startActivity(slideactivity);
                                             }
                                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -292,15 +288,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewProduct.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("key", productDetails.getKey());
-                slideactivity.putExtra("restaurant", productDetails.getOwner());
+                slideactivity.putExtra("key", productDetailsModel.getKey());
+                slideactivity.putExtra("restaurant", productDetailsModel.getOwner());
                 slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
-                slideactivity.putExtra("product", productDetails.getName());
-                slideactivity.putExtra("description", productDetails.getDescription());
-                slideactivity.putExtra("price", productDetails.getPrice());
-                slideactivity.putExtra("imageUrl", productDetails.getImageURL());
-                slideactivity.putExtra("distance", productDetails.getDistance());
-                slideactivity.putExtra("accType", productDetails.accountType);
+                slideactivity.putExtra("product", productDetailsModel.getName());
+                slideactivity.putExtra("description", productDetailsModel.getDescription());
+                slideactivity.putExtra("price", productDetailsModel.getPrice());
+                slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
+                slideactivity.putExtra("distance", productDetailsModel.getDistance());
+                slideactivity.putExtra("accType", productDetailsModel.accountType);
 
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
@@ -312,7 +308,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
          * Add item to cart
          */
 
-        if(!productDetails.accountType.equals("1")){
+        if(!productDetailsModel.accountType.equals("1")){
             holder.addToCart.setVisibility(View.GONE);
         }
 
@@ -320,7 +316,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             @Override
             public void onClick(final View v) {
                 DatabaseReference menuExistRef = FirebaseDatabase.getInstance()
-                        .getReference("menus/"+productDetails.getOwner()+"/"+productDetails.getKey());
+                        .getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey());
                 ValueEventListener existsListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -345,15 +341,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                             String cartDate = currentDate.getDate();
 
                             String key = myCartRef.push().getKey();
-                            ProductDetails cartProduct = new ProductDetails();
-                            cartProduct.setName(productDetails.getName());
-                            cartProduct.setPrice(productDetails.getPrice());
-                            cartProduct.setDescription(productDetails.getDescription());
-                            cartProduct.setImageURL(productDetails.getImageURL());
-                            cartProduct.setOwner(productDetails.getOwner());
-                            cartProduct.setOriginalKey(productDetails.getKey());
+                            ProductDetailsModel cartProduct = new ProductDetailsModel();
+                            cartProduct.setName(productDetailsModel.getName());
+                            cartProduct.setPrice(productDetailsModel.getPrice());
+                            cartProduct.setDescription(productDetailsModel.getDescription());
+                            cartProduct.setImageURL(productDetailsModel.getImageURL());
+                            cartProduct.setOwner(productDetailsModel.getOwner());
+                            cartProduct.setOriginalKey(productDetailsModel.getKey());
                             cartProduct.setQuantity(1);
-                            cartProduct.setDistance(productDetails.getDistance());
+                            cartProduct.setDistance(productDetailsModel.getDistance());
                             cartProduct.setUploadDate(cartDate);
 
                             myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -387,15 +383,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             public void onClick(View v) {
                 Intent slideactivity = new Intent(context, ViewImage.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", productDetails.getImageURL());
+                slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
                 context.startActivity(slideactivity);
             }
         });
 
-        if(productDetails.getDistance() < 1.0){
-            holder.distanceAway.setText(productDetails.getDistance()*1000 + "m away");
+        if(productDetailsModel.getDistance() < 1.0){
+            holder.distanceAway.setText(productDetailsModel.getDistance()*1000 + "m away");
         } else {
-            holder.distanceAway.setText(productDetails.getDistance() + "km away");
+            holder.distanceAway.setText(productDetailsModel.getDistance() + "km away");
 
         }
 
@@ -404,7 +400,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetails.getImageURL()).fit().centerCrop()
+            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
                     .placeholder(R.drawable.menu)
                     .error(R.drawable.menu)
                     .into(holder.foodPic);
