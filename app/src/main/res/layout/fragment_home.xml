@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorBackroundWhite"
+    android:id="@+id/activity_main"
     tools:context=".View.Fragments.HomeFragment">
 
     <LinearLayout
@@ -23,7 +25,104 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:id="@+id/frame"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <ImageButton
+            android:id="@+id/emoji"
+            android:src="@drawable/emoji"
+            android:background="@drawable/layout_bg1"
+            android:layout_width="36dp"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:elevation="1dp"
+            android:layout_gravity="right|bottom"
+            android:layout_height="40dp" />
+
+        <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+            android:id="@+id/myStatus"
+            android:hint="Say something..."
+            android:background="@drawable/layout_bg"
+            android:textSize="18sp"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="100dp"
+            android:padding="10dp"
+            android:paddingRight="20dp"
+            android:inputType="textMultiLine"
+            android:minHeight="36dp"
+            android:shadowRadius="10"
+            emojicon:emojiconSize="28sp"
+            android:autofillHints="" />
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_below="@id/frame"
+        android:id="@+id/statusActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:indeterminate="false"
+            android:max="100"
+            android:minHeight="20dp"
+            android:minWidth="200dp"
+            android:visibility="gone"
+            android:progress="1" />
+
+
+        <ImageView
+            android:layout_below="@id/progressBar"
+            android:visibility="gone"
+            android:layout_margin="5dp"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/selectedImage"
+            android:layout_width="70dp"
+            android:layout_height="70dp" />
+
+        <ImageButton
+            android:layout_below="@id/progressBar"
+            android:layout_toLeftOf="@id/postStatus"
+            android:visibility="visible"
+            android:id="@+id/camera"
+            android:src="@drawable/camera"
+            android:background="@drawable/layout_bg1"
+            android:layout_marginLeft="15dp"
+            android:scaleType="fitCenter"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="TODO" />
+
+        <Button
+            android:layout_below="@id/progressBar"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:id="@+id/postStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:shadowRadius="5"
+            android:text="Post" />
+    </RelativeLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_below="@id/statusActions"
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

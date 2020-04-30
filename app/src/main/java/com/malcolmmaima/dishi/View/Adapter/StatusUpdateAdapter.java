@@ -436,7 +436,19 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                 DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
-                                                postDetails.removeValue();
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        //remember if by any chance we decide to change the status check listener(to live listener)
+                                                        // that does this same operation, then make sure to comment below out
+                                                        try {
+                                                            listdata.remove(position);
+                                                            notifyItemRemoved(position);
+                                                        } catch (Exception e){
+                                                            Log.d(TAG, "statusUpdate: error " + e.getMessage());
+                                                        }
+                                                    }
+                                                });
                                             }
                                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {

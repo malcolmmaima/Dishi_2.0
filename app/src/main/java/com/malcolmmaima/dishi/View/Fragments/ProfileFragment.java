@@ -27,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -405,6 +406,10 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
 
+                myStatusUpdate.setEnabled(false);
+                imageUpload.setEnabled(false);
+                postBtn.setEnabled(false);
+
                 if(myStatusUpdate.getText().toString().equals("") && selectedImage.isShown()){
                     uploadImage(); //This will upload image then on successful upload call uploadContent()
                 }
@@ -412,6 +417,9 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 else if(myStatusUpdate.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                    myStatusUpdate.setEnabled(true);
+                    imageUpload.setEnabled(true);
+                    postBtn.setEnabled(true);
                 }
 
                 else {
@@ -464,6 +472,11 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void onSuccess(Void aVoid) {
                 mSwipeRefreshLayout.setRefreshing(false);
+
+                myStatusUpdate.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postBtn.setEnabled(true);
+
                 myStatusUpdate.setText("");
                 myStatusUpdate.clearFocus();
                 statusUpdate.key = key;
@@ -477,6 +490,18 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 recyclerview.setLayoutManager(layoutmanager);
                 recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                myStatusUpdate.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postBtn.setEnabled(true);
+                try {
+                    Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                } catch (Exception er){
+                    Log.e(TAG, "onFailure: ", e);
+                }
             }
         });
     }

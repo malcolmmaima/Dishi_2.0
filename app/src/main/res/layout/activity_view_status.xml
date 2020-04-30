@@ -47,14 +47,16 @@
                     android:src="@drawable/default_profile"
                     app:view_shadowRadius="2dp"
                     app:view_shadowDx="2dp"
+                    android:layout_marginTop="5dp"
                     app:view_shadowDy="0dp"
                     app:view_borderWidth="2dp"
                     app:view_borderColor="#cccccc"
-                    android:background="@color/pureWhite"
+                    android:background="@color/colorBackroundWhite"
                     android:scaleType="fitXY"
                     />
 
                 <TextView
+                    android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-light"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -66,15 +68,10 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/card_view"
-                    android:layout_width="392dp"
-                    android:layout_height="190dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_below="@id/postedToPic"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="-7dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginBottom="5dp"
+                    android:layout_margin="5dp"
                     android:clickable="false"
                     android:focusableInTouchMode="false"
                     card_view:cardCornerRadius="5dp"
@@ -191,6 +188,12 @@
                                     android:paddingBottom="2dp"
                                     android:src="@drawable/unliked" />
 
+                                <TextView
+                                    android:id="@+id/likesTotal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0" />
+
                                 <ImageView
                                     android:id="@+id/comments"
                                     android:layout_width="40dp"
@@ -209,19 +212,6 @@
                                     android:paddingBottom="6dp"
                                     android:src="@drawable/share"
                                     android:visibility="gone" />
-
-                                <ImageView
-                                    android:id="@+id/deleteBtn"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    android:background="@drawable/ic_delete_black_48dp"
-                                    android:visibility="gone" />
-
-                                <TextView
-                                    android:id="@+id/likesTotal"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0" />
 
                                 <TextView
                                     android:id="@+id/commentsTotal"

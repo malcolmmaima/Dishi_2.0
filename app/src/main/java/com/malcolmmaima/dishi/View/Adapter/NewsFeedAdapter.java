@@ -489,7 +489,17 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                 DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
-                                                postDetails.removeValue();
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        try {
+                                                            listdata.remove(position);
+                                                            notifyItemRemoved(position);
+                                                        } catch (Exception e){
+                                                            Log.e(TAG, "NewsFeedAdapter: error ", e);
+                                                        }
+                                                    }
+                                                });
                                             }
                                         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -708,7 +718,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
         ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
         animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
-        animator.setDuration(500);
+        animator.setDuration(300);
         animatorSet.play(animator);
         animator.start();
     }

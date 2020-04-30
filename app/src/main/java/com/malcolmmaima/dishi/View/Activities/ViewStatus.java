@@ -31,6 +31,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -167,7 +168,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
         DatabaseReference postedToRef = FirebaseDatabase.getInstance().getReference("users/"+postedTo);
 
-        if(postedTo.equals(myPhone)){
+        if(postedTo.equals(myPhone) || postedTo.equals(author)){
             postedToPic.setVisibility(View.GONE);
             postedToName.setVisibility(View.GONE);
         } else {
@@ -617,7 +618,9 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
-
+                statusPost.setEnabled(false);
+                imageUpload.setEnabled(false);
+                postStatus.setEnabled(false);
 
                 if(statusPost.getText().toString().equals("") && selectedImage.isShown()){
                     uploadImage(); //This will upload image then on successful upload call uploadContent()
@@ -625,6 +628,9 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                 else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
+                    statusPost.setEnabled(true);
+                    imageUpload.setEnabled(true);
+                    postStatus.setEnabled(true);
                     SafeToast.makeText(ViewStatus.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -1400,6 +1406,10 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                statusPost.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postStatus.setEnabled(true);
+
                 if(!author.equals(myPhone)){
                     //Send notification to author
                     DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+author);
@@ -1441,6 +1451,18 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 recyclerView.setLayoutManager(layoutmanager);
                 recycler.notifyDataSetChanged();
                 recyclerView.setAdapter(recycler);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                statusPost.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postStatus.setEnabled(true);
+                try {
+                    Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                } catch (Exception er){
+                    Log.e(TAG, "onFailure: ", e);
+                }
             }
         });
     }

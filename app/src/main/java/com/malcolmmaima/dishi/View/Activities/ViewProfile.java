@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.alexzh.circleimageview.CircleImageView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -552,12 +553,18 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
+                myStatusUpdate.setEnabled(false);
+                imageUpload.setEnabled(false);
+                postBtn.setEnabled(false);
                 if(myStatusUpdate.getText().toString().equals("") && selectedImage.isShown()){
                     uploadImage(); //This will upload image then on successful upload call uploadContent()
                 }
 
                 else if(myStatusUpdate.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
+                    myStatusUpdate.setEnabled(true);
+                    imageUpload.setEnabled(true);
+                    postBtn.setEnabled(true);
                     SafeToast.makeText(ViewProfile.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -828,6 +835,9 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                myStatusUpdate.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postBtn.setEnabled(true);
 
                 DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
 
@@ -858,6 +868,18 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 recyclerview.setLayoutManager(layoutmanager);
                 recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                myStatusUpdate.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postBtn.setEnabled(true);
+                try {
+                    Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                } catch (Exception er){
+                    Log.e(TAG, "onFailure: ", e);
+                }
             }
         });
     }

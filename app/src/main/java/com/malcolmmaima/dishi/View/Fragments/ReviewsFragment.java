@@ -25,6 +25,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -194,6 +195,9 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void onClick(View v) {
                 mSwipeRefreshLayout.setRefreshing(true);
+                myReview.setEnabled(false);
+                imageUpload.setEnabled(false);
+                postBtn.setEnabled(false);
 
                 if(myReview.getText().toString().equals("") && selectedImage.isShown()){
                     uploadImage(); //This will upload image then on successful upload call uploadContent()
@@ -201,6 +205,9 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 else if(myReview.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
+                    myReview.setEnabled(true);
+                    imageUpload.setEnabled(true);
+                    postBtn.setEnabled(true);
                     SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -255,6 +262,9 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         myReviewsRef.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                myReview.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postBtn.setEnabled(true);
 
                 DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
 
@@ -285,6 +295,18 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 recyclerview.setLayoutManager(layoutmanager);
                 recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                myReview.setEnabled(true);
+                imageUpload.setEnabled(true);
+                postBtn.setEnabled(true);
+                try {
+                    Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                } catch (Exception er){
+                    Log.e(TAG, "onFailure: ", e);
+                }
             }
         });
     }
