@@ -161,7 +161,7 @@ public class SetupAccountType extends AppCompatActivity {
 
                     final AlertDialog proceedAcc = new AlertDialog.Builder(SetupAccountType.this)
                             //set message, title, and icon
-                            .setMessage("Proceed as restaurant?")
+                            .setMessage("Proceed as vendor?")
                             //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {

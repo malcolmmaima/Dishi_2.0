@@ -119,7 +119,7 @@ public class CustomerOrderFragment extends Fragment {
 
         Adapter adapter = new Adapter(getChildFragmentManager());
         adapter.addFragment(new FragmentFood(), "Food");
-        adapter.addFragment(new FragmentRestaurants(), "Restaurants");
+        adapter.addFragment(new FragmentRestaurants(), "Vendors");
         viewPager.setAdapter(adapter);
 
     }

@@ -56,28 +56,28 @@ import java.util.List;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 
-public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapter.MyHolder> {
+public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHolder> {
 
     Context context;
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
     String TAG = "StatusAdapter";
 
-    public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
+    public NewsFeedAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
         this.context = context;
     }
 
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_status_update,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_newsfeed,parent,false);
 
         MyHolder myHolder = new MyHolder(view);
         return myHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final StatusUpdateAdapter.MyHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final NewsFeedAdapter.MyHolder holder, final int position) {
 
         StatusUpdateModel statusUpdateModel = listdata.get(position);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -491,7 +491,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         holder.profileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!myPhone.equals(statusUpdateModel.getAuthor()) && !statusUpdateModel.getPostedTo().equals(statusUpdateModel.getAuthor())){
+                if(!myPhone.equals(statusUpdateModel.getAuthor())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
                             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
@@ -585,7 +585,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             @Override
             public void onClick(View view) {
                 Intent slideactivity = new Intent(context, ViewStatus.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 slideactivity.putExtra("author", statusUpdateModel.getAuthor());
                 slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
                 slideactivity.putExtra("key", statusUpdateModel.key);

@@ -8,7 +8,7 @@
         android:id="@+id/callRestaurant"
         android:icon="@drawable/ic_phone_black_24dp"
         app:showAsAction="always"
-        android:title="Call Restaurant" />
+        android:title="Call Vendor" />
 
     <item
         android:id="@+id/sendMessage"

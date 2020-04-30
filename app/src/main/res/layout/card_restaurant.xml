@@ -48,7 +48,7 @@
                         android:padding="16dp"
                         android:textSize="20dp"
                         android:textColor="#FFFFFF"
-                        android:text="Restaurant"
+                        android:text="Vendor"
                         android:textStyle="bold" />
                 </LinearLayout>
             </FrameLayout>

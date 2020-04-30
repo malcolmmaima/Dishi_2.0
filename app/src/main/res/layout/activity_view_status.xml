@@ -342,17 +342,19 @@
             android:stackFromBottom="true"
             />
 
-            <TextView
-            android:layout_below="@id/card_view"
-            android:id="@+id/empty_tag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NO COMMENTS"
-            android:textSize="40dp"
-            android:layout_marginTop="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="invisible"/>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_below="@id/card_view"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp"
+                    android:id="@+id/commentsIcon"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:visibility="visible"
+                    android:src="@drawable/comments_big"/>
+
             </RelativeLayout>
         </ScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

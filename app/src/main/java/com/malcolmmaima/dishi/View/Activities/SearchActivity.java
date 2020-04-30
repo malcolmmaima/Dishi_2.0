@@ -157,8 +157,8 @@ public class SearchActivity extends AppCompatActivity {
                     myLocationRef.addValueEventListener(locationListener);
                 }
 
-                if(selectedPreference.equals("Restaurants")){
-                    emptyTag.setText("Restaurants");
+                if(selectedPreference.equals("Vendors")){
+                    emptyTag.setText("Vendors");
                     emptyTag.setVisibility(VISIBLE);
                     myLocationRef.addValueEventListener(locationListener);
 
@@ -501,7 +501,7 @@ public class SearchActivity extends AppCompatActivity {
 
         }
 
-        if(selectedPreference.equals("Restaurants")){
+        if(selectedPreference.equals("Vendors")){
             databaseReference.child("menus").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot datasnapshot) {

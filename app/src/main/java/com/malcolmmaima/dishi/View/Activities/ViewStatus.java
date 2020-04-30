@@ -74,8 +74,8 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     private static final String TAG = "ViewStatusActivity";
     DatabaseReference postRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
-    TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted, statusOptions;
-    ImageView profilePic, imageShare, likePost, comments, sharePost;
+    TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, statusOptions;
+    ImageView profilePic, imageShare, likePost, comments, sharePost, commentsIcon;
     String myPhone, author;
     Button postStatus;
     EmojiconEditText statusPost;
@@ -133,7 +133,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.rview);
         recyclerView.setNestedScrollingEnabled(false);
-        emptyTag = findViewById(R.id.empty_tag);
+        commentsIcon = findViewById(R.id.commentsIcon);
         timePosted = findViewById(R.id.timePosted);
         emoji = findViewById(R.id.emoji);
         emoji.setVisibility(View.GONE);
@@ -1178,7 +1178,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 try {
                     mSwipeRefreshLayout.setRefreshing(false);
                     if (!list.isEmpty()) {
-                        emptyTag.setVisibility(INVISIBLE);
+                        commentsIcon.setVisibility(INVISIBLE);
                         //Collections.reverse(list);
                         recyclerView.setVisibility(View.VISIBLE);
                         CommentAdapter recycler = new CommentAdapter(ViewStatus.this, list);
@@ -1189,7 +1189,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                         recyclerView.setAdapter(recycler);
                     } else {
-                        emptyTag.setVisibility(View.VISIBLE);
+                        commentsIcon.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(INVISIBLE);
                     }
                 }
@@ -1393,7 +1393,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 list.add(comment);
 
                 recyclerView.setVisibility(View.VISIBLE);
-                emptyTag.setVisibility(View.GONE);
+                commentsIcon.setVisibility(View.GONE);
                 CommentAdapter recycler = new CommentAdapter(ViewStatus.this, list);
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewStatus.this);
                 recyclerView.setLayoutManager(layoutmanager);
