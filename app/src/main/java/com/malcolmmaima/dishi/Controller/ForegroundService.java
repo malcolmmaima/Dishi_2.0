@@ -364,11 +364,14 @@ public class ForegroundService extends Service {
         notificationsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                NotificationModel newNotification = dataSnapshot.getValue(NotificationModel.class);
-                newNotification.key = dataSnapshot.getKey();
-
-                int notifId = new Random().nextInt();
-                sendSocialNotification(notifId, newNotification);
+                try {
+                    NotificationModel newNotification = dataSnapshot.getValue(NotificationModel.class);
+                    newNotification.key = dataSnapshot.getKey();
+                    int notifId = new Random().nextInt();
+                    sendSocialNotification(notifId, newNotification);
+                }catch (Exception er){
+                    Log.e(TAG, "onChildAdded: ", er);
+                }
             }
 
             @Override
