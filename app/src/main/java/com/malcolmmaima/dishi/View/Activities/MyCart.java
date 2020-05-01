@@ -389,6 +389,11 @@ public class MyCart extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchCart();
+    }
 
     @Override
     protected void onDestroy() {

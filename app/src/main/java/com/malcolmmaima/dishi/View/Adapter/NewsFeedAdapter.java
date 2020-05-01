@@ -659,8 +659,6 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
     public void onViewDetachedFromWindow(@NonNull MyHolder holder) {
         super.onViewDetachedFromWindow(holder);
 
-        Log.d(TAG, "onViewDetachedFromWindow: "+ listdata.get(holder.getAdapterPosition()).getStatus());
-
     }
 
     @Override

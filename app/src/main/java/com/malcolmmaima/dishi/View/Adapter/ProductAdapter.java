@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,6 +49,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder>{
+    String TAG = "ProductAdapter";
 
     Context context;
     List<ProductDetailsModel> listdata;
@@ -68,7 +71,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
 
     public void onBindViewHolder(final ProductAdapter.MyHolder holder, final int position) {
         final ProductDetailsModel productDetailsModel = listdata.get(position);
-
+        int[] clickCount = new int[listdata.size()];
         /**
          * Adapter animation
          */
@@ -312,66 +315,185 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             holder.addToCart.setVisibility(View.GONE);
         }
 
+        clickCount[position] = 0;
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                DatabaseReference menuExistRef = FirebaseDatabase.getInstance()
-                        .getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey());
-                ValueEventListener existsListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){ //Does not exist!
+                clickCount[position]++;
+                //Clearly this user wants to add multiple items of the same, take them to view product so they can add as many as they want
+                if(clickCount[position] > 2){
+                    clickCount[position] = 0; //reset back to zero
+                    Intent slideactivity = new Intent(context, ViewProduct.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("key", productDetailsModel.getKey());
+                    slideactivity.putExtra("restaurant", productDetailsModel.getOwner());
+                    slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
+                    slideactivity.putExtra("product", productDetailsModel.getName());
+                    slideactivity.putExtra("description", productDetailsModel.getDescription());
+                    slideactivity.putExtra("price", productDetailsModel.getPrice());
+                    slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
+                    slideactivity.putExtra("distance", productDetailsModel.getDistance());
+                    slideactivity.putExtra("accType", productDetailsModel.accountType);
 
-                            SafeToast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
-                        }
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                    SafeToast.makeText(context, "Please add multiple from here", Toast.LENGTH_LONG).show();
+                } else {
+                    DatabaseReference menuExistRef = FirebaseDatabase.getInstance()
+                            .getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey());
+                    ValueEventListener existsListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(!dataSnapshot.exists()){ //Does not exist!
 
-                        else {
-                            try {
-                                Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
-                            } catch(Exception e){
-
+                                SafeToast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
                             }
 
-                            String myPhone;
-                            myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
-                            DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+                            else {
+                                try {
+                                    Snackbar.make(v.getRootView(), "Adding...", Snackbar.LENGTH_LONG).show();
+                                } catch(Exception e){
 
-                            //Get current date
-                            GetCurrentDate currentDate = new GetCurrentDate();
-                            String cartDate = currentDate.getDate();
+                                }
 
-                            String key = myCartRef.push().getKey();
-                            ProductDetailsModel cartProduct = new ProductDetailsModel();
-                            cartProduct.setName(productDetailsModel.getName());
-                            cartProduct.setPrice(productDetailsModel.getPrice());
-                            cartProduct.setDescription(productDetailsModel.getDescription());
-                            cartProduct.setImageURL(productDetailsModel.getImageURL());
-                            cartProduct.setOwner(productDetailsModel.getOwner());
-                            cartProduct.setOriginalKey(productDetailsModel.getKey());
-                            cartProduct.setQuantity(1);
-                            cartProduct.setDistance(productDetailsModel.getDistance());
-                            cartProduct.setUploadDate(cartDate);
+                                //Check to see if this item already exists in cart, if yes, increment quantity
+                                DatabaseReference cartItemExistsRef = FirebaseDatabase
+                                        .getInstance().getReference("cart/"+myPhone);
+                                cartItemExistsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(!dataSnapshot.hasChildren()){
+                                            //cart is empty, add a fresh
+                                            String myPhone;
+                                            myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+                                            DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
 
-                            myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    try {
-                                        Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
-                                    } catch (Exception e){
+                                            //Get current date
+                                            GetCurrentDate currentDate = new GetCurrentDate();
+                                            String cartDate = currentDate.getDate();
+
+                                            String key = myCartRef.push().getKey();
+                                            ProductDetailsModel cartProduct = new ProductDetailsModel();
+                                            cartProduct.setName(productDetailsModel.getName());
+                                            cartProduct.setPrice(productDetailsModel.getPrice());
+                                            cartProduct.setDescription(productDetailsModel.getDescription());
+                                            cartProduct.setImageURL(productDetailsModel.getImageURL());
+                                            cartProduct.setOwner(productDetailsModel.getOwner());
+                                            cartProduct.setOriginalKey(productDetailsModel.getKey());
+                                            cartProduct.setQuantity(1);
+                                            cartProduct.setDistance(productDetailsModel.getDistance());
+                                            cartProduct.setUploadDate(cartDate);
+
+                                            myCartRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    try {
+                                                        Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
+                                                    } catch (Exception e){
+
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    try {
+                                                        Snackbar.make(v.getRootView(), "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                                    } catch(Exception er){
+                                                        Log.e(TAG, "onFailure: ", er);
+                                                    }
+                                                }
+                                            });
+                                        } else {
+
+                                            //Get current date
+                                            GetCurrentDate currentDate = new GetCurrentDate();
+                                            String cartDate = currentDate.getDate();
+
+                                            String key = cartItemExistsRef.push().getKey();
+                                            ProductDetailsModel cartProduct = new ProductDetailsModel();
+                                            cartProduct.setName(productDetailsModel.getName());
+                                            cartProduct.setPrice(productDetailsModel.getPrice());
+                                            cartProduct.setDescription(productDetailsModel.getDescription());
+                                            cartProduct.setImageURL(productDetailsModel.getImageURL());
+                                            cartProduct.setOwner(productDetailsModel.getOwner());
+                                            cartProduct.setOriginalKey(productDetailsModel.getKey());
+                                            cartProduct.setQuantity(1);
+                                            cartProduct.setDistance(productDetailsModel.getDistance());
+                                            cartProduct.setUploadDate(cartDate);
+
+                                            cartItemExistsRef.child(key).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    try {
+                                                        Snackbar.make(v.getRootView(), "Added to cart", Snackbar.LENGTH_LONG).show();
+                                                    } catch (Exception e){
+
+                                                    }
+
+                                                    for(DataSnapshot cartItem : dataSnapshot.getChildren()){
+                                                        ProductDetailsModel cartProd = cartItem.getValue(ProductDetailsModel.class);
+
+                                                        //Item already exists in cart, increment quantity
+                                                        if(cartProd.getOriginalKey().equals(productDetailsModel.getKey())){
+                                                            int currItemQuantity = cartProd.getQuantity();
+                                                            currItemQuantity = currItemQuantity + 1;
+                                                            int finalCurrItemQuantity = currItemQuantity;
+                                                            cartProd.setQuantity(finalCurrItemQuantity);
+                                                            cartItemExistsRef.child(key).setValue(cartProd).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    cartItemExistsRef.child(cartItem.getKey()).removeValue();
+                                                                    try {
+                                                                        Toast.makeText(context, cartProd.getName()+": "+ finalCurrItemQuantity, Toast.LENGTH_SHORT).show();
+                                                                        //Snackbar.make(v.getRootView(), cartProd.getName()+": "+ finalCurrItemQuantity, Snackbar.LENGTH_LONG).show();
+                                                                    } catch(Exception e){
+                                                                        Log.e(TAG, "onSuccess: ", e);
+                                                                    }
+                                                                }
+                                                            }).addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    try {
+                                                                        Snackbar.make(v.getRootView(), "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                                                    } catch(Exception er){
+                                                                        Log.e(TAG, "onFailure: ", er);
+                                                                    }
+                                                                }
+                                                            });
+                                                            //Log.d(TAG, "old qty: "+cartProd.getQuantity()+" new qty "+ currItemQuantity);
+                                                        }
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    try {
+                                                        Snackbar.make(v.getRootView(), "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                                    } catch(Exception er){
+                                                        Log.e(TAG, "onFailure: ", er);
+                                                    }
+                                                }
+                                            });
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                };
-                menuExistRef.addListenerForSingleValueEvent(existsListener);
-
+                        }
+                    };
+                    menuExistRef.addListenerForSingleValueEvent(existsListener);
+                }
             }
         });
 

@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.alexzh.circleimageview.CircleImageView;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -16,6 +17,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,6 +45,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewProduct extends AppCompatActivity {
 
+    String TAG = "ViewProductActivity";
     String key, restaurant, restaurantName_,product, description, price, imageUrl, myPhone, accType;
     Double distance;
     ImageView addToFavourites;
@@ -65,6 +68,8 @@ public class ViewProduct extends AppCompatActivity {
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        count = 1; //item quantity
 
         /**
          * UI Widgets
@@ -102,6 +107,30 @@ public class ViewProduct extends AppCompatActivity {
 
         favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key+"/likes");
         myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
+        DatabaseReference existingCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        existingCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot cartItem : dataSnapshot.getChildren()){
+                    ProductDetailsModel cartProd = cartItem.getValue(ProductDetailsModel.class);
+
+                    //Item already exists in cart, inititalize counter
+                    if(cartProd.getOriginalKey().equals(key)){
+                        int currItemQuantity = cartProd.getQuantity();
+                        itemCount.setText(""+currItemQuantity);
+                        count = currItemQuantity;
+                        subTotal.setVisibility(View.VISIBLE);
+                        subTotal.setText("(Already in cart) Subtotal: "+(currItemQuantity*Integer.parseInt(cartProd.getPrice())));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key);
         existsListener = new ValueEventListener() {
@@ -284,7 +313,7 @@ public class ViewProduct extends AppCompatActivity {
         /**
          * Set product details
          */
-        count = 1;
+
         productName.setText(product);
         productPrice.setText("Ksh "+price);
         productDescription.setText(description);
@@ -421,29 +450,128 @@ public class ViewProduct extends AppCompatActivity {
 
                 Snackbar.make(view, "Adding...", Snackbar.LENGTH_LONG).show();
 
-                String myPhone;
-                myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
-                DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
-
-                //Get current date
-                GetCurrentDate currentDate = new GetCurrentDate();
-                String cartDate = currentDate.getDate();
-
-                String newKey = myCartRef.push().getKey();
-                ProductDetailsModel cartProduct = new ProductDetailsModel();
-                cartProduct.setName(product);
-                cartProduct.setPrice(price);
-                cartProduct.setDescription(description);
-                cartProduct.setImageURL(imageUrl);
-                cartProduct.setOwner(restaurant);
-                cartProduct.setOriginalKey(key);
-                cartProduct.setQuantity(count);
-                cartProduct.setUploadDate(cartDate);
-
-                myCartRef.child(newKey).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                //Check to see if this item already exists in cart, if yes, increment quantity
+                DatabaseReference cartItemExistsRef = FirebaseDatabase
+                        .getInstance().getReference("cart/"+myPhone);
+                cartItemExistsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Snackbar.make(view, "Added to cart", Snackbar.LENGTH_LONG).show();
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.hasChildren()){
+                            //cart is empty, add a fresh
+                            String myPhone;
+                            myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
+                            DatabaseReference myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+
+                            //Get current date
+                            GetCurrentDate currentDate = new GetCurrentDate();
+                            String cartDate = currentDate.getDate();
+
+                            String newKey = myCartRef.push().getKey();
+                            ProductDetailsModel cartProduct = new ProductDetailsModel();
+                            cartProduct.setName(product);
+                            cartProduct.setPrice(price);
+                            cartProduct.setDescription(description);
+                            cartProduct.setImageURL(imageUrl);
+                            cartProduct.setOwner(restaurant);
+                            cartProduct.setOriginalKey(key);
+                            cartProduct.setQuantity(count);
+                            cartProduct.setDistance(distance);
+                            cartProduct.setUploadDate(cartDate);
+
+                            myCartRef.child(newKey).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    try {
+                                        Snackbar.make(view, "Added to cart", Snackbar.LENGTH_LONG).show();
+                                    } catch (Exception e){
+
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    try {
+                                        Snackbar.make(view, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                    } catch(Exception er){
+                                        Log.e(TAG, "onFailure: ", er);
+                                    }
+                                }
+                            });
+                        } else {
+
+                            //Get current date
+                            GetCurrentDate currentDate = new GetCurrentDate();
+                            String cartDate = currentDate.getDate();
+
+                            String newKey = cartItemExistsRef.push().getKey();
+                            ProductDetailsModel cartProduct = new ProductDetailsModel();
+                            cartProduct.setName(product);
+                            cartProduct.setPrice(price);
+                            cartProduct.setDescription(description);
+                            cartProduct.setImageURL(imageUrl);
+                            cartProduct.setOwner(restaurant);
+                            cartProduct.setOriginalKey(key);
+                            cartProduct.setQuantity(count);
+                            cartProduct.setDistance(distance);
+                            cartProduct.setUploadDate(cartDate);
+
+                            cartItemExistsRef.child(newKey).setValue(cartProduct).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    try {
+                                        Snackbar.make(view, "Added to cart", Snackbar.LENGTH_LONG).show();
+                                    } catch (Exception e){
+
+                                    }
+
+                                    for(DataSnapshot cartItem : dataSnapshot.getChildren()){
+                                        ProductDetailsModel cartProd = cartItem.getValue(ProductDetailsModel.class);
+
+                                        //Item already exists in cart, set new quantity
+                                        if(cartProd.getOriginalKey().equals(key)){
+                                            cartProd.setQuantity(count);
+                                            cartItemExistsRef.child(newKey).setValue(cartProd).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    cartItemExistsRef.child(cartItem.getKey()).removeValue();
+                                                    try {
+                                                        Snackbar.make(view, "Added to cart", Snackbar.LENGTH_LONG).show();
+                                                        //Snackbar.make(v.getRootView(), cartProd.getName()+": "+ finalCurrItemQuantity, Snackbar.LENGTH_LONG).show();
+                                                    } catch(Exception e){
+                                                        Log.e(TAG, "onSuccess: ", e);
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    try {
+                                                        Snackbar.make(view, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                                    } catch(Exception er){
+                                                        Log.e(TAG, "onFailure: ", er);
+                                                    }
+                                                }
+                                            });
+                                            //Log.d(TAG, "old qty: "+cartProd.getQuantity()+" new qty "+ currItemQuantity);
+                                        }
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    try {
+                                        Snackbar.make(view, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                    } catch(Exception er){
+                                        Log.e(TAG, "onFailure: ", er);
+                                    }
+                                }
+                            });
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
 

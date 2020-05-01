@@ -170,7 +170,7 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
             public void onClick(final View v) {
                 if(!myPhone.equals(userModel.getPhone())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                     slideactivity.putExtra("phone", userModel.getPhone());
                     Bundle bndlanimation =
