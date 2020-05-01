@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateRandomString;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
@@ -39,6 +40,7 @@ import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
@@ -219,6 +221,16 @@ public class CheckOut extends AppCompatActivity {
 
                     DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("orders/"+product.getOwner());
 
+                    //Generate a random String
+                    GenerateRandomString randomString = new GenerateRandomString();
+                    String orderID_1 = randomString.getAlphaNumericString(3);
+
+                    //Generate random integer
+                    int orderID_2 = new Random().nextInt(1000);
+                    String orderID = orderID_1.toUpperCase()+""+orderID_2;
+
+                    ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
+                    ordersRef.child(myPhone).child("orderID").setValue(orderID);
                     ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
                     ordersRef.child(myPhone).child("completed").setValue(false);
                     ordersRef.child(myPhone).child("remarks").setValue(myRemarks);
