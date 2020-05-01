@@ -121,8 +121,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
                     @Override
                     public void onSuccess(Void aVoid) {
                         try {
-                            listdata.remove(holder.getAdapterPosition());
-                            notifyItemRemoved(holder.getAdapterPosition());
+                            //Comment out since i changed to a live listener in MyCart
+//                            listdata.remove(holder.getAdapterPosition());
+//                            notifyItemRemoved(holder.getAdapterPosition());
                             Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
                         } catch(Exception e){
                             Snackbar.make(v.getRootView(), "Something went wrong!", Snackbar.LENGTH_LONG).show();

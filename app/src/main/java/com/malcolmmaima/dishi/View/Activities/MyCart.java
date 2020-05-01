@@ -127,6 +127,7 @@ public class MyCart extends AppCompatActivity {
 
                 }
                 totalPrice.setText("Ksh "+total[0]);
+                fetchCart();
             }
 
             @Override
