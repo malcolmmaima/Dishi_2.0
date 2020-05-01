@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,26 +36,31 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
 import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewMyOrders extends AppCompatActivity {
-
+    String TAG = "ViewMyOrder";
     List<ProductDetailsModel> list;
-    String myPhone, phone, restaurantName, riderPhone;
+    String myPhone, phone, restaurantName, riderPhone, initiatedTime;
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName, timeStamp;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
@@ -109,6 +115,7 @@ public class ViewMyOrders extends AppCompatActivity {
         myRemarks = findViewById(R.id.myOrderRemarks);
         riderName = findViewById(R.id.riderName);
         riderIcon = findViewById(R.id.riderIcon);
+        timeStamp = findViewById(R.id.timeStamp);
 
         /**
          * On loading this module check to see if it exists. this is a one time check
@@ -142,13 +149,76 @@ public class ViewMyOrders extends AppCompatActivity {
                 try {
                     Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                    initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
+                    //Get today's date
+                    GetCurrentDate currentDate = new GetCurrentDate();
+                    String currDate = currentDate.getDate();
+
+                    //Get dates
+                    String dtEnd = currDate;
+                    String dtStart = initiatedTime;
+
+                    //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                    //Format both current date and date status update was posted
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                    try {
+
+                        //Convert String date values to Date values
+                        Date dateStart;
+                        Date dateEnd;
+
+                        //Date dateStart = format.parse(dtStart);
+                        String[] timeS = Split(initiatedTime);
+                        String[] timeT = Split(currDate);
+
+                        /**
+                         * timeS[0] = date
+                         * timeS[1] = hr
+                         * timeS[2] = min
+                         * timeS[3] = seconds
+                         * timeS[4] = timezone
+                         */
+
+                        //post timeStamp
+                        if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                            timeS[4] = "GMT+03:00";
+
+                            //2020-04-27:20:37:32:GMT+03:00
+                            dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                            dateStart = format.parse(dtStart);
+                        } else {
+                            dateStart = format.parse(dtStart);
+                        }
+
+                        //my device current date
+                        if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                            timeT[4] = "GMT+03:00";
+
+                            //2020-04-27:20:37:32:GMT+03:00
+                            dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                            dateEnd = format.parse(dtEnd);
+                        } else {
+                            dateEnd = format.parse(dtEnd);
+                        }
+
+                        //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                        //Now compute timeAgo duration
+                        TimeAgo timeAgo = new TimeAgo();
+
+                        timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 1));
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "timeStamp: "+ e.getMessage());
+                    }
                     try {
                         riderPhone = dataSnapshot.child("rider").getValue(String.class);
 
                     } catch (Exception e){
-
+                        Log.e(TAG, "onDataChange: ", e);
                     }
+
 
                     myRemarks.setText("Remarks: "+remarks);
                     if (completed == true) {
@@ -853,6 +923,13 @@ public class ViewMyOrders extends AppCompatActivity {
 
     }
         return(super.onOptionsItemSelected(item));
+    }
+
+    public String[] Split(String timeStamp){
+
+        String[] arrSplit = timeStamp.split(":");
+
+        return arrSplit;
     }
 
     @Override

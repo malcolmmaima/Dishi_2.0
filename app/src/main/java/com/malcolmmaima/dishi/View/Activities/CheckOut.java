@@ -128,11 +128,14 @@ public class CheckOut extends AppCompatActivity {
                 builder.setItems(paymentMethods, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if(which == 0){
-                            selectedPaymentMethod = ""; //will set to "mpesa" once implemented Mpesa
-                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                            selectedPaymentMethod = "mpesa";
+                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
 
-                            //Lets set to grey for now since we have not yet implemented Mpesa
-                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+//                            selectedPaymentMethod = ""; //will set to "mpesa" once implemented Mpesa
+//                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+//
+//                            //Lets set to grey for now since we have not yet implemented Mpesa
+//                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
                         }
                         if(which == 1){
                             selectedPaymentMethod = "cash";
