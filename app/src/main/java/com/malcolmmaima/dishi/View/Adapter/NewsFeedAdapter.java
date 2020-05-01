@@ -586,6 +586,82 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                     postDetails.child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            //update likes count
+                            postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        int total = (int) dataSnapshot.getChildrenCount();
+                                        Double totalLikes = Double.valueOf(total);
+
+                                        //below 1000
+                                        if(totalLikes < 1000){
+                                            DecimalFormat value = new DecimalFormat("#");
+                                            holder.likesTotal.setText(""+value.format(totalLikes));
+                                        }
+
+                                        // 1000 to 999,999
+                                        else if(totalLikes >= 1000 && totalLikes <= 999999){
+                                            if(totalLikes % 1000 == 0){ //No remainder
+                                                DecimalFormat value = new DecimalFormat("#####");
+                                                holder.likesTotal.setText(""+value.format(total/1000)+"K");
+                                            }
+
+                                            else { //Has remainder 999.9K
+                                                DecimalFormat value = new DecimalFormat("######.#");
+                                                Double divided = totalLikes/1000;
+                                                if(value.format(divided).equals("1000")){
+                                                    holder.likesTotal.setText("1M"); //if rounded off
+                                                } else {
+                                                    holder.likesTotal.setText(""+value.format(divided)+"K");
+                                                }
+                                            }
+                                        }
+
+                                        // 1,000,0000 to 999,999,999
+                                        else if(totalLikes >= 1000000 && totalLikes <= 999999999){
+                                            if(totalLikes % 1000000 == 0) { //No remainder
+                                                DecimalFormat value = new DecimalFormat("#");
+                                                holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                            }
+
+                                            else { //Has remainder 9.9M, 999.9M etc
+                                                DecimalFormat value = new DecimalFormat("#.#");
+                                                if(value.format(totalLikes/1000000).equals("1000")){
+                                                    holder.likesTotal.setText("1B"); //if rounded off
+                                                } else {
+                                                    holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                                }
+                                            }
+                                        }
+
+                                        postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if(!dataSnapshot.exists()){
+                                                    holder.likePost.setTag(R.drawable.unliked);
+                                                    holder.likePost.setImageResource(R.drawable.unliked);
+                                                } else {
+                                                    holder.likePost.setTag(R.drawable.liked);
+                                                    holder.likePost.setImageResource(R.drawable.liked);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    } catch (Exception e){}
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            //send notification
                             if(!statusUpdateModel.getAuthor().equals(myPhone)){
                                 DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+statusUpdateModel.getAuthor());
 
@@ -613,8 +689,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                                     notificationRef2.child(notif2key).setValue(liked); //send to db
                                 }
                             }
-                            holder.likePost.setTag(R.drawable.liked);
-                            holder.likePost.setImageResource(R.drawable.liked);
+//                            holder.likePost.setTag(R.drawable.liked);
+//                            holder.likePost.setImageResource(R.drawable.liked);
                             //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -625,8 +701,82 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                     postDetails.child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            holder.likePost.setTag(R.drawable.unliked);
-                            holder.likePost.setImageResource(R.drawable.unliked);
+                            //update likes count
+                            postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        int total = (int) dataSnapshot.getChildrenCount();
+                                        Double totalLikes = Double.valueOf(total);
+
+                                        //below 1000
+                                        if(totalLikes < 1000){
+                                            DecimalFormat value = new DecimalFormat("#");
+                                            holder.likesTotal.setText(""+value.format(totalLikes));
+                                        }
+
+                                        // 1000 to 999,999
+                                        else if(totalLikes >= 1000 && totalLikes <= 999999){
+                                            if(totalLikes % 1000 == 0){ //No remainder
+                                                DecimalFormat value = new DecimalFormat("#####");
+                                                holder.likesTotal.setText(""+value.format(total/1000)+"K");
+                                            }
+
+                                            else { //Has remainder 999.9K
+                                                DecimalFormat value = new DecimalFormat("######.#");
+                                                Double divided = totalLikes/1000;
+                                                if(value.format(divided).equals("1000")){
+                                                    holder.likesTotal.setText("1M"); //if rounded off
+                                                } else {
+                                                    holder.likesTotal.setText(""+value.format(divided)+"K");
+                                                }
+                                            }
+                                        }
+
+                                        // 1,000,0000 to 999,999,999
+                                        else if(totalLikes >= 1000000 && totalLikes <= 999999999){
+                                            if(totalLikes % 1000000 == 0) { //No remainder
+                                                DecimalFormat value = new DecimalFormat("#");
+                                                holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                            }
+
+                                            else { //Has remainder 9.9M, 999.9M etc
+                                                DecimalFormat value = new DecimalFormat("#.#");
+                                                if(value.format(totalLikes/1000000).equals("1000")){
+                                                    holder.likesTotal.setText("1B"); //if rounded off
+                                                } else {
+                                                    holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                                }
+                                            }
+                                        }
+
+                                        postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if(!dataSnapshot.exists()){
+                                                    holder.likePost.setTag(R.drawable.unliked);
+                                                    holder.likePost.setImageResource(R.drawable.unliked);
+                                                } else {
+                                                    holder.likePost.setTag(R.drawable.liked);
+                                                    holder.likePost.setImageResource(R.drawable.liked);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    } catch (Exception e){}
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+//                            holder.likePost.setTag(R.drawable.unliked);
+//                            holder.likePost.setImageResource(R.drawable.unliked);
                         }
                     });
 
