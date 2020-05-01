@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -32,19 +33,25 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Utils.GenerateRandomString;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class CheckOut extends AppCompatActivity {
+    String TAG = "CheckOutActivity";
 
     List<ProductDetailsModel> list;
     AppCompatButton orderBtn;
@@ -210,7 +217,7 @@ public class CheckOut extends AppCompatActivity {
                 }
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
-                    final ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
+                    ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
 
                     product.setPaymentMethod(selectedPaymentMethod);
                     product.setAddress(locationSet);
@@ -221,65 +228,221 @@ public class CheckOut extends AppCompatActivity {
 
                     DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("orders/"+product.getOwner());
 
-                    //Generate a random String
-                    GenerateRandomString randomString = new GenerateRandomString();
-                    String orderID_1 = randomString.getAlphaNumericString(3);
+                    //Check to see if i have an active order with the said restaurant
+                    String finalMyRemarks = myRemarks;
+                    ordersRef.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    //Generate random integer
-                    int orderID_2 = new Random().nextInt(1000);
-                    String orderID = orderID_1.toUpperCase()+""+orderID_2;
+                            /**
+                             * I do have an active order, now check if time has passed 10 minutes
+                             * (our minimum order response time from restaurant) after which we cant change our order
+                             */
+                            if(dataSnapshot.exists()){
 
-                    ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
-                    ordersRef.child(myPhone).child("orderID").setValue(orderID);
-                    ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
-                    ordersRef.child(myPhone).child("completed").setValue(false);
-                    ordersRef.child(myPhone).child("remarks").setValue(myRemarks);
+                                Log.d(TAG, "Order exists: " + dataSnapshot.getKey());
+                                //Get today's date
+                                GetCurrentDate currentDate = new GetCurrentDate();
+                                String currDate = currentDate.getDate();
 
-                    if(locationSet.equals("static")){
-                        staticLocationModel.setLatitude(lat);
-                        staticLocationModel.setLongitude(lng);
-                        staticLocationModel.setPlace(placeName);
+                                //Get date status update was posted
+                                String dtEnd = currDate;
+                                String dtStart = dataSnapshot.child("initiatedOn").getValue(String.class);
 
-                        ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel);
-                    }
+                                //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                                //Format both current date and date status update was posted
+                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                                try {
 
-                    //Loop has reached the end
-                    if(dataSnapshot.getChildrenCount() == list.size()){
-                        //Clear my cart then exit
-                        myCartRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+                                    //Convert String date values to Date values
+                                    Date dateStart;
+                                    Date dateEnd;
 
-                                //We need to have a node that keeps track of our active orders to the different restaurants
-                                DatabaseReference myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+                                    //Date dateStart = format.parse(dtStart);
+                                    String[] timeS = Split(dtStart);
+                                    String[] timeT = Split(currDate);
 
-                                //Post restaurant phone numbers which act as our primary key, keep track of our active orders
-                                for(int i = 0; i<list.size(); i++){
-                                    myOrders.child(list.get(i).getOwner()).setValue("active");
+                                    /**
+                                     * timeS[0] = date
+                                     * timeS[1] = hr
+                                     * timeS[2] = min
+                                     * timeS[3] = seconds
+                                     * timeS[4] = timezone
+                                     */
 
-                                    if(i == list.size()-1){
-                                        progressDialog.dismiss();
-                                        finish();
-                                        SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                    //post timeStamp
+                                    if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                        timeS[4] = "GMT+03:00";
+
+                                        //2020-04-27:20:37:32:GMT+03:00
+                                        dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                        dateStart = format.parse(dtStart);
+                                    } else {
+                                        dateStart = format.parse(dtStart);
                                     }
+
+                                    //my device current date
+                                    if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                        timeT[4] = "GMT+03:00";
+
+                                        //2020-04-27:20:37:32:GMT+03:00
+                                        dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                        dateEnd = format.parse(dtEnd);
+                                    } else {
+                                        dateEnd = format.parse(dtEnd);
+                                    }
+
+                                    //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                    //Now compute timeAgo duration
+                                    TimeAgo timeAgo = new TimeAgo();
+
+                                    Log.d(TAG, "initiated: "+ timeAgo.toRelative(dateStart, dateEnd, 1));
+
+                                    long timestamp1 = dateStart.getTime();
+                                    long timestamp2 = dateEnd.getTime();
+                                    if (Math.abs(timestamp2 - timestamp1) > TimeUnit.MINUTES.toMillis(10)) {
+                                        progressDialog.dismiss();
+                                        Toast.makeText(CheckOut.this, "Too late to change order", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "10 minutes has passed");
+                                        Log.d(TAG, "x: "+ Math.abs(timestamp2 - timestamp1)+" y: "+TimeUnit.MINUTES.toMillis(10));
+                                    } else {
+                                        Log.d(TAG, "x: "+ Math.abs(timestamp2 - timestamp1)+" y: "+TimeUnit.MINUTES.toMillis(10));
+                                        //Below 10 minutes so we'll allow changing of order
+
+                                        GenerateRandomString randomString = new GenerateRandomString();
+                                        String orderID_1 = randomString.getAlphaNumericString(3);
+
+                                        //Generate random integer
+                                        int orderID_2 = new Random().nextInt(1000);
+                                        String orderID = orderID_1.toUpperCase()+""+orderID_2;
+
+                                        ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
+                                        ordersRef.child(myPhone).child("orderID").setValue(orderID);
+                                        ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
+                                        ordersRef.child(myPhone).child("completed").setValue(false);
+                                        ordersRef.child(myPhone).child("remarks").setValue(finalMyRemarks);
+
+                                        if(locationSet.equals("static")){
+                                            staticLocationModel.setLatitude(lat);
+                                            staticLocationModel.setLongitude(lng);
+                                            staticLocationModel.setPlace(placeName);
+
+                                            ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel);
+                                        }
+
+                                        //Loop has reached the end
+                                        if(dataSnapshot.getChildrenCount() == list.size()){
+                                            //Clear my cart then exit
+                                            myCartRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+
+                                                    //We need to have a node that keeps track of our active orders to the different restaurants
+                                                    DatabaseReference myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+
+                                                    //Post restaurant phone numbers which act as our primary key, keep track of our active orders
+                                                    for(int i = 0; i<list.size(); i++){
+                                                        myOrders.child(list.get(i).getOwner()).setValue("active");
+
+                                                        if(i == list.size()-1){
+                                                            progressDialog.dismiss();
+                                                            finish();
+                                                            SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                    progressDialog.dismiss();
+                                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
+                                                            "Something went wrong", Snackbar.LENGTH_LONG);
+                                                    snackbar.show();
+
+                                                    if(snackbar.getDuration() == 3000){
+                                                        finish();
+                                                    }
+                                                }
+                                            });
+
+                                        }
+
+                                    }
+
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                }
+                            } else {
+                                //No active order with said restaurant
+                                //Generate a random String
+                                GenerateRandomString randomString = new GenerateRandomString();
+                                String orderID_1 = randomString.getAlphaNumericString(3);
+
+                                //Generate random integer
+                                int orderID_2 = new Random().nextInt(1000);
+                                String orderID = orderID_1.toUpperCase()+""+orderID_2;
+
+                                ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
+                                ordersRef.child(myPhone).child("orderID").setValue(orderID);
+                                ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
+                                ordersRef.child(myPhone).child("completed").setValue(false);
+                                ordersRef.child(myPhone).child("remarks").setValue(finalMyRemarks);
+
+                                if(locationSet.equals("static")){
+                                    staticLocationModel.setLatitude(lat);
+                                    staticLocationModel.setLongitude(lng);
+                                    staticLocationModel.setPlace(placeName);
+
+                                    ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel);
+                                }
+
+                                //Loop has reached the end
+                                if(dataSnapshot.getChildrenCount() == list.size()){
+                                    //Clear my cart then exit
+                                    myCartRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                            //We need to have a node that keeps track of our active orders to the different restaurants
+                                            DatabaseReference myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+
+                                            //Post restaurant phone numbers which act as our primary key, keep track of our active orders
+                                            for(int i = 0; i<list.size(); i++){
+                                                myOrders.child(list.get(i).getOwner()).setValue("active");
+
+                                                if(i == list.size()-1){
+                                                    progressDialog.dismiss();
+                                                    finish();
+                                                    SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                            progressDialog.dismiss();
+                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
+                                                    "Something went wrong", Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+
+                                            if(snackbar.getDuration() == 3000){
+                                                finish();
+                                            }
+                                        }
+                                    });
+
                                 }
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
+                        }
 
-                                progressDialog.dismiss();
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
-                                        "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                if(snackbar.getDuration() == 3000){
-                                    finish();
-                                }
-                            }
-                        });
-
-                    }
+                        }
+                    });
                 }
 
             }
@@ -342,5 +505,12 @@ public class CheckOut extends AppCompatActivity {
 
         paymentStatus = findViewById(R.id.paymentStatus);
         deliveryLocationStatus = findViewById(R.id.deliveryLocationStatus);
+    }
+
+    public String[] Split(String timeStamp){
+
+        String[] arrSplit = timeStamp.split(":");
+
+        return arrSplit;
     }
 }
