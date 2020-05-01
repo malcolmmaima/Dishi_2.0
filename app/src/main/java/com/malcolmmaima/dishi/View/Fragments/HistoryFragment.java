@@ -1,7 +1,9 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +35,7 @@ import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.MyCart;
 import com.malcolmmaima.dishi.View.Adapter.ProductHistoryAdapter;
 
 import java.util.ArrayList;
@@ -50,7 +54,8 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
     SwipeRefreshLayout mSwipeRefreshLayout;
     LiveLocationModel liveLocationModel;
 
-    DatabaseReference dbRef, ordersHistory, myLocationRef;
+    DatabaseReference dbRef, ordersHistory, myLocationRef, myCartRef;
+    ValueEventListener cartListener;
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener locationListener;
@@ -89,6 +94,46 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
         emptyTag = v.findViewById(R.id.empty_tag);
         clearAll = v.findViewById(R.id.clearAll);
         clearAll.setVisibility(View.GONE);
+
+        final FloatingActionButton fab = v.findViewById(R.id.fab);
+        myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        cartListener = new ValueEventListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        fab.setVisibility(View.VISIBLE);
+                    } catch (Exception e){
+
+                    }
+                }
+
+                else {
+                    try {
+                        fab.setVisibility(View.GONE);
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myCartRef.addValueEventListener(cartListener);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(getContext(), MyCart.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(slideactivity);
+            }
+        });
+
 
         clearAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -405,5 +450,6 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onDetach() {
         super.onDetach();
         myLocationRef.removeEventListener(locationListener);
+        myCartRef.removeEventListener(cartListener);
     }
 }
