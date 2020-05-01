@@ -1431,7 +1431,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     notificationRef.child(notifKey).setValue(commentedStatus); //send to db
 
                     //Also send the notification to the person's wall where this status update appears
-                    if(!postedTo.equals(myPhone)){
+                    if(!postedTo.equals(myPhone) && !postedTo.equals(author)){
                         DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+postedTo);
                         String notif2key = notificationRef2.push().getKey();
 
