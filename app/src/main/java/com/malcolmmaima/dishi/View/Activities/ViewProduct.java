@@ -55,8 +55,9 @@ public class ViewProduct extends AppCompatActivity {
     FloatingActionButton add, minus;
     int count;
     Menu myMenu;
-    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef;
+    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef, existingCartRef;
     ValueEventListener cartListener, favouritesTotalListener, myFoodFavouritesListener, existsListener;
+    ValueEventListener cartexixtListner;
     FloatingActionButton fab;
     FirebaseUser user;
 
@@ -107,8 +108,8 @@ public class ViewProduct extends AppCompatActivity {
 
         favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key+"/likes");
         myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
-        DatabaseReference existingCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
-        existingCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        existingCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        cartexixtListner = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -130,7 +131,8 @@ public class ViewProduct extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        existingCartRef.addValueEventListener(cartexixtListner);
 
         menuExistRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key);
         existsListener = new ValueEventListener() {
@@ -669,5 +671,6 @@ public class ViewProduct extends AppCompatActivity {
         favouritesTotalRef.removeEventListener(favouritesTotalListener);
         myCart.removeEventListener(cartListener);
         menuExistRef.removeEventListener(existsListener);
+        existingCartRef.removeEventListener(cartexixtListner);
     }
 }
