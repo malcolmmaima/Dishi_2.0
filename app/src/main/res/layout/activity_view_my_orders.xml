@@ -34,6 +34,18 @@
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
+            <TextView
+                android:id="@+id/myOrderID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#666"
+                android:layout_gravity="right"
+                android:layout_marginTop="5dp"
+                android:textStyle="bold"
+                android:layout_marginRight="5dp"
+                android:text="ORDER ID: #0000"/>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_view"
                 android:clickable="true"
@@ -208,6 +220,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:textColor="#666"
+                            android:fontFamily="sans-serif-light"
                             android:layout_gravity="center_vertical"
                             android:text="Loading..."/>
                     </LinearLayout>
@@ -235,6 +248,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:textColor="#666"
+                            android:fontFamily="sans-serif-light"
                             android:layout_gravity="center_vertical"
                             android:text="Loading..."/>
                     </LinearLayout>

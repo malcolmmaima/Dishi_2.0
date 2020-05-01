@@ -60,7 +60,7 @@ public class ViewMyOrders extends AppCompatActivity {
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName, timeStamp;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName, timeStamp, myOrderID;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
@@ -116,6 +116,7 @@ public class ViewMyOrders extends AppCompatActivity {
         riderName = findViewById(R.id.riderName);
         riderIcon = findViewById(R.id.riderIcon);
         timeStamp = findViewById(R.id.timeStamp);
+        myOrderID = findViewById(R.id.myOrderID);
 
         /**
          * On loading this module check to see if it exists. this is a one time check
@@ -147,8 +148,12 @@ public class ViewMyOrders extends AppCompatActivity {
                 }
 
                 try {
+
                     Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                    String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                    myOrderID.setText("ORDER ID: #"+orderID);
+
                     initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
                     //Get today's date
@@ -206,7 +211,7 @@ public class ViewMyOrders extends AppCompatActivity {
                         //Now compute timeAgo duration
                         TimeAgo timeAgo = new TimeAgo();
 
-                        timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 1));
+                        timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
 
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -317,6 +322,15 @@ public class ViewMyOrders extends AppCompatActivity {
                     }
                 }
                 subTotal.setText("Ksh "+total[0]);
+
+                //Mambo kienyeji hapa (^_^) basically want to enable order tracking by customer if atleast one item is confirmed
+                if(total[0] < 1.0){
+                    DeliveryAddress.setVisibility(View.GONE);
+                    confirmOrder.setVisibility(View.GONE);
+                } else {
+                    DeliveryAddress.setVisibility(View.VISIBLE);
+                    confirmOrder.setVisibility(View.VISIBLE);
+                }
 
                 if(!list.isEmpty()){
                     Collections.reverse(list);
