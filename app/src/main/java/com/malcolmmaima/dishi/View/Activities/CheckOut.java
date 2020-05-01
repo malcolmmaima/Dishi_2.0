@@ -36,6 +36,7 @@ import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
@@ -300,15 +301,53 @@ public class CheckOut extends AppCompatActivity {
 
                                     long timestamp1 = dateStart.getTime();
                                     long timestamp2 = dateEnd.getTime();
+
+
                                     if (Math.abs(timestamp2 - timestamp1) > TimeUnit.MINUTES.toMillis(10)) {
-                                        progressDialog.dismiss();
-                                        Toast.makeText(CheckOut.this, "Too late to change order", Toast.LENGTH_LONG).show();
-                                        Log.d(TAG, "10 minutes has passed");
-                                        Log.d(TAG, "x: "+ Math.abs(timestamp2 - timestamp1)+" y: "+TimeUnit.MINUTES.toMillis(10));
+                                        DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+product.getOwner());
+                                        restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                try {
+                                                    UserModel restaurant_ = dataSnapshot.getValue(UserModel.class);
+
+                                                    final AlertDialog alertUser = new AlertDialog.Builder(CheckOut.this)
+                                                            //set message, title, and icon
+                                                            .setCancelable(false)
+                                                            .setMessage("You have an active order at "
+                                                                    + restaurant_.getFirstname() + " " + restaurant_.getLastname()
+                                                                    + "'s. You can only change order within 10 minutes of placing it otherwise cancel whole order and resend.")
+                                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                                            //set three option buttons
+                                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                                    progressDialog.dismiss();
+//                                                        finish();
+//                                                        Intent backToCart = new Intent(CheckOut.this, MyCart.class)
+//                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                                        startActivity(backToCart);
+                                                                }
+                                                            }).create();
+                                                    alertUser.show();
+                                                } catch (Exception e){
+                                                    finish();
+                                                    Toast.makeText(CheckOut.this, "Something went wrong!", Toast.LENGTH_LONG).show();
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+                                        Log.d(TAG, "10 minutes has passed cannot change order");
+                                        //Log.d(TAG, "x: "+ Math.abs(timestamp2 - timestamp1)+" y: "+TimeUnit.MINUTES.toMillis(10));
                                     } else {
-                                        Log.d(TAG, "x: "+ Math.abs(timestamp2 - timestamp1)+" y: "+TimeUnit.MINUTES.toMillis(10));
                                         //Below 10 minutes so we'll allow changing of order
 
+                                        Log.d(TAG, "10 minutes not up yet");
                                         GenerateRandomString randomString = new GenerateRandomString();
                                         String orderID_1 = randomString.getAlphaNumericString(3);
 
@@ -327,7 +366,49 @@ public class CheckOut extends AppCompatActivity {
                                             staticLocationModel.setLongitude(lng);
                                             staticLocationModel.setPlace(placeName);
 
-                                            ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel);
+                                            ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG, "Order changed");
+                                                    ordersRef.child(myPhone).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            for(DataSnapshot items : dataSnapshot.getChildren()){
+                                                                Log.d(TAG, "Remove cart item: " + items.getKey());
+                                                                myCartRef.child(items.getKey()).removeValue();
+                                                                progressDialog.dismiss();
+                                                                finish();
+                                                                SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        } else {
+                                            Log.d(TAG, "Order changed");
+                                            ordersRef.child(myPhone).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for(DataSnapshot items : dataSnapshot.getChildren()){
+                                                        Log.d(TAG, "Remove cart item: " + items.getKey());
+                                                        myCartRef.child(items.getKey()).removeValue();
+                                                        progressDialog.dismiss();
+                                                        finish();
+                                                        SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
                                         }
 
                                         //Loop has reached the end
@@ -345,6 +426,7 @@ public class CheckOut extends AppCompatActivity {
                                                         myOrders.child(list.get(i).getOwner()).setValue("active");
 
                                                         if(i == list.size()-1){
+                                                            Log.d(TAG, "Updated my orders active");
                                                             progressDialog.dismiss();
                                                             finish();
                                                             SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
@@ -375,6 +457,7 @@ public class CheckOut extends AppCompatActivity {
                                     Log.d(TAG, "timeStamp: "+ e.getMessage());
                                 }
                             } else {
+                                Log.d(TAG, "Order "+dataSnapshot.getKey()+" at "+product.getOwner()+" doesn't exist, add new");
                                 //No active order with said restaurant
                                 //Generate a random String
                                 GenerateRandomString randomString = new GenerateRandomString();
@@ -395,21 +478,45 @@ public class CheckOut extends AppCompatActivity {
                                     staticLocationModel.setLongitude(lng);
                                     staticLocationModel.setPlace(placeName);
 
-                                    ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel);
+                                    ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "New Order added!");
+                                            ordersRef.child(myPhone).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for(DataSnapshot items : dataSnapshot.getChildren()){
+                                                        Log.d(TAG, "Remove cart item "+items.getKey());
+                                                        myCartRef.child(items.getKey()).removeValue();
+                                                        Log.d(TAG, "Order complete");
+                                                        progressDialog.dismiss();
+                                                        finish();
+                                                        SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
 
                                 //Loop has reached the end
-                                if(dataSnapshot.getChildrenCount() == list.size()){
+                                if(dataSnapshot.getChildrenCount() != list.size()){
                                     //Clear my cart then exit
                                     myCartRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-
+                                            Log.d(TAG, "Remove all cart items");
                                             //We need to have a node that keeps track of our active orders to the different restaurants
                                             DatabaseReference myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
 
                                             //Post restaurant phone numbers which act as our primary key, keep track of our active orders
                                             for(int i = 0; i<list.size(); i++){
+                                                Log.d(TAG, "New order updated my orders active");
                                                 myOrders.child(list.get(i).getOwner()).setValue("active");
 
                                                 if(i == list.size()-1){
