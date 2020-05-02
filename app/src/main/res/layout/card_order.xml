@@ -28,8 +28,8 @@
 
         <com.alexzh.circleimageview.CircleImageView
             android:id="@+id/profilePic"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/default_profile"
             app:view_shadowRadius="2dp"
             app:view_shadowDx="2dp"
@@ -49,9 +49,8 @@
             android:text="Customer Name"
             android:fontFamily="sans-serif"
             android:id="@+id/customerName"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="1dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
@@ -79,10 +78,8 @@
             android:id="@+id/restaurantTag"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginTop="5dp"
             android:scaleType="centerCrop"
             android:background="@drawable/online_store"
-            android:layout_marginRight="10dp"
             />
 
         <TextView
@@ -91,7 +88,6 @@
             android:layout_toRightOf="@id/locationTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="loading..."
             android:layout_marginLeft="-8dp"
             android:layout_marginRight="5dp"/>

@@ -64,8 +64,8 @@
 
                         <com.alexzh.circleimageview.CircleImageView
                             android:id="@+id/profilePic"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:src="@drawable/default_profile"
                             app:view_shadowRadius="2dp"
                             app:view_shadowDx="2dp"
@@ -89,13 +89,13 @@
                                 android:textColor="@color/colorAccent"
                                 android:textAppearance="?android:attr/textAppearanceMedium"
                                 android:text="loading..."
+                                android:textStyle="bold"
                                 android:id="@+id/profileName"
                                 android:layout_marginLeft="5dp"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-light"
                                 android:textSize="15sp"
                                 android:text="loading... "
                                 android:id="@+id/userUpdate"
@@ -177,12 +177,14 @@
                                     android:layout_height="30dp"
                                     android:paddingBottom="2dp"
                                     android:paddingTop="2dp"
+                                    android:layout_marginRight="5dp"
                                     android:backgroundTint="@color/lightgray"
                                     android:src="@drawable/unliked" />
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
+                                    android:layout_marginRight="5dp"
                                     android:id="@+id/likesTotal"
                                     />
 
@@ -191,6 +193,7 @@
                                     android:layout_width="40dp"
                                     android:layout_height="40dp"
                                     android:padding="6dp"
+                                    android:layout_marginRight="4dp"
                                     android:backgroundTint="@color/lightgray"
                                     android:src="@drawable/comment" />
 

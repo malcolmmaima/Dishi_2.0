@@ -57,7 +57,6 @@
 
                 <TextView
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-light"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/darkblue"
@@ -148,6 +147,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
                                 android:text="loading..."
+                                android:textStyle="bold"
                                 android:textAppearance="?android:attr/textAppearanceMedium"
                                 android:textColor="@color/colorAccent" />
 
@@ -157,9 +157,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
                                 android:layout_marginRight="20dp"
-                                android:fontFamily="sans-serif-light"
                                 android:text="loading... "
-                                android:textColor="#666"
                                 android:textSize="15sp" />
 
                         </LinearLayout>
@@ -185,6 +183,7 @@
                                     android:layout_height="30dp"
                                     android:backgroundTint="@color/lightgray"
                                     android:paddingTop="2dp"
+                                    android:layout_marginRight="5dp"
                                     android:paddingBottom="2dp"
                                     android:src="@drawable/unliked" />
 
@@ -192,7 +191,8 @@
                                     android:id="@+id/likesTotal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0" />
+                                    android:text="0"
+                                    android:layout_marginRight="5dp"/>
 
                                 <ImageView
                                     android:id="@+id/comments"
@@ -200,6 +200,7 @@
                                     android:layout_height="40dp"
                                     android:backgroundTint="@color/lightgray"
                                     android:padding="6dp"
+                                    android:layout_marginRight="5dp"
                                     android:src="@drawable/comment" />
 
                                 <ImageView
@@ -208,7 +209,6 @@
                                     android:layout_height="40dp"
                                     android:backgroundTint="@color/lightgray"
                                     android:paddingLeft="5dp"
-                                    android:paddingRight="5dp"
                                     android:paddingBottom="6dp"
                                     android:src="@drawable/share"
                                     android:visibility="gone" />
@@ -329,8 +329,8 @@
 
                         <com.alexzh.circleimageview.CircleImageView
                             android:id="@+id/profilePic"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:scaleType="fitXY"
                             android:src="@drawable/default_profile"
                             app:view_borderColor="#cccccc"

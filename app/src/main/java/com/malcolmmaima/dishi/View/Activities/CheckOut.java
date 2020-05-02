@@ -324,7 +324,11 @@ public class CheckOut extends AppCompatActivity {
                                                             //set three option buttons
                                                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                                                    progressDialog.dismiss();
+                                                                    try {
+                                                                        progressDialog.dismiss();
+                                                                    }catch(Exception er){
+
+                                                                    }
 //                                                        finish();
 //                                                        Intent backToCart = new Intent(CheckOut.this, MyCart.class)
 //                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -379,7 +383,11 @@ public class CheckOut extends AppCompatActivity {
                                                             for(DataSnapshot items : dataSnapshot.getChildren()){
                                                                 Log.d(TAG, "Remove cart item: " + items.getKey());
                                                                 myCartRef.child(items.getKey()).removeValue();
-                                                                progressDialog.dismiss();
+                                                                try {
+                                                                    progressDialog.dismiss();
+                                                                } catch (Exception er){
+
+                                                                }
                                                                 finish();
                                                                 SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
 
@@ -401,7 +409,11 @@ public class CheckOut extends AppCompatActivity {
                                                     for(DataSnapshot items : dataSnapshot.getChildren()){
                                                         Log.d(TAG, "Remove cart item: " + items.getKey());
                                                         myCartRef.child(items.getKey()).removeValue();
-                                                        progressDialog.dismiss();
+                                                        try {
+                                                            progressDialog.dismiss();
+                                                        } catch (Exception e){
+
+                                                        }
                                                         finish();
                                                         SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                     }
@@ -429,8 +441,12 @@ public class CheckOut extends AppCompatActivity {
                                                         myOrders.child(list.get(i).getOwner()).setValue("active");
 
                                                         if(i == list.size()-1){
-                                                            Log.d(TAG, "Updated my orders active");
-                                                            progressDialog.dismiss();
+
+                                                            try {
+                                                                progressDialog.dismiss();
+                                                            } catch (Exception e){
+
+                                                            }
                                                             finish();
                                                             SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                         }
@@ -439,8 +455,11 @@ public class CheckOut extends AppCompatActivity {
                                             }).addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
+                                                    try {
+                                                        progressDialog.dismiss();
+                                                    } catch (Exception er){
 
-                                                    progressDialog.dismiss();
+                                                    }
                                                     Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
                                                             "Something went wrong", Snackbar.LENGTH_LONG);
                                                     snackbar.show();
@@ -492,7 +511,11 @@ public class CheckOut extends AppCompatActivity {
                                                         Log.d(TAG, "Remove cart item "+items.getKey());
                                                         myCartRef.child(items.getKey()).removeValue();
                                                         Log.d(TAG, "Order complete");
-                                                        progressDialog.dismiss();
+                                                        try {
+                                                            progressDialog.dismiss();
+                                                        } catch (Exception er){
+
+                                                        }
                                                         finish();
                                                         SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                     }
@@ -523,7 +546,11 @@ public class CheckOut extends AppCompatActivity {
                                                 myOrders.child(list.get(i).getOwner()).setValue("active");
 
                                                 if(i == list.size()-1){
-                                                    progressDialog.dismiss();
+                                                    try {
+                                                        progressDialog.dismiss();
+                                                    } catch (Exception er){
+
+                                                    }
                                                     finish();
                                                     SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                 }
@@ -532,8 +559,11 @@ public class CheckOut extends AppCompatActivity {
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
+                                            try {
+                                                progressDialog.dismiss();
+                                            } catch (Exception er){
 
-                                            progressDialog.dismiss();
+                                            }
                                             Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
                                                     "Something went wrong", Snackbar.LENGTH_LONG);
                                             snackbar.show();

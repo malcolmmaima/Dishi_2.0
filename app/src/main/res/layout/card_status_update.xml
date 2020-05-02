@@ -26,8 +26,8 @@
 
         <com.alexzh.circleimageview.CircleImageView
             android:id="@+id/profilePic"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/default_profile"
             app:view_shadowRadius="2dp"
             app:view_shadowDx="2dp"
@@ -46,6 +46,7 @@
             android:text="loading..."
             android:id="@+id/profileName"
             android:layout_marginLeft="5dp"
+            android:textStyle="bold"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
@@ -98,23 +99,23 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
             android:textSize="15sp"
             android:text="loading..."
             android:id="@+id/userUpdate"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="25dp"
+            android:layout_marginBottom="5dp"
             android:layout_below="@id/profileName"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toEndOf="@id/profilePic"
-            android:textColor="#666"/>
+            android:visibility="visible"/>
 
         <ImageView
             android:id="@+id/imageShare"
             android:layout_width="match_parent"
             android:layout_height="240dp"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
+            android:layout_marginTop="3dp"
             android:layout_marginBottom="5dp"
             android:layout_below="@id/userUpdate"
             android:layout_toRightOf="@id/profilePic"

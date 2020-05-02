@@ -11,8 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".View.Activities.SearchActivity"
-            android:label="@string/title_activity_search"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_search"></activity>
         <activity android:name=".View.Activities.ReportAbuse" />
         <activity android:name=".View.Activities.MyNotifications" />
         <activity android:name=".View.Activities.FollowersFollowing" />
@@ -28,8 +27,7 @@
         <activity android:name=".View.Activities.BlockedAccount" />
         <activity
             android:name=".View.Activities.AddRider"
-            android:label="@string/title_activity_add_rider"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_add_rider" />
         <activity
             android:name=".View.Activities.ViewMyOrders"
             android:launchMode="singleTop" />
@@ -38,8 +36,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".View.Activities.ViewRestaurant"
-            android:label="@string/title_activity_view_restaurants"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_view_restaurants" />
         <activity android:name=".View.Activities.ViewProfile"
             android:launchMode="singleTask"/>
         <activity android:name=".View.Activities.CheckOut" />
@@ -47,8 +44,7 @@
         <activity android:name=".View.Activities.AccountSettings" />
         <activity
             android:name=".View.Activities.MyCart"
-            android:label="@string/title_activity_my_cart"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_my_cart" />
         <activity android:name=".View.Activities.ViewProduct" />
         <activity android:name=".View.Activities.ViewImage" />
         <activity android:name=".View.Activities.PersonalDetails" />

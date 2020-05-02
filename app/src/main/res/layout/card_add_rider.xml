@@ -36,6 +36,7 @@
             app:view_shadowDy="0dp"
             app:view_borderWidth="2dp"
             app:view_borderColor="#cccccc"
+            android:layout_centerVertical="true"
             android:scaleType="fitXY"
             android:background="@color/pureWhite"
             android:foregroundGravity="center_vertical"
@@ -49,7 +50,7 @@
             android:text="Rider Name"
             android:fontFamily="sans-serif"
             android:id="@+id/riderName"
-            android:layout_marginTop="15dp"
+            android:layout_centerVertical="true"
             android:layout_marginBottom="15dp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"/>
