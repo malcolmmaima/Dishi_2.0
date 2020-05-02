@@ -59,6 +59,7 @@ public class AddMenu extends AppCompatActivity {
     private ImageView foodPic;
     Button save;
     String myPhone;
+    FirebaseAuth mAuth;
     private String [] foodPicActions = {"Open Gallery","Open Camera", "View Photo"};
 
     private String [] foodImageOptions = {"Upload Food Photo","Use Default Photo"};
@@ -90,203 +91,65 @@ public class AddMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_menu);
 
-        defaultFood = "";
-        // Assigning Id to ProgressDialog.
-        progressDialog = new ProgressDialog(AddMenu.this);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            defaultFood = "";
+            // Assigning Id to ProgressDialog.
+            progressDialog = new ProgressDialog(AddMenu.this);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        //keep toolbar pinned at top. push edittext on keyboard load
-        new CommentKeyBoardFix(this);
+            //keep toolbar pinned at top. push edittext on keyboard load
+            new CommentKeyBoardFix(this);
 
-        //Hide keyboard on activity load
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            //Hide keyboard on activity load
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        // Assign FirebaseStorage instance to storageReference.
-        storageReference = FirebaseStorage.getInstance().getReference();
+            // Assign FirebaseStorage instance to storageReference.
+            storageReference = FirebaseStorage.getInstance().getReference();
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Go back to previous activity
-            }
-        });
-        //topToolBar.setLogo(R.drawable.logo);
-        //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
-
-        phone = getIntent().getStringExtra("phone"); //From adapters
-        key = getIntent().getStringExtra("key"); //From adapters, to allow for editing
-
-        FirebaseUser user;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        databaseReference = FirebaseDatabase.getInstance().getReference("menus/"+myPhone);
-        defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
-
-        foodPic = findViewById(R.id.foodpic);
-        productName = findViewById(R.id.productName);
-        productPrice = findViewById(R.id.productPrice);
-        productDescription = findViewById(R.id.productDescription);
-        save = findViewById(R.id.save);
-
-        //Fetch default food pic
-        defaultsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot defaults : dataSnapshot.getChildren()) {
-
-                    try {
-                        if (defaults.getKey().equals("foodPic")) {
-                            defaultFood = defaults.getValue(String.class);
-
-                        }
-                    } catch (Exception e){
-
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        //adding new item
-        if(key == null){
-            setTitle("Add New Item");
-
-            foodPic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    // Creating intent.
-                    Intent intent = new Intent();
-
-                    // Setting intent type as image to select image from phone storage.
-                    intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
-
-                }
-            });
-
-            save.setOnClickListener(new View.OnClickListener() {
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    // Checking whether FilePathUri Is not empty and passes validation check.
-                    if (FilePathUri != null && CheckFieldValidation()) {
-                        // Setting progressDialog Title.
-                        progressDialog.setMessage("Adding...");
-
-                        // Showing progressDialog.
-                        progressDialog.show();
-                        progressDialog.setCancelable(false);
-                        uploadMenu();
-
-                    }
-
-                    // Checking whether FilePathUri Is empty and passes validation check.
-                    else if(FilePathUri == null && CheckFieldValidation() && key != null){
-
-                        progressDialog.setMessage("Saving...");
-                        // Showing progressDialog.
-                        progressDialog.show();
-                        progressDialog.setCancelable(false);
-                        uploadMenu();
-
-                    }
-
-                    //Handle other use cases
-                    else {
-                        if(FilePathUri != null){
-                            if(CheckFieldValidation()){
-                                progressDialog.setMessage("Saving...");
-                                // Showing progressDialog.
-                                progressDialog.show();
-                                progressDialog.setCancelable(false);
-                                uploadMenu();
-                            }
-                        }
-
-                        else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
-                            builder.setItems(foodImageOptions, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if(which == 0){
-                                        // Open Gallery.
-                                        Intent intent = new Intent();
-                                        // Setting intent type as image to select image from phone storage.
-                                        intent.setType("image/*");
-                                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                                        startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
-                                    }
-                                    if(which == 1){
-                                        FilePathUri = null;
-
-                                        if(CheckFieldValidation()){
-                                            progressDialog.setMessage("Saving...");
-                                            // Showing progressDialog.
-                                            progressDialog.show();
-                                            progressDialog.setCancelable(false);
-                                            uploadMenu();
-                                        }
-                                    }
-                                }
-                            });
-                            builder.setCancelable(false);
-                            builder.create();
-                            builder.show();
-                        }
-
-                    }
+                    finish(); // Go back to previous activity
                 }
             });
-        } else { //Editing existing item (key != null)
+            //topToolBar.setLogo(R.drawable.logo);
+            //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
-            setTitle("Edit Item");
-            //SafeToast.makeText(this, "key: " + key, Toast.LENGTH_SHORT).show();
+            phone = getIntent().getStringExtra("phone"); //From adapters
+            key = getIntent().getStringExtra("key"); //From adapters, to allow for editing
 
-            //Fetch item details from DB
-            databaseReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseUser user;
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            databaseReference = FirebaseDatabase.getInstance().getReference("menus/"+myPhone);
+            defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
+
+            foodPic = findViewById(R.id.foodpic);
+            productName = findViewById(R.id.productName);
+            productPrice = findViewById(R.id.productPrice);
+            productDescription = findViewById(R.id.productDescription);
+            save = findViewById(R.id.save);
+
+            //Fetch default food pic
+            defaultsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot defaults : dataSnapshot.getChildren()) {
 
-                    for (DataSnapshot menuDetails : dataSnapshot.getChildren()){
                         try {
-
-                            if(menuDetails.getKey().equals("description")){
-                                description = menuDetails.getValue(String.class);
-                                productDescription.setText(description);
-                            }
-                            if(menuDetails.getKey().equals("imageURL")){
-                                imageLink = menuDetails.getValue(String.class);
-
-                                Picasso.with(AddMenu.this).load(imageLink).fit().centerCrop()
-                                            .placeholder(R.drawable.menu)
-                                            .error(R.drawable.menu)
-                                            .into(foodPic);
+                            if (defaults.getKey().equals("foodPic")) {
+                                defaultFood = defaults.getValue(String.class);
 
                             }
-                            if(menuDetails.getKey().equals("name")){
-                                name = menuDetails.getValue(String.class);
-                                productName.setText(name);
-                            }
-                            if(menuDetails.getKey().equals("price")){
-                                price = menuDetails.getValue(String.class);
-                                productPrice.setText(price);
-                            }
-                            if(menuDetails.getKey().equals("storageLocation")){
-                                imageLocation = menuDetails.getValue(String.class);
-                            }
-
-
                         } catch (Exception e){
 
                         }
@@ -300,133 +163,277 @@ public class AddMenu extends AppCompatActivity {
                 }
             });
 
-            /**
-             * On image click, allow user to change or view current image
-             */
-            foodPic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
-                    builder.setItems(foodPicActions, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(which == 0){
-                                // Open Gallery.
-                                Intent intent = new Intent();
-                                // Setting intent type as image to select image from phone storage.
-                                intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
-                            }
-                            if(which == 1){
-                                //Open Camera
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                                snackbar.show();
+            //adding new item
+            if(key == null){
+                setTitle("Add New Item");
+
+                foodPic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        // Creating intent.
+                        Intent intent = new Intent();
+
+                        // Setting intent type as image to select image from phone storage.
+                        intent.setType("image/*");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+
+                    }
+                });
+
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        // Checking whether FilePathUri Is not empty and passes validation check.
+                        if (FilePathUri != null && CheckFieldValidation()) {
+                            // Setting progressDialog Title.
+                            progressDialog.setMessage("Adding...");
+
+                            // Showing progressDialog.
+                            progressDialog.show();
+                            progressDialog.setCancelable(false);
+                            uploadMenu();
+
+                        }
+
+                        // Checking whether FilePathUri Is empty and passes validation check.
+                        else if(FilePathUri == null && CheckFieldValidation() && key != null){
+
+                            progressDialog.setMessage("Saving...");
+                            // Showing progressDialog.
+                            progressDialog.show();
+                            progressDialog.setCancelable(false);
+                            uploadMenu();
+
+                        }
+
+                        //Handle other use cases
+                        else {
+                            if(FilePathUri != null){
+                                if(CheckFieldValidation()){
+                                    progressDialog.setMessage("Saving...");
+                                    // Showing progressDialog.
+                                    progressDialog.show();
+                                    progressDialog.setCancelable(false);
+                                    uploadMenu();
+                                }
                             }
 
-                            if(which == 2){
-                                //View current photo
-                                if(!imageLink.equals("")){
-                                    Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
+                                builder.setItems(foodImageOptions, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(which == 0){
+                                            // Open Gallery.
+                                            Intent intent = new Intent();
+                                            // Setting intent type as image to select image from phone storage.
+                                            intent.setType("image/*");
+                                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                                            startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                                        }
+                                        if(which == 1){
+                                            FilePathUri = null;
 
-                                    slideactivity.putExtra("imageURL", imageLink);
-                                    startActivity(slideactivity);
+                                            if(CheckFieldValidation()){
+                                                progressDialog.setMessage("Saving...");
+                                                // Showing progressDialog.
+                                                progressDialog.show();
+                                                progressDialog.setCancelable(false);
+                                                uploadMenu();
+                                            }
+                                        }
+                                    }
+                                });
+                                builder.setCancelable(false);
+                                builder.create();
+                                builder.show();
+                            }
+
+                        }
+                    }
+                });
+            } else { //Editing existing item (key != null)
+
+                setTitle("Edit Item");
+                //SafeToast.makeText(this, "key: " + key, Toast.LENGTH_SHORT).show();
+
+                //Fetch item details from DB
+                databaseReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot menuDetails : dataSnapshot.getChildren()){
+                            try {
+
+                                if(menuDetails.getKey().equals("description")){
+                                    description = menuDetails.getValue(String.class);
+                                    productDescription.setText(description);
+                                }
+                                if(menuDetails.getKey().equals("imageURL")){
+                                    imageLink = menuDetails.getValue(String.class);
+
+                                    Picasso.with(AddMenu.this).load(imageLink).fit().centerCrop()
+                                            .placeholder(R.drawable.menu)
+                                            .error(R.drawable.menu)
+                                            .into(foodPic);
+
+                                }
+                                if(menuDetails.getKey().equals("name")){
+                                    name = menuDetails.getValue(String.class);
+                                    productName.setText(name);
+                                }
+                                if(menuDetails.getKey().equals("price")){
+                                    price = menuDetails.getValue(String.class);
+                                    productPrice.setText(price);
+                                }
+                                if(menuDetails.getKey().equals("storageLocation")){
+                                    imageLocation = menuDetails.getValue(String.class);
                                 }
 
-                                else {
-                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+
+                            } catch (Exception e){
+
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                /**
+                 * On image click, allow user to change or view current image
+                 */
+                foodPic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
+                        builder.setItems(foodPicActions, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if(which == 0){
+                                    // Open Gallery.
+                                    Intent intent = new Intent();
+                                    // Setting intent type as image to select image from phone storage.
+                                    intent.setType("image/*");
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                                }
+                                if(which == 1){
+                                    //Open Camera
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
                                     snackbar.show();
                                 }
-                            }
-                        }
-                    });
-                    builder.create();
-                    builder.show();
-                }
-            });
 
-            save.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+                                if(which == 2){
+                                    //View current photo
+                                    if(!imageLink.equals("")){
+                                        Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    // Checking whether FilePathUri Is not empty and passes validation check.
-                    if (FilePathUri != null && CheckFieldValidation()) {
-                        // Setting progressDialog Title.
-                        progressDialog.setMessage("Adding...");
-
-                        // Showing progressDialog.
-                        progressDialog.show();
-                        progressDialog.setCancelable(false);
-                        uploadMenu();
-
-                    }
-
-                    // Checking whether FilePathUri Is empty and passes validation check.
-                    else if(FilePathUri == null && CheckFieldValidation() && key != null){
-
-                        progressDialog.setMessage("Saving...");
-                        // Showing progressDialog.
-                        progressDialog.show();
-                        progressDialog.setCancelable(false);
-                        uploadMenu();
-
-                    }
-
-                    //Handle other use cases
-                    else {
-                        if(FilePathUri != null){
-                            if(CheckFieldValidation()){
-                                progressDialog.setMessage("Saving...");
-                                // Showing progressDialog.
-                                progressDialog.show();
-                                progressDialog.setCancelable(false);
-                                uploadMenu();
-                            }
-                        }
-
-                        else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
-                            builder.setItems(foodPicActions, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if(which == 0){
-                                        // Open Gallery.
-                                        Intent intent = new Intent();
-                                        // Setting intent type as image to select image from phone storage.
-                                        intent.setType("image/*");
-                                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                                        startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                                        slideactivity.putExtra("imageURL", imageLink);
+                                        startActivity(slideactivity);
                                     }
-                                    if(which == 1){
-                                        //Open Camera
-                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+
+                                    else {
+                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
                                         snackbar.show();
                                     }
-
-                                    if(which == 2){
-                                        //View current photo
-                                        if(!imageLink.equals("")){
-                                            Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                            slideactivity.putExtra("imageURL", imageLink);
-                                            startActivity(slideactivity);
-                                        }
-
-                                        else {
-                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                            snackbar.show();
-                                        }
-                                    }
                                 }
-                            });
-                            builder.create();
-                            builder.show();
+                            }
+                        });
+                        builder.create();
+                        builder.show();
+                    }
+                });
+
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        // Checking whether FilePathUri Is not empty and passes validation check.
+                        if (FilePathUri != null && CheckFieldValidation()) {
+                            // Setting progressDialog Title.
+                            progressDialog.setMessage("Adding...");
+
+                            // Showing progressDialog.
+                            progressDialog.show();
+                            progressDialog.setCancelable(false);
+                            uploadMenu();
+
                         }
 
-                    }
-                }
-            });
+                        // Checking whether FilePathUri Is empty and passes validation check.
+                        else if(FilePathUri == null && CheckFieldValidation() && key != null){
 
+                            progressDialog.setMessage("Saving...");
+                            // Showing progressDialog.
+                            progressDialog.show();
+                            progressDialog.setCancelable(false);
+                            uploadMenu();
+
+                        }
+
+                        //Handle other use cases
+                        else {
+                            if(FilePathUri != null){
+                                if(CheckFieldValidation()){
+                                    progressDialog.setMessage("Saving...");
+                                    // Showing progressDialog.
+                                    progressDialog.show();
+                                    progressDialog.setCancelable(false);
+                                    uploadMenu();
+                                }
+                            }
+
+                            else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(AddMenu.this);
+                                builder.setItems(foodPicActions, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(which == 0){
+                                            // Open Gallery.
+                                            Intent intent = new Intent();
+                                            // Setting intent type as image to select image from phone storage.
+                                            intent.setType("image/*");
+                                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                                            startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                                        }
+                                        if(which == 1){
+                                            //Open Camera
+                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                        }
+
+                                        if(which == 2){
+                                            //View current photo
+                                            if(!imageLink.equals("")){
+                                                Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                slideactivity.putExtra("imageURL", imageLink);
+                                                startActivity(slideactivity);
+                                            }
+
+                                            else {
+                                                Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                                snackbar.show();
+                                            }
+                                        }
+                                    }
+                                });
+                                builder.create();
+                                builder.show();
+                            }
+
+                        }
+                    }
+                });
+
+            }
         }
 
     }

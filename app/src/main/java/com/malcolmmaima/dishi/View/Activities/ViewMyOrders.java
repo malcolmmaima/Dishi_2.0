@@ -69,818 +69,830 @@ public class ViewMyOrders extends AppCompatActivity {
     Menu myMenu;
     String [] riderOptions = {"View","Message", "Call"};
     final int[] total = {0};
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_my_orders);
 
-        final String[] tempRiderPhoneHolder = new String[1];
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            final String[] tempRiderPhoneHolder = new String[1];
 
-        //Initialize variables
-        deliveryCharge = 0.0;
-        totalAmount = 0.0;
+            //Initialize variables
+            deliveryCharge = 0.0;
+            totalAmount = 0.0;
 
-        //Data passed from adapter
-        phone = getIntent().getStringExtra("phone"); //From adapters
-        restaurantName = getIntent().getStringExtra("name");
+            //Data passed from adapter
+            phone = getIntent().getStringExtra("phone"); //From adapters
+            restaurantName = getIntent().getStringExtra("name");
 
-        try {
-            user = FirebaseAuth.getInstance().getCurrentUser();
-        } catch (Exception e){
-            SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
-        }
-
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
-        myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
-        myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
-
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle(restaurantName);
-
-        subTotal = findViewById(R.id.subTotal);
-        deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
-        payment = findViewById(R.id.payment);
-        totalBill = findViewById(R.id.totalBill);
-        recyclerview = findViewById(R.id.rview);
-        confirmOrder = findViewById(R.id.btn_confirm);
-        confirmOrder.setTag("confirm");
-        declineOrder = findViewById(R.id.btn_decline);
-        declineOrder.setTag("active");
-        DeliveryAddress = findViewById(R.id.DeliveryAddress);
-        myRemarks = findViewById(R.id.myOrderRemarks);
-        riderName = findViewById(R.id.riderName);
-        riderIcon = findViewById(R.id.riderIcon);
-        timeStamp = findViewById(R.id.timeStamp);
-        myOrderID = findViewById(R.id.myOrderID);
-
-        /**
-         * On loading this module check to see if it exists. this is a one time check
-         */
-        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
-                    finish();
-                }
+            try {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+            } catch (Exception e){
+                SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
+            myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
+            myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
 
-            }
-        });
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            setTitle(restaurantName);
 
-        /**
-         * Initialize cart items total and keep track of items
-         */
-        customerOrderItemsListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            subTotal = findViewById(R.id.subTotal);
+            deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
+            payment = findViewById(R.id.payment);
+            totalBill = findViewById(R.id.totalBill);
+            recyclerview = findViewById(R.id.rview);
+            confirmOrder = findViewById(R.id.btn_confirm);
+            confirmOrder.setTag("confirm");
+            declineOrder = findViewById(R.id.btn_decline);
+            declineOrder.setTag("active");
+            DeliveryAddress = findViewById(R.id.DeliveryAddress);
+            myRemarks = findViewById(R.id.myOrderRemarks);
+            riderName = findViewById(R.id.riderName);
+            riderIcon = findViewById(R.id.riderIcon);
+            timeStamp = findViewById(R.id.timeStamp);
+            myOrderID = findViewById(R.id.myOrderID);
 
-                if(!dataSnapshot.exists()){
-                    finish();
+            /**
+             * On loading this module check to see if it exists. this is a one time check
+             */
+            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
                 }
 
-                try {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
-                    String remarks = dataSnapshot.child("remarks").getValue(String.class);
-                    String orderID = dataSnapshot.child("orderID").getValue(String.class);
-                    myOrderID.setText("ORDER ID: #"+orderID);
+                }
+            });
 
-                    initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+            /**
+             * Initialize cart items total and keep track of items
+             */
+            customerOrderItemsListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    //Get today's date
-                    GetCurrentDate currentDate = new GetCurrentDate();
-                    String currDate = currentDate.getDate();
-
-                    //Get dates
-                    String dtEnd = currDate;
-                    String dtStart = initiatedTime;
-
-                    //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                    //Format both current date and date status update was posted
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
-                    try {
-
-                        //Convert String date values to Date values
-                        Date dateStart;
-                        Date dateEnd;
-
-                        //Date dateStart = format.parse(dtStart);
-                        String[] timeS = Split(initiatedTime);
-                        String[] timeT = Split(currDate);
-
-                        /**
-                         * timeS[0] = date
-                         * timeS[1] = hr
-                         * timeS[2] = min
-                         * timeS[3] = seconds
-                         * timeS[4] = timezone
-                         */
-
-                        //post timeStamp
-                        if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                            timeS[4] = "GMT+03:00";
-
-                            //2020-04-27:20:37:32:GMT+03:00
-                            dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                            dateStart = format.parse(dtStart);
-                        } else {
-                            dateStart = format.parse(dtStart);
-                        }
-
-                        //my device current date
-                        if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                            timeT[4] = "GMT+03:00";
-
-                            //2020-04-27:20:37:32:GMT+03:00
-                            dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                            dateEnd = format.parse(dtEnd);
-                        } else {
-                            dateEnd = format.parse(dtEnd);
-                        }
-
-                        //https://memorynotfound.com/calculate-relative-time-time-ago-java/
-                        //Now compute timeAgo duration
-                        TimeAgo timeAgo = new TimeAgo();
-
-                        timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "timeStamp: "+ e.getMessage());
-                    }
-                    try {
-                        riderPhone = dataSnapshot.child("rider").getValue(String.class);
-
-                    } catch (Exception e){
-                        Log.e(TAG, "onDataChange: ", e);
+                    if(!dataSnapshot.exists()){
+                        finish();
                     }
 
+                    try {
 
-                    myRemarks.setText("Remarks: "+remarks);
-                    if (completed == true) {
-                        final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
-                                .setMessage("Order Delivered?")
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+                        Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
+                        String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                        String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                        myOrderID.setText("ORDER ID: #"+orderID);
 
-                                                    try {
-                                                        tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
-                                                    } catch (Exception e){}
-                                                    try {
-                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                        prod.setKey(items.getKey());
+                        initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
-                                                        /**
-                                                         * Move order items to history node
-                                                         */
-                                                        myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
+                        //Get today's date
+                        GetCurrentDate currentDate = new GetCurrentDate();
+                        String currDate = currentDate.getDate();
 
-                                                                        myOrders.child(phone).removeValue();
-                                                                        DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                                ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
+                        //Get dates
+                        String dtEnd = currDate;
+                        String dtStart = initiatedTime;
 
-                                                                        rider.removeValue();
+                        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                        //Format both current date and date status update was posted
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                        try {
 
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
+                            //Convert String date values to Date values
+                            Date dateStart;
+                            Date dateEnd;
 
-                                                    } catch (Exception e) {
+                            //Date dateStart = format.parse(dtStart);
+                            String[] timeS = Split(initiatedTime);
+                            String[] timeT = Split(currDate);
 
+                            /**
+                             * timeS[0] = date
+                             * timeS[1] = hr
+                             * timeS[2] = min
+                             * timeS[3] = seconds
+                             * timeS[4] = timezone
+                             */
+
+                            //post timeStamp
+                            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                timeS[4] = "GMT+03:00";
+
+                                //2020-04-27:20:37:32:GMT+03:00
+                                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                dateStart = format.parse(dtStart);
+                            } else {
+                                dateStart = format.parse(dtStart);
+                            }
+
+                            //my device current date
+                            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                timeT[4] = "GMT+03:00";
+
+                                //2020-04-27:20:37:32:GMT+03:00
+                                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                dateEnd = format.parse(dtEnd);
+                            } else {
+                                dateEnd = format.parse(dtEnd);
+                            }
+
+                            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                            //Now compute timeAgo duration
+                            TimeAgo timeAgo = new TimeAgo();
+
+                            timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "timeStamp: "+ e.getMessage());
+                        }
+                        try {
+                            riderPhone = dataSnapshot.child("rider").getValue(String.class);
+
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+
+
+                        myRemarks.setText("Remarks: "+remarks);
+                        if (completed == true) {
+                            final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
+                                    .setMessage("Order Delivered?")
+                                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                    .setCancelable(false)
+                                    //set three option buttons
+                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+
+                                                        try {
+                                                            tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                        } catch (Exception e){}
+                                                        try {
+                                                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                            prod.setKey(items.getKey());
+
+                                                            /**
+                                                             * Move order items to history node
+                                                             */
+                                                            myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+
+                                                                            myOrders.child(phone).removeValue();
+                                                                            DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                    ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
+
+                                                                            rider.removeValue();
+
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+
+                                                        } catch (Exception e) {
+
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            }
-                                        });
+                                                }
+                                            });
 
-                                    }
-                                })//setPositiveButton
+                                        }
+                                    })//setPositiveButton
 
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                })
+                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                    })
 
-                                .create();
-                        finish.show();
-                    }
-                } catch (Exception e){
-
-                }
-                total[0] = 0;
-
-                list = new ArrayList<>();
-                for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
-
-                    try {
-                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                        prod.setKey(items.getKey());
-                        list.add(prod);
-
-                        if(prod.getConfirmed() == true){
-                            int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
-                            total[0] = total[0] + adapterTotal;
-                            totalAmount = total[0] + deliveryCharge;
-                            payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
+                                    .create();
+                            finish.show();
                         }
-
                     } catch (Exception e){
 
                     }
-                }
-                subTotal.setText("Ksh "+total[0]);
+                    total[0] = 0;
 
-                //Mambo kienyeji hapa (^_^) basically want to enable order tracking by customer if atleast one item is confirmed
-                if(total[0] < 1.0){
-                    DeliveryAddress.setVisibility(View.GONE);
-                    confirmOrder.setVisibility(View.GONE);
-                } else {
-                    DeliveryAddress.setVisibility(View.VISIBLE);
-                    confirmOrder.setVisibility(View.VISIBLE);
-                }
+                    list = new ArrayList<>();
+                    for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
-                if(!list.isEmpty()){
-                    Collections.reverse(list);
-                    ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
-                    recyclerview.setLayoutManager(layoutmanager);
-                    recyclerview.setItemAnimator( new DefaultItemAnimator());
-                    recycler.notifyDataSetChanged();
-                    recyclerview.setAdapter(recycler);
+                        try {
+                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                            prod.setKey(items.getKey());
+                            list.add(prod);
 
-
-                }
-
-                totalBill.setText("ksh " + totalAmount);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        customerOrderItems.addValueEventListener(customerOrderItemsListener);
-
-        /**
-         * fetch current rider
-         */
-        currentRiderListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    riderName.setText(restaurantName);
-                }
-
-                else {
-                    final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
-                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            try {
-                                UserModel riderUser = dataSnapshot.getValue(UserModel.class);
-                                riderName.setText(riderUser.getFirstname() + " " + riderUser.getLastname());
-                            } catch (Exception e){}
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-                    /**
-                     * Reference:
-                     *
-                     * dataSnapshot.getValue() = the rider's phone
-                     * phone = the restaurant's phone
-                     */
-
-                    riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone+"/"+myPhone);
-                    riderStatusListener = new ValueEventListener() {
-                        @SuppressLint("RestrictedApi")
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
-                            String riderOrderStatus = dtSnapshot.getValue(String.class);
-                            if(riderOrderStatus == null && riderPhone == null){
-                                Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
-                                riderName.setText(restaurantName);
-                                //customerOrderItems.child("rider").removeValue(); //bug
+                            if(prod.getConfirmed() == true){
+                                int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                                total[0] = total[0] + adapterTotal;
+                                totalAmount = total[0] + deliveryCharge;
+                                payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
                             }
 
-                            try {
-                                if (riderOrderStatus.equals("accepted")) {
-                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    confirmOrder.setVisibility(View.VISIBLE);
-                                    confirmOrder.setEnabled(true);
-                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.colorPrimary));
-                                }
-
-                                if (riderOrderStatus.equals("assigned")) {
-                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    confirmOrder.setVisibility(View.VISIBLE);
-                                    confirmOrder.setEnabled(false);
-                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
-                                }
-
-                                if (riderOrderStatus.equals("declined")) {
-                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    confirmOrder.setVisibility(View.GONE);
-                                    confirmOrder.setEnabled(false);
-                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
-                                }
-
-                            } catch (Exception e){
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        } catch (Exception e){
 
                         }
-                    };
-                    riderStatus.addValueEventListener(riderStatusListener);
+                    }
+                    subTotal.setText("Ksh "+total[0]);
+
+                    //Mambo kienyeji hapa (^_^) basically want to enable order tracking by customer if atleast one item is confirmed
+                    if(total[0] < 1.0){
+                        DeliveryAddress.setVisibility(View.GONE);
+                        confirmOrder.setVisibility(View.GONE);
+                    } else {
+                        DeliveryAddress.setVisibility(View.VISIBLE);
+                        confirmOrder.setVisibility(View.VISIBLE);
+                    }
+
+                    if(!list.isEmpty()){
+                        Collections.reverse(list);
+                        ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
+                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
+                        recyclerview.setLayoutManager(layoutmanager);
+                        recyclerview.setItemAnimator( new DefaultItemAnimator());
+                        recycler.notifyDataSetChanged();
+                        recyclerview.setAdapter(recycler);
+
+
+                    }
+
+                    totalBill.setText("ksh " + totalAmount);
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        };
-        customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+                }
+            };
+            customerOrderItems.addValueEventListener(customerOrderItemsListener);
 
-        riderName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
+            /**
+             * fetch current rider
+             */
+            currentRiderListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        riderName.setText(restaurantName);
+                    }
 
-                if(riderPhone != null && !riderPhone.equals(myPhone)){
-                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewMyOrders.this);
-                    builder.setTitle(riderName.getText().toString());
-                    builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, final int which) {
-                            if(which == 0){
-                                if(riderPhone != null){
-                                    Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
-                                }
+                    else {
+                        final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
+                        riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                try {
+                                    UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                                    riderName.setText(riderUser.getFirstname() + " " + riderUser.getLastname());
+                                } catch (Exception e){}
                             }
 
-                            if(which == 1){
-                                if(riderPhone != null){
-                                    Intent slideactivity = new Intent(ViewMyOrders.this, Chat.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                    slideactivity.putExtra("fromPhone", myPhone);
-                                    slideactivity.putExtra("toPhone", riderPhone);
-                                    Bundle bndlanimation =
-                                            null;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        bndlanimation = ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
+                            }
+                        });
+
+                        /**
+                         * Reference:
+                         *
+                         * dataSnapshot.getValue() = the rider's phone
+                         * phone = the restaurant's phone
+                         */
+
+                        riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone+"/"+myPhone);
+                        riderStatusListener = new ValueEventListener() {
+                            @SuppressLint("RestrictedApi")
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
+                                String riderOrderStatus = dtSnapshot.getValue(String.class);
+                                if(riderOrderStatus == null && riderPhone == null){
+                                    Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
+                                    riderName.setText(restaurantName);
+                                    //customerOrderItems.child("rider").removeValue(); //bug
+                                }
+
+                                try {
+                                    if (riderOrderStatus.equals("accepted")) {
+                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
+                                        confirmOrder.setVisibility(View.VISIBLE);
+                                        confirmOrder.setEnabled(true);
+                                        confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.colorPrimary));
                                     }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                        startActivity(slideactivity, bndlanimation);
+
+                                    if (riderOrderStatus.equals("assigned")) {
+                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                        confirmOrder.setVisibility(View.VISIBLE);
+                                        confirmOrder.setEnabled(false);
+                                        confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
+                                    }
+
+                                    if (riderOrderStatus.equals("declined")) {
+                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+                                        confirmOrder.setVisibility(View.GONE);
+                                        confirmOrder.setEnabled(false);
+                                        confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
+                                    }
+
+                                } catch (Exception e){
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        };
+                        riderStatus.addValueEventListener(riderStatusListener);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+
+            riderName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if(riderPhone != null && !riderPhone.equals(myPhone)){
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewMyOrders.this);
+                        builder.setTitle(riderName.getText().toString());
+                        builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, final int which) {
+                                if(which == 0){
+                                    if(riderPhone != null){
+                                        Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
                                     }
                                 }
 
-                            }
+                                if(which == 1){
+                                    if(riderPhone != null){
+                                        Intent slideactivity = new Intent(ViewMyOrders.this, Chat.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                            if(which == 2){
-                                if(riderPhone != null){
-                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
-                                    startActivity(intent);
-                                }
-
-                            }
-                        }
-                    });
-                    builder.create();
-                    builder.show();
-                }
-
-            }
-        });
-
-        DeliveryAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent slideactivity = new Intent(ViewMyOrders.this, GeoTracking.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("restaurantPhone", phone);
-                slideactivity.putExtra("customerPhone", myPhone);
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
-                startActivity(slideactivity, bndlanimation);
-
-            }
-        });
-
-
-        confirmOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                final AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
-                        .setMessage("Order has been delivered?")
-                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                        .setCancelable(false)
-                        //set three option buttons
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-
-                                customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
-                                            try {
-                                                //We need to capture the rider phone before the node is removed. this will allow us to
-                                                //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
-                                                //which would mean in turn we are unable to update the rider status
-                                                tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
-                                            } catch (Exception e){}
-                                            try {
-                                                ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                prod.setKey(items.getKey());
-
-                                                /**
-                                                 * Move order items to history node
-                                                 */
-                                                myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-
-                                                                //Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
-                                                                myOrders.child(phone).removeValue();
-                                                                DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                        ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
-
-                                                                rider.removeValue();
-
-                                                            }
-                                                        });
-                                                    }
-                                                });
-
-                                            } catch (Exception e){
-
-                                            }
+                                        slideactivity.putExtra("fromPhone", myPhone);
+                                        slideactivity.putExtra("toPhone", riderPhone);
+                                        Bundle bndlanimation =
+                                                null;
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            bndlanimation = ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
+                                        }
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            startActivity(slideactivity, bndlanimation);
                                         }
                                     }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                }
 
+                                if(which == 2){
+                                    if(riderPhone != null){
+                                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
+                                        startActivity(intent);
                                     }
-                                });
 
+                                }
                             }
-                        })//setPositiveButton
+                        });
+                        builder.create();
+                        builder.show();
+                    }
 
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //Do nothing
-                                Snackbar.make(v.getRootView(), "Confirm once order has been delivered", Snackbar.LENGTH_LONG).show();
-                            }
-                        })
-                        .create();
-                confirmorder.show();
-            }
-        });
+                }
+            });
 
-        declineOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
-                        .setMessage("Cancel your order?")
-                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                        .setCancelable(false)
-                        //set three option buttons
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
+            DeliveryAddress.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent slideactivity = new Intent(ViewMyOrders.this, GeoTracking.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("restaurantPhone", phone);
+                    slideactivity.putExtra("customerPhone", myPhone);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(ViewMyOrders.this, R.anim.animation,R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
 
-                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                }
+            });
 
-                                        myOrders.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                finish();
-                                                SafeToast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
+
+            confirmOrder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    final AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
+                            .setMessage("Order has been delivered?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
+                                                try {
+                                                    //We need to capture the rider phone before the node is removed. this will allow us to
+                                                    //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
+                                                    //which would mean in turn we are unable to update the rider status
+                                                    tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                } catch (Exception e){}
+                                                try {
+                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                    prod.setKey(items.getKey());
+
+                                                    /**
+                                                     * Move order items to history node
+                                                     */
+                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+
+                                                                    //Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
+                                                                    myOrders.child(phone).removeValue();
+                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                            ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
+
+                                                                    rider.removeValue();
+
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+
+                                                } catch (Exception e){
+
+                                                }
                                             }
-                                        });
+                                        }
 
-                                    }
-                                });
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        })//setPositiveButton
+                                        }
+                                    });
 
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //Do nothing
-                            }
-                        })
-                        .create();
-                confirmorder.show();
-            }
-        });
+                                }
+                            })//setPositiveButton
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Go back to previous activity
-            }
-        });
-        //topToolBar.setLogo(R.drawable.logo);
-        //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                    Snackbar.make(v.getRootView(), "Confirm once order has been delivered", Snackbar.LENGTH_LONG).show();
+                                }
+                            })
+                            .create();
+                    confirmorder.show();
+                }
+            });
 
+            declineOrder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
+                            .setMessage("Cancel your order?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
 
+                                    customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                            myOrders.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    finish();
+                                                    SafeToast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                        }
+                                    });
+
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
+                            .create();
+                    confirmorder.show();
+                }
+            });
+
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); // Go back to previous activity
+                }
+            });
+            //topToolBar.setLogo(R.drawable.logo);
+            //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
+
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        //Data passed from adapter
-        final String phone_ = intent.getStringExtra("phone"); //From adapters
-        final String restaurantName_ = intent.getStringExtra("name");
-        setTitle(restaurantName_);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            //Data passed from adapter
+            final String phone_ = intent.getStringExtra("phone"); //From adapters
+            final String restaurantName_ = intent.getStringExtra("name");
+            setTitle(restaurantName_);
 
-        phone = phone_;
-        restaurantName = restaurantName_;
+            phone = phone_;
+            restaurantName = restaurantName_;
 
-        //SafeToast.makeText(this, "Phone: " + phone_, Toast.LENGTH_LONG).show();
+            //SafeToast.makeText(this, "Phone: " + phone_, Toast.LENGTH_LONG).show();
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone_+"/"+myPhone);
-        myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
-        myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone_+"/"+myPhone);
+            myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
+            myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
 
-        /**
-         * Initialize cart items total and keep track of items
-         */
-        customerOrderItemsListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            /**
+             * Initialize cart items total and keep track of items
+             */
+            customerOrderItemsListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                if(!dataSnapshot.exists()){
-                    finish();
-                }
-
-                try {
-                    Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
-                    String remarks = dataSnapshot.child("remarks").getValue(String.class);
-
-                    try {
-                        riderPhone = dataSnapshot.child("rider").getValue(String.class);
-                    } catch (Exception e){
-
+                    if(!dataSnapshot.exists()){
+                        finish();
                     }
 
-                    myRemarks.setText("Remarks: "+remarks);
-                    if (completed == true) {
-                        final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
-                                .setMessage("Order Delivered?")
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+                    try {
+                        Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
+                        String remarks = dataSnapshot.child("remarks").getValue(String.class);
 
-                                                    try {
-                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                        prod.setKey(items.getKey());
+                        try {
+                            riderPhone = dataSnapshot.child("rider").getValue(String.class);
+                        } catch (Exception e){
 
-                                                        /**
-                                                         * Move order items to history node
-                                                         */
-                                                        myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
+                        }
 
-                                                                        myOrders.child(phone_).removeValue();
-                                                                        DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                                ("my_ride_requests/"+riderPhone+"/"+phone_+"/"+myPhone);
+                        myRemarks.setText("Remarks: "+remarks);
+                        if (completed == true) {
+                            final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
+                                    .setMessage("Order Delivered?")
+                                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                    .setCancelable(false)
+                                    //set three option buttons
+                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
 
-                                                                        rider.removeValue();
+                                                        try {
+                                                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                            prod.setKey(items.getKey());
 
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
+                                                            /**
+                                                             * Move order items to history node
+                                                             */
+                                                            myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
 
-                                                    } catch (Exception e) {
+                                                                            myOrders.child(phone_).removeValue();
+                                                                            DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                    ("my_ride_requests/"+riderPhone+"/"+phone_+"/"+myPhone);
 
+                                                                            rider.removeValue();
+
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+
+                                                        } catch (Exception e) {
+
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            }
-                                        });
+                                                }
+                                            });
 
-                                    }
-                                })//setPositiveButton
+                                        }
+                                    })//setPositiveButton
 
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                })
+                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                    })
 
-                                .create();
-                        finish.show();
-                    }
-                } catch (Exception e){
-
-                }
-                total[0] = 0;
-
-                list = new ArrayList<>();
-                for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
-
-                    try {
-                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                        prod.setKey(items.getKey());
-                        list.add(prod);
-
-                        if(prod.getConfirmed() == true){
-                            int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
-                            total[0] = total[0] + adapterTotal;
-                            totalAmount = total[0] + deliveryCharge;
-                            payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
+                                    .create();
+                            finish.show();
                         }
-
                     } catch (Exception e){
 
                     }
-                }
-                subTotal.setText("Ksh "+total[0]);
+                    total[0] = 0;
 
-                if(!list.isEmpty()){
-                    Collections.reverse(list);
-                    ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
-                    recyclerview.setLayoutManager(layoutmanager);
-                    recyclerview.setItemAnimator( new DefaultItemAnimator());
-                    recycler.notifyDataSetChanged();
-                    recyclerview.setAdapter(recycler);
+                    list = new ArrayList<>();
+                    for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
+                        try {
+                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                            prod.setKey(items.getKey());
+                            list.add(prod);
 
-                }
-
-                totalBill.setText("ksh " + totalAmount);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        customerOrderItems.addValueEventListener(customerOrderItemsListener);
-
-        /**
-         * fetch current rider
-         */
-        currentRiderListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    riderName.setText(restaurantName_);
-                }
-
-                else {
-                    final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
-                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            try {
-                                UserModel riderUser = dataSnapshot.getValue(UserModel.class);
-                                riderName.setText(riderUser.getFirstname() + " " + riderUser.getLastname());
-                            } catch (Exception e){}
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-                    /**
-                     * Reference:
-                     *
-                     * dataSnapshot.getValue() = the rider's phone
-                     * phone = the restaurant's phone
-                     */
-
-                    riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone_+"/"+myPhone);
-                    riderStatusListener = new ValueEventListener() {
-                        @SuppressLint("RestrictedApi")
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
-                            String riderOrderStatus = dtSnapshot.getValue(String.class);
-                            if(riderOrderStatus == null && riderPhone == null){
-                                Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
-                                riderName.setText(restaurantName_);
-                                //customerOrderItems.child("rider").removeValue(); //bug
+                            if(prod.getConfirmed() == true){
+                                int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                                total[0] = total[0] + adapterTotal;
+                                totalAmount = total[0] + deliveryCharge;
+                                payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
                             }
 
-                            try {
-                                if (riderOrderStatus.equals("accepted")) {
-                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    confirmOrder.setVisibility(View.VISIBLE);
-                                    confirmOrder.setEnabled(true);
-                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.colorPrimary));
-                                }
+                        } catch (Exception e){
 
-                                if (riderOrderStatus.equals("assigned")) {
-                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    confirmOrder.setVisibility(View.VISIBLE);
-                                    confirmOrder.setEnabled(false);
-                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
-                                }
+                        }
+                    }
+                    subTotal.setText("Ksh "+total[0]);
 
-                                if (riderOrderStatus.equals("declined")) {
-                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    confirmOrder.setVisibility(View.GONE);
-                                    confirmOrder.setEnabled(false);
-                                    confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
-                                }
+                    if(!list.isEmpty()){
+                        Collections.reverse(list);
+                        ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
+                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
+                        recyclerview.setLayoutManager(layoutmanager);
+                        recyclerview.setItemAnimator( new DefaultItemAnimator());
+                        recycler.notifyDataSetChanged();
+                        recyclerview.setAdapter(recycler);
 
-                            } catch (Exception e){
+
+                    }
+
+                    totalBill.setText("ksh " + totalAmount);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            customerOrderItems.addValueEventListener(customerOrderItemsListener);
+
+            /**
+             * fetch current rider
+             */
+            currentRiderListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        riderName.setText(restaurantName_);
+                    }
+
+                    else {
+                        final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
+                        riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                try {
+                                    UserModel riderUser = dataSnapshot.getValue(UserModel.class);
+                                    riderName.setText(riderUser.getFirstname() + " " + riderUser.getLastname());
+                                } catch (Exception e){}
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
                             }
-                        }
+                        });
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        /**
+                         * Reference:
+                         *
+                         * dataSnapshot.getValue() = the rider's phone
+                         * phone = the restaurant's phone
+                         */
 
-                        }
-                    };
-                    riderStatus.addValueEventListener(riderStatusListener);
+                        riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+"/"+dataSnapshot.getValue()+"/"+phone_+"/"+myPhone);
+                        riderStatusListener = new ValueEventListener() {
+                            @SuppressLint("RestrictedApi")
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
+                                String riderOrderStatus = dtSnapshot.getValue(String.class);
+                                if(riderOrderStatus == null && riderPhone == null){
+                                    Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
+                                    riderName.setText(restaurantName_);
+                                    //customerOrderItems.child("rider").removeValue(); //bug
+                                }
+
+                                try {
+                                    if (riderOrderStatus.equals("accepted")) {
+                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
+                                        confirmOrder.setVisibility(View.VISIBLE);
+                                        confirmOrder.setEnabled(true);
+                                        confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.colorPrimary));
+                                    }
+
+                                    if (riderOrderStatus.equals("assigned")) {
+                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                        confirmOrder.setVisibility(View.VISIBLE);
+                                        confirmOrder.setEnabled(false);
+                                        confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
+                                    }
+
+                                    if (riderOrderStatus.equals("declined")) {
+                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewMyOrders.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+                                        confirmOrder.setVisibility(View.GONE);
+                                        confirmOrder.setEnabled(false);
+                                        confirmOrder.setSupportBackgroundTintList(ContextCompat.getColorStateList(ViewMyOrders.this, R.color.grey));
+                                    }
+
+                                } catch (Exception e){
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        };
+                        riderStatus.addValueEventListener(riderStatusListener);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        };
-        customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+                }
+            };
+            customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+        }
     }
 
     @Override
@@ -949,8 +961,11 @@ public class ViewMyOrders extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            customerOrderItems.removeEventListener(customerOrderItemsListener);
+        } catch (Exception e){
 
-        customerOrderItems.removeEventListener(customerOrderItemsListener);
+        }
     }
 
 }

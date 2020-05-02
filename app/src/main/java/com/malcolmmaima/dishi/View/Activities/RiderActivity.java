@@ -199,6 +199,9 @@ public class RiderActivity extends AppCompatActivity
                 }
             };
             myRef.addValueEventListener(myRefListener);
+        } else {
+            finish();
+            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         }
 
         profilePic.setOnClickListener(new View.OnClickListener() {

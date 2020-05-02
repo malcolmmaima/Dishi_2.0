@@ -116,89 +116,90 @@ public class RestaurantActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
 
-        TAG = "RestaurantActivity";
-
-        imageURL = "";
-
-        addMenu = findViewById(R.id.button_add_menu);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        setTitle("");
-
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        try {
-            //get auth state
-            mAuth = FirebaseAuth.getInstance();
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-            //Set fb database reference
-            myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
-        } catch (Exception e){
-
-        }
-
-        /**
-         * Load add menu activity
-         */
-
-        addMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent slideactivity = new Intent(RestaurantActivity.this, AddMenu.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Bundle bndlanimation =
-                        null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    try {
-                        startActivity(slideactivity, bndlanimation);
-                    } catch (Exception e){
-
-                    }
-                }
-            }
-        });
-        /**
-         * Manually displaying the first fragment - one time only
-         */
-        setTitle("Orders");
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flContent, RestaurantOrdersFragment.newInstance());
-        transaction.commit();
-
-        //Used to select an item programmatically
-        navView.getMenu().getItem(2).setChecked(true);
-
-        /**
-         * Navigation drawer
-         */
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.drawer_nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //Drawer header
-        View headerView = navigationView.getHeaderView(0);
-        final CircleImageView profilePic = headerView.findViewById(R.id.profilePic);
-        final TextView navUsername = headerView.findViewById(R.id.userName);
-        final ImageButton notificationIcon = headerView.findViewById(R.id.notifications);
-
-        //Set header data
-        navUsername.setText("");
 
         //User is logged in
         if(mAuth.getInstance().getCurrentUser() != null) {
+
+            TAG = "RestaurantActivity";
+
+            imageURL = "";
+
+            addMenu = findViewById(R.id.button_add_menu);
+
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            setTitle("");
+
+            BottomNavigationView navView = findViewById(R.id.nav_view);
+            navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+            try {
+                //get auth state
+                mAuth = FirebaseAuth.getInstance();
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+                //Set fb database reference
+                myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
+            } catch (Exception e){
+
+            }
+
+            /**
+             * Load add menu activity
+             */
+
+            addMenu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent slideactivity = new Intent(RestaurantActivity.this, AddMenu.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Bundle bndlanimation =
+                            null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        try {
+                            startActivity(slideactivity, bndlanimation);
+                        } catch (Exception e){
+
+                        }
+                    }
+                }
+            });
+            /**
+             * Manually displaying the first fragment - one time only
+             */
+            setTitle("Orders");
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.flContent, RestaurantOrdersFragment.newInstance());
+            transaction.commit();
+
+            //Used to select an item programmatically
+            navView.getMenu().getItem(2).setChecked(true);
+
+            /**
+             * Navigation drawer
+             */
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+
+            NavigationView navigationView = (NavigationView) findViewById(R.id.drawer_nav_view);
+            navigationView.setNavigationItemSelectedListener(this);
+
+            //Drawer header
+            View headerView = navigationView.getHeaderView(0);
+            final CircleImageView profilePic = headerView.findViewById(R.id.profilePic);
+            final TextView navUsername = headerView.findViewById(R.id.userName);
+            final ImageButton notificationIcon = headerView.findViewById(R.id.notifications);
+
+            //Set header data
+            navUsername.setText("");
 
             /**
              * Get logged in user details
@@ -235,107 +236,110 @@ public class RestaurantActivity extends AppCompatActivity
                 }
             };
             myRef.addValueEventListener(myRefListener);
-        }
 
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Make sure image url is not empty
-                if(!imageURL.equals("")){
-                    Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    slideactivity.putExtra("imageURL", imageURL);
-                    startActivity(slideactivity);
-                }
-
-                else {
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
-                    snackbar.show();
-                }
-            }
-        });
-
-        notificationIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent slideactivity = new Intent(RestaurantActivity.this, MyNotifications.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(slideactivity);
-
-            }
-        });
-
-        ////////////////////////////////////
-        //Check whether GPS tracking is enabled//
-
-        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
-            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build();
-            googleApiClient.connect();
-
-            LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(5 * 1000);
-            locationRequest.setFastestInterval(2 * 1000);
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(locationRequest);
-
-            //**************************
-            builder.setAlwaysShow(true); //this is the key ingredient
-            //**************************
-
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            profilePic.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onResult(@NonNull LocationSettingsResult result) {
-                    final Status status = result.getStatus();
-//                final LocationSettingsStates state = result.getLocationSettingsStates();
+                public void onClick(View view) {
+                    //Make sure image url is not empty
+                    if(!imageURL.equals("")){
+                        Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
+                        slideactivity.putExtra("imageURL", imageURL);
+                        startActivity(slideactivity);
+                    }
 
-
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the user
-                            // a dialog.
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(RestaurantActivity.this, 1000);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            break;
+                    else {
+                        Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                        snackbar.show();
                     }
                 }
             });
-        }
 
-        //Check whether this app has access to the location permission//
+            notificationIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent slideactivity = new Intent(RestaurantActivity.this, MyNotifications.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(slideactivity);
 
-        int permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
+                }
+            });
 
-        //If the location permission has been granted, then start the TrackerService//
+            ////////////////////////////////////
+            //Check whether GPS tracking is enabled//
 
-        if (permission == PackageManager.PERMISSION_GRANTED) {
-            startTrackerService();
+            LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+            if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+                GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this).build();
+                googleApiClient.connect();
+
+                LocationRequest locationRequest = LocationRequest.create();
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                locationRequest.setInterval(5 * 1000);
+                locationRequest.setFastestInterval(2 * 1000);
+                LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                        .addLocationRequest(locationRequest);
+
+                //**************************
+                builder.setAlwaysShow(true); //this is the key ingredient
+                //**************************
+
+                PendingResult<LocationSettingsResult> result =
+                        LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+                result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                    @Override
+                    public void onResult(@NonNull LocationSettingsResult result) {
+                        final Status status = result.getStatus();
+//                final LocationSettingsStates state = result.getLocationSettingsStates();
+
+                        switch (status.getStatusCode()) {
+                            case LocationSettingsStatusCodes.SUCCESS:
+
+
+                                break;
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                // Location settings are not satisfied. But could be fixed by showing the user
+                                // a dialog.
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(),
+                                    // and check the result in onActivityResult().
+                                    status.startResolutionForResult(RestaurantActivity.this, 1000);
+                                } catch (IntentSender.SendIntentException e) {
+                                    // Ignore the error.
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                break;
+                        }
+                    }
+                });
+            }
+
+            //Check whether this app has access to the location permission//
+
+            int permission = ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION);
+
+            //If the location permission has been granted, then start the TrackerService//
+
+            if (permission == PackageManager.PERMISSION_GRANTED) {
+                startTrackerService();
+            } else {
+
+                //If the dishi doesn’t currently have access to the user’s location, then request access//
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSIONS_REQUEST);
+            }
         } else {
-
-            //If the dishi doesn’t currently have access to the user’s location, then request access//
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST);
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -512,6 +516,10 @@ public class RestaurantActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        myRef.removeEventListener(myRefListener);
+        try {
+            myRef.removeEventListener(myRefListener);
+        } catch (Exception e){
+
+        }
     }
 }

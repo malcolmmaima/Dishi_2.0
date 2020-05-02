@@ -48,100 +48,109 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
     String myPhone;
     FirebaseUser user;
     ChildEventListener riderAddedListener;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_rider);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        riderUserAccounts = FirebaseDatabase.getInstance().getReference("users");
-        myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
+        //get auth state
+        mAuth = FirebaseAuth.getInstance();
+        //User is logged in
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            riderUserAccounts = FirebaseDatabase.getInstance().getReference("users");
+            myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
 
-        progressBar = findViewById(R.id.progressBar);
-        searchPhone = findViewById(R.id.riderPhone);
-        recyclerview = findViewById(R.id.rview);
-        emptyTag = findViewById(R.id.empty_tag);
+            progressBar = findViewById(R.id.progressBar);
+            searchPhone = findViewById(R.id.riderPhone);
+            recyclerview = findViewById(R.id.rview);
+            emptyTag = findViewById(R.id.empty_tag);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Add Rider");
+            setTitle("Add Rider");
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
-        searchPhone.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                progressBar.setVisibility(View.INVISIBLE);
-                riders.clear();
-            }
+            searchPhone.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    riders.clear();
+                }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                riders.clear();
-            }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    riders.clear();
+                }
 
-            @Override
-            public void afterTextChanged(final Editable s) {
-                progressBar.setVisibility(View.VISIBLE);
-                riders.clear();
+                @Override
+                public void afterTextChanged(final Editable s) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    riders.clear();
 
-                /**
-                 * Pass search value to our search function
-                 */
-                searchRider(s.toString().trim());
-            }
-        });
+                    /**
+                     * Pass search value to our search function
+                     */
+                    searchRider(s.toString().trim());
+                }
+            });
 
-        riderAddedListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                /**
-                 * Check if rider has been added
-                 */
-                try {
-                    if (dataSnapshot.getKey().equals(searchPhone.getText().toString().trim())) {
-                        finish();
-                        SafeToast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
+            riderAddedListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    /**
+                     * Check if rider has been added
+                     */
+                    try {
+                        if (dataSnapshot.getKey().equals(searchPhone.getText().toString().trim())) {
+                            finish();
+                            SafeToast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e){
+
                     }
-                } catch (Exception e){
 
                 }
 
-            }
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
 
-            }
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                }
 
-            }
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        myRidersRef.addChildEventListener(riderAddedListener);
+                }
+            };
+            myRidersRef.addChildEventListener(riderAddedListener);
+        }
     }
 
     private void searchRider(final String phone) {

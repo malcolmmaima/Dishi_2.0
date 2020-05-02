@@ -99,217 +99,114 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
 
     // request code
     private final int PICK_IMAGE_REQUEST = 22;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_review);
 
-        //keep toolbar pinned at top. push edittext on keyboard load
-        new CommentKeyBoardFix(this);
-        //Hide keyboard on activity load
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            //keep toolbar pinned at top. push edittext on keyboard load
+            new CommentKeyBoardFix(this);
+            //Hide keyboard on activity load
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        rootView = findViewById(R.id.parentlayout);
-        profileName = findViewById(R.id.profileName);
-        userUpdate = findViewById(R.id.userUpdate);
-        profilePic = findViewById(R.id.profilePic);
-        likePost = findViewById(R.id.likePost);
-        comments = findViewById(R.id.comments);
-        sharePost = findViewById(R.id.sharePost);
-        likesTotal = findViewById(R.id.likesTotal);
-        commentsTotal = findViewById(R.id.commentsTotal);
-        postStatus = findViewById(R.id.postStatus);
-        statusPost = findViewById(R.id.inputComment);
-        imageUpload = findViewById(R.id.camera);
-        imageUpload.setVisibility(View.GONE);
-        selectedImage = findViewById(R.id.selectedImage);
-        progressBar = findViewById(R.id.progressBar);
-        recyclerView = findViewById(R.id.rview);
-        recyclerView.setNestedScrollingEnabled(false);
-        emptyTag = findViewById(R.id.empty_tag);
-        timePosted = findViewById(R.id.timePosted);
-        emoji = findViewById(R.id.emoji);
-        emoji.setVisibility(View.GONE);
-        imageShare = findViewById(R.id.imageShare);
-        reviewOptions = findViewById(R.id.reviewOptions);
+            rootView = findViewById(R.id.parentlayout);
+            profileName = findViewById(R.id.profileName);
+            userUpdate = findViewById(R.id.userUpdate);
+            profilePic = findViewById(R.id.profilePic);
+            likePost = findViewById(R.id.likePost);
+            comments = findViewById(R.id.comments);
+            sharePost = findViewById(R.id.sharePost);
+            likesTotal = findViewById(R.id.likesTotal);
+            commentsTotal = findViewById(R.id.commentsTotal);
+            postStatus = findViewById(R.id.postStatus);
+            statusPost = findViewById(R.id.inputComment);
+            imageUpload = findViewById(R.id.camera);
+            imageUpload.setVisibility(View.GONE);
+            selectedImage = findViewById(R.id.selectedImage);
+            progressBar = findViewById(R.id.progressBar);
+            recyclerView = findViewById(R.id.rview);
+            recyclerView.setNestedScrollingEnabled(false);
+            emptyTag = findViewById(R.id.empty_tag);
+            timePosted = findViewById(R.id.timePosted);
+            emoji = findViewById(R.id.emoji);
+            emoji.setVisibility(View.GONE);
+            imageShare = findViewById(R.id.imageShare);
+            reviewOptions = findViewById(R.id.reviewOptions);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Replies");
+            setTitle("Replies");
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
-        //topToolBar.setLogo(R.drawable.logo);
-        //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
-
-        String author = getIntent().getStringExtra("author");
-        postedTo = getIntent().getStringExtra("postedTo");
-        key = getIntent().getStringExtra("key");
-
-        reviewsRef = FirebaseDatabase.getInstance().getReference("reviews/"+postedTo);
-        authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
-
-        // get the Firebase  storage reference
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
-
-        // SwipeRefreshLayout
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setOnRefreshListener(ViewReview.this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_blue_dark);
-
-        /**
-         * Showing Swipe Refresh animation on activity create
-         * As animation won't start on onCreate, post runnable is used
-         */
-        mSwipeRefreshLayout.post(new Runnable() {
-
-            @Override
-            public void run() {
-                fetchReviews();
-            }
-        });
-
-        //Get author's user details
-        authorUserDetailsRefListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    authorUser = dataSnapshot.getValue(UserModel.class);
-                    profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
-
-                    Picasso.with(ViewReview.this).load(authorUser.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePic);
-                } catch (Exception e){
-
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
                 }
-            }
+            });
+            //topToolBar.setLogo(R.drawable.logo);
+            //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            String author = getIntent().getStringExtra("author");
+            postedTo = getIntent().getStringExtra("postedTo");
+            key = getIntent().getStringExtra("key");
 
-            }
-        };
-        authorUserDetailsRef.addValueEventListener(authorUserDetailsRefListener);
+            reviewsRef = FirebaseDatabase.getInstance().getReference("reviews/"+postedTo);
+            authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
 
-        //Get post details
-        try {
-            reviewsRefListener = new ValueEventListener() {
+            // get the Firebase  storage reference
+            storage = FirebaseStorage.getInstance();
+            storageReference = storage.getReference();
+
+            // SwipeRefreshLayout
+            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+            mSwipeRefreshLayout.setOnRefreshListener(ViewReview.this);
+            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                    android.R.color.holo_green_dark,
+                    android.R.color.holo_orange_dark,
+                    android.R.color.holo_blue_dark);
+
+            /**
+             * Showing Swipe Refresh animation on activity create
+             * As animation won't start on onCreate, post runnable is used
+             */
+            mSwipeRefreshLayout.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    fetchReviews();
+                }
+            });
+
+            //Get author's user details
+            authorUserDetailsRefListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.exists()){
-                        finish();
-                        SafeToast.makeText(ViewReview.this, "Review no longer exists!", Toast.LENGTH_LONG).show();
-                    } else {
-                        try {
-                            viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
+                    try {
+                        authorUser = dataSnapshot.getValue(UserModel.class);
+                        profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
 
-                            //Get today's date
-                            GetCurrentDate currentDate = new GetCurrentDate();
-                            String currDate = currentDate.getDate();
+                        Picasso.with(ViewReview.this).load(authorUser.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    } catch (Exception e){
 
-                            //Get date status update was posted
-                            String dtEnd = currDate;
-                            String dtStart = viewPost.getTimePosted();
-                            /**
-                             * date string conversion to Date:
-                             * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                             */
-                            //Format both current date and date status update was posted
-                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
-                            try {
-
-                                //Convert String date values to Date values
-                                Date dateStart;
-                                Date dateEnd;
-
-                                //Date dateStart = format.parse(dtStart);
-                                String[] timeS = Split(viewPost.getTimePosted());
-                                String[] timeT = Split(currDate);
-
-                                /**
-                                 * timeS[0] = date
-                                 * timeS[1] = hr
-                                 * timeS[2] = min
-                                 * timeS[3] = seconds
-                                 * timeS[4] = timezone
-                                 */
-
-                                //post timeStamp
-                                if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                    timeS[4] = "GMT+03:00";
-
-                                    //2020-04-27:20:37:32:GMT+03:00
-                                    dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                                    dateStart = format.parse(dtStart);
-                                } else {
-                                    dateStart = format.parse(dtStart);
-                                }
-
-                                //my device current date
-                                if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                    timeT[4] = "GMT+03:00";
-
-                                    //2020-04-27:20:37:32:GMT+03:00
-                                    dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                                    dateEnd = format.parse(dtEnd);
-                                } else {
-                                    dateEnd = format.parse(dtEnd);
-                                }
-
-                                /**
-                                 * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
-                                 */
-                                //Now compute timeAgo duration
-                                TimeAgo timeAgo = new TimeAgo();
-
-                                timePosted.setText(timeAgo.toRelative(dateStart, dateEnd, 1));
-                                //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                                Log.d(TAG, "timeStamp: "+e.getMessage());
-                            }
-
-                            if(viewPost.getStatus().equals("")){
-                                userUpdate.setVisibility(View.GONE);
-                            } else {
-                                userUpdate.setVisibility(View.VISIBLE);
-                                userUpdate.setText(viewPost.getStatus());
-                            }
-
-                            if(viewPost.getImageShare() != null){
-                                imageShare.setVisibility(View.VISIBLE);
-                                try {
-                                    Picasso.with(ViewReview.this).load(viewPost.getImageShare()).fit().centerCrop()
-                                            .placeholder(R.drawable.gray_gradient_background)
-                                            .error(R.drawable.gray_gradient_background)
-                                            .into(imageShare);
-                                } catch (Exception e){}
-                            } else {
-                                imageShare.setVisibility(View.GONE);
-                            }
-                        } catch (Exception e) {
-                        }
                     }
-
                 }
 
                 @Override
@@ -317,396 +214,506 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
 
                 }
             };
-            reviewsRef.child(key).addValueEventListener(reviewsRefListener);
+            authorUserDetailsRef.addValueEventListener(authorUserDetailsRefListener);
 
-        } catch (Exception e){}
-
-        //creating a popup menu
-        PopupMenu popup = new PopupMenu(ViewReview.this, reviewOptions);
-        //inflating menu from xml resource
-        popup.inflate(R.menu.review_options_menu);
-
-        Menu myMenu = popup.getMenu();
-        MenuItem deleteOption = myMenu.findItem(R.id.delete);
-        MenuItem reportOption = myMenu.findItem(R.id.report);
-
-        //Can only delete reviews that i have authored or on my posts
-        if(postedTo.equals(myPhone) || author.equals(myPhone)){
+            //Get post details
             try {
-                deleteOption.setVisible(true);
-            } catch (Exception e){}
-        } else {
-            try {
-                deleteOption.setVisible(false);
-            } catch (Exception e){}
-        }
-
-        //Can only report comments that i havent authored
-        if(!myPhone.equals(author)){
-            try {
-                reportOption.setVisible(true);
-            } catch (Exception e){}
-        } else {
-            try {
-                reportOption.setVisible(false);
-            } catch (Exception e){}
-        }
-
-        reviewOptions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                reviewsRefListener = new ValueEventListener() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.exists()){
+                            finish();
+                            SafeToast.makeText(ViewReview.this, "Review no longer exists!", Toast.LENGTH_LONG).show();
+                        } else {
+                            try {
+                                viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
 
-                            case R.id.delete:
-                                final AlertDialog deletePost = new AlertDialog.Builder(ViewReview.this)
-                                        //set message, title, and icon
-                                        .setMessage("Delete Review?")
-                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                        //set three option buttons
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("reviews/"+postedTo+"/"+key);
-                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        //do nothing since there's a listener that will check to see if review still exists
-                                                    }
-                                                });
-                                            }
-                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                //do nothing
+                                //Get today's date
+                                GetCurrentDate currentDate = new GetCurrentDate();
+                                String currDate = currentDate.getDate();
 
-                                            }
-                                        })//setNegativeButton
+                                //Get date status update was posted
+                                String dtEnd = currDate;
+                                String dtStart = viewPost.getTimePosted();
+                                /**
+                                 * date string conversion to Date:
+                                 * https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                                 */
+                                //Format both current date and date status update was posted
+                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                                try {
 
-                                        .create();
-                                deletePost.show();
-                                return (true);
-                            case R.id.report:
-                                final AlertDialog reportStatus = new AlertDialog.Builder(ViewReview.this)
-                                        //set message, title, and icon
-                                        .setMessage("Report this review?")
-                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                        //set three option buttons
-                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                Intent slideactivity = new Intent(ViewReview.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                slideactivity.putExtra("type", "reviewUpdate");
-                                                slideactivity.putExtra("author", author);
-                                                slideactivity.putExtra("postedTo", postedTo);
-                                                slideactivity.putExtra("reviewKey", key);
-                                                startActivity(slideactivity);
-                                            }
-                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                //do nothing
-                                            }
-                                        })//setNegativeButton
+                                    //Convert String date values to Date values
+                                    Date dateStart;
+                                    Date dateEnd;
 
-                                        .create();
-                                reportStatus.show();
-                                return true;
-                            default:
-                                return false;
+                                    //Date dateStart = format.parse(dtStart);
+                                    String[] timeS = Split(viewPost.getTimePosted());
+                                    String[] timeT = Split(currDate);
+
+                                    /**
+                                     * timeS[0] = date
+                                     * timeS[1] = hr
+                                     * timeS[2] = min
+                                     * timeS[3] = seconds
+                                     * timeS[4] = timezone
+                                     */
+
+                                    //post timeStamp
+                                    if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                        timeS[4] = "GMT+03:00";
+
+                                        //2020-04-27:20:37:32:GMT+03:00
+                                        dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                        dateStart = format.parse(dtStart);
+                                    } else {
+                                        dateStart = format.parse(dtStart);
+                                    }
+
+                                    //my device current date
+                                    if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                        timeT[4] = "GMT+03:00";
+
+                                        //2020-04-27:20:37:32:GMT+03:00
+                                        dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                        dateEnd = format.parse(dtEnd);
+                                    } else {
+                                        dateEnd = format.parse(dtEnd);
+                                    }
+
+                                    /**
+                                     * refer to: https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                     */
+                                    //Now compute timeAgo duration
+                                    TimeAgo timeAgo = new TimeAgo();
+
+                                    timePosted.setText(timeAgo.toRelative(dateStart, dateEnd, 1));
+                                    //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    Log.d(TAG, "timeStamp: "+e.getMessage());
+                                }
+
+                                if(viewPost.getStatus().equals("")){
+                                    userUpdate.setVisibility(View.GONE);
+                                } else {
+                                    userUpdate.setVisibility(View.VISIBLE);
+                                    userUpdate.setText(viewPost.getStatus());
+                                }
+
+                                if(viewPost.getImageShare() != null){
+                                    imageShare.setVisibility(View.VISIBLE);
+                                    try {
+                                        Picasso.with(ViewReview.this).load(viewPost.getImageShare()).fit().centerCrop()
+                                                .placeholder(R.drawable.gray_gradient_background)
+                                                .error(R.drawable.gray_gradient_background)
+                                                .into(imageShare);
+                                    } catch (Exception e){}
+                                } else {
+                                    imageShare.setVisibility(View.GONE);
+                                }
+                            } catch (Exception e) {
+                            }
                         }
+
                     }
-                });
-                //displaying the popup
-                popup.show();
 
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        imageShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                    }
+                };
+                reviewsRef.child(key).addValueEventListener(reviewsRefListener);
+
+            } catch (Exception e){}
+
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(ViewReview.this, reviewOptions);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.review_options_menu);
+
+            Menu myMenu = popup.getMenu();
+            MenuItem deleteOption = myMenu.findItem(R.id.delete);
+            MenuItem reportOption = myMenu.findItem(R.id.report);
+
+            //Can only delete reviews that i have authored or on my posts
+            if(postedTo.equals(myPhone) || author.equals(myPhone)){
                 try {
+                    deleteOption.setVisible(true);
+                } catch (Exception e){}
+            } else {
+                try {
+                    deleteOption.setVisible(false);
+                } catch (Exception e){}
+            }
+
+            //Can only report comments that i havent authored
+            if(!myPhone.equals(author)){
+                try {
+                    reportOption.setVisible(true);
+                } catch (Exception e){}
+            } else {
+                try {
+                    reportOption.setVisible(false);
+                } catch (Exception e){}
+            }
+
+            reviewOptions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+
+                                case R.id.delete:
+                                    final AlertDialog deletePost = new AlertDialog.Builder(ViewReview.this)
+                                            //set message, title, and icon
+                                            .setMessage("Delete Review?")
+                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                            //set three option buttons
+                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("reviews/"+postedTo+"/"+key);
+                                                    postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            //do nothing since there's a listener that will check to see if review still exists
+                                                        }
+                                                    });
+                                                }
+                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    //do nothing
+
+                                                }
+                                            })//setNegativeButton
+
+                                            .create();
+                                    deletePost.show();
+                                    return (true);
+                                case R.id.report:
+                                    final AlertDialog reportStatus = new AlertDialog.Builder(ViewReview.this)
+                                            //set message, title, and icon
+                                            .setMessage("Report this review?")
+                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                            //set three option buttons
+                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    Intent slideactivity = new Intent(ViewReview.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    slideactivity.putExtra("type", "reviewUpdate");
+                                                    slideactivity.putExtra("author", author);
+                                                    slideactivity.putExtra("postedTo", postedTo);
+                                                    slideactivity.putExtra("reviewKey", key);
+                                                    startActivity(slideactivity);
+                                                }
+                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    //do nothing
+                                                }
+                                            })//setNegativeButton
+
+                                            .create();
+                                    reportStatus.show();
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    //displaying the popup
+                    popup.show();
+
+                }
+            });
+
+            imageShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        Intent slideactivity = new Intent(ViewReview.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", viewPost.getImageShare());
+                        startActivity(slideactivity);
+                    } catch (Exception e){}
+                }
+            });
+
+            profileName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if(!myPhone.equals(author)){
+                        Intent slideactivity = new Intent(ViewReview.this, ViewProfile.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        slideactivity.putExtra("phone", viewPost.getAuthor());
+                        Bundle bndlanimation =
+                                ActivityOptions.makeCustomAnimation(ViewReview.this, R.anim.animation,R.anim.animation2).toBundle();
+                        startActivity(slideactivity, bndlanimation);
+                    } else {
+                        finish();
+                    }
+                }
+            });
+
+            emoji.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    emojIcon.ShowEmojIcon();
+                }
+            });
+
+            profilePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
                     Intent slideactivity = new Intent(ViewReview.this, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", viewPost.getImageShare());
+                    slideactivity.putExtra("imageURL", authorUser.getProfilePic());
                     startActivity(slideactivity);
-                } catch (Exception e){}
-            }
-        });
-
-        profileName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if(!myPhone.equals(author)){
-                    Intent slideactivity = new Intent(ViewReview.this, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    slideactivity.putExtra("phone", viewPost.getAuthor());
-                    Bundle bndlanimation =
-                            ActivityOptions.makeCustomAnimation(ViewReview.this, R.anim.animation,R.anim.animation2).toBundle();
-                    startActivity(slideactivity, bndlanimation);
-                } else {
-                    finish();
                 }
-            }
-        });
+            });
 
-        emoji.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                emojIcon.ShowEmojIcon();
-            }
-        });
-
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent slideactivity = new Intent(ViewReview.this, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", authorUser.getProfilePic());
-                startActivity(slideactivity);
-            }
-        });
-
-        statusPost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                    emoji.setVisibility(View.VISIBLE);
-                    postStatus.setVisibility(View.VISIBLE);
-                    imageUpload.setVisibility(View.VISIBLE);
-                }
-                else {
-
-                    if(statusPost.getText().toString().length() > 1){
+            statusPost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(hasFocus){
+                        emoji.setVisibility(View.VISIBLE);
                         postStatus.setVisibility(View.VISIBLE);
                         imageUpload.setVisibility(View.VISIBLE);
-                        emoji.setVisibility(View.VISIBLE);
-                    } else {
-                        postStatus.setVisibility(View.GONE);
-                        imageUpload.setVisibility(View.GONE);
-                        emoji.setVisibility(View.GONE);
                     }
+                    else {
 
-                }
-            }
-        });
-
-        emojIcon = new EmojIconActions(ViewReview.this, rootView, statusPost, emoji);
-        emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
-        emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
-        emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
-            @Override
-            public void onKeyboardOpen() {
-                Log.e(TAG, "Keyboard opened!");
-            }
-
-            @Override
-            public void onKeyboardClose() {
-                emojIcon.closeEmojIcon();
-                Log.e(TAG, "Keyboard closed");
-            }
-        });
-
-        imageUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //https://www.geeksforgeeks.org/android-how-to-upload-an-image-on-firebase-storage/
-                SelectImage();
-            }
-        });
-
-        postStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSwipeRefreshLayout.setRefreshing(true);
-
-
-                if(statusPost.getText().toString().equals("") && selectedImage.isShown()){
-                    uploadImage(); //This will upload image then on successful upload call uploadContent()
-                }
-
-                else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
-                    mSwipeRefreshLayout.setRefreshing(false);
-                    SafeToast.makeText(ViewReview.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
-                }
-
-                else {
-                    if(selectedImage.isShown()){
-                        uploadImage(); //This will upload image then on successful upload call uploadContent()
-                    } else {
-                        String imgLink = null;
-                        uploadContent(imgLink);
-                    }
-
-                }
-
-            }
-
-        });
-
-        //Fetch status update likes
-        likesListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    int total = (int) dataSnapshot.getChildrenCount();
-                    Double totalLikes = Double.valueOf(total);
-
-                    //below 1000
-                    if(totalLikes < 1000){
-                        DecimalFormat value = new DecimalFormat("#");
-                        likesTotal.setText(""+value.format(totalLikes));
-                    }
-
-                    // 1000 to 999,999
-                    else if(totalLikes >= 1000 && totalLikes <= 999999){
-                        if(totalLikes % 1000 == 0){ //No remainder
-                            DecimalFormat value = new DecimalFormat("#####");
-                            likesTotal.setText(""+value.format(total/1000)+"K");
+                        if(statusPost.getText().toString().length() > 1){
+                            postStatus.setVisibility(View.VISIBLE);
+                            imageUpload.setVisibility(View.VISIBLE);
+                            emoji.setVisibility(View.VISIBLE);
+                        } else {
+                            postStatus.setVisibility(View.GONE);
+                            imageUpload.setVisibility(View.GONE);
+                            emoji.setVisibility(View.GONE);
                         }
 
-                        else { //Has remainder 999.9K
-                            DecimalFormat value = new DecimalFormat("######.#");
-                            Double divided = totalLikes/1000;
-                            if(value.format(divided).equals("1000")){
-                                likesTotal.setText("1M"); //if rounded off
-                            } else {
-                                likesTotal.setText(""+value.format(divided)+"K");
+                    }
+                }
+            });
+
+            emojIcon = new EmojIconActions(ViewReview.this, rootView, statusPost, emoji);
+            emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
+            emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
+            emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
+                @Override
+                public void onKeyboardOpen() {
+                    Log.e(TAG, "Keyboard opened!");
+                }
+
+                @Override
+                public void onKeyboardClose() {
+                    emojIcon.closeEmojIcon();
+                    Log.e(TAG, "Keyboard closed");
+                }
+            });
+
+            imageUpload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //https://www.geeksforgeeks.org/android-how-to-upload-an-image-on-firebase-storage/
+                    SelectImage();
+                }
+            });
+
+            postStatus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+
+
+                    if(statusPost.getText().toString().equals("") && selectedImage.isShown()){
+                        uploadImage(); //This will upload image then on successful upload call uploadContent()
+                    }
+
+                    else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        SafeToast.makeText(ViewReview.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    else {
+                        if(selectedImage.isShown()){
+                            uploadImage(); //This will upload image then on successful upload call uploadContent()
+                        } else {
+                            String imgLink = null;
+                            uploadContent(imgLink);
+                        }
+
+                    }
+
+                }
+
+            });
+
+            //Fetch status update likes
+            likesListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        int total = (int) dataSnapshot.getChildrenCount();
+                        Double totalLikes = Double.valueOf(total);
+
+                        //below 1000
+                        if(totalLikes < 1000){
+                            DecimalFormat value = new DecimalFormat("#");
+                            likesTotal.setText(""+value.format(totalLikes));
+                        }
+
+                        // 1000 to 999,999
+                        else if(totalLikes >= 1000 && totalLikes <= 999999){
+                            if(totalLikes % 1000 == 0){ //No remainder
+                                DecimalFormat value = new DecimalFormat("#####");
+                                likesTotal.setText(""+value.format(total/1000)+"K");
+                            }
+
+                            else { //Has remainder 999.9K
+                                DecimalFormat value = new DecimalFormat("######.#");
+                                Double divided = totalLikes/1000;
+                                if(value.format(divided).equals("1000")){
+                                    likesTotal.setText("1M"); //if rounded off
+                                } else {
+                                    likesTotal.setText(""+value.format(divided)+"K");
+                                }
                             }
                         }
-                    }
 
-                    // 1,000,0000 to 999,999,999
-                    else if(totalLikes >= 1000000 && totalLikes <= 999999999){
-                        if(totalLikes % 1000000 == 0) { //No remainder
-                            DecimalFormat value = new DecimalFormat("#");
-                            likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
-                        }
-
-                        else { //Has remainder 9.9M, 999.9M etc
-                            DecimalFormat value = new DecimalFormat("#.#");
-                            if(value.format(totalLikes/1000000).equals("1000")){
-                                likesTotal.setText("1B"); //if rounded off
-                            } else {
+                        // 1,000,0000 to 999,999,999
+                        else if(totalLikes >= 1000000 && totalLikes <= 999999999){
+                            if(totalLikes % 1000000 == 0) { //No remainder
+                                DecimalFormat value = new DecimalFormat("#");
                                 likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
                             }
-                        }
-                    }
-                } catch (Exception e){}
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        reviewsRef.child(key).child("likes").addValueEventListener(likesListener);
-
-        commentsListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    int total = (int) dataSnapshot.getChildrenCount();
-                    Double totalComments = Double.valueOf(total);
-
-                    //below 1000
-                    if(totalComments < 1000){
-                        DecimalFormat value = new DecimalFormat("#");
-                        commentsTotal.setText(""+value.format(totalComments));
-                    }
-
-                    // 1000 to 999,999
-                    else if(totalComments >= 1000 && totalComments <= 999999){
-                        if(totalComments % 1000 == 0){ //No remainder
-                            DecimalFormat value = new DecimalFormat("#####");
-                            commentsTotal.setText(""+value.format(total/1000)+"K");
-                        }
-
-                        else { //Has remainder 999.9K
-                            DecimalFormat value = new DecimalFormat("######.#");
-                            Double divided = totalComments/1000;
-                            if(value.format(divided).equals("1000")){
-                                commentsTotal.setText("1M"); //if rounded off
-                            } else {
-                                commentsTotal.setText(""+value.format(divided)+"K");
+                            else { //Has remainder 9.9M, 999.9M etc
+                                DecimalFormat value = new DecimalFormat("#.#");
+                                if(value.format(totalLikes/1000000).equals("1000")){
+                                    likesTotal.setText("1B"); //if rounded off
+                                } else {
+                                    likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                }
                             }
                         }
-                    }
+                    } catch (Exception e){}
+                }
 
-                    // 1,000,0000 to 999,999,999
-                    else if(totalComments >= 1000000 && totalComments <= 999999999){
-                        if(totalComments % 1000000 == 0) { //No remainder
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            reviewsRef.child(key).child("likes").addValueEventListener(likesListener);
+
+            commentsListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        int total = (int) dataSnapshot.getChildrenCount();
+                        Double totalComments = Double.valueOf(total);
+
+                        //below 1000
+                        if(totalComments < 1000){
                             DecimalFormat value = new DecimalFormat("#");
-                            commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
+                            commentsTotal.setText(""+value.format(totalComments));
                         }
 
-                        else { //Has remainder 9.9M, 999.9M etc
-                            DecimalFormat value = new DecimalFormat("#.#");
-                            if(value.format(totalComments/1000000).equals("1000")){
-                                commentsTotal.setText("1B"); //if rounded off
-                            } else {
+                        // 1000 to 999,999
+                        else if(totalComments >= 1000 && totalComments <= 999999){
+                            if(totalComments % 1000 == 0){ //No remainder
+                                DecimalFormat value = new DecimalFormat("#####");
+                                commentsTotal.setText(""+value.format(total/1000)+"K");
+                            }
+
+                            else { //Has remainder 999.9K
+                                DecimalFormat value = new DecimalFormat("######.#");
+                                Double divided = totalComments/1000;
+                                if(value.format(divided).equals("1000")){
+                                    commentsTotal.setText("1M"); //if rounded off
+                                } else {
+                                    commentsTotal.setText(""+value.format(divided)+"K");
+                                }
+                            }
+                        }
+
+                        // 1,000,0000 to 999,999,999
+                        else if(totalComments >= 1000000 && totalComments <= 999999999){
+                            if(totalComments % 1000000 == 0) { //No remainder
+                                DecimalFormat value = new DecimalFormat("#");
                                 commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
                             }
+
+                            else { //Has remainder 9.9M, 999.9M etc
+                                DecimalFormat value = new DecimalFormat("#.#");
+                                if(value.format(totalComments/1000000).equals("1000")){
+                                    commentsTotal.setText("1B"); //if rounded off
+                                } else {
+                                    commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
+                                }
+                            }
                         }
+                    } catch (Exception e){}
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            reviewsRef.child(key).child("comments").addValueEventListener(commentsListener);
+
+            //On loading adapter fetch the like status
+            reviewsRef.child(key).child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        likePost.setTag(R.drawable.unliked);
+                        likePost.setImageResource(R.drawable.unliked);
+                    } else {
+                        likePost.setTag(R.drawable.liked);
+                        likePost.setImageResource(R.drawable.liked);
                     }
-                } catch (Exception e){}
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        reviewsRef.child(key).child("comments").addValueEventListener(commentsListener);
-
-        //On loading adapter fetch the like status
-        reviewsRef.child(key).child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    likePost.setTag(R.drawable.unliked);
-                    likePost.setImageResource(R.drawable.unliked);
-                } else {
-                    likePost.setTag(R.drawable.liked);
-                    likePost.setImageResource(R.drawable.liked);
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        likePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int id = (int)likePost.getTag();
-                if( id == R.drawable.unliked){
-                    //Add to my favourites
-                    reviewsRef.child(key).child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            likePost.setTag(R.drawable.liked);
-                            likePost.setImageResource(R.drawable.liked);
-                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-
-                } else{
-                    //Remove from my favourites
-                    reviewsRef.child(key).child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            likePost.setTag(R.drawable.unliked);
-                            likePost.setImageResource(R.drawable.unliked);
-                        }
-                    });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            }
-        });
+            });
+
+            likePost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int id = (int)likePost.getTag();
+                    if( id == R.drawable.unliked){
+                        //Add to my favourites
+                        reviewsRef.child(key).child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                likePost.setTag(R.drawable.liked);
+                                likePost.setImageResource(R.drawable.liked);
+                                //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                    } else{
+                        //Remove from my favourites
+                        reviewsRef.child(key).child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                likePost.setTag(R.drawable.unliked);
+                                likePost.setImageResource(R.drawable.unliked);
+                            }
+                        });
+
+                    }
+                }
+            });
+        }
 
     }
 
@@ -934,10 +941,15 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
-        reviewsRef.removeEventListener(likesListener);
-        reviewsRef.removeEventListener(commentsListener);
-        reviewsRef.child(key).removeEventListener(reviewsRefListener);
+
+        try {
+            authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
+            reviewsRef.removeEventListener(likesListener);
+            reviewsRef.removeEventListener(commentsListener);
+            reviewsRef.child(key).removeEventListener(reviewsRefListener);
+        } catch (Exception e){
+
+        }
     }
 
     @Override

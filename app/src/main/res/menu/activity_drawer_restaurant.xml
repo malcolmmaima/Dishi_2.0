@@ -15,7 +15,7 @@
 
         <item
             android:id="@+id/menu4"
-            android:icon="@drawable/deliver_nduthi_48dp"
+            android:icon="@drawable/delivery_bike_64dp"
             android:title="Riders" />
     </group>
 

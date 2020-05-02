@@ -107,13 +107,19 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
     // request code
     private final int PICK_IMAGE_REQUEST = 22;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_profile);
-
-        loadProfile();
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            loadProfile();
+        }
     }
 
     private void loadProfile() {
@@ -604,7 +610,13 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        loadProfile();
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            loadProfile();
+        }
     }
 
     @Override
@@ -887,10 +899,15 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     @Override
     public void onDestroy() {
         super.onDestroy();
-        profileRef.removeEventListener(myListener);
-        profileFollowers.removeEventListener(profileFollowersListener);
-        followersCounterRef.removeEventListener(followersCounterListener);
-        followingCounterref.removeEventListener(followingCounterListener);
+
+        try {
+            profileRef.removeEventListener(myListener);
+            profileFollowers.removeEventListener(profileFollowersListener);
+            followersCounterRef.removeEventListener(followersCounterListener);
+            followingCounterref.removeEventListener(followingCounterListener);
+        } catch (Exception e){
+
+        }
     }
 
     @Override

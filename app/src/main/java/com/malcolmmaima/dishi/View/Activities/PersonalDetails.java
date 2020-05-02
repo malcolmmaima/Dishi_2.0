@@ -52,6 +52,8 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class PersonalDetails extends AppCompatActivity {
 
     private static final String TAG = "PersonalDetails";
@@ -76,277 +78,284 @@ public class PersonalDetails extends AppCompatActivity {
 
     // Creating URI.
     Uri FilePathUri;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_details);
 
-        intiWidgets();
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            intiWidgets();
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Personal Details");
+            setTitle("Personal Details");
 
-        progressDialog = new ProgressDialog(PersonalDetails.this);
+            progressDialog = new ProgressDialog(PersonalDetails.this);
 
-        //Hide keyboard on activity load
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            //Hide keyboard on activity load
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        //Initialize strings
-        email = "";
-        firstname = "";
-        lastname = "";
-        bio = "";
-        imageURL = "";
+            //Initialize strings
+            email = "";
+            firstname = "";
+            lastname = "";
+            bio = "";
+            imageURL = "";
 
-        //get auth state
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            //get auth state
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            //Set fb database reference
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
-        // Assign FirebaseStorage instance to storageReference.
-        storageReference = FirebaseStorage.getInstance().getReference();
+            // Assign FirebaseStorage instance to storageReference.
+            storageReference = FirebaseStorage.getInstance().getReference();
 
-        //User is logged in
-        if(mAuth.getInstance().getCurrentUser() != null) {
+            //User is logged in
+            if(mAuth.getInstance().getCurrentUser() != null) {
+
+                /**
+                 * Get logged in user details
+                 */
+                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try {
+                            UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                            imageURL = user.getProfilePic();
+
+                            email = user.getEmail();
+                            firstname = user.getFirstname();
+                            lastname = user.getLastname();
+                            bio = user.getBio();
+
+                            //Set username on drawer header
+                            mEmail.setText(""+user.getEmail());
+                            mFirstName.setText(""+user.getFirstname());
+                            mLastName.setText(""+user.getLastname());
+                            mBio.setText(""+user.getBio());
+                            mPhone.setText(myPhone);
+
+                            Picasso.with(PersonalDetails.this).load(user.getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: " + e);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
             /**
-             * Get logged in user details
+             * Realtime validation check
              */
-            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            mEmail.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    try {
-                        UserModel user = dataSnapshot.getValue(UserModel.class);
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                        imageURL = user.getProfilePic();
-
-                        email = user.getEmail();
-                        firstname = user.getFirstname();
-                        lastname = user.getLastname();
-                        bio = user.getBio();
-
-                        //Set username on drawer header
-                        mEmail.setText(""+user.getEmail());
-                        mFirstName.setText(""+user.getFirstname());
-                        mLastName.setText(""+user.getLastname());
-                        mBio.setText(""+user.getBio());
-                        mPhone.setText(myPhone);
-
-                        Picasso.with(PersonalDetails.this).load(user.getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(profilePic);
-
-                    } catch (Exception e){
-                        Log.e(TAG, "onDataChange: " + e);
-                    }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    //If data hasn't changed
+                    dataStatus();
+                }
+            });
+
+            mFirstName.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    //If data hasn't changed
+                    dataStatus();
+                }
+            });
+
+            mLastName.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    //If data hasn't changed
+                    dataStatus();
+                }
+            });
+
+            mBio.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    //If data hasn't changed
+                    dataStatus();
+                }
+            });
+
+            /**
+             * Profile picture
+             */
+
+            profilePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(PersonalDetails.this);
+                    builder.setItems(profilePicActions, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(which == 0){
+                                // Open Gallery.
+                                Intent intent = new Intent();
+                                // Setting intent type as image to select image from phone storage.
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                            }
+                            if(which == 1){
+                                //Open Camera
+                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                            }
+
+                            if(which == 2){
+                                //View current photo
+                                if(!imageURL.equals("")){
+                                    Intent slideactivity = new Intent(PersonalDetails.this, ViewImage.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    slideactivity.putExtra("imageURL", imageURL);
+                                    startActivity(slideactivity);
+                                }
+
+                                else {
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
+                            }
+                        }
+                    });
+                    builder.create();
+                    builder.show();
+                }
+            });
+
+            /**
+             * Save details
+             */
+            saveDetails.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if(saveDetails.getTag().equals("edit")){
+                        mEmail.setEnabled(true);
+                        mFirstName.setEnabled(true);
+                        mLastName.setEnabled(true);
+                        mBio.setEnabled(true);
+                    }
+
+                    if(saveDetails.getTag().equals("save")){
+
+                        mEmail.setEnabled(false);
+                        mFirstName.setEnabled(false);
+                        mLastName.setEnabled(false);
+                        mBio.setEnabled(false);
+
+                        progressDialog.setMessage("Saving...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+
+                        saveprofilePhoto();
+
+                        //Save data to specific nodes
+                        myRef.child("email").setValue(mEmail.getText().toString().trim());
+                        myRef.child("firstname").setValue(mFirstName.getText().toString().trim());
+                        myRef.child("lastname").setValue(mLastName.getText().toString().trim());
+                        myRef.child("bio").setValue(mBio.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                saveDetails.setTag("edit");
+                                saveDetails.setText("EDIT");
+
+                                mEmail.setEnabled(false);
+                                mFirstName.setEnabled(false);
+                                mLastName.setEnabled(false);
+                                mBio.setEnabled(false);
+
+                                Snackbar snackbar = Snackbar
+                                        .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+
+                                snackbar.show();
+
+                                if(progressDialog.isShowing()){
+                                    progressDialog.dismiss();
+                                }
+                            }
+                        });
+                    }
+                    //If data hasn't changed
+                    dataStatus();
+
+
 
                 }
             });
         }
-
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
-
-        /**
-         * Realtime validation check
-         */
-        mEmail.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //If data hasn't changed
-                dataStatus();
-            }
-        });
-
-        mFirstName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //If data hasn't changed
-                dataStatus();
-            }
-        });
-
-        mLastName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //If data hasn't changed
-                dataStatus();
-            }
-        });
-
-        mBio.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //If data hasn't changed
-                dataStatus();
-            }
-        });
-
-        /**
-         * Profile picture
-         */
-
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PersonalDetails.this);
-                builder.setItems(profilePicActions, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(which == 0){
-                            // Open Gallery.
-                            Intent intent = new Intent();
-                            // Setting intent type as image to select image from phone storage.
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
-                        }
-                        if(which == 1){
-                            //Open Camera
-                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                            snackbar.show();
-                        }
-
-                        if(which == 2){
-                            //View current photo
-                            if(!imageURL.equals("")){
-                                Intent slideactivity = new Intent(PersonalDetails.this, ViewImage.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                slideactivity.putExtra("imageURL", imageURL);
-                                startActivity(slideactivity);
-                            }
-
-                            else {
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
-                            }
-                        }
-                    }
-                });
-                builder.create();
-                builder.show();
-            }
-        });
-
-        /**
-         * Save details
-         */
-        saveDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if(saveDetails.getTag().equals("edit")){
-                    mEmail.setEnabled(true);
-                    mFirstName.setEnabled(true);
-                    mLastName.setEnabled(true);
-                    mBio.setEnabled(true);
-                }
-
-                if(saveDetails.getTag().equals("save")){
-
-                    mEmail.setEnabled(false);
-                    mFirstName.setEnabled(false);
-                    mLastName.setEnabled(false);
-                    mBio.setEnabled(false);
-
-                    progressDialog.setMessage("Saving...");
-                    progressDialog.setCancelable(false);
-                    progressDialog.show();
-
-                    saveprofilePhoto();
-
-                    //Save data to specific nodes
-                    myRef.child("email").setValue(mEmail.getText().toString().trim());
-                    myRef.child("firstname").setValue(mFirstName.getText().toString().trim());
-                    myRef.child("lastname").setValue(mLastName.getText().toString().trim());
-                    myRef.child("bio").setValue(mBio.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            saveDetails.setTag("edit");
-                            saveDetails.setText("EDIT");
-
-                            mEmail.setEnabled(false);
-                            mFirstName.setEnabled(false);
-                            mLastName.setEnabled(false);
-                            mBio.setEnabled(false);
-
-                            Snackbar snackbar = Snackbar
-                                    .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
-
-                            snackbar.show();
-
-                            if(progressDialog.isShowing()){
-                                progressDialog.dismiss();
-                            }
-                        }
-                    });
-                }
-                //If data hasn't changed
-                dataStatus();
-
-
-
-            }
-        });
     }
 
     @Override

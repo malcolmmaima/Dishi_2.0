@@ -27,6 +27,7 @@ import com.malcolmmaima.dishi.Model.AbuseReportModel;
 import com.malcolmmaima.dishi.R;
 
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ReportAbuse extends AppCompatActivity {
     RelativeLayout option1, option2, option3, option4;
@@ -37,273 +38,280 @@ public class ReportAbuse extends AppCompatActivity {
     String reportType, productOwner, productKey, author, postedTo, statusKey,commentKey, reviewKey, myPhone;
     FirebaseUser user;
     String [] reportOptions = {"It's suspicious or spam","It displays abusive content", "Copyright infringement", "Other"};
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_abuse);
 
-        option1 = findViewById(R.id.option1);
-        option1Tick = findViewById(R.id.option1Tick);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            option1 = findViewById(R.id.option1);
+            option1Tick = findViewById(R.id.option1Tick);
 
-        option2 = findViewById(R.id.option2);
-        option2Tick = findViewById(R.id.option2Tick);
+            option2 = findViewById(R.id.option2);
+            option2Tick = findViewById(R.id.option2Tick);
 
-        option3 = findViewById(R.id.option3);
-        option3Tick = findViewById(R.id.option3Tick);
+            option3 = findViewById(R.id.option3);
+            option3Tick = findViewById(R.id.option3Tick);
 
-        option4 = findViewById(R.id.option4);
-        option4Tick = findViewById(R.id.option4Tick);
+            option4 = findViewById(R.id.option4);
+            option4Tick = findViewById(R.id.option4Tick);
 
-        describe = findViewById(R.id.describe);
-        reportBtn = findViewById(R.id.reportBtn);
-        reportBtn.setVisibility(View.GONE);
+            describe = findViewById(R.id.describe);
+            reportBtn = findViewById(R.id.reportBtn);
+            reportBtn.setVisibility(View.GONE);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle("Report Abuse");
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            setTitle("Report Abuse");
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        reportType = getIntent().getStringExtra("type");
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            reportType = getIntent().getStringExtra("type");
 
-        //Report products
-        if(reportType.equals("product")){
-            productOwner = getIntent().getStringExtra("owner");
-            productKey = getIntent().getStringExtra("productKey");
-        }
-
-        //Report status updates
-        if(reportType.equals("statusUpdate")){
-            author = getIntent().getStringExtra("author");
-            postedTo = getIntent().getStringExtra("postedTo");
-            statusKey = getIntent().getStringExtra("statusKey");
-        }
-
-        //Report comments
-        if(reportType.equals("commentUpdate")){
-            author = getIntent().getStringExtra("author");
-            postedTo = getIntent().getStringExtra("postedTo");
-            commentKey = getIntent().getStringExtra("commentKey");
-        }
-
-        //Report reviews
-        if(reportType.equals("reviewUpdate")){
-            author = getIntent().getStringExtra("author");
-            postedTo = getIntent().getStringExtra("postedTo");
-            reviewKey = getIntent().getStringExtra("reviewKey");
-        }
-
-        //keep toolbar pinned at top. push edittext on keyboard load
-        new CommentKeyBoardFix(this);
-
-        //Hide keyboard on activity load
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Go back to previous activity
+            //Report products
+            if(reportType.equals("product")){
+                productOwner = getIntent().getStringExtra("owner");
+                productKey = getIntent().getStringExtra("productKey");
             }
-        });
 
-        option1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedAbuse(1);
+            //Report status updates
+            if(reportType.equals("statusUpdate")){
+                author = getIntent().getStringExtra("author");
+                postedTo = getIntent().getStringExtra("postedTo");
+                statusKey = getIntent().getStringExtra("statusKey");
             }
-        });
 
-        option2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedAbuse(2);
+            //Report comments
+            if(reportType.equals("commentUpdate")){
+                author = getIntent().getStringExtra("author");
+                postedTo = getIntent().getStringExtra("postedTo");
+                commentKey = getIntent().getStringExtra("commentKey");
             }
-        });
 
-        option3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedAbuse(3);
+            //Report reviews
+            if(reportType.equals("reviewUpdate")){
+                author = getIntent().getStringExtra("author");
+                postedTo = getIntent().getStringExtra("postedTo");
+                reviewKey = getIntent().getStringExtra("reviewKey");
             }
-        });
 
-        option4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedAbuse(4);
-            }
-        });
+            //keep toolbar pinned at top. push edittext on keyboard load
+            new CommentKeyBoardFix(this);
 
-        reportBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            //Hide keyboard on activity load
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-                ProgressDialog progressDialog = new ProgressDialog(ReportAbuse.this);
-                progressDialog.setMessage("Sending...");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-
-                if(reportType.equals("product")){
-
-                    DatabaseReference productReportsRef = FirebaseDatabase.getInstance().getReference("reports/products/"+productKey);
-
-                    //Get today's date
-                    GetCurrentDate currentDate = new GetCurrentDate();
-
-                    //Bundle our report into a model (POJO)
-                    AbuseReportModel newReport = new AbuseReportModel();
-                    newReport.setDescription(describe.getText().toString().trim());
-                    newReport.setComplaint(reportOptions[selectedOption-1]);
-                    newReport.setReportedOn(currentDate.getDate());
-
-                    //Make sure the contact of this product is capture as it acts as our primary key in referencing the particular product
-                    productReportsRef.child("owner").setValue(productOwner);
-
-                    //Now create a new unique reference and post the report POJO then exit
-                    DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/products/"+productKey+"/userReports/"+myPhone);
-                    userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                                finish();
-                                Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
-                            } catch (Exception e){}
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            try {
-                                progressDialog.dismiss();
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
-                            } catch (Exception err){}
-                        }
-                    });
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); // Go back to previous activity
                 }
+            });
 
-                if(reportType.equals("statusUpdate")){
-                    DatabaseReference statusUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/statusUpdates/"+statusKey);
-
-                    //Get today's date
-                    GetCurrentDate currentDate = new GetCurrentDate();
-
-                    //Bundle our report into a model (POJO)
-                    AbuseReportModel newReport = new AbuseReportModel();
-                    newReport.setDescription(describe.getText().toString().trim());
-                    newReport.setComplaint(reportOptions[selectedOption-1]);
-                    newReport.setReportedOn(currentDate.getDate());
-
-                    //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
-                    statusUpdateReportsRef.child("author").setValue(author);
-                    statusUpdateReportsRef.child("postedTo").setValue(postedTo);
-
-                    //Now create a new unique reference and post the report POJO then exit
-                    DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/statusUpdates/"+statusKey+"/userReports/"+myPhone);
-                    userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                                finish();
-                                Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
-                            } catch (Exception e){}
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            try {
-                                progressDialog.dismiss();
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
-                            } catch (Exception err){}
-                        }
-                    });
+            option1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectedAbuse(1);
                 }
+            });
 
-                if(reportType.equals("commentUpdate")){
-                    DatabaseReference commentUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/commentUpdates/"+commentKey);
-
-                    //Get today's date
-                    GetCurrentDate currentDate = new GetCurrentDate();
-
-                    //Bundle our report into a model (POJO)
-                    AbuseReportModel newReport = new AbuseReportModel();
-                    newReport.setDescription(describe.getText().toString().trim());
-                    newReport.setComplaint(reportOptions[selectedOption-1]);
-                    newReport.setReportedOn(currentDate.getDate());
-
-                    //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
-                    commentUpdateReportsRef.child("author").setValue(author);
-                    commentUpdateReportsRef.child("postedTo").setValue(postedTo);
-
-                    //Now create a new unique reference and post the report POJO then exit
-                    DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/commentUpdates/"+commentKey+"/userReports/"+myPhone);
-                    userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                                finish();
-                                Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
-                            } catch (Exception e){}
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            try {
-                                progressDialog.dismiss();
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
-                            } catch (Exception err){}
-                        }
-                    });
+            option2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectedAbuse(2);
                 }
+            });
 
-                if(reportType.equals("reviewUpdate")){
-                    DatabaseReference reviewUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/reviewUpdates/"+reviewKey);
-
-                    //Get today's date
-                    GetCurrentDate currentDate = new GetCurrentDate();
-
-                    //Bundle our report into a model (POJO)
-                    AbuseReportModel newReport = new AbuseReportModel();
-                    newReport.setDescription(describe.getText().toString().trim());
-                    newReport.setComplaint(reportOptions[selectedOption-1]);
-                    newReport.setReportedOn(currentDate.getDate());
-
-                    //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
-                    reviewUpdateReportsRef.child("author").setValue(author);
-                    reviewUpdateReportsRef.child("postedTo").setValue(postedTo);
-
-                    //Now create a new unique reference and post the report POJO then exit
-                    DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/reviewUpdates/"+reviewKey+"/userReports/"+myPhone);
-                    userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            try {
-                                progressDialog.dismiss();
-                                finish();
-                                Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
-                            } catch (Exception e){}
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            try {
-                                progressDialog.dismiss();
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
-                            } catch (Exception err){}
-                        }
-                    });
+            option3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectedAbuse(3);
                 }
-            }
-        });
+            });
+
+            option4.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectedAbuse(4);
+                }
+            });
+
+            reportBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    ProgressDialog progressDialog = new ProgressDialog(ReportAbuse.this);
+                    progressDialog.setMessage("Sending...");
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+
+                    if(reportType.equals("product")){
+
+                        DatabaseReference productReportsRef = FirebaseDatabase.getInstance().getReference("reports/products/"+productKey);
+
+                        //Get today's date
+                        GetCurrentDate currentDate = new GetCurrentDate();
+
+                        //Bundle our report into a model (POJO)
+                        AbuseReportModel newReport = new AbuseReportModel();
+                        newReport.setDescription(describe.getText().toString().trim());
+                        newReport.setComplaint(reportOptions[selectedOption-1]);
+                        newReport.setReportedOn(currentDate.getDate());
+
+                        //Make sure the contact of this product is capture as it acts as our primary key in referencing the particular product
+                        productReportsRef.child("owner").setValue(productOwner);
+
+                        //Now create a new unique reference and post the report POJO then exit
+                        DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/products/"+productKey+"/userReports/"+myPhone);
+                        userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                try {
+                                    progressDialog.dismiss();
+                                    finish();
+                                    Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e){}
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    progressDialog.dismiss();
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception err){}
+                            }
+                        });
+                    }
+
+                    if(reportType.equals("statusUpdate")){
+                        DatabaseReference statusUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/statusUpdates/"+statusKey);
+
+                        //Get today's date
+                        GetCurrentDate currentDate = new GetCurrentDate();
+
+                        //Bundle our report into a model (POJO)
+                        AbuseReportModel newReport = new AbuseReportModel();
+                        newReport.setDescription(describe.getText().toString().trim());
+                        newReport.setComplaint(reportOptions[selectedOption-1]);
+                        newReport.setReportedOn(currentDate.getDate());
+
+                        //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
+                        statusUpdateReportsRef.child("author").setValue(author);
+                        statusUpdateReportsRef.child("postedTo").setValue(postedTo);
+
+                        //Now create a new unique reference and post the report POJO then exit
+                        DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/statusUpdates/"+statusKey+"/userReports/"+myPhone);
+                        userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                try {
+                                    progressDialog.dismiss();
+                                    finish();
+                                    Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e){}
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    progressDialog.dismiss();
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception err){}
+                            }
+                        });
+                    }
+
+                    if(reportType.equals("commentUpdate")){
+                        DatabaseReference commentUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/commentUpdates/"+commentKey);
+
+                        //Get today's date
+                        GetCurrentDate currentDate = new GetCurrentDate();
+
+                        //Bundle our report into a model (POJO)
+                        AbuseReportModel newReport = new AbuseReportModel();
+                        newReport.setDescription(describe.getText().toString().trim());
+                        newReport.setComplaint(reportOptions[selectedOption-1]);
+                        newReport.setReportedOn(currentDate.getDate());
+
+                        //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
+                        commentUpdateReportsRef.child("author").setValue(author);
+                        commentUpdateReportsRef.child("postedTo").setValue(postedTo);
+
+                        //Now create a new unique reference and post the report POJO then exit
+                        DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/commentUpdates/"+commentKey+"/userReports/"+myPhone);
+                        userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                try {
+                                    progressDialog.dismiss();
+                                    finish();
+                                    Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e){}
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    progressDialog.dismiss();
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception err){}
+                            }
+                        });
+                    }
+
+                    if(reportType.equals("reviewUpdate")){
+                        DatabaseReference reviewUpdateReportsRef = FirebaseDatabase.getInstance().getReference("reports/reviewUpdates/"+reviewKey);
+
+                        //Get today's date
+                        GetCurrentDate currentDate = new GetCurrentDate();
+
+                        //Bundle our report into a model (POJO)
+                        AbuseReportModel newReport = new AbuseReportModel();
+                        newReport.setDescription(describe.getText().toString().trim());
+                        newReport.setComplaint(reportOptions[selectedOption-1]);
+                        newReport.setReportedOn(currentDate.getDate());
+
+                        //Make sure the contact of this status is captured as it acts as our primary key in referencing the particular status
+                        reviewUpdateReportsRef.child("author").setValue(author);
+                        reviewUpdateReportsRef.child("postedTo").setValue(postedTo);
+
+                        //Now create a new unique reference and post the report POJO then exit
+                        DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/reviewUpdates/"+reviewKey+"/userReports/"+myPhone);
+                        userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                try {
+                                    progressDialog.dismiss();
+                                    finish();
+                                    Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e){}
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    progressDialog.dismiss();
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception err){}
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 
     private void selectedAbuse(int selected) {

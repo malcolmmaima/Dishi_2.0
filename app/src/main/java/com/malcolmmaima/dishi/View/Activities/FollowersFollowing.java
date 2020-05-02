@@ -10,8 +10,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +33,8 @@ import com.malcolmmaima.dishi.View.Fragments.ViewRestaurantMenuFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class FollowersFollowing extends AppCompatActivity {
 
     String phone, target;
@@ -46,62 +50,69 @@ public class FollowersFollowing extends AppCompatActivity {
 
     FragmentFollowing fragmentFollowing;
     FragmentFollowers fragmentFollowers;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_followers_following);
 
-        setTitle("");
-        phone = getIntent().getStringExtra("phone");
-        target = getIntent().getStringExtra("target");
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } {
+            setTitle("");
+            phone = getIntent().getStringExtra("phone");
+            target = getIntent().getStringExtra("target");
 
-        userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
-        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                    setTitle(userModel.getFirstname() + " " + userModel.getLastname());
-                } catch (Exception e){}
+            userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
+            userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        UserModel userModel = dataSnapshot.getValue(UserModel.class);
+                        setTitle(userModel.getFirstname() + " " + userModel.getLastname());
+                    } catch (Exception e){}
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
+
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+            // Setting ViewPager for each Tabs
+            ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+            setupViewPager(viewPager);
+
+            //Navigate to specific fragment based on what target user clicked on in profile
+            if(target.equals("following")){
+                viewPager.setCurrentItem(0);
+            } else {
+                viewPager.setCurrentItem(1);
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+            // Set Tabs inside Toolbar
+            TabLayout tabs = (TabLayout) findViewById(R.id.result_tabs);
+            tabs.setupWithViewPager(viewPager);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
-        // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-
-        //Navigate to specific fragment based on what target user clicked on in profile
-        if(target.equals("following")){
-            viewPager.setCurrentItem(0);
-        } else {
-            viewPager.setCurrentItem(1);
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
         }
-
-
-        // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.result_tabs);
-        tabs.setupWithViewPager(viewPager);
-
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
 
     }
 

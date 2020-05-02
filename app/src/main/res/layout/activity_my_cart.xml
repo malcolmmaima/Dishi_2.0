@@ -140,7 +140,7 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:visibility="visible"
+            android:visibility="gone"
             android:src="@drawable/sales"/>
 
         <TextView
@@ -152,7 +152,7 @@
             android:textSize="30sp"
             android:layout_marginTop="20dp"
             android:layout_gravity="center"
-            android:visibility="invisible"/>
+            android:visibility="gone"/>
 
     </LinearLayout>
 
@@ -160,8 +160,9 @@
     <LinearLayout
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:gravity="center|center_vertical"
         android:layout_gravity="bottom"
         android:layout_marginBottom="50dp"
         android:weightSum="3" >
@@ -170,11 +171,13 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="CHECKOUT"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
             android:textColor="@color/colorBackroundWhite"
             android:id="@+id/checkOut"
-            android:padding="12dp"
             android:background="@drawable/login_button"
             />
     </LinearLayout>

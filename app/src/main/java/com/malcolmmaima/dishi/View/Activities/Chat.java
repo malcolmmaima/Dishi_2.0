@@ -84,12 +84,21 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     int count = 0;
     View rootView;
     EmojIconActions emojIcon;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         rootView = findViewById(R.id.parentlayout);
+
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+        }
+
+
         try {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number

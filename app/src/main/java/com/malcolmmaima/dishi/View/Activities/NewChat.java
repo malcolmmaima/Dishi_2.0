@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class NewChat extends AppCompatActivity {
 
 
@@ -44,63 +46,70 @@ public class NewChat extends AppCompatActivity {
     TextView emptyTag;
     String myPhone;
     FirebaseUser user;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
 
-        //Hide keyboard on activity load
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            //Hide keyboard on activity load
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
 
-        progressBar = findViewById(R.id.progressBar);
-        searchPhone = findViewById(R.id.userSearch);
-        recyclerview = findViewById(R.id.rview);
-        emptyTag = findViewById(R.id.empty_tag);
+            progressBar = findViewById(R.id.progressBar);
+            searchPhone = findViewById(R.id.userSearch);
+            recyclerview = findViewById(R.id.rview);
+            emptyTag = findViewById(R.id.empty_tag);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("New Chat");
+            setTitle("New Chat");
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
-        searchUser(" "); //Initialize search
+            searchUser(" "); //Initialize search
 
-        searchPhone.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                progressBar.setVisibility(View.INVISIBLE);
-            }
+            searchPhone.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            }
+                }
 
-            @Override
-            public void afterTextChanged(final Editable s) {
-                progressBar.setVisibility(View.VISIBLE);
+                @Override
+                public void afterTextChanged(final Editable s) {
+                    progressBar.setVisibility(View.VISIBLE);
 
-                /**
-                 * Pass search value to our search function
-                 */
-                searchUser(s.toString().trim());
-            }
-        });
+                    /**
+                     * Pass search value to our search function
+                     */
+                    searchUser(s.toString().trim());
+                }
+            });
+        }
     }
 
     private void searchUser(final String search) {

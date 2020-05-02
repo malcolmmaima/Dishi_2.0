@@ -26,6 +26,8 @@ import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class LocationSettings extends AppCompatActivity {
 
     String myPhone;
@@ -33,120 +35,127 @@ public class LocationSettings extends AppCompatActivity {
     Switch defaultLocSwitch, liveLocSwitch;
     Button setLocation;
     Double lat, lng;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_settings);
 
-        String TAG = "LocationSettings";
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            String TAG = "LocationSettings";
 
-        //Initialize widgets
-        initWidgets();
+            //Initialize widgets
+            initWidgets();
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Location");
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            setTitle("Location");
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
-        //get auth state
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            //get auth state
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
-        myRef.child("locationType").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            //Set fb database reference
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("locationType").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                try {
-                    String locationType = dataSnapshot.getValue(String.class);
-                    if(locationType.equals("live")){
+                    try {
+                        String locationType = dataSnapshot.getValue(String.class);
+                        if(locationType.equals("live")){
+                            liveLocSwitch.setChecked(true);
+                            defaultLocSwitch.setChecked(false);
+                            startService(new Intent(LocationSettings.this, TrackingService.class));
+                        }
+
+                        if(locationType.equals("default")){
+                            liveLocSwitch.setChecked(false);
+                            defaultLocSwitch.setChecked(true);
+                            stopService(new Intent(LocationSettings.this, TrackingService.class));
+                        }
+
+                    } catch (Exception e){
+                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                        snackbar.show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+
+            });
+
+            defaultLocSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    // do something, the isChecked will be
+                    // true if the switch is in the On position
+                    if(isChecked){
+                        liveLocSwitch.setChecked(false);
+                        myRef.child("locationType").setValue("default");
+                        stopService(new Intent(LocationSettings.this, TrackingService.class));
+                        checkStaticLocation();
+                    }
+
+                    else {
                         liveLocSwitch.setChecked(true);
-                        defaultLocSwitch.setChecked(false);
+                        myRef.child("locationType").setValue("live");
+                        setLocation.setVisibility(View.GONE);
                         startService(new Intent(LocationSettings.this, TrackingService.class));
                     }
 
-                    if(locationType.equals("default")){
-                        liveLocSwitch.setChecked(false);
+
+                }
+            });
+
+            liveLocSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    // do something, the isChecked will be
+                    // true if the switch is in the On position
+
+                    if(isChecked){
+                        defaultLocSwitch.setChecked(false);
+                        myRef.child("locationType").setValue("live");
+                        setLocation.setVisibility(View.GONE);
+                        startService(new Intent(LocationSettings.this, TrackingService.class));
+                    }
+
+                    else {
                         defaultLocSwitch.setChecked(true);
+                        myRef.child("locationType").setValue("default");
+                        checkStaticLocation();
                         stopService(new Intent(LocationSettings.this, TrackingService.class));
                     }
 
-                } catch (Exception e){
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                    snackbar.show();
                 }
-            }
+            });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-
-        });
-
-        defaultLocSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // do something, the isChecked will be
-                // true if the switch is in the On position
-                if(isChecked){
-                    liveLocSwitch.setChecked(false);
-                    myRef.child("locationType").setValue("default");
-                    stopService(new Intent(LocationSettings.this, TrackingService.class));
-                    checkStaticLocation();
+            setLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestLocation();
                 }
-
-                else {
-                    liveLocSwitch.setChecked(true);
-                    myRef.child("locationType").setValue("live");
-                    setLocation.setVisibility(View.GONE);
-                    startService(new Intent(LocationSettings.this, TrackingService.class));
-                }
-
-
-            }
-        });
-
-        liveLocSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // do something, the isChecked will be
-                // true if the switch is in the On position
-
-                if(isChecked){
-                    defaultLocSwitch.setChecked(false);
-                    myRef.child("locationType").setValue("live");
-                    setLocation.setVisibility(View.GONE);
-                    startService(new Intent(LocationSettings.this, TrackingService.class));
-                }
-
-                else {
-                    defaultLocSwitch.setChecked(true);
-                    myRef.child("locationType").setValue("default");
-                    checkStaticLocation();
-                    stopService(new Intent(LocationSettings.this, TrackingService.class));
-                }
-
-            }
-        });
-
-        setLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestLocation();
-            }
-        });
+            });
+        }
     }
 
     /**

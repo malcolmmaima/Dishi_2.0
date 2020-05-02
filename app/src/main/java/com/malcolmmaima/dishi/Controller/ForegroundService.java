@@ -128,15 +128,15 @@ public class ForegroundService extends Service {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
-                    if (myUserDetails.getAccount_type().equals("1")) {
+                    if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")) {
                         startCustomerNotifications();
                     }
 
-                    if(myUserDetails.getAccount_type().equals("2")){
+                    if(myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")){
                         startRestaurantNotifications();
                     }
 
-                    if(myUserDetails.getAccount_type().equals("3")){
+                    if(myUserDetails.getAccount_type().equals("3") && myUserDetails.getVerified().equals("true")){
                         startRiderNotifications();
 
                         /**
@@ -226,7 +226,6 @@ public class ForegroundService extends Service {
                         };
                         myRideOrderRequests.addValueEventListener(myRideOrderRequestsListener);
                     }
-
 
                 } catch (Exception e){}
             }

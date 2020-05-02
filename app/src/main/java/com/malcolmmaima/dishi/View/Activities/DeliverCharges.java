@@ -29,77 +29,84 @@ public class DeliverCharges extends AppCompatActivity {
     String myPhone;
     int price;
     DatabaseReference myRef;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deliver_charges);
 
-        pricePerKm = findViewById(R.id.pricePerKm);
-        saveDetails = findViewById(R.id.saveDetails);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            pricePerKm = findViewById(R.id.pricePerKm);
+            saveDetails = findViewById(R.id.saveDetails);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            //Set fb database reference
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
-        myRef.child("delivery_charge").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    myRef.child("delivery_charge").setValue(0);
-                    pricePerKm.setText("0");
+            myRef.child("delivery_charge").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        myRef.child("delivery_charge").setValue(0);
+                        pricePerKm.setText("0");
+                    }
+
+                    else {
+                        price = dataSnapshot.getValue(Integer.class);
+                        pricePerKm.setText(""+price);
+                    }
                 }
 
-                else {
-                    price = dataSnapshot.getValue(Integer.class);
-                    pricePerKm.setText(""+price);
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+            });
 
 
-        saveDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            saveDetails.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                price = Integer.parseInt(pricePerKm.getText().toString());
-                if(!pricePerKm.getText().equals("")){
-                    myRef.child("delivery_charge").setValue(price).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            SafeToast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
-                            finish();
-                        }
-                    });
+                    price = Integer.parseInt(pricePerKm.getText().toString());
+                    if(!pricePerKm.getText().equals("")){
+                        myRef.child("delivery_charge").setValue(price).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                SafeToast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                        });
+                    }
+
+                    else {
+                        pricePerKm.setError("Can't be Empty");
+                    }
                 }
+            });
 
-                else {
-                    pricePerKm.setError("Can't be Empty");
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
+
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+            setTitle("Delivery Charges");
+
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
                 }
-            }
-        });
-
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        setTitle("Delivery Charges");
-
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            });
+        }
     }
 }

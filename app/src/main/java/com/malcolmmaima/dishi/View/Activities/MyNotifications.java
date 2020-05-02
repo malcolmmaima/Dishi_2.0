@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class MyNotifications extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     String myPhone;
@@ -41,54 +44,60 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
     TextView emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_notifications);
 
-        icon = findViewById(R.id.menuIcon);
-        recyclerView = findViewById(R.id.rview);
-        emptyTag = findViewById(R.id.empty_tag);
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            icon = findViewById(R.id.menuIcon);
+            recyclerView = findViewById(R.id.rview);
+            emptyTag = findViewById(R.id.empty_tag);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Notifications");
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            setTitle("Notifications");
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
-        // SwipeRefreshLayout
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setOnRefreshListener(MyNotifications.this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_blue_dark);
+            // SwipeRefreshLayout
+            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+            mSwipeRefreshLayout.setOnRefreshListener(MyNotifications.this);
+            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                    android.R.color.holo_green_dark,
+                    android.R.color.holo_orange_dark,
+                    android.R.color.holo_blue_dark);
 
-        mSwipeRefreshLayout.post(new Runnable() {
+            mSwipeRefreshLayout.post(new Runnable() {
 
-            @Override
-            public void run() {
+                @Override
+                public void run() {
 
-                mSwipeRefreshLayout.setRefreshing(true);
+                    mSwipeRefreshLayout.setRefreshing(true);
 
-                // Fetching data from server
-                fetchNotifications();
-            }
-        });
+                    // Fetching data from server
+                    fetchNotifications();
+                }
+            });
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        notificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
-
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            notificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+        }
     }
 
     private void fetchNotifications() {

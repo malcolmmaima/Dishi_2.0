@@ -59,59 +59,65 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     MessageModel chatMessage;
     int count=0;
     public ActionMode actionMode = null;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inbox);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Inbox");
+            setTitle("Inbox");
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
 
 
-        icon = findViewById(R.id.inboxIcon);
-        chatList = findViewById(R.id.chatList);
-        emptyTag = findViewById(R.id.empty_tag);
+            icon = findViewById(R.id.inboxIcon);
+            chatList = findViewById(R.id.chatList);
+            emptyTag = findViewById(R.id.empty_tag);
 
-        // SwipeRefreshLayout
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_blue_dark);
+            // SwipeRefreshLayout
+            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+            mSwipeRefreshLayout.setOnRefreshListener(this);
+            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                    android.R.color.holo_green_dark,
+                    android.R.color.holo_orange_dark,
+                    android.R.color.holo_blue_dark);
 
-        /**
-         * Showing Swipe Refresh animation on activity create
-         * As animation won't start on onCreate, post runnable is used
-         */
-        mSwipeRefreshLayout.post(new Runnable() {
+            /**
+             * Showing Swipe Refresh animation on activity create
+             * As animation won't start on onCreate, post runnable is used
+             */
+            mSwipeRefreshLayout.post(new Runnable() {
 
-            @Override
-            public void run() {
+                @Override
+                public void run() {
 
-                mSwipeRefreshLayout.setRefreshing(true);
-                //fetchMessages();
+                    mSwipeRefreshLayout.setRefreshing(true);
+                    //fetchMessages();
 
-            }
-        });
-
+                }
+            });
+        }
     }
 
     private void fetchMessages() {

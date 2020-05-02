@@ -28,6 +28,8 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class SettingsActivity extends AppCompatActivity {
 
     String myPhone;
@@ -38,32 +40,38 @@ public class SettingsActivity extends AppCompatActivity {
     CardView personalDetails;
     RelativeLayout accountSettings, notificationSettings, help, about;
     ValueEventListener myRefListener;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        TAG = "SettingsActivity";
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            TAG = "SettingsActivity";
 
-        //Initialize widgets
-        initWidgets();
+            //Initialize widgets
+            initWidgets();
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Settings");
+            setTitle("Settings");
 
-        //get auth state
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            //get auth state
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            //Set fb database reference
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
             /**
              * Get logged in user details
@@ -94,59 +102,60 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             };
 
-        myRef.addValueEventListener(myRefListener);
+            myRef.addValueEventListener(myRefListener);
 
-        personalDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent slideactivity = new Intent(SettingsActivity.this, PersonalDetails.class);
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                startActivity(slideactivity, bndlanimation);
-            }
-        });
+            personalDetails.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent slideactivity = new Intent(SettingsActivity.this, PersonalDetails.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
+                }
+            });
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
+                }
+            });
 
-        accountSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent slideactivity = new Intent(SettingsActivity.this, AccountSettings.class);
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                startActivity(slideactivity, bndlanimation);
-            }
-        });
+            accountSettings.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent slideactivity = new Intent(SettingsActivity.this, AccountSettings.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
+                }
+            });
 
-        notificationSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                snackbar.show();
-            }
-        });
+            notificationSettings.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            });
 
-        help.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                snackbar.show();
-            }
-        });
+            help.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            });
 
-        about.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                snackbar.show();
-            }
-        });
+            about.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            });
+        }
     }
 
     private void initWidgets() {
@@ -167,6 +176,10 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        myRef.removeEventListener(myRefListener);
+        try {
+            myRef.removeEventListener(myRefListener);
+        } catch (Exception e){
+
+        }
     }
 }

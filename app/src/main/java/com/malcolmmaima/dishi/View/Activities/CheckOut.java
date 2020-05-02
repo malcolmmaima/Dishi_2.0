@@ -61,7 +61,7 @@ public class CheckOut extends AppCompatActivity {
     TextView SubTotal,deliveryChargeAmount, VATamount, totalBill;
     Double deliveryAmount, totalBillAmount,VAT;
     String [] paymentMethods = {"M-Pesa","Cash on Delivery"};
-    String [] deliveryAddress = {"Live Location","Select Location"};
+    String [] deliveryAddress = {"Live Location","Select Location", "Pick My Order"};
     String selectedPaymentMethod, myPhone;
     Double lat, lng;
     String placeName, locationSet;
@@ -162,6 +162,11 @@ public class CheckOut extends AppCompatActivity {
                         }
                         if(which == 1){
                             requestLocation();
+                        }
+
+                        if(which == 2){
+                            locationSet = "pick";
+                            deliveryLocationStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
                         }
                     }
                 });

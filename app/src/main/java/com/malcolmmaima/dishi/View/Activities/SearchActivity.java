@@ -66,146 +66,152 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        //Hide keyboard on activity load
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            //Hide keyboard on activity load
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
-        searchWord = findViewById(R.id.edtSearch);
-        searchWord.setEnabled(false);
-        emptyTag = findViewById(R.id.empty_tag);
-        recyclerView = findViewById(R.id.rview);
+            progressBar = findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.GONE);
+            searchWord = findViewById(R.id.edtSearch);
+            searchWord.setEnabled(false);
+            emptyTag = findViewById(R.id.empty_tag);
+            recyclerView = findViewById(R.id.rview);
 
-        searchPreference = findViewById(R.id.searchPreference);
-        usersRd = findViewById(R.id.usersRd);
-        foodRd = findViewById(R.id.foodRd);
-        restaurantsRd = findViewById(R.id.restaurantsRd);
+            searchPreference = findViewById(R.id.searchPreference);
+            usersRd = findViewById(R.id.usersRd);
+            foodRd = findViewById(R.id.foodRd);
+            restaurantsRd = findViewById(R.id.restaurantsRd);
 
-        Toolbar topToolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(topToolBar);
+            Toolbar topToolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(topToolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle("");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            setTitle("");
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
-        myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+            myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
-        myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myDetails = dataSnapshot.getValue(UserModel.class);
-                myDetails.setPhone(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
-
-        searchPreference.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                //Toast.makeText(SearchActivity.this, "ID: " + i, Toast.LENGTH_SHORT).show();
-
-                int searchPrf = searchPreference.getCheckedRadioButtonId();
-                liveLocationModel = null;
-                locationListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                        //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                };
-
-                // find the radio button by returned id
-                RadioButton radioButton = findViewById(searchPrf);
-
-                selectedPreference = radioButton.getText().toString();
-                //Toast.makeText(SearchActivity.this, "Selected: " + selectedPreference, Toast.LENGTH_SHORT).show();
-                searchWord.setEnabled(true);
-                recyclerView.setVisibility(View.GONE);
-                if(selectedPreference.equals("Users")){
-                    emptyTag.setText("Users");
-                    emptyTag.setVisibility(VISIBLE);
-                    myLocationRef.removeEventListener(locationListener);
+            myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    myDetails = dataSnapshot.getValue(UserModel.class);
+                    myDetails.setPhone(dataSnapshot.getKey());
                 }
 
-                if(selectedPreference.equals("Food")){
-                    emptyTag.setText("Food");
-                    emptyTag.setVisibility(VISIBLE);
-                    myLocationRef.addValueEventListener(locationListener);
-                }
-
-                if(selectedPreference.equals("Vendors")){
-                    emptyTag.setText("Vendors");
-                    emptyTag.setVisibility(VISIBLE);
-                    myLocationRef.addValueEventListener(locationListener);
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
+            });
 
-                if(!searchWord.getText().toString().trim().equals("")){
-                    searchDB(searchWord.getText().toString().trim(), selectedPreference);
+
+            //Back button on toolbar
+            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish(); //Go back to previous activity
                 }
+            });
 
-            }
-        });
+            searchPreference.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                    //Toast.makeText(SearchActivity.this, "ID: " + i, Toast.LENGTH_SHORT).show();
 
-        searchWord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchWord.requestFocus();
-            }
-        });
+                    int searchPrf = searchPreference.getCheckedRadioButtonId();
+                    liveLocationModel = null;
+                    locationListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                            //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                        }
 
-        searchWord.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
+                        }
+                    };
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //Toast.makeText(SearchActivity.this, "typing...", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(VISIBLE);
-            }
+                    // find the radio button by returned id
+                    RadioButton radioButton = findViewById(searchPrf);
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //Toast.makeText(SearchActivity.this, "done typing", Toast.LENGTH_SHORT).show();
-
-                String word = editable.toString().trim();
-
-                if(isStringNullOrWhiteSpace(word)){
-                    progressBar.setVisibility(View.GONE);
-                    emptyTag.setText("Type something");
-                    emptyTag.setVisibility(VISIBLE);
+                    selectedPreference = radioButton.getText().toString();
+                    //Toast.makeText(SearchActivity.this, "Selected: " + selectedPreference, Toast.LENGTH_SHORT).show();
+                    searchWord.setEnabled(true);
                     recyclerView.setVisibility(View.GONE);
-                    //Toast.makeText(SearchActivity.this, "empty", Toast.LENGTH_SHORT).show();
-                } else {
-                    searchDB(word, selectedPreference);
+                    if(selectedPreference.equals("Users")){
+                        emptyTag.setText("Users");
+                        emptyTag.setVisibility(VISIBLE);
+                        myLocationRef.removeEventListener(locationListener);
+                    }
+
+                    if(selectedPreference.equals("Food")){
+                        emptyTag.setText("Food");
+                        emptyTag.setVisibility(VISIBLE);
+                        myLocationRef.addValueEventListener(locationListener);
+                    }
+
+                    if(selectedPreference.equals("Vendors")){
+                        emptyTag.setText("Vendors");
+                        emptyTag.setVisibility(VISIBLE);
+                        myLocationRef.addValueEventListener(locationListener);
+
+                    }
+
+                    if(!searchWord.getText().toString().trim().equals("")){
+                        searchDB(searchWord.getText().toString().trim(), selectedPreference);
+                    }
+
+                }
+            });
+
+            searchWord.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    searchWord.requestFocus();
+                }
+            });
+
+            searchWord.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
                 }
 
-            }
-        });
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    //Toast.makeText(SearchActivity.this, "typing...", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(VISIBLE);
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    //Toast.makeText(SearchActivity.this, "done typing", Toast.LENGTH_SHORT).show();
+
+                    String word = editable.toString().trim();
+
+                    if(isStringNullOrWhiteSpace(word)){
+                        progressBar.setVisibility(View.GONE);
+                        emptyTag.setText("Type something");
+                        emptyTag.setVisibility(VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                        //Toast.makeText(SearchActivity.this, "empty", Toast.LENGTH_SHORT).show();
+                    } else {
+                        searchDB(word, selectedPreference);
+                    }
+
+                }
+            });
+        }
     }
 
     private void searchDB(final String word, String selectedPreference) {
