@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,12 +54,13 @@ public class ViewRestaurant extends AppCompatActivity {
     String RestaurantName, phone;
     ValueEventListener providerFavsListener;
     Menu myMenu;
-    DatabaseReference myLocationRef, restaurantLocationRef;
-    ValueEventListener mylocationListener, restaurantLocationListener;
+    DatabaseReference myLocationRef, restaurantLocationRef, myCartRef;
+    ValueEventListener mylocationListener, restaurantLocationListener, cartListener;
     LiveLocationModel myLocation, restaurantLocation;
     Double dist;
     String myPhone;
     FirebaseUser user;
+    FloatingActionButton fab;
 
     //This is our tablayout
     private TabLayout tabLayout;
@@ -117,6 +120,7 @@ public class ViewRestaurant extends AppCompatActivity {
             distAway = findViewById(R.id.distanceAway);
             likes = findViewById(R.id.likesTotal);
 
+            fab = findViewById(R.id.fab); //cart icon
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -127,6 +131,45 @@ public class ViewRestaurant extends AppCompatActivity {
             restaurantRef = FirebaseDatabase.getInstance().getReference("users/"+restaurantPhone);
             myFavourites = FirebaseDatabase.getInstance().getReference("my_restaurant_favourites/"+myPhone);
             providerFavs = FirebaseDatabase.getInstance().getReference("restaurant_favourites/"+ restaurantPhone);
+
+            myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+            cartListener = new ValueEventListener() {
+                @SuppressLint("RestrictedApi")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        try {
+                            fab.setVisibility(View.VISIBLE);
+                        } catch (Exception e){
+
+                        }
+                    }
+
+                    else {
+                        try {
+                            fab.setVisibility(View.GONE);
+                        } catch (Exception e){
+
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent slideactivity = new Intent(ViewRestaurant.this, MyCart.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(slideactivity);
+                }
+            });
+
+            myCartRef.addValueEventListener(cartListener);
 
             //Fetch the restauant basic info
             restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {

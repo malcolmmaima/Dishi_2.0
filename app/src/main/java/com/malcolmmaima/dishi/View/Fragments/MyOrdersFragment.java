@@ -79,8 +79,10 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
         myOrders = db.getReference("my_orders/"+myPhone);
 
         icon = v.findViewById(R.id.menuIcon);
+        icon.setVisibility(View.GONE);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        emptyTag.setVisibility(View.GONE);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);

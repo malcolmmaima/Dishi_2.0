@@ -29,7 +29,6 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-
         <LinearLayout
             android:id="@+id/userInfo"
             android:layout_below="@id/app_bar"
@@ -182,6 +181,24 @@
             android:layout_height="470dp">
 
         </androidx.viewpager.widget.ViewPager>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:visibility="visible"
+                app:srcCompat="@drawable/ic_shopping_cart_white_48dp" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
