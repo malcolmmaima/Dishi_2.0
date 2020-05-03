@@ -34,6 +34,21 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
+            <TextView
+                android:layout_below="@id/restaurantName"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/myOrderID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#666"
+                android:layout_gravity="right"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="1dp"
+                android:textStyle="bold"
+                android:layout_marginRight="5dp"
+                android:text="ORDER ID: #0000"/>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_order_status"
                 android:clickable="true"
@@ -86,20 +101,6 @@
                         android:textStyle="bold"
                         android:textSize="20sp" />
 
-                    <TextView
-                        android:layout_below="@id/restaurantName"
-                        android:layout_centerHorizontal="true"
-                        android:id="@+id/myOrderID"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="#666"
-                        android:layout_gravity="right"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="10dp"
-                        android:textStyle="bold"
-                        android:layout_marginRight="5dp"
-                        android:text="ORDER ID: #0000"/>
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/confirmOrd"

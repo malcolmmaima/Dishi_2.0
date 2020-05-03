@@ -317,6 +317,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     list = new ArrayList<>();
 
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                    String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                    myOrderID.setText("ORDER ID: #"+orderID);
 
                     initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
