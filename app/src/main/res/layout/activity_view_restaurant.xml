@@ -179,7 +179,7 @@
             android:layout_below="@id/tablayout"
             android:backgroundTint="@color/colorBackroundWhite"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:layout_height="500dp">
+            android:layout_height="470dp">
 
         </androidx.viewpager.widget.ViewPager>
 
