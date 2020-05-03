@@ -35,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.FragmentStats;
@@ -75,8 +76,8 @@ public class RestaurantActivity extends AppCompatActivity
     FloatingActionButton addMenu;
     Menu myMenu;
     String myPhone, imageURL;
-    private DatabaseReference myRef;
-    private ValueEventListener myRefListener;
+    private DatabaseReference myRef, myNotificationsRef;
+    private ValueEventListener myRefListener, myNotificationsListener;
     private FirebaseAuth mAuth;
     private String TAG;
     private static final int PERMISSIONS_REQUEST = 100;
@@ -141,6 +142,7 @@ public class RestaurantActivity extends AppCompatActivity
 
                 //Set fb database reference
                 myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
+                myNotificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
             } catch (Exception e){
 
             }
@@ -236,6 +238,29 @@ public class RestaurantActivity extends AppCompatActivity
                 }
             };
             myRef.addValueEventListener(myRefListener);
+
+            /**
+             * Check notifications
+             */
+
+            myNotificationsListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    notificationIcon.setBackgroundResource(R.drawable.ic_notifications_white_48dp);
+                    for(DataSnapshot notifs : dataSnapshot.getChildren()){
+                        NotificationModel allnotifications = notifs.getValue(NotificationModel.class);
+                        if(allnotifications.getSeen() == false){
+                            notificationIcon.setBackgroundResource(R.drawable.active_notification_64dp);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            myNotificationsRef.addValueEventListener(myNotificationsListener);
 
             profilePic.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -518,6 +543,7 @@ public class RestaurantActivity extends AppCompatActivity
         super.onDestroy();
         try {
             myRef.removeEventListener(myRefListener);
+            myNotificationsRef.removeEventListener(myNotificationsListener);
         } catch (Exception e){
 
         }

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:background="@color/pureWhite"
     android:layout_height="wrap_content"
-    android:minHeight="70dp"
-    android:gravity="center_vertical"
+    android:background="@color/pureWhite"
     android:layout_marginLeft="5dp"
     android:id="@+id/card_view"
     android:layout_marginRight="5dp"
@@ -38,10 +35,9 @@
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingLeft="5dp"
         android:paddingBottom="0dp"
-        android:gravity="center_vertical"
         android:background="@color/pureWhite"
         android:paddingTop="8dp"
         android:paddingRight="15dp">
@@ -60,13 +56,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-
         <TextView
             android:id="@+id/message"
             android:layout_below="@+id/contact_name"
             android:textSize="15dp"
-            android:text="loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading...loading..."
+            android:text="loading..."
             android:layout_marginRight="40dp"
+            android:paddingRight="5dp"
             android:layout_marginBottom="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -111,7 +107,16 @@
             android:paddingTop="2dp"
             android:backgroundTint="@color/lightgray"
             android:src="@drawable/comments"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
+
+        <ImageView
+            android:layout_below="@id/notificationTime"
+            android:visibility="gone"
+            android:layout_alignParentRight="true"
+            android:id="@+id/statusImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"/>
 
         <ImageView
             android:layout_below="@id/notificationTime"
@@ -126,6 +131,7 @@
             android:visibility="gone"/>
 
         <RelativeLayout
+            android:layout_marginTop="5dp"
             android:layout_alignParentBottom="true"
             android:background="#40000000"
             android:layout_width="match_parent"

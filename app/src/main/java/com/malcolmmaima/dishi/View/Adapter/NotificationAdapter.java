@@ -97,7 +97,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                  * Load image url onto imageview
                  */
                 try {
-                    //Load food image
                     Picasso.with(context).load(userData.getProfilePic()).fit().centerCrop()
                             .placeholder(R.drawable.default_profile)
                             .error(R.drawable.default_profile)
@@ -215,6 +214,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.followUnfollow.setVisibility(View.GONE);
             holder.commented.setVisibility(View.GONE);
             holder.postedWall.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
 
             holder.liked.setVisibility(View.VISIBLE);
             DatabaseReference postDetailsRef = FirebaseDatabase.getInstance().getReference("posts/"+my_notification.getPostedTo()+"/"+my_notification.getMessage());
@@ -226,8 +226,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     } else {
                         try {
                             StatusUpdateModel statusUpdate = dataSnapshot.getValue(StatusUpdateModel.class);
-                            holder.notificationMessage.setText("liked: " + statusUpdate.getStatus());
-                            Log.d(TAG, "onDataChange: liked"+statusUpdate.getStatus());
+                            if(statusUpdate.getStatus().length() > 50) {
+                                holder.notificationMessage.setText("liked: " +statusUpdate.getStatus().substring(0, 50) + "...");
+                            } else {
+                                holder.notificationMessage.setText("liked: " + statusUpdate.getStatus());
+                            }
+
+                            if(statusUpdate.getImageShare() != null && !statusUpdate.getImageShare().equals("")){
+                                holder.commented.setVisibility(View.GONE);
+                                holder.statusImage.setVisibility(View.VISIBLE);
+
+                                Picasso.with(context).load(statusUpdate.getImageShare()).fit().centerCrop()
+                                        .placeholder(R.drawable.gray_gradient_background)
+                                        .error(R.drawable.gray_gradient_background)
+                                        .into(holder.statusImage);
+                            }
+
                         } catch (Exception e){
                             Log.e(TAG, "onDataChange: ", e);
                             holder.liked.setVisibility(View.GONE);
@@ -246,6 +260,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.followUnfollow.setVisibility(View.GONE);
             holder.liked.setVisibility(View.GONE);
             holder.postedWall.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
 
             holder.commented.setVisibility(View.VISIBLE);
 
@@ -271,9 +286,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                                             try {
                                                 StatusUpdateModel comment = dataSnapshot.getValue(StatusUpdateModel.class); //the comment reply to above mentioned status
 
-                                                holder.notificationMessage.setText("commented: " + comment.getStatus());
+                                                if(comment.getStatus().length() > 50) {
+                                                    holder.notificationMessage.setText("commented: " +comment.getStatus().substring(0, 50) + "...");
+                                                } else {
+                                                    holder.notificationMessage.setText("commented: " + comment.getStatus());
+                                                }
+
+                                                if(statusUpdate.getImageShare() != null && !statusUpdate.getImageShare().equals("")){
+                                                    holder.commented.setVisibility(View.GONE);
+                                                    holder.statusImage.setVisibility(View.VISIBLE);
+
+                                                    Picasso.with(context).load(statusUpdate.getImageShare()).fit().centerCrop()
+                                                            .placeholder(R.drawable.gray_gradient_background)
+                                                            .error(R.drawable.gray_gradient_background)
+                                                            .into(holder.statusImage);
+                                                }
                                             } catch (Exception e){
-                                                holder.notificationMessage.setText("...");
                                                 Log.e(TAG, "onDataChange: ", e);
                                             }
                                         }
@@ -487,7 +515,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView contact_name, notificationMessage, notificationTime;
-        ImageView profilePic, liked, commented, postedWall;
+        ImageView profilePic, liked, commented, postedWall, statusImage;
         LinearLayout cardView;
         AppCompatButton followUnfollow;
 
@@ -502,6 +530,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             liked = itemView.findViewById(R.id.liked);
             commented = itemView.findViewById(R.id.commented);
             postedWall = itemView.findViewById(R.id.postedWall);
+            statusImage = itemView.findViewById(R.id.statusImage);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
