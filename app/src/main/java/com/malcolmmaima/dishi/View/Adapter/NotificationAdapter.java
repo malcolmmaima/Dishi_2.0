@@ -37,6 +37,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReviewsActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
@@ -398,7 +399,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 }
 
                 if(my_notification.getType().equals("postedwall")){
-                    //Do somthing
+                    Intent slideactivity = new Intent(context, ViewStatus.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("author", my_notification.getFrom());
+                    slideactivity.putExtra("postedTo", myPhone);
+                    slideactivity.putExtra("key", my_notification.getMessage());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
                 }
 
                 if(my_notification.getType().equals("likedstatus")){
@@ -430,8 +438,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 }
 
                 if(my_notification.getType().equals("postedreview")){
-                    Intent slideactivity = new Intent(context, ReviewsActivity.class)
+                    Intent slideactivity = new Intent(context, ViewReview.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("author", my_notification.getFrom());
+                    slideactivity.putExtra("postedTo", myPhone);
+                    slideactivity.putExtra("key", my_notification.getMessage());
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                     context.startActivity(slideactivity, bndlanimation);

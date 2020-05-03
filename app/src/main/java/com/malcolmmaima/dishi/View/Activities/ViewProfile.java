@@ -862,7 +862,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 postedOnWall.setImage(imgLink);
                 postedOnWall.setSeen(false);
                 postedOnWall.setTimeStamp(postDate);
-                postedOnWall.setMessage(myStatusUpdate.getText().toString().trim());
+                postedOnWall.setMessage(key);
 
                 notificationRef.child(notifKey).setValue(postedOnWall); //send to db
 
