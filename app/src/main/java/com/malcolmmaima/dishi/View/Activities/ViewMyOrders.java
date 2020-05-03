@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
@@ -70,6 +72,7 @@ public class ViewMyOrders extends AppCompatActivity {
     String [] riderOptions = {"View","Message", "Call"};
     final int[] total = {0};
     FirebaseAuth mAuth;
+    Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,67 +169,96 @@ public class ViewMyOrders extends AppCompatActivity {
 
                         initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
-                        //Get today's date
-                        GetCurrentDate currentDate = new GetCurrentDate();
-                        String currDate = currentDate.getDate();
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
 
-                        //Get dates
-                        String dtEnd = currDate;
-                        String dtStart = initiatedTime;
+                            int second = 1800; //30minutes
 
-                        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                        //Format both current date and date status update was posted
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
-                        try {
+                            @Override
+                            public void run() {
+                                if (second <= 0) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //Orer id taking too long
+                                            timer.cancel();
+                                        }
+                                    });
 
-                            //Convert String date values to Date values
-                            Date dateStart;
-                            Date dateEnd;
+                                } else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                            //Date dateStart = format.parse(dtStart);
-                            String[] timeS = Split(initiatedTime);
-                            String[] timeT = Split(currDate);
+                                            //Get today's date
+                                            GetCurrentDate currentDate = new GetCurrentDate();
+                                            String currDate = currentDate.getDate();
 
-                            /**
-                             * timeS[0] = date
-                             * timeS[1] = hr
-                             * timeS[2] = min
-                             * timeS[3] = seconds
-                             * timeS[4] = timezone
-                             */
+                                            //Get dates
+                                            String dtEnd = currDate;
+                                            String dtStart = initiatedTime;
 
-                            //post timeStamp
-                            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                timeS[4] = "GMT+03:00";
+                                            //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                                            //Format both current date and date status update was posted
+                                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                                            try {
 
-                                //2020-04-27:20:37:32:GMT+03:00
-                                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                                dateStart = format.parse(dtStart);
-                            } else {
-                                dateStart = format.parse(dtStart);
+                                                //Convert String date values to Date values
+                                                Date dateStart;
+                                                Date dateEnd;
+
+                                                //Date dateStart = format.parse(dtStart);
+                                                String[] timeS = Split(initiatedTime);
+                                                String[] timeT = Split(currDate);
+
+                                                /**
+                                                 * timeS[0] = date
+                                                 * timeS[1] = hr
+                                                 * timeS[2] = min
+                                                 * timeS[3] = seconds
+                                                 * timeS[4] = timezone
+                                                 */
+
+                                                //post timeStamp
+                                                if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                    timeS[4] = "GMT+03:00";
+
+                                                    //2020-04-27:20:37:32:GMT+03:00
+                                                    dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                                    dateStart = format.parse(dtStart);
+                                                } else {
+                                                    dateStart = format.parse(dtStart);
+                                                }
+
+                                                //my device current date
+                                                if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                    timeT[4] = "GMT+03:00";
+
+                                                    //2020-04-27:20:37:32:GMT+03:00
+                                                    dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                                    dateEnd = format.parse(dtEnd);
+                                                } else {
+                                                    dateEnd = format.parse(dtEnd);
+                                                }
+
+                                                //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                                //Now compute timeAgo duration
+                                                TimeAgo timeAgo = new TimeAgo();
+
+                                                timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                                Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                            }
+
+                                            second--;
+                                        }
+                                    });
+                                }
+
                             }
-
-                            //my device current date
-                            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                timeT[4] = "GMT+03:00";
-
-                                //2020-04-27:20:37:32:GMT+03:00
-                                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                                dateEnd = format.parse(dtEnd);
-                            } else {
-                                dateEnd = format.parse(dtEnd);
-                            }
-
-                            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
-                            //Now compute timeAgo duration
-                            TimeAgo timeAgo = new TimeAgo();
-
-                            timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                            Log.d(TAG, "timeStamp: "+ e.getMessage());
-                        }
+                        }, 0, 1000);
                         try {
                             riderPhone = dataSnapshot.child("rider").getValue(String.class);
 

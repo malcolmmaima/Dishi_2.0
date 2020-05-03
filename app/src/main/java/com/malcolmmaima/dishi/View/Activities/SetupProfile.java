@@ -281,7 +281,7 @@ public class SetupProfile extends AppCompatActivity {
                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                 Bundle bndlanimation =
                                                         null;
-                                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                                                     bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                                                 }
                                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -299,9 +299,13 @@ public class SetupProfile extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
                                         // Handle any errors
-                                        progressDialog.dismiss();
-                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                        snackbar.show();
+                                        try {
+                                            progressDialog.dismiss();
+                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                        } catch (Exception e){
+                                            Log.e(TAG, "onFailure: ", e);
+                                        }
                                     }
                                 });
 
@@ -316,7 +320,7 @@ public class SetupProfile extends AppCompatActivity {
                                     Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
                                     snackbar.show();
                                 } catch (Exception e){
-                                    
+                                    Log.e(TAG, "onFailure: ", e);
                                 }
                             }
                         })
@@ -393,7 +397,7 @@ public class SetupProfile extends AppCompatActivity {
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             Bundle bndlanimation =
                                                     null;
-                                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                                                 bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                                             }
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -406,14 +410,23 @@ public class SetupProfile extends AppCompatActivity {
                                         }
                                     });
                                 } catch (Exception e){
-                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                    snackbar.show();
+                                    Log.e(TAG, "onClick: ", e);
+                                    try {
+                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    } catch (Exception er){
+                                        Log.e(TAG, "onClick: ", e);
+                                    }
                                 }
                             }
 
                             else if(defaultProfile.equals("")){
-                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                snackbar.show();
+                                try {
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception e){
+                                    Log.e(TAG, "onClick: ", e);
+                                }
                             }
 
                         }

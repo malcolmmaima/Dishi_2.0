@@ -39,6 +39,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.Interface.OnOrderChecked;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
@@ -48,20 +50,25 @@ import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewCustomerOrder extends AppCompatActivity implements OnOrderChecked {
     String TAG = "ViewCustomerOrder";
     List<ProductDetailsModel> list;
-    String myPhone, phone, customerName, restaurantPhone;
+    String myPhone, phone, customerName, restaurantPhone, initiatedTime;
     FirebaseUser user;
     DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
     ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName, restaurantName;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, customerRemarks, riderName, restaurantName, timeStamp, myOrderID;
     FloatingActionButton acceptOrd;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
@@ -79,6 +86,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     String riderPhone;
     String [] restaurantActions = {"View","Message", "Call"};
     String [] riderOptions = {"View","Message", "Call"};
+    Timer timer;
 
     final int[] total = {0};
 
@@ -141,10 +149,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             profilePic = findViewById(R.id.profilePic);
             OrderStatus = findViewById(R.id.card_order_status);
             acceptOrd = findViewById(R.id.confirmOrd);
+            timeStamp = findViewById(R.id.timeStamp);
             acceptOrd.setTag("accept");
             restaurantName = findViewById(R.id.restaurantName);
-
             restaurantName.setText(restaurantname);
+            myOrderID = findViewById(R.id.myOrderID);
 
             /**
              * Load image url onto imageview
@@ -308,6 +317,100 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     list = new ArrayList<>();
 
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
+
+                    initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+
+                        int second = 1800; //30minutes
+
+                        @Override
+                        public void run() {
+                            if (second <= 0) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Orer id taking too long
+                                        timer.cancel();
+                                    }
+                                });
+
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        //Get today's date
+                                        GetCurrentDate currentDate = new GetCurrentDate();
+                                        String currDate = currentDate.getDate();
+
+                                        //Get dates
+                                        String dtEnd = currDate;
+                                        String dtStart = initiatedTime;
+
+                                        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                                        //Format both current date and date status update was posted
+                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                                        try {
+
+                                            //Convert String date values to Date values
+                                            Date dateStart;
+                                            Date dateEnd;
+
+                                            //Date dateStart = format.parse(dtStart);
+                                            String[] timeS = Split(initiatedTime);
+                                            String[] timeT = Split(currDate);
+
+                                            /**
+                                             * timeS[0] = date
+                                             * timeS[1] = hr
+                                             * timeS[2] = min
+                                             * timeS[3] = seconds
+                                             * timeS[4] = timezone
+                                             */
+
+                                            //post timeStamp
+                                            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                timeS[4] = "GMT+03:00";
+
+                                                //2020-04-27:20:37:32:GMT+03:00
+                                                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                                dateStart = format.parse(dtStart);
+                                            } else {
+                                                dateStart = format.parse(dtStart);
+                                            }
+
+                                            //my device current date
+                                            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                timeT[4] = "GMT+03:00";
+
+                                                //2020-04-27:20:37:32:GMT+03:00
+                                                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                                dateEnd = format.parse(dtEnd);
+                                            } else {
+                                                dateEnd = format.parse(dtEnd);
+                                            }
+
+                                            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                            //Now compute timeAgo duration
+                                            TimeAgo timeAgo = new TimeAgo();
+
+                                            timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                            Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                        }
+
+                                        second--;
+                                    }
+                                });
+                            }
+
+                        }
+                    }, 0, 1000);
+
                     try {
                         riderPhone = dataSnapshot.child("rider").getValue(String.class);
                     } catch (Exception e){
@@ -1081,6 +1184,13 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             return  (true);
     }
         return(super.onOptionsItemSelected(item));
+    }
+
+    public String[] Split(String timeStamp){
+
+        String[] arrSplit = timeStamp.split(":");
+
+        return arrSplit;
     }
 
     @Override
