@@ -30,12 +30,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Adapter.ChatListAdapter;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
 import com.malcolmmaima.dishi.View.Fragments.HistoryFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
@@ -58,13 +61,19 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
@@ -72,8 +81,8 @@ public class CustomerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     String myPhone;
-    private DatabaseReference myRef, myNotificationsRef;
-    private ValueEventListener myRefListener, myNotificationsListener;
+    private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
+    private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener;
     private FirebaseAuth mAuth;
     private String TAG, imageURL;
     Menu myMenu;
@@ -168,6 +177,8 @@ public class CustomerActivity extends AppCompatActivity
 
             //Set header data
             navUsername.setText("");
+
+            checkNewMessage();
 
 
                 /**
@@ -335,6 +346,70 @@ public class CustomerActivity extends AppCompatActivity
             finish();
             SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void checkNewMessage() {
+        myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
+        myMessagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(!dataSnapshot.hasChildren()){
+                    //default icon
+                } else {
+                    for(DataSnapshot userDm : dataSnapshot.getChildren()){
+                        /**
+                         * Get recipient user details
+                         */
+                        DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
+                        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot users) {
+
+                                /**
+                                 * Get recipient's last message
+                                 */
+                                Query lastQuery = myMessagesRef.child(userDm.getKey()).orderByKey().limitToLast(1);
+                                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        for(DataSnapshot message : dataSnapshot.getChildren()){
+                                            try {
+                                                MessageModel chatMessage = message.getValue(MessageModel.class);
+                                                if(chatMessage.getSender().equals(myPhone) && chatMessage.getRead() != true){
+                                                    //chane message icon top right to active one
+                                                } else {
+                                                    //back to default, no messages icon
+                                                }
+                                            } catch (Exception e){
+                                                Log.e(TAG, "Error: ", e);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        // Handle possible errors.
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myMessagesRef.addValueEventListener(myMessagesListener);
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[]
@@ -519,6 +594,7 @@ public class CustomerActivity extends AppCompatActivity
         try {
             myNotificationsRef.removeEventListener(myNotificationsListener);
             myRef.removeEventListener(myRefListener);
+            myMessagesRef.removeEventListener(myMessagesListener);
         } catch (Exception e){
 
         }
