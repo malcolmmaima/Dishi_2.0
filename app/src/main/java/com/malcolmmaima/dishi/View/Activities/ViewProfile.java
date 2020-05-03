@@ -112,7 +112,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_profile);
+
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
@@ -123,6 +123,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     }
 
     private void loadProfile() {
+        setContentView(R.layout.activity_view_profile);
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -89,16 +89,20 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-        rootView = findViewById(R.id.parentlayout);
 
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
             SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+        } else {
+            loadChat();
         }
 
+    }
 
+    private void loadChat() {
+        setContentView(R.layout.activity_chat);
+        rootView = findViewById(R.id.parentlayout);
         try {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -220,13 +224,13 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             public boolean onActionItemClicked(android.view.ActionMode mode, MenuItem item) {
                 switch(item.getItemId()) {
                     /** case R.id.reply:
-                        return true;
-                    case R.id.star_message:
-                        return true;
+                     return true;
+                     case R.id.star_message:
+                     return true;
                      case R.id.forward:
                      return true;
-                    case R.id.info:
-                        return true; */
+                     case R.id.info:
+                     return true; */
                     case R.id.delete:
                         for (int i=0; i<selectedMsgs.size(); i++){
                             //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
@@ -399,167 +403,14 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
-        /**
-         * onNewIntent() is triggered if user is already in the Chat activity and user clicks on mesg notification,
-         * you want to refresh some of the key data
-         */
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-        String fromPhone_ = intent.getStringExtra("fromPhone");
-        String toPhone_ = intent.getStringExtra("toPhone");
-
-        //For debugging purposes
-        //Toast.makeText(this, "new from => "+fromPhone_ +" to => " +toPhone_, Toast.LENGTH_LONG).show();
-
-        //You never know :-D ...
-        if(fromPhone_.equals(toPhone_)){
-            SafeToast.makeText(this, "not allowed!", Toast.LENGTH_SHORT).show();
+        setIntent(intent);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
             finish();
+            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+        } else {
+            loadChat();
         }
-
-        recipientRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone_);
-        recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone_+"/"+fromPhone_);
-        myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone_+"/"+toPhone_);
-        followingRef = FirebaseDatabase.getInstance().getReference("following/"+fromPhone_+"/"+toPhone_);
-        followerRef = FirebaseDatabase.getInstance().getReference("followers/"+fromPhone_+"/"+toPhone_);
-
-        myMessagesListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                messages.clear();
-                for(DataSnapshot message : dataSnapshot.getChildren()){
-                    chatMessage = message.getValue(MessageModel.class);
-                    chatMessage.setKey(message.getKey());
-
-                    if(chatMessage.getMessage() != null){
-                        messages.add(chatMessage);
-                    }
-
-                }
-
-                arrayAdapter=new MyChatAdapter(Chat.this,messages);
-                list.setAdapter(arrayAdapter);
-                list.setOnItemClickListener(Chat.this);
-                list.setOnItemLongClickListener(Chat.this);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        myMessagedRef.addValueEventListener(myMessagesListener);
-
-        ArrayList<Integer> selectedMsgs = new ArrayList<>();
-        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
-                if(checked){
-                    count = count + 1;
-                    selectedMsgs.add(position);
-                }
-                else
-                    count =count-1;
-                mode.setTitle(count+"");
-                mode.setSubtitle(null);
-                mode.setTag(false);
-                mode.setTitleOptionalHint(false);
-            }
-
-            @Override
-            public boolean onCreateActionMode(android.view.ActionMode mode, Menu menu) {
-                MenuInflater inflater=mode.getMenuInflater();
-                inflater.inflate(R.menu.chat_cab,menu);
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(android.view.ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(android.view.ActionMode mode, MenuItem item) {
-                switch(item.getItemId()) {
-                    /** case R.id.reply:
-                     return true;
-                     case R.id.star_message:
-                     return true;
-                     case R.id.forward:
-                     return true;
-                     case R.id.info:
-                     return true; */
-                    case R.id.delete:
-                        for (int i=0; i<selectedMsgs.size(); i++){
-                            //Toast.makeText(Chat.this, "delete: " + messages.get(deletes.get(i)).getKey() + " => "+messages.get(deletes.get(i)).getMessage(), Toast.LENGTH_SHORT).show();
-                            myMessagedRef.child(messages.get(selectedMsgs.get(i)).getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    arrayAdapter.notifyDataSetChanged();
-                                }
-                            });
-
-                            if(i==selectedMsgs.size()-1){
-                                selectedMsgs.clear();
-                                count = 0;
-                                mode.finish();
-                            }
-                        }
-                        return true;
-                    case R.id.copy:
-                        // Append all selected messages to a single string  variable and pass to setClipboard()
-                        String [] selected = new String[selectedMsgs.size()];
-                        StringBuffer sb = new StringBuffer();
-                        for (int i=0; i<selectedMsgs.size(); i++){
-                            selected[i] = messages.get(selectedMsgs.get(i)).getMessage();
-                        }
-
-                        String str = Arrays.toString(selected);
-                        setClipboard(Chat.this, str, mode);
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public void onDestroyActionMode(android.view.ActionMode mode) {
-                count = 0;
-                selectedMsgs.clear();
-            }
-        });
-
-        /**
-         * Get recipient's user details
-         */
-        recipientListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    recipientUser = dataSnapshot.getValue(UserModel.class);
-                    recipientUser.setPhone(toPhone_);
-                    name.setText(recipientUser.getFirstname() + " " + recipientUser.getLastname());
-
-                    Picasso.with(Chat.this).load(recipientUser.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePic);
-                } catch (Exception e){
-                    Log.e(TAG, "onDataChange: ", e);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        recipientRef.addValueEventListener(recipientListener);
-
     }
 
     @Override
