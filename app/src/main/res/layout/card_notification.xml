@@ -107,7 +107,19 @@
             android:paddingTop="2dp"
             android:backgroundTint="@color/lightgray"
             android:src="@drawable/comments"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
+
+        <ImageView
+            android:layout_below="@id/notificationTime"
+            android:layout_alignParentRight="true"
+            android:id="@+id/reviewIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:backgroundTint="@color/lightgray"
+            android:src="@drawable/review_64dp"
+            android:visibility="gone"/>
 
         <ImageView
             android:layout_below="@id/notificationTime"

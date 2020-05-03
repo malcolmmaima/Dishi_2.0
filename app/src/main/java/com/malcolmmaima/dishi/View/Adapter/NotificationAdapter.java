@@ -34,6 +34,7 @@ import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.ReviewsActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
@@ -332,6 +333,54 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             });
         }
 
+        //This notification is specific to vendor accounts
+        if(my_notification.getType().equals("postedreview")){
+            holder.followUnfollow.setVisibility(View.GONE);
+            holder.liked.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+
+            holder.reviewIcon.setVisibility(View.VISIBLE);
+
+            DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews/"+myPhone+"/"+my_notification.getMessage());
+            reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        holder.notificationMessage.setText("[Deleted review]");
+                    } else {
+                        try {
+                            StatusUpdateModel review = dataSnapshot.getValue(StatusUpdateModel.class); //the comment reply to above mentioned status
+
+                            if(review.getStatus().length() > 50) {
+                                holder.notificationMessage.setText("posted review: " +review.getStatus().substring(0, 50) + "...");
+                            } else {
+                                holder.notificationMessage.setText("posted review: " + review.getStatus());
+                            }
+
+                            if(review.getImageShare() != null && !review.getImageShare().equals("")){
+                                holder.reviewIcon.setVisibility(View.GONE);
+                                holder.statusImage.setVisibility(View.VISIBLE);
+
+                                Picasso.with(context).load(review.getImageShare()).fit().centerCrop()
+                                        .placeholder(R.drawable.gray_gradient_background)
+                                        .error(R.drawable.gray_gradient_background)
+                                        .into(holder.statusImage);
+                            }
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
         /**
          * Click listener on our card
          */
@@ -378,6 +427,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     } catch (Exception e){
                         Log.e(TAG, "onClick: ", e);
                     }
+                }
+
+                if(my_notification.getType().equals("postedreview")){
+                    Intent slideactivity = new Intent(context, ReviewsActivity.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
                 }
             }
         });
@@ -477,7 +534,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             public void onClick(View v) {
                 if(!myPhone.equals(my_notification.getFrom())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     slideactivity.putExtra("phone", my_notification.getFrom());
                     Bundle bndlanimation =
@@ -515,7 +572,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     class MyHolder extends RecyclerView.ViewHolder{
         TextView contact_name, notificationMessage, notificationTime;
-        ImageView profilePic, liked, commented, postedWall, statusImage;
+        ImageView profilePic, liked, commented, postedWall, statusImage, reviewIcon;
         LinearLayout cardView;
         AppCompatButton followUnfollow;
 
@@ -531,6 +588,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             commented = itemView.findViewById(R.id.commented);
             postedWall = itemView.findViewById(R.id.postedWall);
             statusImage = itemView.findViewById(R.id.statusImage);
+            reviewIcon = itemView.findViewById(R.id.reviewIcon);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
