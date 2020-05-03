@@ -496,6 +496,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                     context.startActivity(slideactivity, bndlanimation);
                 }
+
+                if(my_notification.getType().equals("commentedreview")){
+                    Intent slideactivity = new Intent(context, ViewReview.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("author", my_notification.getFrom());
+                    slideactivity.putExtra("postedTo", myPhone);
+                    slideactivity.putExtra("key", my_notification.getMessage());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                }
+
             }
         });
 

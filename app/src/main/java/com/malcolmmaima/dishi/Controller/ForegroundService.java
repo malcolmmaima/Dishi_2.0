@@ -38,6 +38,7 @@ import com.malcolmmaima.dishi.View.Activities.Chat;
 import com.malcolmmaima.dishi.View.Activities.MyNotifications;
 import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.RiderActivity;
+import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewReview;
@@ -524,7 +525,7 @@ public class ForegroundService extends Service {
                             }
                             int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
-                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, RestaurantActivity.class, customerPhone, title);
+                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, ViewCustomerOrder.class, customerPhone, title);
                         } catch (Exception e){}
                     }
 
@@ -800,14 +801,14 @@ public class ForegroundService extends Service {
             }
 
             Intent intent = new Intent(this, targetActivity);
-//            intent.putExtra("phone", customerPhone);
-//            intent.putExtra("name", customerName);
-//            intent.putExtra("restaurantPhone", myPhone);
-//            intent.putExtra("restaurantName", myUserDetails.getFirstname()+" "+myUserDetails.getLastname());
-//            intent.putExtra("accountType", "2");
+            intent.putExtra("phone", customerPhone);
+            intent.putExtra("name", customerName);
+            intent.putExtra("restaurantPhone", myPhone);
+            intent.putExtra("restaurantName", myUserDetails.getFirstname()+" "+myUserDetails.getLastname());
+            intent.putExtra("accountType", "2");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(contentIntent);
             Notification notification = builder.build();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
@@ -896,10 +897,7 @@ public class ForegroundService extends Service {
                             .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
                                     .bigText(message));
                 }
-
-
             }
-
 
             Intent intent = new Intent(this, targetActivity);
             intent.putExtra("fromPhone", incomingPhone);
@@ -947,7 +945,7 @@ public class ForegroundService extends Service {
                                                     .setGroupSummary(true)
                                                     //.setOnlyAlertOnce(true)
                                                     .setGroup(String.valueOf(notifId))
-                                                    .setSmallIcon(R.drawable.logo_notification)
+                                                    .setSmallIcon(R.drawable.profile_64dp)
                                                     .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                                                     .setContentTitle(fromUser.getFirstname()+" posted on your wall:")
                                                     .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
@@ -962,7 +960,7 @@ public class ForegroundService extends Service {
                                                     .setGroupSummary(true)
                                                     //.setOnlyAlertOnce(true)
                                                     .setGroup(String.valueOf(notifId))
-                                                    .setSmallIcon(R.drawable.logo_notification)
+                                                    .setSmallIcon(R.drawable.profile_64dp)
                                                     .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                                                     .setContentTitle(fromUser.getFirstname()+" posted on your wall:")
                                                     .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)

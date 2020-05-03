@@ -87,8 +87,18 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_customer_order);
+        loadViewCustomer();
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        loadViewCustomer();
+    }
+
+    private void loadViewCustomer() {
+        setContentView(R.layout.activity_view_customer_order);
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
