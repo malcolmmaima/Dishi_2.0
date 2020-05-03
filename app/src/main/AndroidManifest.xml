@@ -17,7 +17,8 @@
         <activity android:name=".View.Activities.MyNotifications" />
         <activity android:name=".View.Activities.FollowersFollowing" />
         <activity android:name=".View.Activities.NewChat" />
-        <activity android:name=".View.Activities.ViewReview" />
+        <activity android:name=".View.Activities.ViewReview"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".View.Activities.ViewStatus"
             android:launchMode="singleTask" />

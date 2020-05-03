@@ -382,6 +382,55 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             });
         }
 
+
+        if(my_notification.getType().equals("commentedreview")){
+            holder.followUnfollow.setVisibility(View.GONE);
+            holder.liked.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+
+            holder.reviewIcon.setVisibility(View.VISIBLE);
+
+            DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews/"+myPhone+"/"+my_notification.getMessage());
+            reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        holder.notificationMessage.setText("[Deleted review]");
+                    } else {
+                        try {
+                            StatusUpdateModel review = dataSnapshot.getValue(StatusUpdateModel.class); //the comment reply to above mentioned status
+
+                            if(review.getStatus().length() > 50) {
+                                holder.notificationMessage.setText("replied review: " +review.getStatus().substring(0, 50) + "...");
+                            } else {
+                                holder.notificationMessage.setText("replied review: " + review.getStatus());
+                            }
+
+                            if(review.getImageShare() != null && !review.getImageShare().equals("")){
+                                holder.reviewIcon.setVisibility(View.GONE);
+                                holder.statusImage.setVisibility(View.VISIBLE);
+
+                                Picasso.with(context).load(review.getImageShare()).fit().centerCrop()
+                                        .placeholder(R.drawable.gray_gradient_background)
+                                        .error(R.drawable.gray_gradient_background)
+                                        .into(holder.statusImage);
+                            }
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+
         /**
          * Click listener on our card
          */

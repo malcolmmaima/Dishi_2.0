@@ -44,6 +44,7 @@ import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
+import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -105,7 +106,11 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_review);
+        loadReview();
 
+    }
+
+    private void loadReview() {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
@@ -714,7 +719,13 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                 }
             });
         }
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        loadReview();
     }
 
     private void fetchReviews() {
@@ -915,6 +926,24 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
         reviewsRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+
+                if(!postedTo.equals(myPhone)){
+                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+postedTo);
+
+                    String notifKey = notificationRef.push().getKey();
+
+                    //send notification
+                    NotificationModel review = new NotificationModel();
+                    review.setFrom(myPhone);
+                    review.setType("commentedreview");
+                    review.setImage(imgLink);
+                    review.setSeen(false);
+                    review.setTimeStamp(time);
+                    review.setMessage(key); // the reference to that particular review reply
+
+                    notificationRef.child(notifKey).setValue(review); //send to db
+                }
+
                 mSwipeRefreshLayout.setRefreshing(false);
                 comment.key = commentKey;
                 statusPost.setText("");

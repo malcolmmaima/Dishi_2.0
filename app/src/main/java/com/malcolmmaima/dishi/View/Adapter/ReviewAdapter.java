@@ -488,7 +488,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
             public void onClick(View view) {
                 if(!myPhone.equals(statusUpdateModel.getAuthor()) && !statusUpdateModel.getPostedTo().equals(statusUpdateModel.getAuthor())){
                     Intent slideactivity = new Intent(context, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                     slideactivity.putExtra("phone", statusUpdateModel.getAuthor());
                     Bundle bndlanimation =

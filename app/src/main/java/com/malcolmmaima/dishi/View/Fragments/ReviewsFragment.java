@@ -266,20 +266,22 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 imageUpload.setEnabled(true);
                 postBtn.setEnabled(true);
 
-                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
+                if(!phone.equals(myPhone)){
+                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
 
-                String notifKey = notificationRef.push().getKey();
+                    String notifKey = notificationRef.push().getKey();
 
-                //send notification
-                NotificationModel review = new NotificationModel();
-                review.setFrom(myPhone);
-                review.setType("postedreview");
-                review.setImage(imgLink);
-                review.setSeen(false);
-                review.setTimeStamp(postDate);
-                review.setMessage(key); // the reference to that particular review
+                    //send notification
+                    NotificationModel review = new NotificationModel();
+                    review.setFrom(myPhone);
+                    review.setType("postedreview");
+                    review.setImage(imgLink);
+                    review.setSeen(false);
+                    review.setTimeStamp(postDate);
+                    review.setMessage(key); // the reference to that particular review
 
-                notificationRef.child(notifKey).setValue(review); //send to db
+                    notificationRef.child(notifKey).setValue(review); //send to db
+                }
 
                 mSwipeRefreshLayout.setRefreshing(false);
                 myReview.setText("");
