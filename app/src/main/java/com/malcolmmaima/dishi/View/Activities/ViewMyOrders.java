@@ -741,8 +741,12 @@ public class ViewMyOrders extends AppCompatActivity {
     }
 
     public String[] Split(String timeStamp){
-
-        String[] arrSplit = timeStamp.split(":");
+        String[] arrSplit = {};
+        try {
+            arrSplit = timeStamp.split(":");
+        } catch (Exception e){
+            Log.e(TAG, "Split: ", e);
+        }
 
         return arrSplit;
     }

@@ -370,12 +370,10 @@ public class CustomerActivity extends AppCompatActivity
                                 lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        //set default icon here before checking for new messages
-                                        item.setIcon(ContextCompat.getDrawable(CustomerActivity.this, R.drawable.inbox_default_64dp));
                                         for(DataSnapshot message : dataSnapshot.getChildren()){
                                             try {
                                                 MessageModel chatMessage = message.getValue(MessageModel.class);
-                                                if(!chatMessage.getSender().equals(myPhone) && chatMessage.getRead() != true){
+                                                if(!chatMessage.getSender().equals(myPhone) && chatMessage.getRead() == false){
                                                     //chane message icon top right to active one
                                                     item.setIcon(ContextCompat.getDrawable(CustomerActivity.this, R.drawable.inbox_active_64dp));
                                                 }

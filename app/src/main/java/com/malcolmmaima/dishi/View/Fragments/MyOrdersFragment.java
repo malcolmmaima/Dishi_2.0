@@ -161,6 +161,9 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(!dataSnapshot.exists()){
+                                            myOrders.child(userOrders.getKey()).removeValue(); //update my_orders node
+                                        }
 
                                         customer.itemCount = dataSnapshot.getChildrenCount();
 
