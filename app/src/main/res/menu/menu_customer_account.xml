@@ -8,6 +8,6 @@
         android:id="@+id/search" android:icon="@drawable/ic_search_black_48dp" app:showAsAction="always"   android:title="Search"/>
 
     <item
-        android:id="@+id/sendDM" android:icon="@drawable/ic_send_black_48dp" app:showAsAction="always"   android:title="Message" />
+        android:id="@+id/sendDM" android:icon="@drawable/inbox_default_64dp" app:showAsAction="always"   android:title="Message" />
 
 </menu>

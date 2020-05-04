@@ -32,9 +32,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -76,10 +78,11 @@ public class RestaurantActivity extends AppCompatActivity
     FloatingActionButton addMenu;
     Menu myMenu;
     String myPhone, imageURL;
-    private DatabaseReference myRef, myNotificationsRef;
-    private ValueEventListener myRefListener, myNotificationsListener;
+    private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
+    private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener, lastQueryListener;
     private FirebaseAuth mAuth;
     private String TAG;
+    private Query lastQuery;
     private static final int PERMISSIONS_REQUEST = 100;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -410,6 +413,70 @@ public class RestaurantActivity extends AppCompatActivity
         }
     }
 
+    private void checkNewMessage(MenuItem item) {
+        myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
+        myMessagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                item.setIcon(ContextCompat.getDrawable(RestaurantActivity.this, R.drawable.inbox_default_64dp));
+                if(!dataSnapshot.hasChildren()){
+                    //default icon
+                } else {
+                    for(DataSnapshot userDm : dataSnapshot.getChildren()){
+                        /**
+                         * Get recipient user details
+                         */
+                        DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
+                        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot users) {
+
+                                /**
+                                 * Get recipient's last message
+                                 */
+                                lastQuery = myMessagesRef.child(userDm.getKey()).orderByKey().limitToLast(1);
+                                lastQueryListener = new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        for(DataSnapshot message : dataSnapshot.getChildren()){
+                                            try {
+                                                MessageModel chatMessage = message.getValue(MessageModel.class);
+                                                if(!chatMessage.getSender().equals(myPhone) && chatMessage.getRead() == false){
+                                                    //chane message icon top right to active one
+                                                    item.setIcon(ContextCompat.getDrawable(RestaurantActivity.this, R.drawable.inbox_active_64dp));
+                                                }
+                                            } catch (Exception e){
+                                                Log.e(TAG, "Error: ", e);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        // Handle possible errors.
+                                    }
+                                };
+                                lastQuery.addListenerForSingleValueEvent(lastQueryListener);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myMessagesRef.addValueEventListener(myMessagesListener);
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -493,9 +560,11 @@ public class RestaurantActivity extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_restaurant_account, menu);
         myMenu = menu;
-
+        MenuItem item = menu.findItem(R.id.sendDM);
+        checkNewMessage(item);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

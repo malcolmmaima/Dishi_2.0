@@ -787,6 +787,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
+                            .setOnlyAlertOnce(true)
                             .setContentText(message);
                 } else {
                     builder = new Notification.Builder(this)
@@ -795,6 +796,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
+                            .setOnlyAlertOnce(true)
                             .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message);
                 }

@@ -179,8 +179,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         //Show follow button if type of notification is 'followedwall'
         if(my_notification.getType().equals("followedwall")){
             holder.liked.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
+            holder.reviewIcon.setVisibility(View.GONE);
             holder.commented.setVisibility(View.GONE);
             holder.postedWall.setVisibility(View.GONE);
+
             holder.followUnfollow.setVisibility(View.VISIBLE);
             holder.notificationMessage.setText(my_notification.getMessage());
             followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -206,6 +209,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         if(my_notification.getType().equals("postedwall")){
             holder.followUnfollow.setVisibility(View.GONE);
             holder.liked.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
+            holder.reviewIcon.setVisibility(View.GONE);
             holder.commented.setVisibility(View.GONE);
 
             holder.postedWall.setVisibility(View.VISIBLE);
@@ -263,6 +268,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.liked.setVisibility(View.GONE);
             holder.postedWall.setVisibility(View.GONE);
             holder.statusImage.setVisibility(View.GONE);
+            holder.reviewIcon.setVisibility(View.GONE);
 
             holder.commented.setVisibility(View.VISIBLE);
 

@@ -178,9 +178,6 @@ public class CustomerActivity extends AppCompatActivity
             //Set header data
             navUsername.setText("");
 
-            checkNewMessage();
-
-
                 /**
                  * Get logged in user details
                  */
@@ -348,12 +345,12 @@ public class CustomerActivity extends AppCompatActivity
         }
     }
 
-    private void checkNewMessage() {
+    private void checkNewMessage(MenuItem item) {
         myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                item.setIcon(ContextCompat.getDrawable(CustomerActivity.this, R.drawable.inbox_default_64dp));
                 if(!dataSnapshot.hasChildren()){
                     //default icon
                 } else {
@@ -373,14 +370,14 @@ public class CustomerActivity extends AppCompatActivity
                                 lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-
+                                        //set default icon here before checking for new messages
+                                        item.setIcon(ContextCompat.getDrawable(CustomerActivity.this, R.drawable.inbox_default_64dp));
                                         for(DataSnapshot message : dataSnapshot.getChildren()){
                                             try {
                                                 MessageModel chatMessage = message.getValue(MessageModel.class);
-                                                if(chatMessage.getSender().equals(myPhone) && chatMessage.getRead() != true){
+                                                if(!chatMessage.getSender().equals(myPhone) && chatMessage.getRead() != true){
                                                     //chane message icon top right to active one
-                                                } else {
-                                                    //back to default, no messages icon
+                                                    item.setIcon(ContextCompat.getDrawable(CustomerActivity.this, R.drawable.inbox_active_64dp));
                                                 }
                                             } catch (Exception e){
                                                 Log.e(TAG, "Error: ", e);
@@ -543,7 +540,8 @@ public class CustomerActivity extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_customer_account, menu);
         myMenu = menu;
-
+        MenuItem item = menu.findItem(R.id.sendDM);
+        checkNewMessage(item);
         return true;
     }
 

@@ -30,9 +30,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -71,8 +73,8 @@ public class RiderActivity extends AppCompatActivity
 
     String myPhone, imageURL;
     Menu myMenu;
-    private DatabaseReference myRef, myNotificationsRef;
-    private ValueEventListener myRefListener, myNotificationsListener;
+    private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
+    private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener;
     private FirebaseAuth mAuth;
     private String TAG;
     private static final int PERMISSIONS_REQUEST = 100;
@@ -449,6 +451,69 @@ public class RiderActivity extends AppCompatActivity
         return true;
     }
 
+    private void checkNewMessage(MenuItem item) {
+        myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
+        myMessagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                item.setIcon(ContextCompat.getDrawable(RiderActivity.this, R.drawable.inbox_default_64dp));
+                if(!dataSnapshot.hasChildren()){
+                    //default icon
+                } else {
+                    for(DataSnapshot userDm : dataSnapshot.getChildren()){
+                        /**
+                         * Get recipient user details
+                         */
+                        DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+userDm.getKey());
+                        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot users) {
+
+                                /**
+                                 * Get recipient's last message
+                                 */
+                                Query lastQuery = myMessagesRef.child(userDm.getKey()).orderByKey().limitToLast(1);
+                                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        //set default icon here before checking for new messages
+                                        item.setIcon(ContextCompat.getDrawable(RiderActivity.this, R.drawable.inbox_default_64dp));
+                                        for(DataSnapshot message : dataSnapshot.getChildren()){
+                                            try {
+                                                MessageModel chatMessage = message.getValue(MessageModel.class);
+                                                if(!chatMessage.getSender().equals(myPhone) && chatMessage.getRead() != true){
+                                                    //chane message icon top right to active one
+                                                    item.setIcon(ContextCompat.getDrawable(RiderActivity.this, R.drawable.inbox_active_64dp));
+                                                }
+                                            } catch (Exception e){
+                                                Log.e(TAG, "Error: ", e);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        // Handle possible errors.
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myMessagesRef.addValueEventListener(myMessagesListener);
+    }
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_rider_account, menu);
