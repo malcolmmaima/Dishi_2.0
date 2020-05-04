@@ -123,6 +123,7 @@ public class TrackingService extends Service {
 
             //Stop the Service//
 
+            stopForeground(true);
             stopSelf();
 
             stopTracking = true;

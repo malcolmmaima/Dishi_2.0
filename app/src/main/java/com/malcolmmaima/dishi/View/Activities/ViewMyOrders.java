@@ -159,243 +159,243 @@ public class ViewMyOrders extends AppCompatActivity {
 
                     if(!dataSnapshot.exists()){
                         finish();
-                    }
-
-                    try {
-
-                        Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
-                        String remarks = dataSnapshot.child("remarks").getValue(String.class);
-                        String orderID = dataSnapshot.child("orderID").getValue(String.class);
-                        String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
-                        address = dataSnapshot.child("address").getValue(String.class);
-                        myOrderID.setText("ORDER ID: #"+orderID);
-                        payment.setText(paymentMethod);
-
-                        if(address.equals("pick")){
-                            trackOrderTxt.setText("Locate Vendor");
-                            riderName.setVisibility(View.GONE);
-                            riderIcon.setVisibility(View.GONE);
-                        }
-
-                        initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
-
-                        timer = new Timer();
-                        timer.schedule(new TimerTask() {
-
-                            int second = 1800; //30minutes
-
-                            @Override
-                            public void run() {
-                                if (second <= 0) {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //Orer id taking too long
-                                            timer.cancel();
-                                        }
-                                    });
-
-                                } else {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                            //Get today's date
-                                            GetCurrentDate currentDate = new GetCurrentDate();
-                                            String currDate = currentDate.getDate();
-
-                                            //Get dates
-                                            String dtEnd = currDate;
-                                            String dtStart = initiatedTime;
-
-                                            //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                                            //Format both current date and date status update was posted
-                                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
-                                            try {
-
-                                                //Convert String date values to Date values
-                                                Date dateStart;
-                                                Date dateEnd;
-
-                                                //Date dateStart = format.parse(dtStart);
-                                                String[] timeS = Split(initiatedTime);
-                                                String[] timeT = Split(currDate);
-
-                                                /**
-                                                 * timeS[0] = date
-                                                 * timeS[1] = hr
-                                                 * timeS[2] = min
-                                                 * timeS[3] = seconds
-                                                 * timeS[4] = timezone
-                                                 */
-
-                                                //post timeStamp
-                                                if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                                    timeS[4] = "GMT+03:00";
-
-                                                    //2020-04-27:20:37:32:GMT+03:00
-                                                    dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                                                    dateStart = format.parse(dtStart);
-                                                } else {
-                                                    dateStart = format.parse(dtStart);
-                                                }
-
-                                                //my device current date
-                                                if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                                    timeT[4] = "GMT+03:00";
-
-                                                    //2020-04-27:20:37:32:GMT+03:00
-                                                    dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                                                    dateEnd = format.parse(dtEnd);
-                                                } else {
-                                                    dateEnd = format.parse(dtEnd);
-                                                }
-
-                                                //https://memorynotfound.com/calculate-relative-time-time-ago-java/
-                                                //Now compute timeAgo duration
-                                                TimeAgo timeAgo = new TimeAgo();
-
-                                                timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
-
-                                            } catch (ParseException e) {
-                                                e.printStackTrace();
-                                                Log.d(TAG, "timeStamp: "+ e.getMessage());
-                                            }
-
-                                            second--;
-                                        }
-                                    });
-                                }
-
-                            }
-                        }, 0, 1000);
+                    } else {
                         try {
-                            riderPhone = dataSnapshot.child("rider").getValue(String.class);
 
-                        } catch (Exception e){
-                            Log.e(TAG, "onDataChange: ", e);
-                        }
+                            Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
+                            String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                            String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                            String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                            address = dataSnapshot.child("address").getValue(String.class);
+                            myOrderID.setText("ORDER ID: #"+orderID);
+                            payment.setText(paymentMethod);
+
+                            if(address.equals("pick")){
+                                trackOrderTxt.setText("Locate Vendor");
+                                riderName.setVisibility(View.GONE);
+                                riderIcon.setVisibility(View.GONE);
+                            }
+
+                            initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+
+                            timer = new Timer();
+                            timer.schedule(new TimerTask() {
+
+                                int second = 1800; //30minutes
+
+                                @Override
+                                public void run() {
+                                    if (second <= 0) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                //Orer id taking too long
+                                                timer.cancel();
+                                            }
+                                        });
+
+                                    } else {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                                //Get today's date
+                                                GetCurrentDate currentDate = new GetCurrentDate();
+                                                String currDate = currentDate.getDate();
+
+                                                //Get dates
+                                                String dtEnd = currDate;
+                                                String dtStart = initiatedTime;
+
+                                                //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                                                //Format both current date and date status update was posted
+                                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                                                try {
+
+                                                    //Convert String date values to Date values
+                                                    Date dateStart;
+                                                    Date dateEnd;
+
+                                                    //Date dateStart = format.parse(dtStart);
+                                                    String[] timeS = Split(initiatedTime);
+                                                    String[] timeT = Split(currDate);
+
+                                                    /**
+                                                     * timeS[0] = date
+                                                     * timeS[1] = hr
+                                                     * timeS[2] = min
+                                                     * timeS[3] = seconds
+                                                     * timeS[4] = timezone
+                                                     */
+
+                                                    //post timeStamp
+                                                    if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                        timeS[4] = "GMT+03:00";
+
+                                                        //2020-04-27:20:37:32:GMT+03:00
+                                                        dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                                        dateStart = format.parse(dtStart);
+                                                    } else {
+                                                        dateStart = format.parse(dtStart);
+                                                    }
+
+                                                    //my device current date
+                                                    if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                        timeT[4] = "GMT+03:00";
+
+                                                        //2020-04-27:20:37:32:GMT+03:00
+                                                        dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                                        dateEnd = format.parse(dtEnd);
+                                                    } else {
+                                                        dateEnd = format.parse(dtEnd);
+                                                    }
+
+                                                    //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                                    //Now compute timeAgo duration
+                                                    TimeAgo timeAgo = new TimeAgo();
+
+                                                    timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+
+                                                } catch (ParseException e) {
+                                                    e.printStackTrace();
+                                                    Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                                }
+
+                                                second--;
+                                            }
+                                        });
+                                    }
+
+                                }
+                            }, 0, 1000);
+                            try {
+                                riderPhone = dataSnapshot.child("rider").getValue(String.class);
+
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
 
 
-                        myRemarks.setText("Remarks: "+remarks);
-                        if (completed == true) {
-                            final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
-                                    .setMessage("Order Delivered?")
-                                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                    .setCancelable(false)
-                                    //set three option buttons
-                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+                            myRemarks.setText("Remarks: "+remarks);
+                            if (completed == true) {
+                                final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
+                                        .setMessage("Order Delivered?")
+                                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                        .setCancelable(false)
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
 
-                                                        try {
-                                                            tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
-                                                        } catch (Exception e){}
-                                                        try {
-                                                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                            prod.setKey(items.getKey());
+                                                            try {
+                                                                tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                            } catch (Exception e){}
+                                                            try {
+                                                                ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                                prod.setKey(items.getKey());
 
-                                                            /**
-                                                             * Move order items to history node
-                                                             */
-                                                            myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
+                                                                /**
+                                                                 * Move order items to history node
+                                                                 */
+                                                                myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
 
-                                                                            myOrders.child(phone).removeValue();
-                                                                            DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                                    ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
+                                                                                myOrders.child(phone).removeValue();
+                                                                                DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                        ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
 
-                                                                            rider.removeValue();
+                                                                                rider.removeValue();
 
-                                                                        }
-                                                                    });
-                                                                }
-                                                            });
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                });
 
-                                                        } catch (Exception e) {
+                                                            } catch (Exception e) {
 
+                                                            }
                                                         }
                                                     }
-                                                }
 
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                }
-                                            });
+                                                    }
+                                                });
 
-                                        }
-                                    })//setPositiveButton
+                                            }
+                                        })//setPositiveButton
 
-                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
-                                    })
+                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        })
 
-                                    .create();
-                            finish.show();
-                        }
-                    } catch (Exception e){
-
-                    }
-                    total[0] = 0;
-
-                    list = new ArrayList<>();
-                    for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
-
-                        try {
-                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                            prod.setKey(items.getKey());
-                            list.add(prod);
-
-                            if(prod.getConfirmed() == true){
-                                int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
-                                total[0] = total[0] + adapterTotal;
-                                totalAmount = total[0] + deliveryCharge;
+                                        .create();
+                                finish.show();
                             }
-
                         } catch (Exception e){
 
                         }
+                        total[0] = 0;
+
+                        list = new ArrayList<>();
+                        for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
+
+                            try {
+                                ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                prod.setKey(items.getKey());
+                                list.add(prod);
+
+                                if(prod.getConfirmed() == true){
+                                    int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                                    total[0] = total[0] + adapterTotal;
+                                    totalAmount = total[0] + deliveryCharge;
+                                }
+
+                            } catch (Exception e){
+
+                            }
+                        }
+                        subTotal.setText("Ksh "+total[0]);
+
+                        //Mambo kienyeji hapa (^_^) basically want to enable order tracking by customer if atleast one item is confirmed
+                        if(total[0] < 1.0){
+                            DeliveryAddress.setVisibility(View.GONE);
+                            confirmOrder.setVisibility(View.GONE);
+                        } else {
+                            DeliveryAddress.setVisibility(View.VISIBLE);
+                            confirmOrder.setVisibility(View.VISIBLE);
+                        }
+
+                        if(!list.isEmpty()){
+                            Collections.reverse(list);
+                            ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
+                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
+                            recyclerview.setLayoutManager(layoutmanager);
+                            recyclerview.setItemAnimator( new DefaultItemAnimator());
+                            recycler.notifyDataSetChanged();
+                            recyclerview.setAdapter(recycler);
+
+
+                        }
+
+                        totalBill.setText("ksh " + totalAmount);
                     }
-                    subTotal.setText("Ksh "+total[0]);
-
-                    //Mambo kienyeji hapa (^_^) basically want to enable order tracking by customer if atleast one item is confirmed
-                    if(total[0] < 1.0){
-                        DeliveryAddress.setVisibility(View.GONE);
-                        confirmOrder.setVisibility(View.GONE);
-                    } else {
-                        DeliveryAddress.setVisibility(View.VISIBLE);
-                        confirmOrder.setVisibility(View.VISIBLE);
-                    }
-
-                    if(!list.isEmpty()){
-                        Collections.reverse(list);
-                        ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
-                        recyclerview.setLayoutManager(layoutmanager);
-                        recyclerview.setItemAnimator( new DefaultItemAnimator());
-                        recycler.notifyDataSetChanged();
-                        recyclerview.setAdapter(recycler);
-
-
-                    }
-
-                    totalBill.setText("ksh " + totalAmount);
                 }
 
                 @Override
