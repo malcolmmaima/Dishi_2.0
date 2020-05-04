@@ -227,9 +227,6 @@ public class CheckOut extends AppCompatActivity {
 
                 for(DataSnapshot cart : dataSnapshot.getChildren()){
                     ProductDetailsModel product = cart.getValue(ProductDetailsModel.class);
-
-                    product.setPaymentMethod(selectedPaymentMethod);
-                    product.setAddress(locationSet);
                     product.setDistance(null);
                     product.setUploadDate(orderDate);
                     product.setConfirmed(false);
@@ -368,6 +365,8 @@ public class CheckOut extends AppCompatActivity {
                                         String orderID = orderID_1.toUpperCase()+""+orderID_2;
 
                                         ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
+                                        ordersRef.child(myPhone).child("paymentMethod").setValue(selectedPaymentMethod);
+                                        ordersRef.child(myPhone).child("address").setValue(locationSet);
                                         ordersRef.child(myPhone).child("orderID").setValue(orderID);
                                         ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
                                         ordersRef.child(myPhone).child("completed").setValue(false);
@@ -495,6 +494,8 @@ public class CheckOut extends AppCompatActivity {
                                 String orderID = orderID_1.toUpperCase()+""+orderID_2;
 
                                 ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
+                                ordersRef.child(myPhone).child("paymentMethod").setValue(selectedPaymentMethod);
+                                ordersRef.child(myPhone).child("address").setValue(locationSet);
                                 ordersRef.child(myPhone).child("orderID").setValue(orderID);
                                 ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
                                 ordersRef.child(myPhone).child("completed").setValue(false);

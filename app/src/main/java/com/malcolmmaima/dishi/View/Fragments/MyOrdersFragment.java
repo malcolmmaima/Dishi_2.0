@@ -163,36 +163,36 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if(!dataSnapshot.exists()){
                                             myOrders.child(userOrders.getKey()).removeValue(); //update my_orders node
-                                        }
-
-                                        customer.itemCount = dataSnapshot.getChildrenCount();
+                                        } else {
+                                            customer.itemCount = dataSnapshot.getChildrenCount();
 
 //                                        LinkedHashSet<UserModel> hashSet = new LinkedHashSet<>(orders);
 //                                        ArrayList<UserModel> listWithoutDuplicates = new ArrayList<>(hashSet);
-                                        if (!orders.isEmpty()) {
+                                            if (!orders.isEmpty()) {
 
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                            Collections.reverse(orders);
-                                            MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                            recyclerview.setLayoutManager(layoutmanager);
-                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                            recycler.notifyDataSetChanged();
-                                            recyclerview.setAdapter(recycler);
-                                            emptyTag.setVisibility(View.INVISIBLE);
-                                            icon.setVisibility(View.INVISIBLE);
-                                        } else {
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                Collections.reverse(orders);
+                                                MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
+                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                recyclerview.setLayoutManager(layoutmanager);
+                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                recycler.notifyDataSetChanged();
+                                                recyclerview.setAdapter(recycler);
+                                                emptyTag.setVisibility(View.INVISIBLE);
+                                                icon.setVisibility(View.INVISIBLE);
+                                            } else {
 
-                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                mSwipeRefreshLayout.setRefreshing(false);
 //                                        progressDialog.dismiss();
-                                            MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                            recyclerview.setLayoutManager(layoutmanager);
-                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                            recyclerview.setAdapter(recycler);
-                                            emptyTag.setVisibility(View.VISIBLE);
-                                            icon.setVisibility(View.VISIBLE);
+                                                MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
+                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                recyclerview.setLayoutManager(layoutmanager);
+                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                recyclerview.setAdapter(recycler);
+                                                emptyTag.setVisibility(View.VISIBLE);
+                                                icon.setVisibility(View.VISIBLE);
 
+                                            }
                                         }
 
                                     }

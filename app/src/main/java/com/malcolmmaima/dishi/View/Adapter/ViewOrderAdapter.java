@@ -52,7 +52,8 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
         final ProductDetailsModel productDetailsModel = listdata.get(position);
 
         if(productDetailsModel.getConfirmed() == true){
-            holder.checkBox.setVisibility(View.GONE);
+            holder.checkBox.setChecked(true);
+            holder.checkBox.setEnabled(false);
         }
 
         /**

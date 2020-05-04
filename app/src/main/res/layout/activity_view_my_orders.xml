@@ -294,6 +294,7 @@
                         android:textSize="20sp"
                         android:layout_marginRight="10dp"
                         android:text="Track Order"
+                        android:id="@+id/trackOrderTxt"
                         android:fontFamily="sans-serif" />
 
                 </RelativeLayout>

@@ -389,6 +389,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         android:layout_marginRight="10dp"
+                        android:id="@+id/trackOrderTxt"
                         android:text="Delivery Address"
                         android:fontFamily="sans-serif" />
 

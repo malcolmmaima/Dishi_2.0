@@ -58,11 +58,11 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ViewMyOrders extends AppCompatActivity {
     String TAG = "ViewMyOrder";
     List<ProductDetailsModel> list;
-    String myPhone, phone, restaurantName, riderPhone, initiatedTime;
+    String myPhone, phone, restaurantName, riderPhone, initiatedTime, address;
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName, timeStamp, myOrderID;
+    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName, timeStamp, myOrderID, trackOrderTxt;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;
@@ -130,6 +130,7 @@ public class ViewMyOrders extends AppCompatActivity {
             riderIcon = findViewById(R.id.riderIcon);
             timeStamp = findViewById(R.id.timeStamp);
             myOrderID = findViewById(R.id.myOrderID);
+            trackOrderTxt = findViewById(R.id.trackOrderTxt);
 
             /**
              * On loading this module check to see if it exists. this is a one time check
@@ -165,7 +166,16 @@ public class ViewMyOrders extends AppCompatActivity {
                         Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
                         String remarks = dataSnapshot.child("remarks").getValue(String.class);
                         String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                        String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                        address = dataSnapshot.child("address").getValue(String.class);
                         myOrderID.setText("ORDER ID: #"+orderID);
+                        payment.setText(paymentMethod);
+
+                        if(address.equals("pick")){
+                            trackOrderTxt.setText("Locate Vendor");
+                            riderName.setVisibility(View.GONE);
+                            riderIcon.setVisibility(View.GONE);
+                        }
 
                         initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
@@ -356,7 +366,6 @@ public class ViewMyOrders extends AppCompatActivity {
                                 int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
                                 total[0] = total[0] + adapterTotal;
                                 totalAmount = total[0] + deliveryCharge;
-                                payment.setText(prod.getPaymentMethod()); //We just need to capture the payment method from one of the items
                             }
 
                         } catch (Exception e){
@@ -553,8 +562,14 @@ public class ViewMyOrders extends AppCompatActivity {
             confirmOrder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
+                    String message = "Order has been delivered?";
+                    if(address.equals("pick")){
+                        message = "Have you picked your order?";
+                    } else {
+                        message = "Order has been delivered?";
+                    }
                     final AlertDialog confirmorder = new AlertDialog.Builder(ViewMyOrders.this)
-                            .setMessage("Order has been delivered?")
+                            .setMessage(message)
                             //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
                             .setCancelable(false)
                             //set three option buttons
@@ -615,8 +630,12 @@ public class ViewMyOrders extends AppCompatActivity {
                             .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    //Do nothing
-                                    Snackbar.make(v.getRootView(), "Confirm once order has been delivered", Snackbar.LENGTH_LONG).show();
+                                    if(address.equals("pick")){
+                                        Snackbar.make(v.getRootView(), "Confirm once you have picked your order", Snackbar.LENGTH_LONG).show();
+                                    } else {
+                                        Snackbar.make(v.getRootView(), "Confirm once order has been delivered", Snackbar.LENGTH_LONG).show();
+                                    }
+
                                 }
                             })
                             .create();
