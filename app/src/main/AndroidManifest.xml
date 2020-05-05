@@ -9,7 +9,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.ReviewsActivity"></activity>
+        <activity android:name=".View.Activities.ReceiptActivity"></activity>
+        <activity android:name=".View.Activities.ReviewsActivity" />
         <activity
             android:name=".View.Activities.SearchActivity"
             android:label="@string/title_activity_search" />
@@ -17,8 +18,9 @@
         <activity android:name=".View.Activities.MyNotifications" />
         <activity android:name=".View.Activities.FollowersFollowing" />
         <activity android:name=".View.Activities.NewChat" />
-        <activity android:name=".View.Activities.ViewReview"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name=".View.Activities.ViewReview"
+            android:launchMode="singleTask" />
         <activity
             android:name=".View.Activities.ViewStatus"
             android:launchMode="singleTask" />

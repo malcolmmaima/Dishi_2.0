@@ -123,6 +123,7 @@ public class TrackingService extends Service {
 
             //Stop the Service//
 
+            onUnbind(intent);
             stopForeground(true);
             stopSelf();
 

@@ -45,6 +45,7 @@ import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyFavourites;
 import com.malcolmmaima.dishi.View.Fragments.MyOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
+import com.malcolmmaima.dishi.View.Fragments.ReceiptsFragment;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.Nullable;
@@ -474,6 +475,11 @@ public class CustomerActivity extends AppCompatActivity
         }
 
         else if (id == R.id.menu4) {
+            setTitle("Receipts");
+            fragmentClass[0] = ReceiptsFragment.class;
+        }
+
+        else if (id == R.id.menu5) {
             setTitle("History");
             fragmentClass[0] = HistoryFragment.class;
         }

@@ -39,6 +39,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.ReceiptModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
@@ -58,7 +59,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ViewMyOrders extends AppCompatActivity {
     String TAG = "ViewMyOrder";
     List<ProductDetailsModel> list;
-    String myPhone, phone, restaurantName, riderPhone, initiatedTime, address;
+    String myPhone, phone, restaurantName, riderPhone, initiatedTime, address, orderID, paymentMethod;
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
@@ -164,8 +165,8 @@ public class ViewMyOrders extends AppCompatActivity {
 
                             Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
                             String remarks = dataSnapshot.child("remarks").getValue(String.class);
-                            String orderID = dataSnapshot.child("orderID").getValue(String.class);
-                            String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                            orderID = dataSnapshot.child("orderID").getValue(String.class);
+                            paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
                             address = dataSnapshot.child("address").getValue(String.class);
                             myOrderID.setText("ORDER ID: #"+orderID);
                             payment.setText(paymentMethod);
@@ -575,45 +576,18 @@ public class ViewMyOrders extends AppCompatActivity {
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
+                                    ReceiptModel receipt = new ReceiptModel();
+                                    String nodeKey = receiptsRef.push().getKey();
+                                    GetCurrentDate currentDate = new GetCurrentDate();
 
-                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    customerOrderItems.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
-                                                try {
-                                                    //We need to capture the rider phone before the node is removed. this will allow us to
-                                                    //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
-                                                    //which would mean in turn we are unable to update the rider status
-                                                    tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
-                                                } catch (Exception e){}
-                                                try {
-                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                    prod.setKey(items.getKey());
-
-                                                    /**
-                                                     * Move order items to history node
-                                                     */
-                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-
-                                                                    //Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
-                                                                    myOrders.child(phone).removeValue();
-                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                            ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
-
-                                                                    rider.removeValue();
-
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-
-                                                } catch (Exception e){
-
+                                            for(DataSnapshot items : dataSnapshot.getChildren()){
+                                                ProductDetailsModel item = items.getValue(ProductDetailsModel.class);
+                                                if(item.getConfirmed() == true){
+                                                    receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                 }
                                             }
                                         }
@@ -624,6 +598,64 @@ public class ViewMyOrders extends AppCompatActivity {
                                         }
                                     });
 
+                                    receipt.setDeliveredOn(currentDate.getDate());
+                                    receipt.setInitiatedOn(initiatedTime);
+                                    receipt.setOrderID(orderID);
+                                    receipt.setPaymentMethod(paymentMethod);
+                                    receipt.setRestaurant(phone);
+
+                                    receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
+                                                        try {
+                                                            //We need to capture the rider phone before the node is removed. this will allow us to
+                                                            //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
+                                                            //which would mean in turn we are unable to update the rider status
+                                                            tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                        } catch (Exception e){}
+                                                        try {
+                                                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                            prod.setKey(items.getKey());
+
+                                                            /**
+                                                             * Move order items to history node
+                                                             */
+                                                            myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+
+                                                                            //Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
+                                                                            myOrders.child(phone).removeValue();
+                                                                            DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                    ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
+
+                                                                            rider.removeValue();
+
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+
+                                                        } catch (Exception e){
+
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             })//setPositiveButton
 

@@ -916,7 +916,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 @Override
                 public void onClick(final View v) {
                     if(declineOrder.getTag().equals("declined")){
-                        SafeToast.makeText(ViewCustomerOrder.this, "Delete order", Toast.LENGTH_SHORT).show();
+                        customerOrderItems.removeValue();
                     }
 
                     else {

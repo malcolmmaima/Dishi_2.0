@@ -508,6 +508,7 @@ public class ForegroundService extends Service {
             @Override
             public void onChildAdded(@NonNull DataSnapshot customerPhones, @Nullable String s) {
                 int itemCount = (int) customerPhones.child("items").getChildrenCount();
+                String orderID = customerPhones.child("orderID").getValue(String.class);
                 //Get user details
                 DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+customerPhones.getKey());
                 userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -518,7 +519,7 @@ public class ForegroundService extends Service {
 
                             //compose our notification and send
                             String title = customer.getFirstname() + " " + customer.getLastname();
-                            String message = "New order request (" + itemCount + ")";
+                            String message = "New order request [#"+orderID+"]";
                             String customerPhone = customerPhones.getKey();
                             if (customerPhone.length() > 4) {
                                 lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
