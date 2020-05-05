@@ -1,6 +1,7 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import java.util.List;
 
 public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
+    String TAG = "ReceiptsFragment";
     List<ReceiptModel> list;
     RecyclerView recyclerview;
     String myPhone;
@@ -112,14 +114,17 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 // StringBuffer stringbuffer = new StringBuffer();
                 for(DataSnapshot dataSnapshot1 :dataSnapshot.getChildren()){
-                    ReceiptModel receipt = dataSnapshot1.getValue(ReceiptModel.class);
-                    receipt.key = dataSnapshot1.getKey();
-                    list.add(receipt);
+                    try {
+                        ReceiptModel receipt = dataSnapshot1.getValue(ReceiptModel.class);
+                        receipt.key = dataSnapshot1.getKey();
+                        list.add(receipt);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
                     //progressDialog.dismiss();
                 }
 
                 if(!list.isEmpty()){
-
                     mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     ReceiptAdapter recycler = new ReceiptAdapter(getContext(),list);

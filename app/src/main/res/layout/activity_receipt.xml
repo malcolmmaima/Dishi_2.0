@@ -18,6 +18,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:id="@+id/exitReceipt"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:layout_marginLeft="15dp"
@@ -41,9 +42,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="11dp"
                 android:layout_marginBottom="2dp"
-                android:src="@drawable/ic_hot_chocolate_cup1"/>
+                android:src="@drawable/ic_receipt_white_48dp"/>
         </LinearLayout>
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
@@ -68,7 +69,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
-                android:text="7.85"
+                android:id="@+id/totalTitle"
+                android:text="0"
                 android:textSize="37dp"/>
 
         </LinearLayout>
@@ -144,9 +146,10 @@
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7.85"
+                android:text="n/a"
                 android:textSize="12dp"
                 android:layout_marginRight="15dp"
+                android:id="@+id/vatCharge"
                 android:textColor="#b1b1b1"/>
         </LinearLayout>
         <LinearLayout
@@ -171,9 +174,10 @@
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7.85"
+                android:text="0.00"
                 android:textSize="12dp"
                 android:layout_marginRight="15dp"
+                android:id="@+id/totalBill"
                 android:textColor="#000"/>
         </LinearLayout>
     </LinearLayout>

@@ -101,11 +101,11 @@ public class ViewMyOrders extends AppCompatActivity {
 
             try {
                 user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber(); //Current logged in user phone number
             } catch (Exception e){
                 SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
             }
 
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
             customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
             myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
             myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
