@@ -31,6 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.NotificationModel;
@@ -761,7 +764,9 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, statusOptions;
+        MyTextView_Roboto_Regular profileName, userUpdate, likesTotal, commentsTotal;
+        MyTextView_Roboto_Light timePosted;
+        TextView statusOptions;
         ImageView profilePic, imageShare, likePost, comments, sharePost;
         CardView cardView;
 

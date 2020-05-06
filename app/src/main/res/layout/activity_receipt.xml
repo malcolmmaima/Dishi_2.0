@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".View.Activities.ReceiptActivity">
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#ffffff"
-    tools:context=".View.Activities.ReceiptActivity">
+    >
+
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -19,13 +26,15 @@
 
             <ImageView
                 android:id="@+id/exitReceipt"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="5dp"
                 android:layout_marginLeft="15dp"
                 android:src="@drawable/ic_cross" />
 
             <ImageView
-                android:layout_width="17dp"
+                android:id="@+id/receiptOptions"
+                android:layout_width="30dp"
                 android:layout_height="17dp"
                 android:layout_gravity="right"
                 android:layout_marginRight="15dp"
@@ -37,22 +46,25 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/circle4"
-            android:layout_marginTop="30dp">
+            android:layout_marginTop="0dp">
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:layout_marginLeft="11dp"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
                 android:layout_marginBottom="2dp"
+
                 android:src="@drawable/ic_receipt_white_48dp"/>
         </LinearLayout>
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12dp"
-            android:text="Normal purchase"
+            android:text="Order ID: #0000"
             android:textColor="#000"
             android:layout_gravity="center_horizontal"
+            android:id="@+id/orderID"
             android:layout_marginTop="15dp"/>
         <LinearLayout
             android:layout_width="wrap_content"
@@ -60,25 +72,79 @@
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp">
-            <ImageView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Bold
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_british_pound_symbol"
-                android:layout_marginTop="10dp"/>
+                android:textColor="#000"
+                android:text="Ksh"
+                android:textSize="50dp"/>
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
                 android:id="@+id/totalTitle"
+                android:layout_marginLeft="10dp"
                 android:text="0"
                 android:textSize="37dp"/>
 
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.7dp"
+            android:background="#b1b1b1"
+            android:layout_marginTop="10dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ordered"
+                android:layout_marginLeft="15dp"
+                android:textSize="12dp"
+                android:layout_weight="1"
+                android:textColor="#000"/>
+
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1/1/2020 4:30PM"
+                android:textSize="12dp"
+                android:layout_marginRight="15dp"
+                android:id="@+id/dateOrdered"
+                android:textColor="#000"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delivered"
+                android:layout_marginLeft="15dp"
+                android:textSize="12dp"
+                android:layout_weight="1"
+                android:textColor="#000"/>
+
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1/1/2020 4:50PM"
+                android:textSize="12dp"
+                android:layout_marginRight="15dp"
+                android:id="@+id/dateDelivered"
+                android:textColor="#000"/>
         </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="0.7dp"
             android:background="#b1b1b1"
-            android:layout_marginTop="30dp"/>
+            android:layout_marginTop="10dp"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12dp"
                 android:layout_weight="1"
-                android:text="ITEAM"
+                android:text="ITEM"
 
                 android:textColor="#b1b1b1"/>
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
@@ -138,11 +204,7 @@
                 android:textSize="12dp"
                 android:layout_weight="1"
                 android:textColor="#b1b1b1"/>
-            <ImageView
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginTop="3dp"
-                android:src="@drawable/ic_pound"/>
+
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,6 +218,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="10dp">
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -166,22 +229,18 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <ImageView
-                android:layout_width="9dp"
-                android:layout_height="10dp"
-                android:layout_marginTop="3dp"
-                android:src="@drawable/ic_british_pound_symbol" />
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0.00"
+                android:text="Ksh 0.00"
                 android:textSize="12dp"
                 android:layout_marginRight="15dp"
                 android:id="@+id/totalBill"
                 android:textColor="#000"/>
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout
+
+    <!-- <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#f6f8f9"
@@ -198,9 +257,10 @@
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="flux"
+            android:text="DishiPay"
             android:layout_marginLeft="3dp"
             android:textSize="12dp"
             android:textColor="#b1b1b1"/>
-    </LinearLayout>
+    </LinearLayout> -->
 </RelativeLayout>
+</ScrollView>

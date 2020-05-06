@@ -2,12 +2,9 @@ package com.malcolmmaima.dishi.View.Adapter;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,8 +24,6 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
     private List<ProductDetailsModel> OfferList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-
-
 
         MyTextView_Roboto_Regular iteamName,quantity,price;
 
@@ -64,7 +59,7 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
 
         holder.iteamName.setText(lists.getName());
         holder.quantity.setText(""+lists.getQuantity());
-        holder.price.setText(lists.getPrice());
+        holder.price.setText(""+Integer.parseInt(lists.getPrice())*lists.getQuantity());
 
     }
 

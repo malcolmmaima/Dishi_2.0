@@ -38,15 +38,14 @@
             android:scaleType="fitXY"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
             android:text="loading..."
             android:id="@+id/profileName"
             android:layout_marginLeft="5dp"
-            android:textStyle="bold"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
@@ -64,12 +63,11 @@
                 android:background="@drawable/ic_access_time_black_48dp"
                 android:layout_marginRight="3dp"/>
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
                 android:layout_gravity="start"
                 android:id="@+id/timePosted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
                 android:textColor="#666"
                 android:textSize="10sp"
                 android:text="loading..."/>
@@ -96,14 +94,13 @@
 
         </RelativeLayout>
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:text="loading..."
             android:id="@+id/userUpdate"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="25dp"
             android:layout_marginBottom="5dp"
             android:layout_below="@id/profileName"
             android:layout_toRightOf="@id/profilePic"
@@ -147,7 +144,7 @@
                     android:backgroundTint="@color/lightgray"
                     android:src="@drawable/unliked" />
 
-                <TextView
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
@@ -162,7 +159,7 @@
                     android:backgroundTint="@color/lightgray"
                     android:src="@drawable/comment" />
 
-                <TextView
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"

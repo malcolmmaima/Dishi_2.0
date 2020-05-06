@@ -124,6 +124,9 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                     Intent slideactivity = new Intent(context, ReceiptActivity.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     slideactivity.putExtra("key", receipt.key);
+                    slideactivity.putExtra("orderID", receipt.getOrderID());
+                    slideactivity.putExtra("orderOn", receipt.getInitiatedOn());
+                    slideactivity.putExtra("deliveredOn", receipt.getDeliveredOn());
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
                     context.startActivity(slideactivity, bndlanimation);
