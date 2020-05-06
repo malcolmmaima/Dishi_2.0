@@ -31,11 +31,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.ReceiptModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
 import com.malcolmmaima.dishi.View.Activities.MyNotifications;
+import com.malcolmmaima.dishi.View.Activities.ReceiptActivity;
 import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.RiderActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
@@ -57,10 +59,10 @@ public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     String TAG = "ForeGroundService";
     DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, notificationRef, myMessages;
-    DatabaseReference myRideOrderRequests;
+    DatabaseReference myRideOrderRequests, receiptsRef;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     ValueEventListener myRideOrderRequestsListener;
-    ChildEventListener notificationsListener;
+    ChildEventListener notificationsListener, receiptsListener;
     String myPhone;
     FirebaseUser user;
     UserModel myUserDetails;
@@ -114,6 +116,7 @@ public class ForegroundService extends Service {
             databaseReference = FirebaseDatabase.getInstance().getReference();
             myUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
             notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+            receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
         } catch(Exception e){}
 
         //initialize chat notifications listener
@@ -680,7 +683,46 @@ public class ForegroundService extends Service {
             }
         };
         databaseReference.child("my_orders").child(myPhone).addValueEventListener(myOrdersListener);
+
+        receiptsListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                try {
+                    ReceiptModel newReceipt = dataSnapshot.getValue(ReceiptModel.class);
+                    newReceipt.key = dataSnapshot.getKey();
+                    if (newReceipt.getSeen() == false) {
+                        //Log.d(TAG, "new receipt: "+newReceipt.getOrderID());
+                        sendReceiptNotification(newReceipt);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onChildAdded: ", e);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        receiptsRef.addChildEventListener(receiptsListener);
+
     }
+
 
     /**
      * End of Notification listeners
@@ -1426,6 +1468,50 @@ public class ForegroundService extends Service {
                 }
             });
         }
+    }
+
+    private void sendReceiptNotification(ReceiptModel newReceipt) {
+        int notifId = new Random().nextInt();
+        Class targetActivity = ReceiptActivity.class;
+        Notification.Builder builder = null;
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder = new Notification.Builder(this, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_receipt_white_48dp)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle("Order #"+newReceipt.getOrderID())
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText("Receipt has been generated");
+            } else {
+                builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.ic_receipt_white_48dp)
+                        .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                        .setContentTitle("Order #"+newReceipt.getOrderID())
+                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setSound(soundUri)
+                        .setContentText("Receipt has been generated");
+            }
+        }
+
+        Intent intent = new Intent(this, targetActivity);
+        intent.putExtra("orderOn", newReceipt.getInitiatedOn());
+        intent.putExtra("deliveredOn", newReceipt.getDeliveredOn());
+        intent.putExtra("restaurantName", "vendorName");
+        intent.putExtra("orderID", newReceipt.getOrderID());
+        intent.putExtra("restaurantPhone", newReceipt.getRestaurant());
+        intent.putExtra("key", newReceipt.key);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notification.defaults |= Notification.DEFAULT_SOUND;
+        notification.icon |= Notification.BADGE_ICON_LARGE;
+        manager.notify(notifId, notification);
     }
 
     /**

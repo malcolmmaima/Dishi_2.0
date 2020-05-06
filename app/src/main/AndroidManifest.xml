@@ -9,7 +9,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.ReceiptActivity"></activity>
+        <activity android:name=".View.Activities.ReceiptActivity"
+            android:launchMode="singleTask"></activity>
         <activity android:name=".View.Activities.ReviewsActivity" />
         <activity
             android:name=".View.Activities.SearchActivity"

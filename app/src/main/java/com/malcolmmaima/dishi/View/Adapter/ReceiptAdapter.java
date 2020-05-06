@@ -126,6 +126,8 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                     Intent slideactivity = new Intent(context, ReceiptActivity.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     slideactivity.putExtra("key", receipt.key);
+                    slideactivity.putExtra("restaurantName", holder.restaurantName.getText().toString());
+                    slideactivity.putExtra("restaurantPhone", receipt.getRestaurant());
                     slideactivity.putExtra("orderID", receipt.getOrderID());
                     slideactivity.putExtra("orderOn", receipt.getInitiatedOn());
                     slideactivity.putExtra("deliveredOn", receipt.getDeliveredOn());
