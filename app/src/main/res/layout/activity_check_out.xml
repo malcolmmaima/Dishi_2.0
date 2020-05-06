@@ -122,13 +122,12 @@
                         android:textColor="#666"
                         />
 
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="VAT Charge (16%)"
-                        android:fontFamily="sans-serif-light"
                         android:id="@+id/vatCharge"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="5dp"
@@ -137,14 +136,13 @@
                         android:layout_below="@id/DeliveryCharge"
                         android:textColor="#666"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Ksh 0"
                         android:id="@+id/VATamount"
-                        android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="10dp"
                         android:layout_below="@id/DeliveryCharge"
@@ -176,7 +174,7 @@
                 android:orientation="horizontal"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginTop="15dp">
+                android:layout_marginTop="10dp">
                 <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -203,11 +201,18 @@
                     android:text="PRICE"
                     android:textColor="#000"/>
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.7dp"
+                android:background="#b1b1b1"
+                android:layout_marginTop="10dp"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
                 android:id="@+id/recyclerview"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp">
             </androidx.recyclerview.widget.RecyclerView>

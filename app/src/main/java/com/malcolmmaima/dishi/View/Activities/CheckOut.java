@@ -73,7 +73,7 @@ public class CheckOut extends AppCompatActivity {
     Double lat, lng;
     String placeName, locationSet;
     AppCompatImageView paymentStatus, deliveryLocationStatus;
-    DatabaseReference myRef, myCartRef, receiptItemsRef;
+    DatabaseReference myRef, myCartRef;
     ProgressDialog progressDialog;
     ArrayList<ProductDetailsModel> myCartItems;
     private RecyclerView recyclerView;
@@ -123,8 +123,7 @@ public class CheckOut extends AppCompatActivity {
 
         setTitle("Checkout");
 
-        receiptItemsRef = FirebaseDatabase.getInstance().getReference("my_cart/"+myPhone);
-        receiptItemsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 myCartItems = new ArrayList<>();
