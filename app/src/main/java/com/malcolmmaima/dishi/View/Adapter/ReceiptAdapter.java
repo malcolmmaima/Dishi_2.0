@@ -10,12 +10,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +41,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
 import com.malcolmmaima.dishi.View.Activities.ReceiptActivity;
+import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
 
@@ -44,6 +49,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import io.fabric.sdk.android.services.common.SafeToast;
 
 
 public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder>{
@@ -69,6 +76,10 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
 
     public void onBindViewHolder(final ReceiptAdapter.MyHolder holder, final int position) {
         final ReceiptModel receipt = listdata.get(position);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
         DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+receipt.getRestaurant());
         restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -86,7 +97,6 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
 
             }
         });
-
         setAnimation(holder.itemView, position);
 
         holder.orderID.setText("#"+receipt.getOrderID());
@@ -124,7 +134,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
             public void onClick(View v) {
                 try {
                     Intent slideactivity = new Intent(context, ReceiptActivity.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     slideactivity.putExtra("key", receipt.key);
                     slideactivity.putExtra("restaurantName", holder.restaurantName.getText().toString());
                     slideactivity.putExtra("restaurantPhone", receipt.getRestaurant());
@@ -137,6 +147,96 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                 } catch (Exception e){
                     Log.e(TAG, "onClick: ", e);
                 }
+            }
+        });
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(context, holder.receiptOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.receipt_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem deleteOption = myMenu.findItem(R.id.delete);
+        MenuItem downloadOption = myMenu.findItem(R.id.download);
+
+        try {
+            deleteOption.setVisible(true);
+            downloadOption.setVisible(true);
+
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ",e);
+        }
+
+        holder.receiptOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete:
+                                final AlertDialog deletePost = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Delete receipt?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference receiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone+"/"+receipt.key);
+                                                receiptRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        try {
+                                                            listdata.remove(position);
+                                                            notifyItemRemoved(position);
+                                                        } catch (Exception e){
+                                                            Log.e(TAG, "error ", e);
+                                                        }
+                                                        SafeToast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                deletePost.show();
+                                return (true);
+                            case R.id.download:
+                                final AlertDialog reportStatus = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Download this receipt?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Snackbar.make(view.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                            }
+                                        })
+                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                reportStatus.show();
+
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
             }
         });
 
@@ -171,6 +271,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
         MyTextView_Roboto_Medium restaurantName;
         MyTextView_Roboto_Regular orderedOn;
         MyTextView_Roboto_Medium orderID;
+        TextView receiptOptions;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -178,6 +279,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
             restaurantName = itemView.findViewById(R.id.restaurantName);
             orderID = itemView.findViewById(R.id.orderID);
             orderedOn = itemView.findViewById(R.id.orderedOn);
+            receiptOptions = itemView.findViewById(R.id.receiptOptions);
             cardView = itemView.findViewById(R.id.card_view);
 
             //Long Press

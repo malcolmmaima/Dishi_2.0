@@ -684,6 +684,7 @@ public class ForegroundService extends Service {
         };
         databaseReference.child("my_orders").child(myPhone).addValueEventListener(myOrdersListener);
 
+        //check for new receipts generated
         receiptsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {

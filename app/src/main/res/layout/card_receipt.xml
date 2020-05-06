@@ -43,10 +43,22 @@
             android:id="@+id/orderID"
             android:textColor="@color/colorAccent"
             android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@id/receiptOptions"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginEnd="15dp"
             />
+
+        <TextView
+            android:id="@+id/receiptOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="3dp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:text="&#8942;"
+            android:textAppearance="?android:textAppearanceLarge" />
 
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"

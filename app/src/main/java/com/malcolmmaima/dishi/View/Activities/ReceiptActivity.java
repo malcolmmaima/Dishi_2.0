@@ -268,7 +268,13 @@ public class ReceiptActivity extends AppCompatActivity {
                                 public boolean onMenuItemClick(MenuItem item) {
                                     switch (item.getItemId()) {
                                         case R.id.delete:
-                                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                            receiptObjRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    finish();
+                                                    SafeToast.makeText(ReceiptActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
                                             //do something
                                             return (true);
                                         case R.id.download:
