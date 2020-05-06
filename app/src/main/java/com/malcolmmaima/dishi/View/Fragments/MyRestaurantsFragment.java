@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.OrdersAdapter;
@@ -37,7 +38,7 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
     List<UserModel> riderRequests = new ArrayList<>();
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag;
+    MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
 

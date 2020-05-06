@@ -32,6 +32,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -50,7 +52,8 @@ public class ViewRestaurant extends AppCompatActivity {
     FirebaseAuth mAuth;
     DatabaseReference restaurantRef, myFavourites, providerFavs;
     ImageView coverImageView, favourite, callBtn, shareRest;
-    TextView restaurantName, distAway, likes;
+    MyTextView_Roboto_Medium restaurantName;
+    MyTextView_Roboto_Regular distAway, likes;
     String RestaurantName, phone;
     ValueEventListener providerFavsListener;
     Menu myMenu;

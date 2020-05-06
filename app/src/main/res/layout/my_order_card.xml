@@ -41,28 +41,25 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
             android:text="Customer Name"
             android:fontFamily="sans-serif"
             android:id="@+id/customerName"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="#0"
             android:textSize="25dp"
             android:id="@+id/orderQty"
-            android:fontFamily="sans-serif"
             android:textColor="@color/colorAccent"
             android:layout_alignParentRight="true"
             android:layout_marginTop="15dp"

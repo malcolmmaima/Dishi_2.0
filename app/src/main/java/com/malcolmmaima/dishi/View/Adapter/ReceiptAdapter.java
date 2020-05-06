@@ -28,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.ReceiptModel;
@@ -164,7 +166,9 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView restaurantName , orderID, orderedOn;
+        MyTextView_Roboto_Medium restaurantName;
+        MyTextView_Roboto_Regular orderedOn;
+        MyTextView_Roboto_Medium orderID;
         CardView cardView;
 
         public MyHolder(View itemView) {

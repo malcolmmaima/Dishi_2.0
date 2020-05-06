@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
@@ -168,7 +169,8 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView orderQty, customerName,distanceAway;
+        MyTextView_Roboto_Medium orderQty, customerName;
+        TextView distanceAway;
         ImageView profilePic;
         CardView cardView;
 

@@ -34,11 +34,11 @@
             android:scaleType="fitXY"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
             android:text="loading..."
             android:id="@+id/profileName"
             android:layout_marginLeft="5dp"
@@ -61,7 +61,7 @@
                 android:background="@drawable/ic_access_time_black_48dp"
                 android:layout_marginRight="3dp"/>
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
                 android:id="@+id/timePosted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -78,11 +78,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:fontFamily="sans-serif-light"
                 android:text="loading..."
                 android:id="@+id/userUpdate"
                 android:layout_marginLeft="5dp"

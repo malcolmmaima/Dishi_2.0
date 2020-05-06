@@ -8,6 +8,9 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -30,6 +33,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GenerateRandomString;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.TrackingService;
@@ -38,6 +43,7 @@ import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Adapter.ReceiptItemAdapter;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
 import java.text.DecimalFormat;
@@ -58,7 +64,8 @@ public class CheckOut extends AppCompatActivity {
     AppCompatButton orderBtn;
     CardView PaymentMethod, DeliveryAddress;
     EditText remarks;
-    TextView SubTotal,deliveryChargeAmount, VATamount, totalBill;
+    MyTextView_Roboto_Medium totalBill;
+    MyTextView_Roboto_Regular SubTotal, deliveryChargeAmount, VATamount;
     Double deliveryAmount, totalBillAmount,VAT;
     String [] paymentMethods = {"M-Pesa","Cash on Delivery"};
     String [] deliveryAddress = {"Live Location","Select Location", "Pick My Order"};
@@ -66,8 +73,11 @@ public class CheckOut extends AppCompatActivity {
     Double lat, lng;
     String placeName, locationSet;
     AppCompatImageView paymentStatus, deliveryLocationStatus;
-    DatabaseReference myRef, myCartRef;
+    DatabaseReference myRef, myCartRef, receiptItemsRef;
     ProgressDialog progressDialog;
+    ArrayList<ProductDetailsModel> myCartItems;
+    private RecyclerView recyclerView;
+    private ReceiptItemAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +122,35 @@ public class CheckOut extends AppCompatActivity {
         totalBill.setText("Ksh " + totalBillAmount);
 
         setTitle("Checkout");
+
+        receiptItemsRef = FirebaseDatabase.getInstance().getReference("my_cart/"+myPhone);
+        receiptItemsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myCartItems = new ArrayList<>();
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                    try {
+                        ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
+                        myCartItems.add(product);
+
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                }
+
+                mAdapter = new ReceiptItemAdapter(CheckOut.this,myCartItems);
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(CheckOut.this);
+                recyclerView.setLayoutManager(mLayoutManager);
+                recyclerView.setItemAnimator(new DefaultItemAnimator());
+                recyclerView.setAdapter(mAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -651,6 +690,7 @@ public class CheckOut extends AppCompatActivity {
 
         paymentStatus = findViewById(R.id.paymentStatus);
         deliveryLocationStatus = findViewById(R.id.deliveryLocationStatus);
+        recyclerView = findViewById(R.id.recyclerview);
     }
 
     public String[] Split(String timeStamp){

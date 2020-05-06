@@ -27,6 +27,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
@@ -238,8 +241,10 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted;
-        ImageView profilePic, deleteBtn, likePost, comments, sharePost, imageShare;
+        MyTextView_Roboto_Medium profileName;
+        MyTextView_Roboto_Regular userUpdate;
+        MyTextView_Roboto_Light timePosted;
+        ImageView profilePic, imageShare;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -248,13 +253,7 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
             profileName = itemView.findViewById(R.id.profileName);
             userUpdate = itemView.findViewById(R.id.userUpdate);
             profilePic = itemView.findViewById(R.id.profilePic);
-            deleteBtn = itemView.findViewById(R.id.deleteBtn);
-            likePost = itemView.findViewById(R.id.likePost);
-            comments = itemView.findViewById(R.id.comments);
-            sharePost = itemView.findViewById(R.id.sharePost);
             imageShare = itemView.findViewById(R.id.imageShare);
-            likesTotal = itemView.findViewById(R.id.likesTotal);
-            commentsTotal = itemView.findViewById(R.id.commentsTotal);
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
 

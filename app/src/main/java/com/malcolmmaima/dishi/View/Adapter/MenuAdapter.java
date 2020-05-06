@@ -24,6 +24,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AddMenu;
@@ -140,7 +142,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice , foodDescription, foodName;
+        MyTextView_Roboto_Medium foodPrice , foodName;
+        MyTextView_Roboto_Regular foodDescription;
         ImageView foodPic;
         CardView cardView;
 

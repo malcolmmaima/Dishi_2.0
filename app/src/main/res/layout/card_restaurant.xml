@@ -41,7 +41,7 @@
                     android:background="@android:drawable/screen_background_dark_transparent"
                     android:orientation="vertical">
 
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/titleTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
 
                 />
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
                 android:id="@+id/distanceAway"
                 android:layout_toRightOf="@id/locationTag"
                 android:layout_width="wrap_content"
@@ -95,7 +95,7 @@
                     android:padding="5dp"
                     android:src="@drawable/ic_like" />
 
-                <TextView
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"

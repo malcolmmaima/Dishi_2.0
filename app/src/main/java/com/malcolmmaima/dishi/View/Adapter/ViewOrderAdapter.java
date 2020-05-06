@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Interface.OnOrderChecked;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
@@ -146,7 +148,8 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodName, quantity;
+        MyTextView_Roboto_Medium foodName, foodPrice;
+        MyTextView_Roboto_Regular quantity;
         ImageView foodPic;
         CardView cardView;
         CheckBox checkBox;

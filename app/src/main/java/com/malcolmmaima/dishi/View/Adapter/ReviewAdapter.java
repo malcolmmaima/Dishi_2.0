@@ -31,6 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
@@ -566,7 +569,10 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView profileName, userUpdate, likesTotal, commentsTotal, timePosted, reviewOptions;
+        MyTextView_Roboto_Medium profileName;
+        MyTextView_Roboto_Regular userUpdate, likesTotal, commentsTotal;
+        MyTextView_Roboto_Light timePosted;
+        TextView reviewOptions;
         ImageView profilePic, imageShare, likePost, comments, sharePost;
         CardView cardView;
 

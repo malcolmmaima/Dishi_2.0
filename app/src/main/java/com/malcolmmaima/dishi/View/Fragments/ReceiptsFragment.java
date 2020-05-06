@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.ReceiptModel;
 import com.malcolmmaima.dishi.R;
@@ -37,7 +38,7 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
     List<ReceiptModel> list;
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag;
+    MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
 

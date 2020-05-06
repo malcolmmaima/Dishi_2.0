@@ -34,11 +34,11 @@
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:id="@+id/myOrderID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="15sp"
                 android:textColor="#666"
                 android:layout_gravity="right"
                 android:layout_marginTop="5dp"
@@ -66,7 +66,7 @@
                     android:padding="10dp"
                     >
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/billTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -76,10 +76,9 @@
                         android:text="Total Bill:"
                         android:textStyle="bold"
                         />
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
                         android:text="Ksh 0"
                         android:textSize="25dp"
                         android:id="@+id/totalBill"
@@ -87,12 +86,11 @@
                         android:textColor="@color/colorAccent"
                         android:layout_alignParentRight="true"
                         />
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Subtotal"
-                        android:fontFamily="sans-serif-light"
                         android:id="@+id/productsSubtotal"
                         android:layout_marginTop="20dp"
                         android:layout_marginLeft="5dp"
@@ -101,25 +99,23 @@
                         android:layout_below="@id/billTitle"
                         android:textColor="#666"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Ksh 0"
                         android:id="@+id/subTotal"
-                        android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_below="@id/billTitle"
                         android:textColor="#666"
                         />
 
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Delivery Charge"
-                        android:fontFamily="sans-serif-light"
                         android:id="@+id/DeliveryCharge"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="5dp"
@@ -128,13 +124,12 @@
                         android:layout_below="@id/productsSubtotal"
                         android:textColor="#666"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Ksh 0"
                         android:id="@+id/deliveryChargeAmount"
-                        android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="10dp"
                         android:layout_below="@id/productsSubtotal"
@@ -142,12 +137,11 @@
                         />
 
 
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Payment"
-                        android:fontFamily="sans-serif-light"
                         android:id="@+id/paymentType"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="5dp"
@@ -156,13 +150,12 @@
                         android:layout_below="@id/DeliveryCharge"
                         android:textColor="#666"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Cash/Mpesa"
                         android:id="@+id/payment"
-                        android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="10dp"
                         android:layout_below="@id/DeliveryCharge"
@@ -178,13 +171,12 @@
                         android:layout_height="wrap_content">
 
                         <!-- Might add more widgets here -->
-                        <androidx.appcompat.widget.AppCompatTextView
+                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textSize="15sp"
                             android:text="Remarks: "
                             android:id="@+id/myOrderRemarks"
-                            android:fontFamily="sans-serif"
                             android:layout_alignParentLeft="true"
                             android:layout_marginTop="10dp"
                             android:layout_marginLeft="5dp"
@@ -214,13 +206,12 @@
                             android:layout_marginLeft="5dp"
                             />
 
-                        <TextView
+                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/riderName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
                             android:textColor="#666"
-                            android:fontFamily="sans-serif-light"
+                            android:textSize="15sp"
                             android:layout_gravity="center_vertical"
                             android:text="Loading..."/>
                     </LinearLayout>
@@ -242,13 +233,12 @@
                             android:layout_marginLeft="5dp"
                             />
 
-                        <TextView
+                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/timeStamp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textSize="15sp"
                             android:textColor="#666"
-                            android:fontFamily="sans-serif-light"
                             android:layout_gravity="center_vertical"
                             android:text="Loading..."/>
                     </LinearLayout>
@@ -282,16 +272,18 @@
                         android:id="@+id/locationIcon"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:layout_marginRight="10dp"
                         android:layout_alignParentLeft="true"
                         app:tint="@color/colorPrimary"
                         android:src="@drawable/location_pin"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_toRightOf="@id/locationIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="15sp"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="10dp"
                         android:text="Track Order"
                         android:id="@+id/trackOrderTxt"

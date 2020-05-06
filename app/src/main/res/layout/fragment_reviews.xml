@@ -131,7 +131,7 @@
                 android:visibility="gone"
                 android:src="@drawable/post_update"/>
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_below="@id/noPostsIcon"
                 android:id="@+id/empty_tag"
                 android:layout_width="wrap_content"

@@ -42,16 +42,14 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
             android:text="Rider Name"
-            android:fontFamily="sans-serif"
             android:id="@+id/riderName"
             android:layout_centerVertical="true"
-            android:layout_marginBottom="15dp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"/>
 

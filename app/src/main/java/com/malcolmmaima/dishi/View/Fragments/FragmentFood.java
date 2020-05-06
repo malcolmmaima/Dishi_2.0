@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
@@ -44,7 +45,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     List<ProductDetailsModel> list;
     RecyclerView recyclerview;
     String myPhone;
-    TextView emptyTag, distanceShow;
+    MyTextView_Roboto_Regular emptyTag, distanceShow;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
     LiveLocationModel liveLocationModel;

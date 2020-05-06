@@ -5,7 +5,7 @@
     android:id="@+id/card_view"
     android:clickable="true"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:elevation="8dp"
     card_view:cardCornerRadius="5dp"
@@ -25,24 +25,21 @@
         android:padding="5dp"
         >
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
             android:text="Loading..."
-            android:fontFamily="sans-serif"
             android:id="@+id/restaurantName"
             android:layout_marginLeft="5dp"/>
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="#0000"
             android:textSize="25dp"
             android:id="@+id/orderID"
-            android:fontFamily="sans-serif"
             android:textColor="@color/colorAccent"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="5dp"
@@ -50,14 +47,12 @@
             android:layout_marginEnd="15dp"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="loading..."
-            android:fontFamily="sans-serif-light"
             android:id="@+id/orderedOn"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="35dp"
             android:layout_marginBottom="10dp"

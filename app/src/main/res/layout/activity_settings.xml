@@ -21,6 +21,7 @@
         app:view_shadowDy="0dp"
         app:view_borderWidth="2dp"
         app:view_borderColor="@color/colorPrimaryDark">
+
     </androidx.appcompat.widget.Toolbar>
     <ScrollView
         android:layout_below="@id/toolbar"
@@ -63,32 +64,28 @@
                     app:view_shadowDy="0dp"
                     app:view_shadowRadius="1dp" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                     android:id="@+id/userName"
                     android:layout_marginTop="25dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="20sp"
-                    android:layout_gravity="start"
                     android:layout_marginLeft="120dp"
                     android:layout_marginRight="10dp"
                     android:text="Dishi User"
                     android:textColor="@color/colorPrimaryDark"
-                    android:fontFamily="sans-serif-medium"
                     android:layout_marginStart="120dp"
                     android:layout_marginEnd="10dp" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                     android:id="@+id/phoneNumber"
                     android:layout_marginTop="50dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
-                    android:layout_gravity="start"
                     android:layout_marginLeft="120dp"
                     android:layout_marginRight="10dp"
                     android:text="+1234567890"
-                    android:fontFamily="sans-serif-medium"
                     android:layout_marginStart="120dp"
                     android:layout_marginEnd="10dp" />
 
@@ -133,16 +130,14 @@
                         android:src="@drawable/ic_account_circle_white_48dp"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_marginTop="20dp"
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_centerVertical="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_gravity="start"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:text="Account"
-                        android:fontFamily="sans-serif"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
 
@@ -179,16 +174,14 @@
                         android:src="@drawable/ic_notifications_white_48pt_3x"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_marginTop="20dp"
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_centerVertical="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_gravity="start"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:text="Notifications"
-                        android:fontFamily="sans-serif"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
 
@@ -225,16 +218,14 @@
                         android:src="@drawable/ic_help_white_48dp"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_marginTop="20dp"
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_centerVertical="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_gravity="start"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:text="Help"
-                        android:fontFamily="sans-serif"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
 
@@ -271,16 +262,14 @@
                         android:src="@drawable/ic_info_white_48dp"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_marginTop="20dp"
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_centerVertical="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:layout_gravity="start"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:text="About"
-                        android:fontFamily="sans-serif"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
 

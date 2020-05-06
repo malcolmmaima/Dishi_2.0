@@ -28,6 +28,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.NotificationModel;
@@ -649,7 +652,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView contact_name, notificationMessage, notificationTime;
+        MyTextView_Roboto_Medium contact_name;
+        MyTextView_Roboto_Regular notificationMessage;
+        MyTextView_Roboto_Light notificationTime;
         ImageView profilePic, liked, commented, postedWall, statusImage, reviewIcon;
         LinearLayout cardView;
         AppCompatButton followUnfollow;

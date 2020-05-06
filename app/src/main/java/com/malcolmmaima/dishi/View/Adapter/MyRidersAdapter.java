@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
@@ -136,7 +137,7 @@ public class MyRidersAdapter extends RecyclerView.Adapter<MyRidersAdapter.MyHold
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView riderName;
+        MyTextView_Roboto_Medium riderName;
         ImageView profilePic;
         CardView cardView;
 

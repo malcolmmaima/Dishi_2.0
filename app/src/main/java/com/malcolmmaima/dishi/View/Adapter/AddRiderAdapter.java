@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Interface.OnRiderSelected;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -69,7 +70,7 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
          * Set widget values
          **/
 
-        holder.customerName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
+        holder.riderName.setText(orderDetails.getFirstname() + " " + orderDetails.getLastname());
 
 
         /**
@@ -164,13 +165,13 @@ public class AddRiderAdapter extends RecyclerView.Adapter<AddRiderAdapter.MyHold
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView customerName;
+        MyTextView_Roboto_Medium riderName;
         ImageView profilePic;
         CardView cardView;
 
         public MyHolder(View itemView) {
             super(itemView);
-            customerName = itemView.findViewById(R.id.riderName);
+            riderName = itemView.findViewById(R.id.riderName);
             profilePic = itemView.findViewById(R.id.profilePic);
             cardView = itemView.findViewById(R.id.card_view);
 

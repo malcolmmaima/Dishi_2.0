@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
@@ -47,7 +48,7 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
     String myPhone;
     Switch liveStatus;
     ImageView liveStatusIcon;
-    TextView liveTitle;
+    MyTextView_Roboto_Regular liveTitle;
     CardView live;
 
     DatabaseReference dbRef, incomingOrders, userDetailsRef;
@@ -55,7 +56,7 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
     FirebaseUser user;
     ValueEventListener liveListener, inComingOrdersListener, userDetailsListener;
 
-    TextView emptyTag;
+    MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
 

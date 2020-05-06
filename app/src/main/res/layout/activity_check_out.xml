@@ -54,33 +54,29 @@
                     android:padding="10dp"
                     >
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/billTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         android:layout_marginRight="70dp"
-                        android:fontFamily="sans-serif-medium"
                         android:text="Total Bill:"
                         android:textStyle="bold"
                         />
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
                         android:text="Ksh 0"
                         android:textSize="25dp"
                         android:id="@+id/totalBill"
-                        android:fontFamily="sans-serif"
                         android:textColor="@color/colorAccent"
                         android:layout_alignParentRight="true"
                         />
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Subtotal"
-                        android:fontFamily="sans-serif-light"
                         android:id="@+id/productsSubtotal"
                         android:layout_marginTop="20dp"
                         android:layout_marginLeft="5dp"
@@ -89,25 +85,23 @@
                         android:layout_below="@id/billTitle"
                         android:textColor="#666"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Ksh 0"
                         android:id="@+id/subTotal"
-                        android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_below="@id/billTitle"
                         android:textColor="#666"
                         />
 
-                    <TextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Delivery Charge"
-                        android:fontFamily="sans-serif-light"
                         android:id="@+id/DeliveryCharge"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="5dp"
@@ -116,13 +110,12 @@
                         android:layout_below="@id/productsSubtotal"
                         android:textColor="#666"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="15sp"
                         android:text="Ksh 0"
                         android:id="@+id/deliveryChargeAmount"
-                        android:fontFamily="sans-serif"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="10dp"
                         android:layout_below="@id/productsSubtotal"
@@ -172,6 +165,53 @@
 
             </androidx.cardview.widget.CardView>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.7dp"
+                android:background="#b1b1b1"
+                android:layout_marginTop="10dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp">
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:layout_weight="1"
+                    android:text="ITEM"
+
+                    android:textColor="#000"/>
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="QTY"
+                    android:layout_marginLeft="50dp"
+                    android:textColor="#000"/>
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12dp"
+                    android:gravity="right"
+                    android:text="PRICE"
+                    android:textColor="#000"/>
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:id="@+id/recyclerview"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp">
+            </androidx.recyclerview.widget.RecyclerView>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/PaymentMethod"
                 android:clickable="true"
@@ -195,19 +235,20 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:layout_centerVertical="true"
                         android:id="@+id/paymentIcon"
                         android:src="@drawable/payment"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_toRightOf="@id/paymentIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="15sp"
                         android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
-                        android:text="Payment Method"
-                        android:fontFamily="sans-serif" />
+                        android:layout_centerVertical="true"
+                        android:text="Payment Method" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="30dp"
@@ -247,15 +288,17 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:id="@+id/locationIcon"
+                        android:layout_centerVertical="true"
                         app:tint="@color/colorPrimary"
                         android:src="@drawable/location_pin"
                         />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_toRightOf="@id/locationIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="15sp"
+                        android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="Delivery Address"
                         android:fontFamily="sans-serif" />
@@ -308,7 +351,6 @@
                 android:background="@drawable/login_button"
                 />
         </LinearLayout>
-
 
     </ScrollView>
 </RelativeLayout>

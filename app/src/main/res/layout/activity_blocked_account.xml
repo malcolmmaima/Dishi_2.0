@@ -13,7 +13,7 @@
         android:layout_centerInParent="true"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
+    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
         android:layout_margin="15dp"
         android:layout_below="@id/icon"
         android:layout_centerHorizontal="true"
@@ -21,7 +21,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Your account has been blocked. Contact support."
-        android:fontFamily="sans-serif-medium"
         android:textSize="15sp"/>
 
     <TextView

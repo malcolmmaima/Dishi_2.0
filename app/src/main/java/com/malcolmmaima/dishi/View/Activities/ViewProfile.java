@@ -46,6 +46,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.NotificationModel;
@@ -79,7 +82,9 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     FirebaseUser user;
 
     CircleImageView profilePhoto;
-    TextView profileName, profileBio, following, followers;
+    MyTextView_Roboto_Medium profileName;
+    MyTextView_Roboto_Light profileBio;
+    MyTextView_Roboto_Regular following, followers;
     LinearLayout followingLayout, followersLayout;
     ImageButton emoji;
     EmojiconEditText myStatusUpdate;
@@ -90,7 +95,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     AppCompatButton followBtn;
     UserModel myUserDetails;
 
-    TextView emptyTag;
+    MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     ImageView selectedImage,viewRestaurant;
     SwipeRefreshLayout mSwipeRefreshLayout;

@@ -41,6 +41,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -74,7 +76,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     EditText editText;
     ListView list;
     MyChatAdapter arrayAdapter;
-    TextView name, userStatus;
+    MyTextView_Roboto_Medium name;
+    MyTextView_Roboto_Light userStatus;
     Toolbar toolbar;
     CircleImageView profilePic;
     ImageButton sendBtn;

@@ -41,27 +41,24 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
             android:text="Food name"
-            android:fontFamily="sans-serif"
             android:id="@+id/foodName"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/foodPic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Ksh 0"
             android:textSize="25dp"
             android:id="@+id/foodPrice"
-            android:fontFamily="sans-serif"
             android:textColor="@color/colorAccent"
             android:layout_alignParentRight="true"
             android:layout_toLeftOf="@id/productOptions"
@@ -81,17 +78,16 @@
             android:text="&#8942;"
             android:textAppearance="?android:textAppearanceLarge" />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="15sp"
             android:text="Food Description"
-            android:fontFamily="sans-serif-light"
             android:id="@+id/foodDescription"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="35dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="1dp"
             android:layout_below="@id/foodName"
             android:layout_toRightOf="@id/foodPic"
             android:layout_toEndOf="@id/foodPic"
@@ -109,7 +105,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/restaurantName"
             android:layout_below="@id/foodDescription"
             android:layout_toRightOf="@id/locationTag"
@@ -133,7 +129,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/distanceAway"
             android:layout_below="@id/restaurantName"
             android:layout_toRightOf="@id/locationTag"

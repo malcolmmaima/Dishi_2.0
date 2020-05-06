@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.NewChat;
@@ -34,7 +35,7 @@ public class FragmentFollowing extends Fragment implements SwipeRefreshLayout.On
     String phone;
     DatabaseReference followingRef;
     RecyclerView recyclerview;
-    TextView emptyTag;
+    MyTextView_Roboto_Regular emptyTag;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     public FragmentFollowing() {

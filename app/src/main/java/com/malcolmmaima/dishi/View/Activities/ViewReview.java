@@ -41,6 +41,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
@@ -72,7 +75,10 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     private static final String TAG = "ViewReview";
     DatabaseReference reviewsRef, authorUserDetailsRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, reviewsRefListener;
-    TextView profileName, userUpdate, likesTotal, commentsTotal, emptyTag, timePosted, reviewOptions;
+    MyTextView_Roboto_Medium profileName;
+    MyTextView_Roboto_Regular userUpdate, likesTotal, commentsTotal, emptyTag;
+    MyTextView_Roboto_Light timePosted;
+    TextView reviewOptions;
     ImageView profilePic, imageShare, likePost, comments, sharePost;
     String myPhone;
     Button postStatus;
@@ -105,12 +111,12 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_review);
         loadReview();
 
     }
 
     private void loadReview() {
+        setContentView(R.layout.activity_view_review);
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();

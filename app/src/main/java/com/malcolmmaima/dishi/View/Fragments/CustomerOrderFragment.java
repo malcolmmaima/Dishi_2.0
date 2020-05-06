@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerOrderFragment extends Fragment {
+    String TAG = "CustomerOrderFragment";
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -158,6 +160,10 @@ public class CustomerOrderFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         //Dealing with memory leaks.
-        myCartRef.removeEventListener(cartListener);
+        try {
+            myCartRef.removeEventListener(cartListener);
+        } catch (Exception e){
+            Log.e(TAG, "onDestroy: ", e);
+        }
     }
 }

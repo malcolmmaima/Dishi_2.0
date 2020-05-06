@@ -55,12 +55,12 @@
                     android:scaleType="fitXY"
                     />
 
-                <TextView
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_marginTop="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/darkblue"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="15sp"
                     android:text="loading..."
                     android:id="@+id/postedToName"
                     android:layout_toRightOf="@id/postedToPic"/>
@@ -111,12 +111,11 @@
                                 android:scaleType="centerCrop"
                                 android:visibility="gone" />
 
-                            <TextView
+                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
                                 android:id="@+id/timePosted"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start"
-                                android:fontFamily="sans-serif-light"
                                 android:text="loading..."
                                 android:textColor="#666"
                                 android:textSize="10sp" />
@@ -141,17 +140,16 @@
                             android:layout_toRightOf="@id/profilePic"
                             android:orientation="vertical">
 
-                            <TextView
+                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                                 android:id="@+id/profileName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
                                 android:text="loading..."
-                                android:textStyle="bold"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textSize="15sp"
                                 android:textColor="@color/colorAccent" />
 
-                            <TextView
+                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                                 android:id="@+id/userUpdate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -187,7 +185,7 @@
                                     android:paddingBottom="2dp"
                                     android:src="@drawable/unliked" />
 
-                                <TextView
+                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                                     android:id="@+id/likesTotal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -213,7 +211,7 @@
                                     android:src="@drawable/share"
                                     android:visibility="gone" />
 
-                                <TextView
+                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                                     android:id="@+id/commentsTotal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"

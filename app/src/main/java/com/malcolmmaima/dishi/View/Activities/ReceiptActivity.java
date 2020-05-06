@@ -108,7 +108,7 @@ public class ReceiptActivity extends AppCompatActivity {
                         ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
                         deliveredItems.add(product);
 
-                        totalAmount = totalAmount + Integer.parseInt(product.getPrice());
+                        totalAmount = totalAmount + (Integer.parseInt(product.getPrice())*product.getQuantity());
                         totalBill.setText("Ksh " + totalAmount);
                         totalTitle.setText("" + totalAmount);
                     } catch (Exception e){

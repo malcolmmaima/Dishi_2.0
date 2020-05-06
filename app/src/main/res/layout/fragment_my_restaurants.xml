@@ -21,12 +21,11 @@
             android:visibility="invisible"
             android:src="@drawable/shop"/>
 
-        <TextView
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/empty_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="EMPTY"
-            android:fontFamily="sans-serif"
             android:textSize="30sp"
             android:layout_marginTop="20dp"
             android:layout_gravity="center"

@@ -36,6 +36,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
@@ -63,7 +65,8 @@ public class ViewMyOrders extends AppCompatActivity {
     FirebaseUser user;
     DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment, totalBill, myRemarks, riderName, timeStamp, myOrderID, trackOrderTxt;
+    MyTextView_Roboto_Medium myOrderID, totalBill;
+    MyTextView_Roboto_Regular subTotal, deliveryChargeAmount, payment, myRemarks, riderName, timeStamp, trackOrderTxt;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;
     RecyclerView recyclerview;

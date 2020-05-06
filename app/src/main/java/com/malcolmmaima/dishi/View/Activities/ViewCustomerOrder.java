@@ -37,6 +37,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.Interface.OnOrderChecked;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
@@ -68,9 +70,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     FirebaseUser user;
     DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
     ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
-    TextView subTotal, deliveryChargeAmount, payment,
-            totalBill, customerRemarks, riderName, restaurantName,
-            timeStamp, myOrderID, trackOrderTxt;
+    MyTextView_Roboto_Medium myOrderID, restaurantName, totalBill;
+    MyTextView_Roboto_Regular subTotal, deliveryChargeAmount, payment, customerRemarks, riderName,
+            timeStamp, trackOrderTxt;
     FloatingActionButton acceptOrd;
     ImageView riderIcon;
     Double deliveryCharge, totalAmount;

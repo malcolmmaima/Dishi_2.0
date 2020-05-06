@@ -764,7 +764,8 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        MyTextView_Roboto_Regular profileName, userUpdate, likesTotal, commentsTotal;
+        MyTextView_Roboto_Regular userUpdate, likesTotal, commentsTotal;
+        MyTextView_Roboto_Medium profileName;
         MyTextView_Roboto_Light timePosted;
         TextView statusOptions;
         ImageView profilePic, imageShare, likePost, comments, sharePost;

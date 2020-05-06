@@ -49,10 +49,11 @@
                 android:hint="Search"
                  />
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"
+                android:textSize="15sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Enter rider's phone number including country code e.g. +254700000000"/>
@@ -70,12 +71,11 @@
                 android:layout_gravity="center"
                 android:visibility="invisible"/>
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:id="@+id/empty_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nothing found"
-                android:fontFamily="sans-serif"
                 android:textSize="30sp"
                 android:layout_marginTop="20dp"
                 android:layout_gravity="center"

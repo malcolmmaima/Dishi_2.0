@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
@@ -235,7 +236,7 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView customerName;
+        MyTextView_Roboto_Medium customerName;
         ImageView profilePic;
         LinearLayout cardView;
         AppCompatButton followUnfollow;

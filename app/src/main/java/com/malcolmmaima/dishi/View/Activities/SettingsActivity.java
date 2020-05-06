@@ -24,6 +24,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
@@ -35,7 +37,8 @@ public class SettingsActivity extends AppCompatActivity {
     String myPhone;
     private DatabaseReference myRef;
     private String TAG;
-    AppCompatTextView userName, phoneNumber;
+    MyTextView_Roboto_Medium userName;
+    MyTextView_Roboto_Regular phoneNumber;
     CircleImageView profilePic;
     CardView personalDetails;
     RelativeLayout accountSettings, notificationSettings, help, about;

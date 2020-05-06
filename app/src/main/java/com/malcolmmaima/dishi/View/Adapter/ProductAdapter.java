@@ -34,6 +34,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -558,7 +560,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView foodPrice, foodDescription, foodName, restaurantName,distanceAway, productOptions;
+        MyTextView_Roboto_Medium foodName, foodPrice;
+        MyTextView_Roboto_Regular foodDescription, restaurantName, distanceAway;
+        TextView  productOptions;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;

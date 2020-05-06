@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.PersonalDetails;
@@ -252,7 +253,8 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView orderQty, customerName,distanceAway;
+        MyTextView_Roboto_Medium customerName;
+        TextView orderQty,distanceAway;
         ImageView profilePic;
         CardView cardView;
 

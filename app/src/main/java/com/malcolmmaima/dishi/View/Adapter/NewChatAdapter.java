@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.Chat;
@@ -164,7 +165,7 @@ public class NewChatAdapter extends RecyclerView.Adapter<NewChatAdapter.MyHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder{
-        TextView customerName;
+        MyTextView_Roboto_Medium customerName;
         ImageView profilePic;
         CardView cardView;
 

@@ -20,12 +20,11 @@
             android:clipChildren="false"
             android:orientation="vertical" >
 
-            <TextView
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
                 android:id="@+id/empty_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 Following"
-                android:fontFamily="sans-serif"
                 android:textSize="20sp"
                 android:layout_marginTop="20dp"
                 android:gravity="center"

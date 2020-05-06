@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Interface.OnRiderSelected;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -44,7 +45,7 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
     ProgressBar progressBar;
     EditText searchPhone;
     RecyclerView recyclerview;
-    TextView emptyTag;
+    MyTextView_Roboto_Medium emptyTag;
     String myPhone;
     FirebaseUser user;
     ChildEventListener riderAddedListener;

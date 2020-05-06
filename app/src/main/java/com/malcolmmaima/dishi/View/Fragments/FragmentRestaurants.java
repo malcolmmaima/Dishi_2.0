@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
@@ -47,7 +48,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     RecyclerView recyclerview;
     String myPhone;
     LiveLocationModel liveLocationModel;
-    TextView emptyTag, distanceShow;
+    MyTextView_Roboto_Regular emptyTag, distanceShow;
     DatabaseReference dbRef, menusRef, myLocationRef;
     ValueEventListener locationListener;
     FirebaseDatabase db;
