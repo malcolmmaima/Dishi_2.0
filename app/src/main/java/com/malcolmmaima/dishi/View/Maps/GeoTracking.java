@@ -39,8 +39,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.ReceiptModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.R;
 
@@ -51,6 +53,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback {
 
+    String TAG = "GeoTrackingActivity";
     private GoogleMap mMap;
     FloatingActionButton callNduthi, confirmOrd;
     double myLat, myLong;
@@ -59,6 +62,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     Circle myArea;
     Double distance;
     int zoomLevel;
+    String paymentMethod, address, orderID, initiatedTime;
     Double restaurantLat, restaurantLong;
     VerticalSeekBar zoomMap;
     DatabaseReference myRef, myOrders, myOrdersHistory, customerOrderItems,customerOrderRef, riderLocationRef, deliveryLocationRef, restaurantLocationRef, customerLocationRef;
@@ -70,6 +74,8 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        final String[] tempRiderPhoneHolder = new String[1];
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -154,72 +160,133 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(final View v) {
                 if(accType.equals("1")){
-                    final AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
-                            .setMessage("Order Delivered?")
-                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                            .setCancelable(false)
-                            //set three option buttons
-                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
 
-                                                try {
-                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                    prod.setKey(items.getKey());
+                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                            address = dataSnapshot.child("address").getValue(String.class);
+                            initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+                            orderID = dataSnapshot.child("orderID").getValue(String.class);
 
-                                                    /**
-                                                     * Move order items to history node
-                                                     */
-                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
+                            String message = "Order has been delivered?";
+                            if(address.equals("pick")){
+                                message = "Have you picked your order?";
+                            } else {
+                                message = "Order has been delivered?";
+                            }
+                            final AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
+                                    .setMessage(message)
+                                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                    .setCancelable(false)
+                                    //set three option buttons
+                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
+                                            ReceiptModel receipt = new ReceiptModel();
+                                            String nodeKey = receiptsRef.push().getKey();
+                                            GetCurrentDate currentDate = new GetCurrentDate();
+                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for (DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                        //prod.setKey(items.getKey());
 
-                                                                    myOrders.child(restaurantPhone).removeValue();
-                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                            ("my_ride_requests/"+riderPhone+"/"+restaurantPhone+"/"+myPhone);
-
-                                                                    rider.removeValue();
-
-                                                                }
-                                                            });
+                                                        if(prod.getConfirmed() == true){
+                                                            receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
                                                         }
-                                                    });
+                                                    }
+                                                }
 
-                                                } catch (Exception e) {
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                                 }
-                                            }
-                                        }
+                                            });
 
+                                            receipt.setDeliveredOn(currentDate.getDate());
+                                            receipt.setInitiatedOn(initiatedTime);
+                                            receipt.setOrderID(orderID);
+                                            receipt.setPaymentMethod(paymentMethod);
+                                            receipt.setRestaurant(restaurantPhone);
+                                            receipt.setSeen(false);
+
+                                            receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
+                                                                try {
+                                                                    //We need to capture the rider phone before the node is removed. this will allow us to
+                                                                    //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
+                                                                    //which would mean in turn we are unable to update the rider status
+                                                                    tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                                } catch (Exception e){}
+                                                                try {
+                                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                                    prod.setKey(items.getKey());
+
+                                                                    /**
+                                                                     * Move order items to history node
+                                                                     */
+                                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
+
+                                                                                    myOrders.child(restaurantPhone).removeValue();
+                                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                            ("my_ride_requests/"+riderPhone+"/"+restaurantPhone+"/"+myPhone);
+
+                                                                                    rider.removeValue();
+
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                } catch (Exception e){
+
+                                                                }
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+                                                }
+                                            });
+
+                                        }
+                                    })//setPositiveButton
+
+                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
                                         }
-                                    });
+                                    })
 
-                                }
-                            })//setPositiveButton
+                                    .create();
+                            finish.show();
+                        }
 
-                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            })
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            .create();
-                    finish.show();
+                        }
+                    });
                 }
 
                 if(accType.equals("2")){

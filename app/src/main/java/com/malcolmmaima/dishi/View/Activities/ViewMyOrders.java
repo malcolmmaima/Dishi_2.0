@@ -606,6 +606,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                     receipt.setOrderID(orderID);
                                     receipt.setPaymentMethod(paymentMethod);
                                     receipt.setRestaurant(phone);
+                                    receipt.setSeen(false);
 
                                     receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
