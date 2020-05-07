@@ -138,16 +138,20 @@ public class SettingsActivity extends AppCompatActivity {
             notificationSettings.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                    snackbar.show();
+                    Intent slideactivity = new Intent(SettingsActivity.this, NotificationSettings.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
                 }
             });
 
             help.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                    snackbar.show();
+                    Intent slideactivity = new Intent(SettingsActivity.this, HelpActivity.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
                 }
             });
 

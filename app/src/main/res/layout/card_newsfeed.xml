@@ -72,6 +72,7 @@
             android:text="loading..."
             android:textSize="15sp"
             android:id="@+id/postedTo"
+            android:visibility="visible"
             android:layout_below="@id/profileName"
             android:layout_toRightOf="@id/postedToPic"/>
 
@@ -80,14 +81,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <ImageButton
-                android:visibility="gone"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:scaleType="centerCrop"
-                android:background="@drawable/ic_access_time_black_48dp"
-                android:layout_marginRight="3dp"/>
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
                 android:layout_gravity="start"
@@ -128,6 +121,7 @@
             android:text="loading..."
             android:id="@+id/userUpdate"
             android:visibility="visible"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="25dp"
             android:layout_toRightOf="@id/postedTo"
@@ -139,7 +133,7 @@
             android:layout_width="match_parent"
             android:layout_height="240dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
             android:layout_below="@id/userUpdate"
             android:layout_toRightOf="@id/profilePic"
