@@ -155,4 +155,20 @@
         operations and create a fun environment for interested customers. Using users geolocation,
         dishi makes sure your experience is tailored based on your interests and your location.
         We are constantly improving the service as we add more features and look forward to your feedback and concerns.</string>
+    <string name="title_activity_privacy_security">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

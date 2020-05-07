@@ -6,7 +6,7 @@
     android:id="@+id/card_view"
     android:clickable="true"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:elevation="8dp"
     card_view:cardCornerRadius="5dp"

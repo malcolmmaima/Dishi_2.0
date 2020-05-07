@@ -3,6 +3,7 @@ package com.malcolmmaima.dishi.View.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -24,7 +25,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class AccountSettings extends AppCompatActivity {
 
-    RelativeLayout deliveryCharge;
+    CardView cardDeliveryChrg, cardPrivacy, deleteAccount;
     DatabaseReference myRef;
     String myPhone, accountType;
     FirebaseAuth mAuth;
@@ -39,7 +40,11 @@ public class AccountSettings extends AppCompatActivity {
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
-            deliveryCharge = findViewById(R.id.deliveryCharge);
+            cardDeliveryChrg = findViewById(R.id.card_delivery);
+            cardDeliveryChrg.setVisibility(View.GONE);
+
+            cardPrivacy = findViewById(R.id.card_privacy);
+            deleteAccount = findViewById(R.id.card_delete_acc);
 
             Toolbar topToolBar = findViewById(R.id.toolbar);
             setSupportActionBar(topToolBar);
@@ -73,11 +78,11 @@ public class AccountSettings extends AppCompatActivity {
                         accountType = dataSnapshot.getValue(String.class);
 
                         if (!accountType.equals("2")){
-                            deliveryCharge.setVisibility(View.GONE);
+                            cardDeliveryChrg.setVisibility(View.GONE);
                         }
 
                         else {
-                            deliveryCharge.setVisibility(View.VISIBLE);
+                            cardDeliveryChrg.setVisibility(View.VISIBLE);
                         }
 
                     } catch (Exception e){
@@ -91,7 +96,26 @@ public class AccountSettings extends AppCompatActivity {
                 }
             });
 
-            deliveryCharge.setOnClickListener(new View.OnClickListener() {
+            deleteAccount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent slideactivity = new Intent(AccountSettings.this, DeleteAccount.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
+                }
+            });
+            cardPrivacy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent slideactivity = new Intent(AccountSettings.this, PrivacySecurity.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
+                }
+            });
+
+            cardDeliveryChrg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent slideactivity = new Intent(AccountSettings.this, DeliverCharges.class);

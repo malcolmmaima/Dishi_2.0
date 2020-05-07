@@ -9,7 +9,9 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.AboutActivity"></activity>
+        <activity android:name=".View.Activities.PrivacySecurity"></activity>
+        <activity android:name=".View.Activities.DeleteAccount" />
+        <activity android:name=".View.Activities.AboutActivity" />
         <activity
             android:name=".View.Activities.ReceiptActivity"
             android:launchMode="singleTask" />

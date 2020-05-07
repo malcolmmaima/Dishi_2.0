@@ -27,8 +27,9 @@
         android:layout_height="match_parent"
         android:layout_width="fill_parent">
 
+
         <LinearLayout
-            android:id="@+id/Customer"
+            android:id="@+id/settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -36,7 +37,61 @@
             android:orientation="vertical" >
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/card_view"
+                android:id="@+id/card_privacy"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff"
+                android:focusable="true">
+
+                <RelativeLayout
+                    android:id="@+id/PrivacySettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="20dp"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="40dp"
+                        app:tint="@color/colorPrimary"
+                        android:src="@drawable/deliver_nduthi_48dp"
+                        />
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:text="Privacy and Security"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginEnd="10dp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginTop="20dp"
+                        android:tint="@color/grey"
+                        android:src="@drawable/ic_chevron_right_black_48dp"
+                        />
+                </RelativeLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_delivery"
                 android:clickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,6 +127,60 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:text="Delivery Charges"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginEnd="10dp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginTop="20dp"
+                        android:tint="@color/grey"
+                        android:src="@drawable/ic_chevron_right_black_48dp"
+                        />
+                </RelativeLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_delete_acc"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff"
+                android:focusable="true">
+
+                <RelativeLayout
+                    android:id="@+id/deleteAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="20dp"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="40dp"
+                        app:tint="@color/colorPrimary"
+                        android:src="@drawable/deliver_nduthi_48dp"
+                        />
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:text="Delete My Account"
                         android:layout_marginStart="60dp"
                         android:layout_marginEnd="10dp" />
 
