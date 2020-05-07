@@ -9,8 +9,10 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.ReceiptActivity"
-            android:launchMode="singleTask"></activity>
+        <activity android:name=".View.Activities.AboutActivity"></activity>
+        <activity
+            android:name=".View.Activities.ReceiptActivity"
+            android:launchMode="singleTask" />
         <activity android:name=".View.Activities.ReviewsActivity" />
         <activity
             android:name=".View.Activities.SearchActivity"

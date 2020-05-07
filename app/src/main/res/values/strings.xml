@@ -149,4 +149,10 @@
     <string name="title_activity_search">SearchActivity</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+    <string name="appdescription">Dishi Food is your one stop food app for all things food related.
+        A realtime food ordering / social application dishi helps big and small vendors alike
+        ease their food delivery operations. This is a free service and only seeks to aid vendor
+        operations and create a fun environment for interested customers. Using users geolocation,
+        dishi makes sure your experience is tailored based on your interests and your location.
+        We are constantly improving the service as we add more features and look forward to your feedback and concerns.</string>
 </resources>

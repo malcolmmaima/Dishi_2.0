@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackroundWhite"
+    tools:context=".View.Activities.AboutActivity"
+    android:id="@+id/parentlayout">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:maxHeight="@dimen/actionBarSize"
+        android:background="@color/pureWhite"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/actionBarSize"
+        android:elevation="5dp"
+        app:view_shadowDx="10dp"
+        app:view_shadowDy="0dp"
+        app:view_borderWidth="2dp"
+        app:view_borderColor="@color/colorPrimaryDark">
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_below="@id/toolbar"
+        android:layout_height="fill_parent"
+        android:layout_width="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/activity_main"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            tools:context=".View.Activities.AddMenu">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lin"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:padding="10dp">
+
+                <com.alexzh.circleimageview.CircleImageView
+                    android:id="@+id/dishiLogo"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:ems="1"
+                    android:src="@drawable/logo"
+                    app:view_borderColor="#cccccc"
+                    app:view_borderWidth="2dp"
+                    app:view_shadowDx="1dp"
+                    android:background="@color/colorBackroundWhite"
+                    app:view_shadowDy="1dp"
+                    android:scaleType="fitXY"
+                    app:view_shadowRadius="1dp" />
+
+            </LinearLayout>
+
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                android:id="@+id/subTotal"
+                android:layout_below="@id/lin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="Subtotal: 0"
+                android:layout_marginRight="20dp"
+                android:textSize="20sp"
+                android:visibility="gone"
+                android:layout_alignParentRight="true" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_view"
+                android:clickable="true"
+                android:layout_below="@id/subTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginBottom="20dp"
+                card_view:cardCornerRadius="5dp"
+                android:focusableInTouchMode="false"
+                card_view:view_shadowDx="2dp"
+                card_view:view_shadowDy="0dp"
+                android:elevation="8dp"
+                card_view:view_borderWidth="2dp"
+                card_view:view_borderColor="#ffffff" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="20dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="20dp"
+                    >
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:id="@+id/appTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_centerHorizontal="true"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Dishi Food"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold"
+                        />
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/appdescription"
+                        android:textSize="15sp"
+                        android:id="@+id/appDescription"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/appTitle"
+                        android:textColor="@color/colorPrimaryDark"/>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/version"
+        android:text="Version 1.0.0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginBottom="20dp"/>
+
+</RelativeLayout>
