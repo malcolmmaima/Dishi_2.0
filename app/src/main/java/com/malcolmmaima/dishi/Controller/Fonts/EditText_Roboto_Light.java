@@ -5,7 +5,7 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-public class EditText_Roboto_Light extends EditText {
+public class EditText_Roboto_Light extends androidx.appcompat.widget.AppCompatEditText {
 
     public EditText_Roboto_Light(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
