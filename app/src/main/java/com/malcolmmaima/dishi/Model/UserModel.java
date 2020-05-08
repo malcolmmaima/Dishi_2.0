@@ -14,6 +14,8 @@ public class UserModel {
     Boolean chatNotification;
     Boolean orderNotification;
     Boolean socialNotification;
+    Boolean shareOrders;
+    Boolean syncContacts;
     String locationType;
     String profilePic;
     String signupDate;
@@ -177,5 +179,21 @@ public class UserModel {
 
     public void setSocialNotification(Boolean socialNotification) {
         this.socialNotification = socialNotification;
+    }
+
+    public Boolean getShareOrders() {
+        return shareOrders;
+    }
+
+    public void setShareOrders(Boolean shareOrders) {
+        this.shareOrders = shareOrders;
+    }
+
+    public Boolean getSyncContacts() {
+        return syncContacts;
+    }
+
+    public void setSyncContacts(Boolean syncContacts) {
+        this.syncContacts = syncContacts;
     }
 }

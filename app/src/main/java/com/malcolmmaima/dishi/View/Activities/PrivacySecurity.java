@@ -1,26 +1,36 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 
 public class PrivacySecurity extends AppCompatActivity {
 
+    String TAG = "PrivacySecurity";
     String myPhone;
     DatabaseReference myRef;
     Switch shareOrders, syncContacts;
@@ -62,6 +72,24 @@ public class PrivacySecurity extends AppCompatActivity {
             }
         });
 
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    UserModel myUserDetails = dataSnapshot.getValue(UserModel.class);
+                    shareOrders.setChecked(myUserDetails.getShareOrders());
+                    syncContacts.setChecked(myUserDetails.getSyncContacts());
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //switches
         shareOrders.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
@@ -69,11 +97,41 @@ public class PrivacySecurity extends AppCompatActivity {
                 // true if the switch is in the On position
 
                 if(isChecked == true && buttonView.isPressed()){
-                    Toast.makeText(PrivacySecurity.this, "Share orders ON", Toast.LENGTH_SHORT).show();
+                    myRef.child("shareOrders").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            shareOrders.setChecked(false);
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    });
                 }
 
-                else {
-                    Toast.makeText(PrivacySecurity.this, "Share orders OFF", Toast.LENGTH_SHORT).show();
+                else if(isChecked == false && buttonView.isPressed()){
+                    myRef.child("shareOrders").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            shareOrders.setChecked(true);
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    });
                 }
 
             }
@@ -85,13 +143,42 @@ public class PrivacySecurity extends AppCompatActivity {
                 // true if the switch is in the On position
 
                 if(isChecked == true && buttonView.isPressed()){
-                    Toast.makeText(PrivacySecurity.this, "Sync contacts ON", Toast.LENGTH_SHORT).show();
+                    myRef.child("syncContacts").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            syncContacts.setChecked(false);
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    });
                 }
 
-                else {
-                    Toast.makeText(PrivacySecurity.this, "Sync contacts OFF", Toast.LENGTH_SHORT).show();
+                else if(isChecked == false && buttonView.isPressed()){
+                    myRef.child("syncContacts").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            syncContacts.setChecked(false);
+                            Snackbar snackbar = Snackbar
+                                    .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                            snackbar.show();
+                        }
+                    });
                 }
-
             }
         });
 

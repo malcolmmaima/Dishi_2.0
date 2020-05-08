@@ -118,7 +118,7 @@ public class NotificationSettings extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            socialSwitch.setChecked(false);
+                            socialSwitch.setChecked(true);
                             Snackbar snackbar = Snackbar
                                     .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
                             snackbar.show();
@@ -164,7 +164,7 @@ public class NotificationSettings extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            orderSwitch.setChecked(false);
+                            orderSwitch.setChecked(true);
                             Snackbar snackbar = Snackbar
                                     .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
                             snackbar.show();
@@ -210,7 +210,7 @@ public class NotificationSettings extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            chatSwitch.setChecked(false);
+                            chatSwitch.setChecked(true);
                             Snackbar snackbar = Snackbar
                                     .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
                             snackbar.show();
