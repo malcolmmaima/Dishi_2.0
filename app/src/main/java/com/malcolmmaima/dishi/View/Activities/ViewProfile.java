@@ -24,10 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,6 +88,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     MyTextView_Roboto_Light profileBio;
     MyTextView_Roboto_Regular following, followers;
     LinearLayout followingLayout, followersLayout;
+    RelativeLayout statusActions;
+    FrameLayout frame;
     ImageButton emoji;
     EmojiconEditText myStatusUpdate;
     View rootView;
@@ -203,6 +207,10 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         emoji.setVisibility(View.GONE);
         viewRestaurant = findViewById(R.id.viewRestaurant);
         viewRestaurant.setVisibility(View.GONE);
+        frame = findViewById(R.id.frame);
+        frame.setVisibility(View.GONE);
+        statusActions = findViewById(R.id.statusActions);
+        statusActions.setVisibility(View.GONE);
 
         followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,19 +245,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
 
-        /**
-         * Showing Swipe Refresh animation on activity create
-         * As animation won't start on onCreate, post runnable is used
-         */
-        mSwipeRefreshLayout.post(new Runnable() {
-
-            @Override
-            public void run() {
-
-                mSwipeRefreshLayout.setRefreshing(true);
-                fetchPosts();
-            }
-        });
 
 
         profileRef = FirebaseDatabase.getInstance().getReference("users/"+phone);
@@ -493,6 +488,21 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         };
         profileRef.addValueEventListener(myListener);
 
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used. also placed after above listener which gets user details
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                profileCheck();
+            }
+        });
+
         myStatusUpdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -610,6 +620,58 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 } catch (Exception e){}
             }
         });
+    }
+
+    private void profileCheck() {
+        try {
+            profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    myUserDetails = dataSnapshot.getValue(UserModel.class);
+
+                    //hide profile posts
+                    if (myUserDetails.getAccountPrivacy().equals("private")) {
+
+                        //now check to see if i'm following this user
+                        profileFollowers.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    statusActions.setVisibility(View.VISIBLE);
+                                    frame.setVisibility(View.VISIBLE);
+                                    fetchPosts();
+                                } else {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    recyclerview.setVisibility(View.GONE);
+                                    icon.setVisibility(View.VISIBLE);
+                                    icon.setImageResource(R.drawable.ic_locked);
+                                    emptyTag.setVisibility(View.VISIBLE);
+                                    statusActions.setVisibility(View.GONE);
+                                    frame.setVisibility(View.GONE);
+                                    emptyTag.setText("PRIVATE");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+
+                    if (myUserDetails.getAccountPrivacy().equals("public")) {
+                        fetchPosts();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } catch (Exception e){
+            Log.e(TAG, "run: ", e);
+        }
     }
 
     @Override
@@ -918,6 +980,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
     @Override
     public void onRefresh() {
-        fetchPosts();
+        profileCheck();
     }
 }
