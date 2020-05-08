@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -39,10 +40,12 @@ public class PrivacySecurity extends AppCompatActivity {
     ValueEventListener myRefListener;
     Switch shareOrders, syncContacts;
     RelativeLayout setViewPhone, blockedAccounts, myLocationSettings, accountPrivacy, accountPin, loginActivity;
-    MyTextView_Roboto_Regular phoneVisibilityTxt;
-    View setViewPhoneBorder;
+    LinearLayout shareOrdersOption;
+    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt;
+    View setViewPhoneBorder, shareOrdersOptionBorder;
     int chckdItem = 0;
-    AlertDialog alert;
+    int chckItem2 = 0;
+    AlertDialog alertPhone, alertPrivacy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +76,16 @@ public class PrivacySecurity extends AppCompatActivity {
         accountPrivacy = findViewById(R.id.accountPrivacy);
         accountPin = findViewById(R.id.accountPin);
         loginActivity = findViewById(R.id.loginActivity);
+        accountPrivacyTxt = findViewById(R.id.accountPrivacyTxt);
         phoneVisibilityTxt = findViewById(R.id.phoneVisibilityTxt);
         setViewPhoneBorder = findViewById(R.id.setViewPhoneBorder);
         setViewPhoneBorder.setVisibility(View.GONE);
+
+        shareOrdersOptionBorder = findViewById(R.id.shareOrdersOptionBorder);
+        shareOrdersOptionBorder.setVisibility(View.GONE);
+
+        shareOrdersOption = findViewById(R.id.shareOrdersOption);
+        shareOrdersOption.setVerticalGravity(View.GONE);
 
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -88,40 +98,69 @@ public class PrivacySecurity extends AppCompatActivity {
         myRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                UserModel myUserDetails = dataSnapshot.getValue(UserModel.class);
                 try {
-                    UserModel myUserDetails = dataSnapshot.getValue(UserModel.class);
                     shareOrders.setChecked(myUserDetails.getShareOrders());
                     syncContacts.setChecked(myUserDetails.getSyncContacts());
+                } catch (Exception er){
+                    Log.e(TAG, "onDataChange: ", er);
+                }
 
-                    if(myUserDetails.getPhoneVisibility().equals("everyone")){
+                try {
+                    if (myUserDetails.getPhoneVisibility().equals("everyone")) {
                         chckdItem = 0;
                         phoneVisibilityTxt.setText("Everyone");
                     }
 
-                    if(myUserDetails.getPhoneVisibility().equals("mutual")){
+                    if (myUserDetails.getPhoneVisibility().equals("mutual")) {
                         chckdItem = 1;
                         phoneVisibilityTxt.setText("Mutual");
                     }
 
-                    if(myUserDetails.getPhoneVisibility().equals("none")){
+                    if (myUserDetails.getPhoneVisibility().equals("none")) {
                         chckdItem = 2;
                         phoneVisibilityTxt.setText("None");
                     }
 
-                    if(myUserDetails.getPhoneVisibility() == null || myUserDetails.getPhoneVisibility().isEmpty()){
+                    if (myUserDetails.getPhoneVisibility() == null || myUserDetails.getPhoneVisibility().isEmpty()) {
                         chckdItem = 2;
                         phoneVisibilityTxt.setText("None");
-                    }
-
-                    if(!myUserDetails.getAccount_type().equals("1")){
-                        setViewPhone.setVisibility(View.GONE); //Only show this settings option to customer accounts
-                        setViewPhoneBorder.setVisibility(View.GONE);
-                    } else {
-                        setViewPhone.setVisibility(View.VISIBLE);
-                        setViewPhoneBorder.setVisibility(View.VISIBLE);
                     }
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
+                }
+
+                try {
+                    if(!myUserDetails.getAccount_type().equals("1")){
+                        setViewPhone.setVisibility(View.GONE); //Only show this settings option to customer accounts
+                        setViewPhoneBorder.setVisibility(View.GONE);
+
+                        shareOrdersOptionBorder.setVisibility(View.GONE);
+                        shareOrdersOption.setVisibility(View.GONE);
+                    } else {
+                        setViewPhone.setVisibility(View.VISIBLE);
+                        setViewPhoneBorder.setVisibility(View.VISIBLE);
+
+                        shareOrdersOptionBorder.setVisibility(View.VISIBLE);
+                        shareOrdersOption.setVisibility(View.VISIBLE);
+                    }
+                } catch (Exception err){
+                    Log.e(TAG, "onDataChange: ", err);
+                }
+
+                try {
+                    if(myUserDetails.getAccountPrivacy().equals("public")){
+                        chckItem2 = 0;
+                        accountPrivacyTxt.setText("Public");
+                    }
+
+                    if(myUserDetails.getAccountPrivacy().equals("private")){
+                        chckItem2 = 1;
+                        accountPrivacyTxt.setText("Private");
+                    }
+                } catch (Exception errr){
+                    Log.e(TAG, "onDataChange: ", errr);
                 }
             }
 
@@ -301,19 +340,21 @@ public class PrivacySecurity extends AppCompatActivity {
                                 alertUser.show();
                                 break;
                         }
-                        alert.dismiss();
+                        alertPhone.dismiss();
                     }
                 });
-                alert = alertDialog.create();
-                alert.setCancelable(true);
-                alert.show();
+                alertPhone = alertDialog.create();
+                alertPhone.setCancelable(true);
+                alertPhone.show();
             }
         });
 
         blockedAccounts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
+                Intent blockedActivity = new Intent(PrivacySecurity.this, MyBlockedAccounts.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(blockedActivity);
             }
         });
 
@@ -327,7 +368,56 @@ public class PrivacySecurity extends AppCompatActivity {
         accountPrivacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(PrivacySecurity.this);
+                String[] items = {"Public","Private"};
+
+                int checkedItem = chckItem2; //set to value from db
+                alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                myRef.child("accountPrivacy").setValue("public").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                });
+                                break;
+                            case 1:
+                                myRef.child("accountPrivacy").setValue("private").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                });
+                                break;
+
+                        }
+                        alertPrivacy.dismiss();
+                    }
+                });
+                alertPrivacy = alertDialog.create();
+                alertPrivacy.setCancelable(true);
+                alertPrivacy.show();
             }
         });
 

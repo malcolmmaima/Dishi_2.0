@@ -17,6 +17,7 @@ public class UserModel {
     Boolean shareOrders;
     Boolean syncContacts;
     String phoneVisibility;
+    String accountPrivacy;
     String locationType;
     String profilePic;
     String signupDate;
@@ -204,5 +205,13 @@ public class UserModel {
 
     public void setPhoneVisibility(String phoneVisibility) {
         this.phoneVisibility = phoneVisibility;
+    }
+
+    public String getAccountPrivacy() {
+        return accountPrivacy;
+    }
+
+    public void setAccountPrivacy(String accountPrivacy) {
+        this.accountPrivacy = accountPrivacy;
     }
 }

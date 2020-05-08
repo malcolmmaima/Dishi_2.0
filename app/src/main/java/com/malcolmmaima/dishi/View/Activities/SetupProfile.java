@@ -167,6 +167,7 @@ public class SetupProfile extends AppCompatActivity {
                     userModel.setShareOrders(true);
                     userModel.setSyncContacts(false);
                     userModel.setPhoneVisibility("none");
+                    userModel.setAccountPrivacy("public");
 
                     /**
                      * Check if user is logged in then fetch phone number
