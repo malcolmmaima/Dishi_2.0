@@ -161,6 +161,9 @@ public class SetupProfile extends AppCompatActivity {
                     userModel.setFollowers(0);
                     userModel.setFollowing(0);
                     userModel.setLocationType("default");
+                    userModel.setSocialNotification(true);
+                    userModel.setOrderNotification(true);
+                    userModel.setChatNotification(true);
 
                     /**
                      * Check if user is logged in then fetch phone number

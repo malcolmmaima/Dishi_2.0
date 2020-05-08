@@ -11,12 +11,16 @@ public class UserModel {
     String gender;
     String lastname;
     Boolean liveStatus;
+    Boolean chatNotification;
+    Boolean orderNotification;
+    Boolean socialNotification;
     String locationType;
     String profilePic;
     String signupDate;
     String verified;
     Integer followers;
     Integer following;
+
     public long itemCount; //Not part of our user model, just a temporary data holder to be passed from OrdersFragment to orders adapter
     public String restaurantPhone; //Not part of our user model, just a temporary data holder to be passed
     public String riderPhone; //temp data holder for use in RiderFragment. will be passed to adapter
@@ -151,5 +155,27 @@ public class UserModel {
         this.verified = verified;
     }
 
+    public Boolean getChatNotification() {
+        return chatNotification;
+    }
 
+    public void setChatNotification(Boolean chatNotification) {
+        this.chatNotification = chatNotification;
+    }
+
+    public Boolean getOrderNotification() {
+        return orderNotification;
+    }
+
+    public void setOrderNotification(Boolean orderNotification) {
+        this.orderNotification = orderNotification;
+    }
+
+    public Boolean getSocialNotification() {
+        return socialNotification;
+    }
+
+    public void setSocialNotification(Boolean socialNotification) {
+        this.socialNotification = socialNotification;
+    }
 }
