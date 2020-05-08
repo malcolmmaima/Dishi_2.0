@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
@@ -147,7 +148,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
              */
 
             //post timeStamp
-            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+            if(!timeS[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
                 timeS[4] = "GMT+03:00";
 
                 //2020-04-27:20:37:32:GMT+03:00
@@ -158,7 +159,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             }
 
             //my device current date
-            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+            if(!timeT[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
                 timeT[4] = "GMT+03:00";
 
                 //2020-04-27:20:37:32:GMT+03:00
@@ -199,6 +200,54 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     else {
                         holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
                         holder.followUnfollow.setText("UNFOLLOW");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        //Show accept button if type of notification is 'followrequest'
+        if(my_notification.getType().equals("followrequest")){
+            holder.liked.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
+            holder.reviewIcon.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
+
+            holder.followUnfollow.setVisibility(View.VISIBLE);
+            holder.notificationMessage.setText(my_notification.getMessage());
+            DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone+"/"+my_notification.getFrom());
+            followersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                        holder.followUnfollow.setText("ACCEPT");
+                    }
+                    else {
+                        //check to see if i follow this new request
+                        followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(!dataSnapshot.exists()){
+                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                    holder.followUnfollow.setText("FOLLOW");
+                                }
+                                else {
+                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                    holder.followUnfollow.setText("UNFOLLOW");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 }
 
@@ -456,6 +505,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     context.startActivity(slideactivity, bndlanimation);
                 }
 
+                if(my_notification.getType().equals("followrequest") && !myPhone.equals(my_notification.getFrom())){
+                    Intent slideactivity = new Intent(context, ViewProfile.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("phone", my_notification.getFrom());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                }
+
                 if(my_notification.getType().equals("postedwall")){
                     Intent slideactivity = new Intent(context, ViewStatus.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -523,59 +582,112 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.followUnfollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference followerRef = FirebaseDatabase.getInstance().getReference("followers/"+my_notification.getFrom()+"/"+myPhone);
-                followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
-                            followingRef.setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    followerRef.setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                                            holder.followUnfollow.setText("UNFOLLOW");
-                                        }
-                                    });
 
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
+                if(holder.followUnfollow.getText().equals("ACCEPT")){
+                    DatabaseReference myFollowersRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone);
+                    myFollowersRef.child(my_notification.getFrom()).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            DatabaseReference followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+myPhone);
+                            followRequests.child(my_notification.getFrom()).removeValue();
+                            //check to see if i follow this new request
+                            followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                                    holder.followUnfollow.setText("FOLLOW");
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(!dataSnapshot.exists()){
+                                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                        holder.followUnfollow.setText("FOLLOW");
+                                    }
+                                    else {
+                                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                        holder.followUnfollow.setText("UNFOLLOW");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                 }
                             });
+                            Toast.makeText(context, "Accepted", Toast.LENGTH_LONG).show();
+
+                            sendNotification("accepted follow request", "followedwall");
                         }
-                        else {
-                            followingRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    followerRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                                            holder.followUnfollow.setText("FOLLOW");
-                                        }
-                                    });
 
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                                    holder.followUnfollow.setText("UNFOLLOW");
-                                }
-                            });
+                        private void sendNotification(String message, String type) {
+                            DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+my_notification.getFrom());
+
+                            String notifKey = notificationRef.push().getKey();
+                            GetCurrentDate currentDate = new GetCurrentDate();
+
+                            //send notification
+                            NotificationModel followed = new NotificationModel();
+                            followed.setFrom(myPhone);
+                            followed.setType(type);
+                            followed.setImage("");
+                            followed.setSeen(false);
+                            followed.setTimeStamp(currentDate.getDate());
+                            followed.setMessage(message);
+
+                            notificationRef.child(notifKey).setValue(followed); //send to db
                         }
-                    }
+                    });
+                } else {
+                    DatabaseReference followerRef = FirebaseDatabase.getInstance().getReference("followers/"+my_notification.getFrom()+"/"+myPhone);
+                    followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(!dataSnapshot.exists()){
+                                followingRef.setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        followerRef.setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                                holder.followUnfollow.setText("UNFOLLOW");
+                                            }
+                                        });
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                        holder.followUnfollow.setText("FOLLOW");
+                                    }
+                                });
+                            }
+                            else {
+                                followingRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        followerRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                                holder.followUnfollow.setText("FOLLOW");
+                                            }
+                                        });
 
-                    }
-                });
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                        holder.followUnfollow.setText("UNFOLLOW");
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
             }
         });
 
@@ -642,7 +754,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
         ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
         animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
-        animator.setDuration(500);
+        animator.setDuration(200);
         animatorSet.play(animator);
         animator.start();
     }

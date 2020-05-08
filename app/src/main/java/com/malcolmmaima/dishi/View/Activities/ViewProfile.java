@@ -79,7 +79,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     List<StatusUpdateModel> statusUpdates;
     RecyclerView recyclerview;
 
-    DatabaseReference profileRef, myPostUpdates, profileFollowers, followersCounterRef, followingCounterref;
+    DatabaseReference profileRef, myPostUpdates, profileFollowers, followersCounterRef, followingCounterref, followRequests;
     ValueEventListener myListener, profileFollowersListener, followersCounterListener, followingCounterListener;
     FirebaseUser user;
 
@@ -196,6 +196,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         recyclerview = findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
         followBtn = findViewById(R.id.follow);
+        followBtn.setEnabled(false);
         emoji = findViewById(R.id.emoji);
         myStatusUpdate = findViewById(R.id.myStatus);
         imageUpload = findViewById(R.id.camera);
@@ -252,6 +253,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         profileFollowers = FirebaseDatabase.getInstance().getReference("followers/"+phone);
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+phone);
         followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+phone);
+        followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+phone);
 
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
@@ -261,12 +263,44 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         profileFollowersListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                followBtn.setEnabled(true);
                 if(dataSnapshot.exists()){
                     followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
                     followBtn.setText("UNFOLLOW");
                 }  else {
-                    followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                    followBtn.setText("FOLLOW");
+                    //check to see if private
+                    profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            myUserDetails = dataSnapshot.getValue(UserModel.class);
+
+                            if(myUserDetails.getAccountPrivacy().equals("private")){
+
+                                //check to see if i have a pending follow request sent to this profile
+                                followRequests.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.exists()){
+                                            followBtn.setText("REQUESTED");
+                                        } else {
+                                            followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                            followBtn.setText("FOLLOW");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
 
@@ -312,10 +346,54 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             @Override
             public void onClick(View v) {
                 if(followBtn.getText().toString().equals("FOLLOW")){
-                    profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
 
+                    //Check to see if profile is private
+                    profileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            myUserDetails = dataSnapshot.getValue(UserModel.class);
+
+                            if(myUserDetails.getAccountPrivacy().equals("private")){
+                                //send follow request
+
+                                followRequests.child(myPhone).setValue("followrequest").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        try {
+                                            followBtn.setText("REQUESTED");
+                                            Snackbar.make(rootView, "Request sent", Snackbar.LENGTH_LONG).show();
+                                        } catch (Exception er){
+                                            Log.e(TAG, "onFailure: ", er);
+                                        }
+
+                                        sendNotification("wants to follow you", "followrequest");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        try {
+                                            followBtn.setText("REQUESTED");
+                                            Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                        } catch (Exception er){
+                                            Log.e(TAG, "onFailure: ", er);
+                                        }
+                                    }
+                                });
+
+                            }
+
+                            if(myUserDetails.getAccountPrivacy().equals("public")){
+                                //automatically follow
+                                profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        sendNotification("followed you", "followedwall");
+                                    }
+                                });
+                            }
+                        }
+
+                        private void sendNotification(String message, String type) {
                             DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
 
                             String notifKey = notificationRef.push().getKey();
@@ -324,18 +402,18 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                             //send notification
                             NotificationModel followed = new NotificationModel();
                             followed.setFrom(myPhone);
-                            followed.setType("followedwall");
+                            followed.setType(type);
                             followed.setImage("");
                             followed.setSeen(false);
                             followed.setTimeStamp(currentDate.getDate());
-                            followed.setMessage("followed you");
+                            followed.setMessage(message);
 
                             notificationRef.child(notifKey).setValue(followed); //send to db
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
-                            myFollowing.child(phone).setValue("follow");
-                            followBtn.setText("UNFOLLOW");
                         }
                     });
                 } else {
@@ -637,11 +715,17 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if(dataSnapshot.exists()){
+                                    followingLayout.setClickable(true);
+                                    followersLayout.setClickable(true);
+                                    viewRestaurant.setClickable(true);
                                     statusActions.setVisibility(View.VISIBLE);
                                     frame.setVisibility(View.VISIBLE);
                                     fetchPosts();
                                 } else {
                                     mSwipeRefreshLayout.setRefreshing(false);
+                                    followingLayout.setClickable(false);
+                                    followersLayout.setClickable(false);
+                                    viewRestaurant.setClickable(false);
                                     recyclerview.setVisibility(View.GONE);
                                     icon.setVisibility(View.VISIBLE);
                                     icon.setImageResource(R.drawable.ic_locked);
@@ -660,6 +744,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     }
 
                     if (myUserDetails.getAccountPrivacy().equals("public")) {
+                        statusActions.setVisibility(View.VISIBLE);
+                        frame.setVisibility(View.VISIBLE);
                         fetchPosts();
                     }
                 }
