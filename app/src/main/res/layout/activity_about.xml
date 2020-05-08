@@ -115,6 +115,7 @@
                         android:text="@string/appdescription"
                         android:textSize="15sp"
                         android:id="@+id/appDescription"
+                        android:gravity="center"
                         android:layout_marginTop="10dp"
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"

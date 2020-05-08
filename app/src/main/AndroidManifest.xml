@@ -9,7 +9,9 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.MyBlockedAccounts"></activity>
+        <activity android:name=".View.Activities.LoginActivity"></activity>
+        <activity android:name=".View.Activities.MyLocation" />
+        <activity android:name=".View.Activities.MyBlockedAccounts" />
         <activity android:name=".View.Activities.HelpActivity" />
         <activity android:name=".View.Activities.NotificationSettings" />
         <activity android:name=".View.Activities.PrivacySecurity" />

@@ -46,6 +46,7 @@ public class PrivacySecurity extends AppCompatActivity {
     int chckdItem = 0;
     int chckItem2 = 0;
     AlertDialog alertPhone, alertPrivacy;
+    UserModel myUserDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +100,7 @@ public class PrivacySecurity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                UserModel myUserDetails = dataSnapshot.getValue(UserModel.class);
+                myUserDetails = dataSnapshot.getValue(UserModel.class);
                 try {
                     shareOrders.setChecked(myUserDetails.getShareOrders());
                     syncContacts.setChecked(myUserDetails.getSyncContacts());
@@ -361,7 +362,22 @@ public class PrivacySecurity extends AppCompatActivity {
         myLocationSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
+                try {
+                    if (myUserDetails.getAccount_type().equals("2")) {
+                        Intent blockedActivity = new Intent(PrivacySecurity.this, LocationSettings.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(blockedActivity);
+                    } else {
+                        Intent blockedActivity = new Intent(PrivacySecurity.this, MyLocation.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(blockedActivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                    Snackbar snackbar = Snackbar
+                            .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
             }
         });
 
@@ -424,14 +440,18 @@ public class PrivacySecurity extends AppCompatActivity {
         accountPin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar
+                        .make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
+                snackbar.show();
             }
         });
 
         loginActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
+                Intent blockedActivity = new Intent(PrivacySecurity.this, LoginActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(blockedActivity);
             }
         });
     }
