@@ -418,7 +418,11 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
                         }
                     });
-                } else {
+                }
+                else if(followBtn.getText().toString().equals("REQUESTED")){
+                    //Do nothing
+                }
+                else {
                     profileFollowers.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

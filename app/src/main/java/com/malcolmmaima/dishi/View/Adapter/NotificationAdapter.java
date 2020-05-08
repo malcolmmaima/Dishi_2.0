@@ -98,6 +98,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         DatabaseReference followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+my_notification.getFrom());
         DatabaseReference profileFollowers = FirebaseDatabase.getInstance().getReference("followers/"+my_notification.getFrom());
         DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone+"/"+my_notification.getFrom());
+        DatabaseReference followingFromRef = FirebaseDatabase.getInstance().getReference("following/"+my_notification.getFrom()+"/"+myPhone);
         userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -192,38 +193,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.reviewIcon.setVisibility(View.GONE);
             holder.commented.setVisibility(View.GONE);
             holder.postedWall.setVisibility(View.GONE);
-
             holder.followUnfollow.setVisibility(View.VISIBLE);
             holder.notificationMessage.setText(my_notification.getMessage());
-            followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.exists()){
-                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                        holder.followUnfollow.setText("FOLLOW");
-                    }
-                    else {
-                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                        holder.followUnfollow.setText("UNFOLLOW");
-                    }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
-
-        //Show accept button if type of notification is 'followrequest'
-        if(my_notification.getType().equals("followrequest")){
-            holder.liked.setVisibility(View.GONE);
-            holder.statusImage.setVisibility(View.GONE);
-            holder.reviewIcon.setVisibility(View.GONE);
-            holder.commented.setVisibility(View.GONE);
-            holder.postedWall.setVisibility(View.GONE);
-
-            holder.followUnfollow.setVisibility(View.VISIBLE);
+            /**
+             * Below code must always be same as for 'followrequest' below
+             * */
             holder.notificationMessage.setText(my_notification.getMessage());
             DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone+"/"+my_notification.getFrom());
             followersRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -234,17 +209,36 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         holder.followUnfollow.setText("ACCEPT");
                     }
                     else {
-                        //check to see if i follow this new request
-                        followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                        //Check to see if i had earlier sent a follow request
+                        DatabaseReference followRequest = FirebaseDatabase.getInstance().getReference("followRequests/"+my_notification.getFrom()+"/"+myPhone);
+                        followRequest.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(!dataSnapshot.exists()){
+                                //looks like i did
+                                if(dataSnapshot.exists()){
                                     holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                                    holder.followUnfollow.setText("FOLLOW");
-                                }
-                                else {
-                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                                    holder.followUnfollow.setText("UNFOLLOW");
+                                    holder.followUnfollow.setText("REQUESTED");
+                                } else { //I didn't, check follow status
+                                    //check to see if i follow this new request
+                                    followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(!dataSnapshot.exists()){
+                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                                holder.followUnfollow.setText("FOLLOW");
+                                            }
+                                            else {
+                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                                holder.followUnfollow.setText("UNFOLLOW");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
                             }
 
@@ -261,6 +255,84 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
                 }
             });
+
+            /**
+             * Ends here
+             * */
+        }
+
+        //Show accept button if type of notification is 'followrequest'
+        if(my_notification.getType().equals("followrequest")){
+            holder.liked.setVisibility(View.GONE);
+            holder.statusImage.setVisibility(View.GONE);
+            holder.reviewIcon.setVisibility(View.GONE);
+            holder.commented.setVisibility(View.GONE);
+            holder.postedWall.setVisibility(View.GONE);
+            holder.followUnfollow.setVisibility(View.VISIBLE);
+
+            /**
+             * Below code must always be same as for 'followedwall' above
+             * */
+            holder.notificationMessage.setText(my_notification.getMessage());
+            DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone+"/"+my_notification.getFrom());
+            followersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                        holder.followUnfollow.setText("ACCEPT");
+                    }
+                    else {
+
+                        //Check to see if i had earlier sent a follow request
+                        DatabaseReference followRequest = FirebaseDatabase.getInstance().getReference("followRequests/"+my_notification.getFrom()+"/"+myPhone);
+                        followRequest.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                //looks like i did
+                                if(dataSnapshot.exists()){
+                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                    holder.followUnfollow.setText("REQUESTED");
+                                } else { //I didn't, check follow status
+                                    //check to see if i follow this new request
+                                    followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(!dataSnapshot.exists()){
+                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                                holder.followUnfollow.setText("FOLLOW");
+                                            }
+                                            else {
+                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                                holder.followUnfollow.setText("UNFOLLOW");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            /**
+             * Ends here
+             * */
         }
 
         if(my_notification.getType().equals("postedwall")){
@@ -593,6 +665,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     myFollowersRef.child(my_notification.getFrom()).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            followingFromRef.setValue("follow"); //update recipients following node as well since i just accepted their request
                             DatabaseReference followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+myPhone);
                             followRequests.child(my_notification.getFrom()).removeValue();
                             //check to see if i follow this new request
@@ -637,7 +710,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                             notificationRef.child(notifKey).setValue(followed); //send to db
                         }
                     });
-                } else {
+
+                }
+
+                else if(holder.followUnfollow.getText().equals("REQUESTED")){
+                    //Do nothing
+                }
+                else {
 
                     DatabaseReference followerRef = FirebaseDatabase.getInstance().getReference("followers/"+my_notification.getFrom()+"/"+myPhone);
                     followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
