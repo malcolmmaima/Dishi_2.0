@@ -275,25 +275,29 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             myUserDetails = dataSnapshot.getValue(UserModel.class);
 
-                            if(myUserDetails.getAccountPrivacy().equals("private")){
+                            try {
+                                if (myUserDetails.getAccountPrivacy().equals("private")) {
 
-                                //check to see if i have a pending follow request sent to this profile
-                                followRequests.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if(dataSnapshot.exists()){
-                                            followBtn.setText("REQUESTED");
-                                        } else {
-                                            followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                                            followBtn.setText("FOLLOW");
+                                    //check to see if i have a pending follow request sent to this profile
+                                    followRequests.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                followBtn.setText("REQUESTED");
+                                            } else {
+                                                followBtn.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                                                followBtn.setText("FOLLOW");
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                    }
-                                });
+                                        }
+                                    });
+                                }
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
                             }
                         }
 
@@ -354,44 +358,48 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             myUserDetails = dataSnapshot.getValue(UserModel.class);
 
-                            if(myUserDetails.getAccountPrivacy().equals("private")){
-                                //send follow request
+                            try {
+                                if (myUserDetails.getAccountPrivacy().equals("private")) {
+                                    //send follow request
 
-                                followRequests.child(myPhone).setValue("followrequest").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        try {
-                                            followBtn.setText("REQUESTED");
-                                            Snackbar.make(rootView, "Request sent", Snackbar.LENGTH_LONG).show();
-                                        } catch (Exception er){
-                                            Log.e(TAG, "onFailure: ", er);
+                                    followRequests.child(myPhone).setValue("followrequest").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            try {
+                                                followBtn.setText("REQUESTED");
+                                                Snackbar.make(rootView, "Request sent", Snackbar.LENGTH_LONG).show();
+                                            } catch (Exception er) {
+                                                Log.e(TAG, "onFailure: ", er);
+                                            }
+
+                                            sendNotification("wants to follow you", "followrequest");
                                         }
-
-                                        sendNotification("wants to follow you", "followrequest");
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        try {
-                                            followBtn.setText("REQUESTED");
-                                            Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
-                                        } catch (Exception er){
-                                            Log.e(TAG, "onFailure: ", er);
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            try {
+                                                followBtn.setText("REQUESTED");
+                                                Snackbar.make(rootView, "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                            } catch (Exception er) {
+                                                Log.e(TAG, "onFailure: ", er);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                            }
+                                }
 
-                            if(myUserDetails.getAccountPrivacy().equals("public")){
-                                //automatically follow
-                                profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        myFollowing.child(phone).setValue("follow");
-                                        sendNotification("followed you", "followedwall");
-                                    }
-                                });
+                                if (myUserDetails.getAccountPrivacy().equals("public")) {
+                                    //automatically follow
+                                    profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            myFollowing.child(phone).setValue("follow");
+                                            sendNotification("followed you", "followedwall");
+                                        }
+                                    });
+                                }
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
                             }
                         }
 
@@ -713,46 +721,50 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
 
-                    //hide profile posts
-                    if (myUserDetails.getAccountPrivacy().equals("private")) {
+                    try {
+                        //hide profile posts
+                        if (myUserDetails.getAccountPrivacy().equals("private")) {
 
-                        //now check to see if i'm following this user
-                        profileFollowers.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists()){
-                                    followingLayout.setClickable(true);
-                                    followersLayout.setClickable(true);
-                                    viewRestaurant.setClickable(true);
-                                    statusActions.setVisibility(View.VISIBLE);
-                                    frame.setVisibility(View.VISIBLE);
-                                    fetchPosts();
-                                } else {
-                                    mSwipeRefreshLayout.setRefreshing(false);
-                                    followingLayout.setClickable(false);
-                                    followersLayout.setClickable(false);
-                                    viewRestaurant.setClickable(false);
-                                    recyclerview.setVisibility(View.GONE);
-                                    icon.setVisibility(View.VISIBLE);
-                                    icon.setImageResource(R.drawable.ic_locked);
-                                    emptyTag.setVisibility(View.VISIBLE);
-                                    statusActions.setVisibility(View.GONE);
-                                    frame.setVisibility(View.GONE);
-                                    emptyTag.setText("PRIVATE");
+                            //now check to see if i'm following this user
+                            profileFollowers.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(dataSnapshot.exists()){
+                                        followingLayout.setClickable(true);
+                                        followersLayout.setClickable(true);
+                                        viewRestaurant.setClickable(true);
+                                        statusActions.setVisibility(View.VISIBLE);
+                                        frame.setVisibility(View.VISIBLE);
+                                        fetchPosts();
+                                    } else {
+                                        mSwipeRefreshLayout.setRefreshing(false);
+                                        followingLayout.setClickable(false);
+                                        followersLayout.setClickable(false);
+                                        viewRestaurant.setClickable(false);
+                                        recyclerview.setVisibility(View.GONE);
+                                        icon.setVisibility(View.VISIBLE);
+                                        icon.setImageResource(R.drawable.ic_locked);
+                                        emptyTag.setVisibility(View.VISIBLE);
+                                        statusActions.setVisibility(View.GONE);
+                                        frame.setVisibility(View.GONE);
+                                        emptyTag.setText("PRIVATE");
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        });
-                    }
+                                }
+                            });
+                        }
 
-                    if (myUserDetails.getAccountPrivacy().equals("public")) {
-                        statusActions.setVisibility(View.VISIBLE);
-                        frame.setVisibility(View.VISIBLE);
-                        fetchPosts();
+                        if (myUserDetails.getAccountPrivacy().equals("public")) {
+                            statusActions.setVisibility(View.VISIBLE);
+                            frame.setVisibility(View.VISIBLE);
+                            fetchPosts();
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
                     }
                 }
 
