@@ -62,7 +62,7 @@ public class ForegroundService extends Service {
     DatabaseReference myRideOrderRequests, receiptsRef;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     ValueEventListener myRideOrderRequestsListener;
-    ChildEventListener notificationsListener, receiptsListener;
+    ChildEventListener notificationsListener, receiptsListener, myMessagesListener, myRestaurantOrdersListener, myRideRequestsListener;
     String myPhone;
     FirebaseUser user;
     UserModel myUserDetails;
@@ -119,11 +119,6 @@ public class ForegroundService extends Service {
             receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
         } catch(Exception e){}
 
-        //initialize chat notifications listener
-        startChatNotifications();
-
-        //initialize social media notifications
-        startSocialNotifications();
 
         /**
          * Get logged in user details
@@ -134,15 +129,44 @@ public class ForegroundService extends Service {
                 try {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
                     if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")) {
-                        startCustomerNotifications();
+                        //Check notification settings
+                        if(myUserDetails.getOrderNotification() == true){
+                            startCustomerNotifications();
+                        } else {
+                            try {
+                                databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
                     }
+
 
                     if(myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")){
-                        startRestaurantNotifications();
+                        if(myUserDetails.getOrderNotification() == true){
+                            startRestaurantNotifications();
+                        } else {
+                            try {
+                                myOrdersRef.removeEventListener(myRestaurantOrdersListener);
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
                     }
 
+
+
                     if(myUserDetails.getAccount_type().equals("3") && myUserDetails.getVerified().equals("true")){
-                        startRiderNotifications();
+                        if(myUserDetails.getOrderNotification() == true){
+                            startRiderNotifications();
+                        } else {
+                            try {
+                                myRideRequests.removeEventListener(myRideRequestsListener);
+                            }catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
 
                         /**
                          * We need to keep track of my active status and whether i (rider) have any orders in progress
@@ -232,6 +256,42 @@ public class ForegroundService extends Service {
                         myRideOrderRequests.addValueEventListener(myRideOrderRequestsListener);
                     }
 
+                    try {
+                        //start/stop social notifications depending on notification settings
+                        if (myUserDetails.getSocialNotification() == true) {
+                            //initialize social media notifications
+                            startSocialNotifications();
+                        }
+
+                        if (myUserDetails.getSocialNotification() == false) {
+                            try {
+                                notificationRef.removeEventListener(notificationsListener);
+                            } catch (Exception e) {
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
+                        //start/stop chat notifications depending on notification settings
+                        if (myUserDetails.getChatNotification() == true) {
+                            //initialize chat notifications listener
+                            startChatNotifications();
+                        }
+
+                        if (myUserDetails.getChatNotification() == false) {
+                            //initialize chat notifications listener
+                            try {
+                                myMessages.removeEventListener(myMessagesListener);
+                            } catch (Exception e) {
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
+                    } catch (Exception err){
+                        Log.e(TAG, "onDataChange: ", err);
+                    }
+
+
+
                 } catch (Exception e){}
             }
 
@@ -253,7 +313,7 @@ public class ForegroundService extends Service {
      */
     private void startChatNotifications() {
         myMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
-        myMessages.addChildEventListener(new ChildEventListener() {
+        myMessagesListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot incoming, @Nullable String s) {
 
@@ -360,7 +420,9 @@ public class ForegroundService extends Service {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myMessages.addChildEventListener(myMessagesListener);
+
     }
 
     private void startSocialNotifications(){
@@ -413,7 +475,7 @@ public class ForegroundService extends Service {
          * Get the ride requests from the 'my_ride_requests' node (contains restaurants with customers as child nodes)
          */
         myRideRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone);
-        myRideRequests.addChildEventListener(new ChildEventListener() {
+        myRideRequestsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot restaurants, @Nullable String s) {
                 /**
@@ -502,12 +564,13 @@ public class ForegroundService extends Service {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myRideRequests.addChildEventListener(myRideRequestsListener);
     }
 
     private void startRestaurantNotifications() {
         myOrdersRef = FirebaseDatabase.getInstance().getReference("orders/"+myPhone);
-        myOrdersRef.addChildEventListener(new ChildEventListener() {
+        myRestaurantOrdersListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot customerPhones, @Nullable String s) {
                 int itemCount = (int) customerPhones.child("items").getChildrenCount();
@@ -560,7 +623,8 @@ public class ForegroundService extends Service {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myOrdersRef.addChildEventListener(myRestaurantOrdersListener);
     }
 
     private void startCustomerNotifications() {
@@ -1527,6 +1591,9 @@ public class ForegroundService extends Service {
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
             notificationRef.removeEventListener(notificationsListener);
+            myMessages.removeEventListener(myMessagesListener);
+            myOrdersRef.removeEventListener(myRestaurantOrdersListener);
+            myRideRequests.removeEventListener(myRideRequestsListener);
             myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
             databaseReference.removeEventListener(databaseListener);
             databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
