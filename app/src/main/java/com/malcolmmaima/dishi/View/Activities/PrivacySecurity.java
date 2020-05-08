@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Controller.ForegroundService;
+import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 
@@ -33,8 +36,13 @@ public class PrivacySecurity extends AppCompatActivity {
     String TAG = "PrivacySecurity";
     String myPhone;
     DatabaseReference myRef;
+    ValueEventListener myRefListener;
     Switch shareOrders, syncContacts;
     RelativeLayout setViewPhone, blockedAccounts, myLocationSettings, accountPrivacy, accountPin, loginActivity;
+    MyTextView_Roboto_Regular phoneVisibilityTxt;
+    View setViewPhoneBorder;
+    int chckdItem = 0;
+    AlertDialog alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +66,16 @@ public class PrivacySecurity extends AppCompatActivity {
         shareOrders = findViewById(R.id.shareOrdersSwitch);
         syncContacts = findViewById(R.id.syncContacts);
         setViewPhone = findViewById(R.id.setViewPhone);
+        setViewPhone.setVisibility(View.GONE);
+
         blockedAccounts = findViewById(R.id.blockedAccounts);
         myLocationSettings = findViewById(R.id.myLocationSettings);
         accountPrivacy = findViewById(R.id.accountPrivacy);
         accountPin = findViewById(R.id.accountPin);
         loginActivity = findViewById(R.id.loginActivity);
+        phoneVisibilityTxt = findViewById(R.id.phoneVisibilityTxt);
+        setViewPhoneBorder = findViewById(R.id.setViewPhoneBorder);
+        setViewPhoneBorder.setVisibility(View.GONE);
 
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -72,13 +85,41 @@ public class PrivacySecurity extends AppCompatActivity {
             }
         });
 
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        myRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     UserModel myUserDetails = dataSnapshot.getValue(UserModel.class);
                     shareOrders.setChecked(myUserDetails.getShareOrders());
                     syncContacts.setChecked(myUserDetails.getSyncContacts());
+
+                    if(myUserDetails.getPhoneVisibility().equals("everyone")){
+                        chckdItem = 0;
+                        phoneVisibilityTxt.setText("Everyone");
+                    }
+
+                    if(myUserDetails.getPhoneVisibility().equals("mutual")){
+                        chckdItem = 1;
+                        phoneVisibilityTxt.setText("Mutual");
+                    }
+
+                    if(myUserDetails.getPhoneVisibility().equals("none")){
+                        chckdItem = 2;
+                        phoneVisibilityTxt.setText("None");
+                    }
+
+                    if(myUserDetails.getPhoneVisibility() == null || myUserDetails.getPhoneVisibility().isEmpty()){
+                        chckdItem = 2;
+                        phoneVisibilityTxt.setText("None");
+                    }
+
+                    if(!myUserDetails.getAccount_type().equals("1")){
+                        setViewPhone.setVisibility(View.GONE); //Only show this settings option to customer accounts
+                        setViewPhoneBorder.setVisibility(View.GONE);
+                    } else {
+                        setViewPhone.setVisibility(View.VISIBLE);
+                        setViewPhoneBorder.setVisibility(View.VISIBLE);
+                    }
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
                 }
@@ -88,7 +129,8 @@ public class PrivacySecurity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        myRef.addValueEventListener(myRefListener);
 
         //switches
         shareOrders.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -186,7 +228,85 @@ public class PrivacySecurity extends AppCompatActivity {
         setViewPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(PrivacySecurity.this);
+                String[] items = {"Everyone","Mutual Follows","None"};
+
+                int checkedItem = chckdItem; //set to value from db
+                alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                myRef.child("phoneVisibility").setValue("everyone").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                });
+                                break;
+                            case 1:
+                                myRef.child("phoneVisibility").setValue("mutual").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                });
+                                break;
+                            case 2:
+                                myRef.child("phoneVisibility").setValue("none").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                });
+
+                                AlertDialog alertUser = new AlertDialog.Builder(PrivacySecurity.this)
+                                        .setMessage("Please note that vendors will have access to your phone number during active orders :-)")
+                                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                        .setCancelable(false)
+                                        //set three option buttons
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                                            }
+                                        }).create();
+                                alertUser.setCancelable(false);
+                                alertUser.show();
+                                break;
+                        }
+                        alert.dismiss();
+                    }
+                });
+                alert = alertDialog.create();
+                alert.setCancelable(true);
+                alert.show();
             }
         });
 
@@ -224,5 +344,15 @@ public class PrivacySecurity extends AppCompatActivity {
                 Toast.makeText(PrivacySecurity.this, "clicked", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            myRef.removeEventListener(myRefListener);
+        } catch (Exception e){
+            Log.e(TAG, "onDestroy: ", e);
+        }
     }
 }

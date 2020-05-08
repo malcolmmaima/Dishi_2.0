@@ -16,6 +16,7 @@ public class UserModel {
     Boolean socialNotification;
     Boolean shareOrders;
     Boolean syncContacts;
+    String phoneVisibility;
     String locationType;
     String profilePic;
     String signupDate;
@@ -195,5 +196,13 @@ public class UserModel {
 
     public void setSyncContacts(Boolean syncContacts) {
         this.syncContacts = syncContacts;
+    }
+
+    public String getPhoneVisibility() {
+        return phoneVisibility;
+    }
+
+    public void setPhoneVisibility(String phoneVisibility) {
+        this.phoneVisibility = phoneVisibility;
     }
 }
