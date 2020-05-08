@@ -198,6 +198,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             /**
              * Below code must always be same as for 'followrequest' below
+             * any changes to code below should be made in 'followrequest' and FollowerFollowingAdapter
              * */
             holder.notificationMessage.setText(my_notification.getMessage());
             DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone+"/"+my_notification.getFrom());
@@ -272,6 +273,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             /**
              * Below code must always be same as for 'followedwall' above
+             * any changes to code below should be made in 'followedwall' and FollowerFollowingAdapter
              * */
             holder.notificationMessage.setText(my_notification.getMessage());
             DatabaseReference followersRef = FirebaseDatabase.getInstance().getReference("followers/"+myPhone+"/"+my_notification.getFrom());
