@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -85,13 +86,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         //Hide notification icon types on load
-        holder.followUnfollow.setVisibility(View.GONE);
         holder.liked.setVisibility(View.GONE);
+        holder.statusImage.setVisibility(View.GONE);
+        holder.reviewIcon.setVisibility(View.GONE);
         holder.commented.setVisibility(View.GONE);
         holder.postedWall.setVisibility(View.GONE);
+        holder.followUnfollow.setVisibility(View.GONE);
 
         holder.contact_name.setText("loading...");
         DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+my_notification.getFrom());
+        DatabaseReference followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+my_notification.getFrom());
+        DatabaseReference profileFollowers = FirebaseDatabase.getInstance().getReference("followers/"+my_notification.getFrom());
         DatabaseReference followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone+"/"+my_notification.getFrom());
         userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -633,28 +638,82 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         }
                     });
                 } else {
+
                     DatabaseReference followerRef = FirebaseDatabase.getInstance().getReference("followers/"+my_notification.getFrom()+"/"+myPhone);
                     followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(!dataSnapshot.exists()){
-                                followingRef.setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                //Check to see if profile is private
+                                userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onSuccess(Void aVoid) {
-                                        followerRef.setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                                                holder.followUnfollow.setText("UNFOLLOW");
-                                            }
-                                        });
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        userData = dataSnapshot.getValue(UserModel.class);
 
+                                        if(userData.getAccountPrivacy().equals("private")){
+                                            //send follow request
+
+                                            followRequests.child(myPhone).setValue("followrequest").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    try {
+                                                        holder.followUnfollow.setText("REQUESTED");
+                                                        Snackbar.make(v.getRootView(), "Request sent", Snackbar.LENGTH_LONG).show();
+                                                    } catch (Exception er){
+                                                        Log.e(TAG, "onFailure: ", er);
+                                                    }
+
+                                                    sendNotification("wants to follow you", "followrequest");
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    try {
+                                                        holder.followUnfollow.setText("REQUESTED");
+                                                        Snackbar.make(v.getRootView(), "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                                    } catch (Exception er){
+                                                        Log.e(TAG, "onFailure: ", er);
+                                                    }
+                                                }
+                                            });
+
+                                        }
+
+                                        if(userData.getAccountPrivacy().equals("public")){
+                                            //automatically follow
+                                            profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    followingRef.setValue("follow");
+                                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                                    holder.followUnfollow.setText("UNFOLLOW");
+                                                    sendNotification("followed you", "followedwall");
+                                                }
+                                            });
+                                        }
                                     }
-                                }).addOnFailureListener(new OnFailureListener() {
+
+                                    private void sendNotification(String message, String type) {
+                                        DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+my_notification.getFrom());
+
+                                        String notifKey = notificationRef.push().getKey();
+                                        GetCurrentDate currentDate = new GetCurrentDate();
+
+                                        //send notification
+                                        NotificationModel followed = new NotificationModel();
+                                        followed.setFrom(myPhone);
+                                        followed.setType(type);
+                                        followed.setImage("");
+                                        followed.setSeen(false);
+                                        followed.setTimeStamp(currentDate.getDate());
+                                        followed.setMessage(message);
+
+                                        notificationRef.child(notifKey).setValue(followed); //send to db
+                                    }
+
                                     @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                                        holder.followUnfollow.setText("FOLLOW");
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                     }
                                 });
                             }
@@ -754,7 +813,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
         ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
         animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
-        animator.setDuration(200);
+        animator.setDuration(500);
         animatorSet.play(animator);
         animator.start();
     }

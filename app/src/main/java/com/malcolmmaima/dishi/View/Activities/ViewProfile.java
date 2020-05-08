@@ -251,6 +251,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         profileRef = FirebaseDatabase.getInstance().getReference("users/"+phone);
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+phone);
         profileFollowers = FirebaseDatabase.getInstance().getReference("followers/"+phone);
+        DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+phone);
         followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+phone);
         followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+phone);
@@ -387,6 +388,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                                 profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        myFollowing.child(phone).setValue("follow");
                                         sendNotification("followed you", "followedwall");
                                     }
                                 });
@@ -420,7 +422,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     profileFollowers.child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            DatabaseReference myFollowing = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+
                             myFollowing.child(phone).removeValue();
                             followBtn.setText("FOLLOW");
                         }
