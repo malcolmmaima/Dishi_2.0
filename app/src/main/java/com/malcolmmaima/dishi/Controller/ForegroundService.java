@@ -126,7 +126,6 @@ public class ForegroundService extends Service {
         myUserDetailsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
                     if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")) {
                         //Check notification settings
@@ -143,29 +142,36 @@ public class ForegroundService extends Service {
                     }
 
 
-                    if(myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")){
-                        if(myUserDetails.getOrderNotification() == true){
-                            startRestaurantNotifications();
-                        } else {
-                            try {
-                                myOrdersRef.removeEventListener(myRestaurantOrdersListener);
-                            } catch (Exception e){
-                                Log.e(TAG, "onDataChange: ", e);
+                    try {
+                        if (myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")) {
+                            if (myUserDetails.getOrderNotification() == true) {
+                                startRestaurantNotifications();
+                            } else {
+                                try {
+                                    myOrdersRef.removeEventListener(myRestaurantOrdersListener);
+                                } catch (Exception e) {
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
                             }
                         }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
                     }
 
 
-
                     if(myUserDetails.getAccount_type().equals("3") && myUserDetails.getVerified().equals("true")){
-                        if(myUserDetails.getOrderNotification() == true){
-                            startRiderNotifications();
-                        } else {
-                            try {
-                                myRideRequests.removeEventListener(myRideRequestsListener);
-                            }catch (Exception e){
-                                Log.e(TAG, "onDataChange: ", e);
+                        try {
+                            if (myUserDetails.getOrderNotification() == true) {
+                                startRiderNotifications();
+                            } else {
+                                try {
+                                    myRideRequests.removeEventListener(myRideRequestsListener);
+                                } catch (Exception e) {
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
                             }
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
                         }
 
                         /**
@@ -270,7 +276,11 @@ public class ForegroundService extends Service {
                                 Log.e(TAG, "onDataChange: ", e);
                             }
                         }
+                    } catch (Exception ee){
+                        Log.e(TAG, "onDataChange: ", ee);
+                    }
 
+                    try {
                         //start/stop chat notifications depending on notification settings
                         if (myUserDetails.getChatNotification() == true) {
                             //initialize chat notifications listener
@@ -285,15 +295,10 @@ public class ForegroundService extends Service {
                                 Log.e(TAG, "onDataChange: ", e);
                             }
                         }
-
-                    } catch (Exception err){
-                        Log.e(TAG, "onDataChange: ", err);
+                    } catch (Exception ee){
+                        Log.e(TAG, "onDataChange: ", ee);
                     }
-
-
-
-                } catch (Exception e){}
-            }
+                }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -365,7 +370,15 @@ public class ForegroundService extends Service {
 
                                                 //TODO find a way to get data from Chat activity and compare to new notification data.
                                                 //If i am actively in chat don't fire up notification
-                                                sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+
+                                                try {
+                                                    //second check if chat notification is on or off
+                                                    if (myUserDetails.getChatNotification() == true) {
+                                                        sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+                                                    }
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                }
                                             }
                                         }
                                     }
@@ -434,7 +447,15 @@ public class ForegroundService extends Service {
                     NotificationModel newNotification = dataSnapshot.getValue(NotificationModel.class);
                     newNotification.key = dataSnapshot.getKey();
                     int notifId = new Random().nextInt();
-                    sendSocialNotification(notifId, newNotification);
+
+                    //Always check notification settings before sending a notification
+                    try {
+                        if (myUserDetails.getSocialNotification() == true) {
+                            sendSocialNotification(notifId, newNotification);
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onChildAdded: ", e);
+                    }
                 }catch (Exception er){
                     Log.e(TAG, "onChildAdded: ", er);
                 }
@@ -506,7 +527,13 @@ public class ForegroundService extends Service {
                                             lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
                                         }
                                         int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
-                                        sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                        try {
+                                            if (myUserDetails.getOrderNotification() == true) {
+                                                sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                            }
+                                        } catch (Exception e){
+                                            Log.e(TAG, "onDataChange: ", e);
+                                        }
                                     }
 
                                     @Override
@@ -585,14 +612,26 @@ public class ForegroundService extends Service {
 
                             //compose our notification and send
                             String title = customer.getFirstname() + " " + customer.getLastname();
-                            String message = "New order request [#"+orderID+"]";
+                            String message;
+                            if(orderID != null){
+                                message = "New order request [#"+orderID+"]";
+                            } else {
+                                message = "New order request";
+                            }
+
                             String customerPhone = customerPhones.getKey();
                             if (customerPhone.length() > 4) {
                                 lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
                             }
                             int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
-                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, ViewCustomerOrder.class, customerPhone, title);
+                            try {
+                                if (myUserDetails.getOrderNotification() == true) {
+                                    sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, ViewCustomerOrder.class, customerPhone, title);
+                                }
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
                         } catch (Exception e){}
                     }
 
@@ -666,7 +705,13 @@ public class ForegroundService extends Service {
                                                 lastName = dataSnapshot.child("lastname").getValue(String.class);
                                                 String title = "Order Delivered";
                                                 String message = restaurantName + " " + lastName + " order delivered!";
-                                                sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                try {
+                                                    if (myUserDetails.getOrderNotification() == true) {
+                                                        sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                    }
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                }
                                             }
 
                                             @Override
