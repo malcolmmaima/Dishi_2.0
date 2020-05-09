@@ -301,7 +301,7 @@ public class ForegroundService extends Service {
             }
         };
         try {
-            myUserDetailsRef.addListenerForSingleValueEvent(myUserDetailsListener);
+            myUserDetailsRef.addValueEventListener(myUserDetailsListener);
         } catch (Exception e){}
 
         //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
@@ -1666,6 +1666,7 @@ public class ForegroundService extends Service {
         stopService(new Intent(ForegroundService.this, TrackingService.class));
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
+            myUserDetailsRef.removeEventListener(myUserDetailsListener);
             notificationRef.removeEventListener(notificationsListener);
             myMessages.removeEventListener(myMessagesListener);
             myOrdersRef.removeEventListener(myRestaurantOrdersListener);
