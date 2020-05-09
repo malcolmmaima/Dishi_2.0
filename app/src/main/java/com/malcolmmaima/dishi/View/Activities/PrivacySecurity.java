@@ -364,9 +364,9 @@ public class PrivacySecurity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     if (myUserDetails.getAccount_type().equals("2")) {
-                        Intent blockedActivity = new Intent(PrivacySecurity.this, LocationSettings.class)
+                        Intent locationActivity = new Intent(PrivacySecurity.this, LocationSettings.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(blockedActivity);
+                        startActivity(locationActivity);
                     } else {
                         Intent blockedActivity = new Intent(PrivacySecurity.this, MyLocation.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -440,9 +440,10 @@ public class PrivacySecurity extends AppCompatActivity {
         accountPin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar snackbar = Snackbar
-                        .make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                snackbar.show();
+                Intent securityPin = new Intent(PrivacySecurity.this, SecurityPin.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                securityPin.putExtra("type", "setPin");
+                startActivity(securityPin);
             }
         });
 

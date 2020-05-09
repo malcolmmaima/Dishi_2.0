@@ -82,19 +82,11 @@ public class SplashActivity extends AppCompatActivity {
                         Settings.Secure.ANDROID_ID);
 
                 DatabaseReference adminRef = FirebaseDatabase.getInstance().getReference("admin");
-                adminRef.addValueEventListener(new ValueEventListener() {
+                adminRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         try {
                             Boolean maintenance = dataSnapshot.child("maintenance").getValue(Boolean.class);
-                            Boolean diskPersistence = dataSnapshot.child("disk_persistence").getValue(Boolean.class);
-
-                            try {
-                                /**
-                                 * Enable/disable disk persistence
-                                 */
-                                FirebaseDatabase.getInstance().setPersistenceEnabled(diskPersistence);
-                            } catch (Exception e){ }
 
                             if (maintenance == true) {
                                 progressBar.setVisibility(View.GONE);
