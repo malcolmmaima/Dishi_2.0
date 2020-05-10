@@ -41,7 +41,7 @@ public class PrivacySecurity extends AppCompatActivity {
     Switch shareOrders, syncContacts;
     RelativeLayout setViewPhone, blockedAccounts, myLocationSettings, accountPrivacy, accountPin, loginActivity;
     LinearLayout shareOrdersOption;
-    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt;
+    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt, pinStatus;
     View setViewPhoneBorder, shareOrdersOptionBorder;
     int chckdItem = 0;
     int chckItem2 = 0;
@@ -76,6 +76,7 @@ public class PrivacySecurity extends AppCompatActivity {
         myLocationSettings = findViewById(R.id.myLocationSettings);
         accountPrivacy = findViewById(R.id.accountPrivacy);
         accountPin = findViewById(R.id.accountPin);
+        pinStatus = findViewById(R.id.pinStatus);
         loginActivity = findViewById(R.id.loginActivity);
         accountPrivacyTxt = findViewById(R.id.accountPrivacyTxt);
         phoneVisibilityTxt = findViewById(R.id.phoneVisibilityTxt);
@@ -162,6 +163,16 @@ public class PrivacySecurity extends AppCompatActivity {
                     }
                 } catch (Exception errr){
                     Log.e(TAG, "onDataChange: ", errr);
+                }
+
+                try {
+                    if (dataSnapshot.child("pin").exists()) {
+                        pinStatus.setText("****");
+                    } else {
+                        pinStatus.setText("Not set");
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
                 }
             }
 
