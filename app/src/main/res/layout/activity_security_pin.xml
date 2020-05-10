@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:text="Your Pin is required to"
+        android:text="Your pin is required to"
         android:textColor="#ffffff"
         android:textSize="12dp" />
 
@@ -391,13 +391,13 @@
             android:textSize="12dp" />
 
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
-            android:id="@+id/clearPin"
+            android:id="@+id/resetPin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginRight="40dp"
             android:layout_alignParentRight="true"
-            android:text="Clear"
+            android:text="Reset"
             android:textColor="#ffffff"
             android:textSize="12dp" />
 

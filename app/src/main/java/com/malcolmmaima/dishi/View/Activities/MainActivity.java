@@ -303,37 +303,99 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                 if(progressDialog.isShowing()){
                                                                     progressDialog.dismiss();
                                                                 }
-                                                                //SafeToast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                                Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
-                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                Bundle bndlanimation =
-                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                startActivity(slideactivity, bndlanimation);
+                                                                dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if(dataSnapshot.exists()){
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("accType", "1");
+                                                                            startActivity(slideactivity);
+                                                                        }
+
+                                                                        else {
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            Bundle bndlanimation =
+                                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                            startActivity(slideactivity, bndlanimation);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
                                                             }
 
                                                             else if (account_type.equals("2")){ //Provider Restaurant account
                                                                 if(progressDialog.isShowing()){
                                                                     progressDialog.dismiss();
                                                                 }
-                                                                //SafeToast.makeText(MainActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
-                                                                Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
-                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                Bundle bndlanimation =
-                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                startActivity(slideactivity, bndlanimation);
+                                                                dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if(dataSnapshot.exists()){
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("accType", "2");
+                                                                            startActivity(slideactivity);
+                                                                        }
+
+                                                                        else {
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            Bundle bndlanimation =
+                                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                            startActivity(slideactivity, bndlanimation);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
                                                             }
 
                                                             else if (account_type.equals("3")){ //Nduthi account
                                                                 if(progressDialog.isShowing()){
                                                                     progressDialog.dismiss();
                                                                 }
-                                                                //Slide to new activity
-                                                                //SafeToast.makeText(MainActivity.this, "Nduthi Account", Toast.LENGTH_LONG).show();
-                                                                Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
-                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                Bundle bndlanimation =
-                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                startActivity(slideactivity, bndlanimation);
+                                                                dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if(dataSnapshot.exists()){
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("accType", "3");
+                                                                            startActivity(slideactivity);
+                                                                        }
+
+                                                                        else {
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            Bundle bndlanimation =
+                                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                            startActivity(slideactivity, bndlanimation);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
                                                             }
 
                                                             else if (account_type.equals("x") || account_type.equals("X")){
@@ -426,8 +488,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onResume() {
         super.onResume();
         checkConnection();
-
-
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
@@ -531,33 +591,95 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                         if (progressDialog.isShowing()) {
                                                                             progressDialog.dismiss();
                                                                         }
-                                                                        //SafeToast.makeText(MainActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                                        Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
-                                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                        Bundle bndlanimation =
-                                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                                                        startActivity(slideactivity, bndlanimation);
+                                                                        dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                if(dataSnapshot.exists()){
+                                                                                    //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
+                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                    slideactivity.putExtra("type", "login");
+                                                                                    slideactivity.putExtra("accType", "1");
+                                                                                    startActivity(slideactivity);
+                                                                                }
+
+                                                                                else {
+                                                                                    //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
+                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                    Bundle bndlanimation =
+                                                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                                    startActivity(slideactivity, bndlanimation);
+                                                                                }
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                            }
+                                                                        });
                                                                     } else if (account_type.equals("2")) { //Provider Restaurant account
                                                                         if (progressDialog.isShowing()) {
                                                                             progressDialog.dismiss();
                                                                         }
-                                                                        //SafeToast.makeText(MainActivity.this, "Restaurant Account", Toast.LENGTH_LONG).show();
-                                                                        Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
-                                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                        Bundle bndlanimation =
-                                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                        startActivity(slideactivity, bndlanimation);
+                                                                        dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                if(dataSnapshot.exists()){
+                                                                                    //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
+                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                    slideactivity.putExtra("type", "login");
+                                                                                    slideactivity.putExtra("accType", "2");
+                                                                                    startActivity(slideactivity);
+                                                                                }
+
+                                                                                else {
+                                                                                    //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
+                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                    Bundle bndlanimation =
+                                                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                                    startActivity(slideactivity, bndlanimation);
+                                                                                }
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                            }
+                                                                        });
                                                                     } else if (account_type.equals("3")) { //Nduthi account
                                                                         if (progressDialog.isShowing()) {
                                                                             progressDialog.dismiss();
                                                                         }
-                                                                        //Slide to new activity
-                                                                        //SafeToast.makeText(MainActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
-                                                                        Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
-                                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                        Bundle bndlanimation =
-                                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                        startActivity(slideactivity, bndlanimation);
+                                                                        dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                if(dataSnapshot.exists()){
+                                                                                    //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
+                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                    slideactivity.putExtra("type", "login");
+                                                                                    slideactivity.putExtra("accType", "3");
+                                                                                    startActivity(slideactivity);
+                                                                                }
+
+                                                                                else {
+                                                                                    //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
+                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                    Bundle bndlanimation =
+                                                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                                    startActivity(slideactivity, bndlanimation);
+                                                                                }
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                            }
+                                                                        });
                                                                     } else if (account_type.equals("X") || account_type.equals("x")) {
                                                                         Intent slideactivity = new Intent(MainActivity.this, BlockedAccount.class)
                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

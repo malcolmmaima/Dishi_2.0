@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,13 +38,12 @@ public class SecurityPin extends AppCompatActivity {
     DatabaseReference myRef;
     FirebaseAuth mAuth;
     String TAG = "SecurityPin";
-    String myPin, oldPin;
+    String myPin, oldPin, loginPin, accountType;
     ImageView pin1, pin2, pin3, pin4;
     LinearLayout num1, num2, num3, num4, num5, num6, num7, num8, num9, num0;
-    MyTextView_Roboto_Medium logout, clearPin;
+    MyTextView_Roboto_Medium logout, resetPin;
     MyTextView_Roboto_Regular title1, title2;
     int [] pinCombo = new int[4];
-    int [] initPin = new int[4];
     int counter = 0;
     Boolean reEnter = false;
     Boolean reset;
@@ -67,7 +67,8 @@ public class SecurityPin extends AppCompatActivity {
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
             logout = findViewById(R.id.logOut);
-            clearPin = findViewById(R.id.clearPin);
+            resetPin = findViewById(R.id.resetPin);
+            resetPin.setVisibility(View.GONE); //TODO: implement reset pin mechanism later
 
             pin1 = findViewById(R.id.pin1);
             pin2 = findViewById(R.id.pin2);
@@ -93,6 +94,7 @@ public class SecurityPin extends AppCompatActivity {
 
             if(pinType.equals("setPin")){
 
+                logout.setVisibility(View.GONE);
                 //Check to see if i have an existing pin
                 myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -118,7 +120,9 @@ public class SecurityPin extends AppCompatActivity {
             }
 
             if(pinType.equals("login")){
-                title1.setText("Your Pin is required to");
+                accountType = getIntent().getStringExtra("accType");
+                logout.setVisibility(View.VISIBLE);
+                title1.setText("Your pin is required to");
                 title2.setText("login to your account");
             }
 
@@ -193,11 +197,10 @@ public class SecurityPin extends AppCompatActivity {
                 }
             });
 
-            clearPin.setOnClickListener(new View.OnClickListener() {
+            resetPin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    pinCombo = new int[4];
-                    resetPinEnter(false);
+                    //implement reset machanism later
                 }
             });
 
@@ -236,9 +239,34 @@ public class SecurityPin extends AppCompatActivity {
                 pin4.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
                 myPin = ""+pinCombo[0]+""+pinCombo[1]+""+pinCombo[2]+""+pinCombo[3]+"";
 
-                if(reset == true){
-                    if(oldPin.equals(myPin)){
-                        oldPin = myPin; //update old pin to new pin
+                if(pinType.equals("setPin")){
+                    if(reset == true){
+                        if(oldPin.equals(myPin)){
+                            oldPin = myPin; //update old pin to new pin
+                            if(reEnter == false){
+                                disableEnableButtons(false);
+                                progressBar.setVisibility(View.VISIBLE);
+                                myRef.child("pendingPin").setValue(myPin).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        progressBar.setVisibility(View.GONE);
+                                        title1.setText("Enter your new preferred");
+                                        title2.setText("four digit security PIN");
+                                        SafeToast.makeText(SecurityPin.this, "ENTER NEW PIN!", Toast.LENGTH_LONG).show();
+                                        disableEnableButtons(true);
+                                        resetPinEnter(false);
+                                        reset = false;
+                                    }
+                                });
+                            }
+
+                        } else {
+                            finish();
+                            Toast.makeText(this, "WRONG OLD PIN", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    else {
                         if(reEnter == false){
                             disableEnableButtons(false);
                             progressBar.setVisibility(View.VISIBLE);
@@ -246,45 +274,64 @@ public class SecurityPin extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     progressBar.setVisibility(View.GONE);
-                                    title1.setText("Enter your new preferred");
+                                    title1.setText("Enter your preferred");
                                     title2.setText("four digit security PIN");
-                                    SafeToast.makeText(SecurityPin.this, "ENTER NEW PIN!", Toast.LENGTH_LONG).show();
+                                    SafeToast.makeText(SecurityPin.this, "RE-ENTER PIN!", Toast.LENGTH_LONG).show();
                                     disableEnableButtons(true);
-                                    resetPinEnter(false);
-                                    reset = false;
+                                    resetPinEnter(true);
                                 }
                             });
                         }
-
-                    } else {
-                        finish();
-                        Toast.makeText(this, "WRONG OLD PIN", Toast.LENGTH_LONG).show();
+                        else {
+                            updatePIN();
+                        }
                     }
                 }
 
-                else {
-                    if(reEnter == false){
-                        disableEnableButtons(false);
-                        progressBar.setVisibility(View.VISIBLE);
-                        myRef.child("pendingPin").setValue(myPin).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                progressBar.setVisibility(View.GONE);
-                                title1.setText("Enter your preferred");
-                                title2.setText("four digit security PIN");
-                                SafeToast.makeText(SecurityPin.this, "RE-ENTER PIN!", Toast.LENGTH_LONG).show();
-                                disableEnableButtons(true);
-                                resetPinEnter(true);
+                if(pinType.equals("login")){
+                    myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            loginPin = dataSnapshot.getValue(String.class);
+
+                            if(myPin.equals(loginPin)){
+                                //proceed to account
+                                if(accountType.equals("1")){
+                                    Intent slideactivity = new Intent(SecurityPin.this, CustomerActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    Bundle bndlanimation =
+                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                    startActivity(slideactivity, bndlanimation);
+                                }
+                                if(accountType.equals("2")){
+                                    Intent slideactivity = new Intent(SecurityPin.this, RestaurantActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    Bundle bndlanimation =
+                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                    startActivity(slideactivity, bndlanimation);
+                                }
+                                if(accountType.equals("3")){
+                                    Intent slideactivity = new Intent(SecurityPin.this, RiderActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    Bundle bndlanimation =
+                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                    startActivity(slideactivity, bndlanimation);
+                                }
+                            } else {
+                                pinCombo = new int[4];
+                                resetPinEnter(false);
+                                SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
                             }
-                        });
-                    }
-                    else {
-                        updatePIN();
-                    }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
+
             }
-        } else {
-            SafeToast.makeText(this, "complete pin["+pinCombo[0]+","+pinCombo[1]+","+pinCombo[2]+","+pinCombo[3]+"]", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -334,15 +381,21 @@ public class SecurityPin extends AppCompatActivity {
         num7.setEnabled(b);
         num8.setEnabled(b);
         num9.setEnabled(b);
-        clearPin.setEnabled(b);
     }
 
     private void resetPinEnter(Boolean reenter) {
         reEnter = reenter;
         counter = 0;
 
-        title1.setText("Enter your preferred");
-        title2.setText("four digit security PIN");
+        if(pinType.equals("setPin")){
+            title1.setText("Enter your preferred");
+            title2.setText("four digit security PIN");
+        }
+
+        if(pinType.equals("login")){
+            title1.setText("Your pin is required to");
+            title2.setText("login to your account");
+        }
 
         pin1.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
         pin2.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);

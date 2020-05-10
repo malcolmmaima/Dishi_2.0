@@ -56,6 +56,11 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadSplash();
+
+    }
+
+    private void loadSplash() {
         setContentView(R.layout.activity_splash);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -203,12 +208,34 @@ public class SplashActivity extends AppCompatActivity {
                                                     else {
                                                         if(account_type.equals("1")){ //Customer account
                                                             try {
-                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                                Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
-                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                Bundle bndlanimation =
-                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                                                startActivity(slideactivity, bndlanimation);
+                                                                dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if(dataSnapshot.exists()){
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("accType", "1");
+                                                                            startActivity(slideactivity);
+                                                                        }
+
+                                                                        else {
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            Bundle bndlanimation =
+                                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                            startActivity(slideactivity, bndlanimation);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
+
                                                             } catch (Exception e){
 
                                                             }
@@ -216,13 +243,33 @@ public class SplashActivity extends AppCompatActivity {
 
                                                         else if (account_type.equals("2")){ //Provider Restaurant account
                                                             try {
-                                                                progressBar.setVisibility(View.GONE);
-                                                                //SafeToast.makeText(SplashActivity.this, "Provider Account", Toast.LENGTH_LONG).show();
-                                                                Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
-                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                Bundle bndlanimation =
-                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                startActivity(slideactivity, bndlanimation);
+                                                                dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if(dataSnapshot.exists()){
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("accType", "2");
+                                                                            startActivity(slideactivity);
+                                                                        }
+
+                                                                        else {
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            Bundle bndlanimation =
+                                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                            startActivity(slideactivity, bndlanimation);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
                                                             } catch (Exception e){
 
                                                             }
@@ -230,14 +277,33 @@ public class SplashActivity extends AppCompatActivity {
 
                                                         else if (account_type.equals("3")){ //Nduthi account
                                                             try {
-                                                                progressBar.setVisibility(View.GONE);
-                                                                //Slide to new activity
-                                                                //SafeToast.makeText(SplashActivity.this, "Rider Account", Toast.LENGTH_LONG).show();
-                                                                Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
-                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                Bundle bndlanimation =
-                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                startActivity(slideactivity, bndlanimation);
+                                                                dbRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if(dataSnapshot.exists()){
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("accType", "3");
+                                                                            startActivity(slideactivity);
+                                                                        }
+
+                                                                        else {
+                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                            Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
+                                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                            Bundle bndlanimation =
+                                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                            startActivity(slideactivity, bndlanimation);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
                                                             } catch (Exception e){
 
                                                             }
@@ -310,7 +376,6 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(new Intent(SplashActivity.this, WelcomeActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         }
-
     }
 
     public void startNotificationService() {
@@ -338,7 +403,10 @@ public class SplashActivity extends AppCompatActivity {
         if(serviceRunning != true){
             startNotificationService();
         }
+
+        loadSplash();
     }
+
 
     @Override
     protected void onRestart() {
