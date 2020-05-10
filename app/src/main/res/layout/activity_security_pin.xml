@@ -17,6 +17,7 @@
         android:textSize="16dp" />
 
     <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        android:id="@+id/title1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -27,6 +28,7 @@
 
 
     <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        android:id="@+id/title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -43,24 +45,28 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/pin1"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="18dp"
             android:src="@drawable/ic_circle" />
 
         <ImageView
+            android:id="@+id/pin2"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="18dp"
             android:src="@drawable/ic_circle" />
 
         <ImageView
+            android:id="@+id/pin3"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="18dp"
             android:src="@drawable/ic_circle" />
 
         <ImageView
+            android:id="@+id/pin4"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="0dp"
@@ -80,7 +86,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:gravity="center"
-            android:background="@drawable/circle1">
+            android:background="@drawable/circle1"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -97,7 +106,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -122,7 +134,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -156,7 +171,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -182,7 +200,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -208,7 +229,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="0dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -243,7 +267,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -269,7 +296,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -295,7 +325,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="0dp"
             android:background="@drawable/circle1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
@@ -325,7 +358,10 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/circle1"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusableInTouchMode="false"
+        android:foreground="?android:attr/selectableItemBackground">
 
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
@@ -355,17 +391,25 @@
             android:textSize="12dp" />
 
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
-            android:id="@+id/proceed"
+            android:id="@+id/clearPin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginRight="40dp"
             android:layout_alignParentRight="true"
-            android:text="Proceed"
+            android:text="Clear"
             android:textColor="#ffffff"
             android:textSize="12dp" />
 
 
     </RelativeLayout>
+
+    <ProgressBar
+        android:layout_marginTop="-30dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible"/>
 
 </LinearLayout>
