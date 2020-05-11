@@ -92,7 +92,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_chat);
+        
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
@@ -142,7 +143,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     }
 
     private void loadChat() {
-        setContentView(R.layout.activity_chat);
         rootView = findViewById(R.id.parentlayout);
 
         //keep toolbar pinned at top. push edittext on keyboard load
@@ -754,16 +754,17 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        myMessagedRef.removeEventListener(myMessagesListener);
 
         try {
+            myMessagedRef.removeEventListener(myMessagesListener);
             //there may be instances where these two listeners are not triggered
             followerRef.removeEventListener(followerListener);
             followingRef.removeEventListener(followingListener);
+            recipientRef.removeEventListener(recipientListener);
+            recipientRef.removeEventListener(accountTypeListener);
         } catch (Exception e){
 
         }
-        recipientRef.removeEventListener(recipientListener);
-        recipientRef.removeEventListener(accountTypeListener);
+
     }
 }

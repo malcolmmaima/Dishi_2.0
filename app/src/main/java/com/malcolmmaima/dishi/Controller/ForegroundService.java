@@ -109,7 +109,11 @@ public class ForegroundService extends Service {
              */
             if (mDatabase == null) {
                 mDatabase = FirebaseDatabase.getInstance();
-                mDatabase.setPersistenceEnabled(true);
+                try {
+                    mDatabase.setPersistenceEnabled(true);
+                } catch (Exception e){
+                    Log.e(TAG, "onCreate: ", e);
+                }
                 Log.d(TAG, "diskPersistence: "+ true);
             }
 
@@ -1690,6 +1694,7 @@ public class ForegroundService extends Service {
                         .setContentTitle("Order #"+newReceipt.getOrderID())
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                         .setSound(soundUri)
+                        .setOnlyAlertOnce(true)
                         .setContentText("Receipt has been generated");
             } else {
                 builder = new Notification.Builder(this)
@@ -1698,6 +1703,7 @@ public class ForegroundService extends Service {
                         .setContentTitle("Order #"+newReceipt.getOrderID())
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                         .setSound(soundUri)
+                        .setOnlyAlertOnce(true)
                         .setContentText("Receipt has been generated");
             }
         }
