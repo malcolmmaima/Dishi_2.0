@@ -44,19 +44,19 @@ import java.util.List;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-    ArrayList<UserModel> chatlist = new ArrayList<>();
+    String TAG = "InboxActivity";
+    ArrayList<UserModel> chatlist;
     Menu myMenu;
     String myPhone;
     FirebaseUser user;
     TextView emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    DatabaseReference myMessagesRef;
+    DatabaseReference myMessagesRef, myRef;
     ValueEventListener myMessagesListener;
-    UserModel contactDm;
+    ChildEventListener myMessagesChildListener;
     ListView chatList;
     ChatListAdapter adapter;
-    MessageModel chatMessage;
     int count=0;
     public ActionMode actionMode = null;
     FirebaseAuth mAuth;
@@ -71,6 +71,42 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
+
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(Inbox.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
             Toolbar topToolBar = findViewById(R.id.toolbar);
             setSupportActionBar(topToolBar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,11 +121,6 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                     finish(); //Go back to previous activity
                 }
             });
-
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
-            myMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
-
 
             icon = findViewById(R.id.inboxIcon);
             chatList = findViewById(R.id.chatList);
@@ -113,30 +144,28 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                 public void run() {
 
                     mSwipeRefreshLayout.setRefreshing(true);
-                    //fetchMessages();
-
+                    onRefresh();
                 }
             });
         }
     }
 
+
+    //TODO: find an efficient way to refresh the chatlist whenever there's a change
     private void fetchMessages() {
         mSwipeRefreshLayout.setRefreshing(true);
-        chatlist.clear();
-        contactDm = null;
-        chatMessage = null;
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                chatlist.clear();
-                contactDm = null;
                 if(!dataSnapshot.hasChildren()){
+                    chatlist = new ArrayList<>();
                     mSwipeRefreshLayout.setRefreshing(false);
                     adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
                     chatList.setAdapter(adapter);
                     emptyTag.setVisibility(View.VISIBLE);
                     icon.setVisibility(View.VISIBLE);
                 } else {
+                    chatlist = new ArrayList<>();
                     for(DataSnapshot userDm : dataSnapshot.getChildren()){
                         /**
                          * Get recipient user details
@@ -145,7 +174,8 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                         userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot users) {
-
+                                UserModel contactDm = users.getValue(UserModel.class);
+                                contactDm.setPhone(userDm.getKey());
 
                                 /**
                                  * Get recipient's last message
@@ -157,18 +187,18 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
                                         for(DataSnapshot message : dataSnapshot.getChildren()){
                                             try {
-                                                chatMessage = message.getValue(MessageModel.class);
+                                                MessageModel chatMessage = message.getValue(MessageModel.class);
                                                 chatMessage.setKey(message.getKey());
-
-                                                contactDm = users.getValue(UserModel.class);
-                                                contactDm.setPhone(userDm.getKey());
                                                 contactDm.timeStamp = chatMessage.getTimeStamp();
                                                 contactDm.message = chatMessage.getMessage();
-                                                chatlist.add(contactDm);
+
+
                                             } catch (Exception e){
                                                 Log.d("Inbox", "Error: "+ e.getMessage());
                                             }
                                         }
+
+                                        chatlist.add(contactDm);
 
                                         if(!chatlist.isEmpty()){
                                             try {
@@ -188,6 +218,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                             emptyTag.setVisibility(View.VISIBLE);
                                             icon.setVisibility(View.VISIBLE);
                                         }
+
                                     }
 
                                     @Override
@@ -206,6 +237,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
                             }
                         });
+
                     }
                 }
 
@@ -274,6 +306,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                 count=0;
             }
         });
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -331,11 +364,46 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     @Override
     protected void onResume() {
         super.onResume();
-        fetchMessages();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(Inbox.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        try {
+            myMessagesRef.removeEventListener(myMessagesChildListener);
+        } catch (Exception e){
+            Log.e(TAG, "onDestroy: ", e);
+        }
     }
 }
