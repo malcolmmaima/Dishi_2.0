@@ -57,7 +57,7 @@ public class ViewProduct extends AppCompatActivity {
     FloatingActionButton add, minus;
     int count;
     Menu myMenu;
-    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef, existingCartRef;
+    DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef, existingCartRef, myRef;
     ValueEventListener cartListener, favouritesTotalListener, myFoodFavouritesListener, existsListener;
     ValueEventListener cartexixtListner;
     FloatingActionButton fab;
@@ -74,6 +74,48 @@ public class ViewProduct extends AppCompatActivity {
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
+
+            mAuth = FirebaseAuth.getInstance();
+            if(mAuth.getInstance().getCurrentUser() == null){
+                finish();
+                SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            } else {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber();
+                myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(ViewProduct.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+
             Toolbar topToolBar = findViewById(R.id.toolbar);
             setSupportActionBar(topToolBar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -112,8 +154,6 @@ public class ViewProduct extends AppCompatActivity {
             restaurantName_ = getIntent().getStringExtra("restaurantName");
             accType = getIntent().getStringExtra("accType");
 
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
             favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key+"/likes");
             myFoodFavourites = FirebaseDatabase.getInstance().getReference("my_food_favourites/"+myPhone);
@@ -589,6 +629,41 @@ public class ViewProduct extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(ViewProduct.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void productSubTotal() {

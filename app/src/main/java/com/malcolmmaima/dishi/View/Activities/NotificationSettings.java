@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,17 +26,62 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class NotificationSettings extends AppCompatActivity {
 
     String TAG = "NotificationSettings";
     String myPhone;
     DatabaseReference myRef;
     Switch socialSwitch, orderSwitch, chatSwitch;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_settings);
+
+
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber();
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(NotificationSettings.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -44,12 +90,6 @@ public class NotificationSettings extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         setTitle("Notifications");
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
         socialSwitch = findViewById(R.id.SocialNotifications);
         orderSwitch = findViewById(R.id.OrderNotifications);
@@ -217,6 +257,41 @@ public class NotificationSettings extends AppCompatActivity {
                         }
                     });
                 }
+
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(NotificationSettings.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });

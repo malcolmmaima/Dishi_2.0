@@ -32,6 +32,8 @@ import com.malcolmmaima.dishi.Controller.TrackingService;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 
+import io.fabric.sdk.android.services.common.SafeToast;
+
 public class PrivacySecurity extends AppCompatActivity {
 
     String TAG = "PrivacySecurity";
@@ -47,6 +49,8 @@ public class PrivacySecurity extends AppCompatActivity {
     int chckItem2 = 0;
     AlertDialog alertPhone, alertPrivacy;
     UserModel myUserDetails;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +65,45 @@ public class PrivacySecurity extends AppCompatActivity {
 
         setTitle("Privacy & Security");
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber();
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-        //Set fb database reference
-        myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(PrivacySecurity.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
 
         shareOrders = findViewById(R.id.shareOrdersSwitch);
         syncContacts = findViewById(R.id.syncContacts);
@@ -464,6 +502,41 @@ public class PrivacySecurity extends AppCompatActivity {
                 Intent blockedActivity = new Intent(PrivacySecurity.this, LoginActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(blockedActivity);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(PrivacySecurity.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }

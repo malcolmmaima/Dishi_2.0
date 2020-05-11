@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -59,7 +60,8 @@ public class SearchActivity extends AppCompatActivity {
     UserModel myDetails;
     String myPhone, selectedPreference;
     private FirebaseAuth mAuth;
-    DatabaseReference databaseReference, myUserDetails;
+    DatabaseReference databaseReference, myUserDetails, myRef;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,46 @@ public class SearchActivity extends AppCompatActivity {
         } else {
             //Hide keyboard on activity load
             this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+            mAuth = FirebaseAuth.getInstance();
+            if(mAuth.getInstance().getCurrentUser() == null){
+                finish();
+                SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            } else {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber();
+                myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(SearchActivity.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
 
             progressBar = findViewById(R.id.progressBar);
             progressBar.setVisibility(View.GONE);
@@ -93,8 +135,6 @@ public class SearchActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             setTitle("");
 
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
             databaseReference = FirebaseDatabase.getInstance().getReference();
             myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
             myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
@@ -212,6 +252,41 @@ public class SearchActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(SearchActivity.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void searchDB(final String word, String selectedPreference) {

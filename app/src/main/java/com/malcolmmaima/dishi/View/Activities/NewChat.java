@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -39,7 +40,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class NewChat extends AppCompatActivity {
 
 
-    DatabaseReference followingRef;
+    DatabaseReference followingRef, myRef;
     ProgressBar progressBar;
     EditText searchPhone;
     RecyclerView recyclerview;
@@ -64,6 +65,37 @@ public class NewChat extends AppCompatActivity {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(NewChat.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
             progressBar = findViewById(R.id.progressBar);
             searchPhone = findViewById(R.id.userSearch);
@@ -110,6 +142,41 @@ public class NewChat extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(NewChat.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void searchUser(final String search) {
@@ -170,9 +237,4 @@ public class NewChat extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        finish();
-    }
 }

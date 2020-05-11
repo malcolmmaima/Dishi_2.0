@@ -79,7 +79,8 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     List<StatusUpdateModel> statusUpdates;
     RecyclerView recyclerview;
 
-    DatabaseReference profileRef, myPostUpdates, profileFollowers, followersCounterRef, followingCounterref, followRequests;
+    DatabaseReference profileRef, myPostUpdates, profileFollowers,
+            followersCounterRef, followingCounterref, followRequests, myRef;
     ValueEventListener myListener, profileFollowersListener, followersCounterListener, followingCounterListener;
     FirebaseUser user;
 
@@ -127,8 +128,79 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
-            loadProfile();
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber();
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(ViewProfile.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadProfile();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        loadProfile();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(ViewProfile.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void loadProfile() {

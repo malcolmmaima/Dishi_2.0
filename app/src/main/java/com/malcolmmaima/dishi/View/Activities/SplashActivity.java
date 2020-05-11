@@ -212,6 +212,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                         if(dataSnapshot.exists()){
+                                                                            dbRef.child("appLocked").setValue(true);
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -247,6 +248,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                         if(dataSnapshot.exists()){
+                                                                            dbRef.child("appLocked").setValue(true);
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -281,6 +283,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                         if(dataSnapshot.exists()){
+                                                                            dbRef.child("appLocked").setValue(true);
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

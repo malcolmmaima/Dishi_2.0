@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,8 +20,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.AbuseReportModel;
@@ -39,6 +43,7 @@ public class ReportAbuse extends AppCompatActivity {
     FirebaseUser user;
     String [] reportOptions = {"It's suspicious or spam","It displays abusive content", "Copyright infringement", "Other"};
     FirebaseAuth mAuth;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,47 @@ public class ReportAbuse extends AppCompatActivity {
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
+
+            mAuth = FirebaseAuth.getInstance();
+            if(mAuth.getInstance().getCurrentUser() == null){
+                finish();
+                SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            } else {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber();
+                myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(ReportAbuse.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
             option1 = findViewById(R.id.option1);
             option1Tick = findViewById(R.id.option1Tick);
 
@@ -72,8 +118,6 @@ public class ReportAbuse extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             setTitle("Report Abuse");
 
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
             reportType = getIntent().getStringExtra("type");
 
             //Report products
@@ -312,6 +356,41 @@ public class ReportAbuse extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(ReportAbuse.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void selectedAbuse(int selected) {
