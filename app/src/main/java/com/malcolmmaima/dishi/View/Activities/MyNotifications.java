@@ -118,7 +118,7 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);
                             } else {
-                                loadActivity();
+                                //loadActivity(); //redundant in this context
                             }
                         }
 
