@@ -49,6 +49,9 @@ public class SecurityPin extends AppCompatActivity {
     Boolean reset;
     ProgressBar progressBar;
 
+    //receipt notification vals
+    String orderOn, deliveredOn, restaurantName, orderID, restaurantPhone, key;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +127,15 @@ public class SecurityPin extends AppCompatActivity {
                 logout.setVisibility(View.VISIBLE);
                 title1.setText("Your pin is required to");
                 title2.setText("login to your account");
+            }
+
+            if(pinType.equals("ReceiptNotification")){
+                orderOn = getIntent().getStringExtra("orderOn");
+                deliveredOn = getIntent().getStringExtra("deliveredOn");
+                restaurantName = getIntent().getStringExtra("restaurantName");
+                orderID = getIntent().getStringExtra("orderID");
+                restaurantPhone = getIntent().getStringExtra("restaurantPhone");
+                key = getIntent().getStringExtra("key");
             }
 
 
@@ -331,6 +343,38 @@ public class SecurityPin extends AppCompatActivity {
                     });
                 }
 
+                if(pinType.equals("ReceiptNotification")){
+                    myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            loginPin = dataSnapshot.getValue(String.class);
+
+                            if(myPin.equals(loginPin)){
+                                //proceed to receipt
+                                Intent slideactivity = new Intent(SecurityPin.this, ReceiptActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                slideactivity.putExtra("orderOn", orderOn);
+                                slideactivity.putExtra("deliveredOn", deliveredOn);
+                                slideactivity.putExtra("restaurantName", restaurantName);
+                                slideactivity.putExtra("orderID", orderID);
+                                slideactivity.putExtra("restaurantPhone", restaurantPhone);
+                                slideactivity.putExtra("key", key);
+                                Bundle bndlanimation =
+                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                startActivity(slideactivity, bndlanimation);
+                            } else {
+                                pinCombo = new int[4];
+                                resetPinEnter(false);
+                                SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
         }
     }
