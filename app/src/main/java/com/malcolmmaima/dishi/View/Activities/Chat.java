@@ -65,7 +65,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
     private static final String TAG = "ChatActivity";
-    DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef, followingRef, followerRef;
+    DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef, followingRef, followerRef, myRef;
     ValueEventListener recipientListener, myMessagesListener, followingListener, followerListener, accountTypeListener;
     UserModel recipientUser;
     Menu myMenu;
@@ -98,7 +98,45 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             finish();
             SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         } else {
-            loadChat();
+            try {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber(); //Current logged in user phone number
+                myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(Chat.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    } else {
+                                        loadChat();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        } else {
+                            loadChat();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            } catch (Exception e){}
         }
 
     }
@@ -106,10 +144,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     private void loadChat() {
         setContentView(R.layout.activity_chat);
         rootView = findViewById(R.id.parentlayout);
-        try {
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
-        } catch (Exception e){}
 
         //keep toolbar pinned at top. push edittext on keyboard load
         new CommentKeyBoardFix(this);
@@ -404,6 +438,41 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(Chat.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
@@ -412,7 +481,45 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             finish();
             SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         } else {
-            loadChat();
+            try {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber(); //Current logged in user phone number
+                myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(Chat.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    } else {
+                                        loadChat();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        } else {
+                            loadChat();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            } catch (Exception e){}
         }
     }
 
