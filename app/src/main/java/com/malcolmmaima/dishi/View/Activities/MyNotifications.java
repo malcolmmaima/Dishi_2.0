@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,7 +39,7 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
 
     String myPhone;
     FirebaseUser user;
-    DatabaseReference notificationsRef;
+    DatabaseReference notificationsRef, myRef;
     ValueEventListener notificationListener;
     RecyclerView recyclerView;
     TextView emptyTag;
@@ -56,48 +57,126 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
-            icon = findViewById(R.id.menuIcon);
-            recyclerView = findViewById(R.id.rview);
-            emptyTag = findViewById(R.id.empty_tag);
-            Toolbar topToolBar = findViewById(R.id.toolbar);
-            setSupportActionBar(topToolBar);
-
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-            setTitle("Notifications");
-            //Back button on toolbar
-            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish(); //Go back to previous activity
-                }
-            });
-
-            // SwipeRefreshLayout
-            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-            mSwipeRefreshLayout.setOnRefreshListener(MyNotifications.this);
-            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                    android.R.color.holo_green_dark,
-                    android.R.color.holo_orange_dark,
-                    android.R.color.holo_blue_dark);
-
-            mSwipeRefreshLayout.post(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    mSwipeRefreshLayout.setRefreshing(true);
-
-                    // Fetching data from server
-                    fetchNotifications();
-                }
-            });
 
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             notificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(MyNotifications.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadActivity();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        loadActivity();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(MyNotifications.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            } else {
+                                loadActivity();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    loadActivity();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void loadActivity() {
+        icon = findViewById(R.id.menuIcon);
+        recyclerView = findViewById(R.id.rview);
+        emptyTag = findViewById(R.id.empty_tag);
+        Toolbar topToolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(topToolBar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        setTitle("Notifications");
+        //Back button on toolbar
+        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); //Go back to previous activity
+            }
+        });
+
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(MyNotifications.this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                // Fetching data from server
+                fetchNotifications();
+            }
+        });
     }
 
     private void fetchNotifications() {
