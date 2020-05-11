@@ -64,6 +64,7 @@ public class AddMenu extends AppCompatActivity {
 
     private String [] foodImageOptions = {"Upload Food Photo","Use Default Photo"};
 
+    String TAG = "AddMenu";
 
     // Creating URI.
     Uri FilePathUri;
@@ -75,11 +76,12 @@ public class AddMenu extends AppCompatActivity {
 
     // Creating StorageReference and DatabaseReference object.
     StorageReference storageReference;
-    DatabaseReference databaseReference, defaultsRef;
+    DatabaseReference databaseReference, defaultsRef, myRef;
 
     ProgressDialog progressDialog ;
     StorageReference storageReference2nd;
 
+    FirebaseUser user;
 
     // Image request code for onActivityResult() .
     int Image_Request_Code = 7;
@@ -96,6 +98,43 @@ public class AddMenu extends AppCompatActivity {
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            databaseReference = FirebaseDatabase.getInstance().getReference("menus/"+myPhone);
+            defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(AddMenu.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
             defaultFood = "";
             // Assigning Id to ProgressDialog.
             progressDialog = new ProgressDialog(AddMenu.this);
@@ -105,8 +144,12 @@ public class AddMenu extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-            //keep toolbar pinned at top. push edittext on keyboard load
-            new CommentKeyBoardFix(this);
+            try {
+                //keep toolbar pinned at top. push edittext on keyboard load
+                new CommentKeyBoardFix(this);
+            } catch (Exception e){
+                Log.e(TAG, "onCreate: ", e);
+            }
 
             //Hide keyboard on activity load
             this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -126,12 +169,6 @@ public class AddMenu extends AppCompatActivity {
 
             phone = getIntent().getStringExtra("phone"); //From adapters
             key = getIntent().getStringExtra("key"); //From adapters, to allow for editing
-
-            FirebaseUser user;
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            myPhone = user.getPhoneNumber(); //Current logged in user phone number
-            databaseReference = FirebaseDatabase.getInstance().getReference("menus/"+myPhone);
-            defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
 
             foodPic = findViewById(R.id.foodpic);
             productName = findViewById(R.id.productName);
@@ -436,6 +473,41 @@ public class AddMenu extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(AddMenu.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
