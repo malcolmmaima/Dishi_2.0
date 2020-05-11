@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -40,7 +41,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class AddRider extends AppCompatActivity implements OnRiderSelected {
 
     List<UserModel> riders = new ArrayList<>();
-    DatabaseReference riderUserAccounts, myRidersRef, ridersRef;
+    DatabaseReference riderUserAccounts, myRidersRef, ridersRef, myRef;
     ValueEventListener ridersRefListener;
     ProgressBar progressBar;
     EditText searchPhone;
@@ -67,6 +68,37 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             riderUserAccounts = FirebaseDatabase.getInstance().getReference("users");
             myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(AddRider.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
             progressBar = findViewById(R.id.progressBar);
             searchPhone = findViewById(R.id.riderPhone);
@@ -152,6 +184,41 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
             };
             myRidersRef.addChildEventListener(riderAddedListener);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(AddRider.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void searchRider(final String phone) {
