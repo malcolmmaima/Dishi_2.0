@@ -453,7 +453,7 @@ public class PrivacySecurity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent securityPin = new Intent(PrivacySecurity.this, SecurityPin.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                securityPin.putExtra("type", "setPin");
+                securityPin.putExtra("pinType", "setPin");
                 startActivity(securityPin);
             }
         });

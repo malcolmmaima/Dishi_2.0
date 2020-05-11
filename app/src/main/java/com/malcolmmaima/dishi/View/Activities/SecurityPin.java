@@ -359,6 +359,7 @@ public class SecurityPin extends AppCompatActivity {
                                 locked = false;
                                 finish();
                             } else {
+                                myRef.child("appLocked").setValue(true);
                                 locked = true;
                                 pinCombo = new int[4];
                                 resetPinEnter(false);
