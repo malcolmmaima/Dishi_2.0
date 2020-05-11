@@ -307,6 +307,7 @@ public class SecurityPin extends AppCompatActivity {
                             loginPin = dataSnapshot.getValue(String.class);
 
                             if(myPin.equals(loginPin)){
+                                locked = false;
                                 myRef.child("appLocked").setValue(false);
                                 //proceed to account
                                 if(accountType.equals("1")){
@@ -331,6 +332,8 @@ public class SecurityPin extends AppCompatActivity {
                                     startActivity(slideactivity, bndlanimation);
                                 }
                             } else {
+                                locked = true;
+                                myRef.child("appLocked").setValue(true);
                                 pinCombo = new int[4];
                                 resetPinEnter(false);
                                 SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();

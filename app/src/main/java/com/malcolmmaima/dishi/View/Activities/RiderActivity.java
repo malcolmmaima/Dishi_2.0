@@ -34,6 +34,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.ForegroundService;
 import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Controller.Utils.AppLifecycleObserver;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -56,6 +57,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import android.util.Log;
 import android.view.Menu;
@@ -112,15 +114,6 @@ public class RiderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rider);
 
-        TAG = "RiderActivity";
-        imageURL = "";
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        setTitle("Ride Requests");
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         try {
             //get auth state
@@ -132,9 +125,121 @@ public class RiderActivity extends AppCompatActivity
             myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
             myNotificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
 
-        } catch (Exception e){
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(RiderActivity.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadActivity();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        loadActivity();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        } catch (Exception e){
+            Log.e(TAG, "onCreate: ", e);
         }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //get auth state
+        mAuth = FirebaseAuth.getInstance();
+        //User is logged in
+        if(mAuth.getInstance().getCurrentUser() != null) {
+
+            AppLifecycleObserver appLifecycleObserver = new AppLifecycleObserver();
+            ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
+
+            try {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+                //Set fb database reference
+                myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
+                myNotificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(RiderActivity.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    } else {
+                                        loadActivity();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        } else {
+                            loadActivity();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            } catch (Exception e){
+
+            }
+
+
+        } else {
+            finish();
+            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadActivity() {
+        TAG = "RiderActivity";
+        imageURL = "";
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        setTitle("Ride Requests");
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         /**
          * Manually displaying the first fragment - one time only
          */

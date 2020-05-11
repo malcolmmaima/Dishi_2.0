@@ -129,7 +129,7 @@ public class RestaurantActivity extends AppCompatActivity
 
             AppLifecycleObserver appLifecycleObserver = new AppLifecycleObserver();
             ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
-            TAG = "RestaurantActivity";
+
 
             try {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -184,6 +184,8 @@ public class RestaurantActivity extends AppCompatActivity
     }
 
     private void loadActivity() {
+        TAG = "RestaurantActivity";
+
         imageURL = "";
 
         addMenu = findViewById(R.id.button_add_menu);
