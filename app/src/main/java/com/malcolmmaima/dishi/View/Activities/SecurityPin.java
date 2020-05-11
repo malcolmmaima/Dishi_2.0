@@ -46,7 +46,7 @@ public class SecurityPin extends AppCompatActivity {
     int [] pinCombo = new int[4];
     int counter = 0;
     Boolean reEnter = false;
-    Boolean reset;
+    Boolean reset, locked;
     ProgressBar progressBar;
 
     //receipt notification vals
@@ -55,6 +55,10 @@ public class SecurityPin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadActivity();
+    }
+
+    private void loadActivity() {
         setContentView(R.layout.activity_security_pin);
 
         mAuth = FirebaseAuth.getInstance();
@@ -63,7 +67,7 @@ public class SecurityPin extends AppCompatActivity {
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
-            pinType = getIntent().getStringExtra("type");
+            pinType = getIntent().getStringExtra("pinType");
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
@@ -129,15 +133,11 @@ public class SecurityPin extends AppCompatActivity {
                 title2.setText("login to your account");
             }
 
-            if(pinType.equals("ReceiptNotification")){
-                orderOn = getIntent().getStringExtra("orderOn");
-                deliveredOn = getIntent().getStringExtra("deliveredOn");
-                restaurantName = getIntent().getStringExtra("restaurantName");
-                orderID = getIntent().getStringExtra("orderID");
-                restaurantPhone = getIntent().getStringExtra("restaurantPhone");
-                key = getIntent().getStringExtra("key");
+            if(pinType.equals("resume")){
+                logout.setVisibility(View.VISIBLE);
+                title1.setText("Your pin is required to");
+                title2.setText("login to your account");
             }
-
 
             num0.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -307,6 +307,7 @@ public class SecurityPin extends AppCompatActivity {
                             loginPin = dataSnapshot.getValue(String.class);
 
                             if(myPin.equals(loginPin)){
+                                myRef.child("appLocked").setValue(false);
                                 //proceed to account
                                 if(accountType.equals("1")){
                                     Intent slideactivity = new Intent(SecurityPin.this, CustomerActivity.class)
@@ -343,26 +344,19 @@ public class SecurityPin extends AppCompatActivity {
                     });
                 }
 
-                if(pinType.equals("ReceiptNotification")){
+                if(pinType.equals("resume")){
                     myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             loginPin = dataSnapshot.getValue(String.class);
 
                             if(myPin.equals(loginPin)){
-                                //proceed to receipt
-                                Intent slideactivity = new Intent(SecurityPin.this, ReceiptActivity.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                slideactivity.putExtra("orderOn", orderOn);
-                                slideactivity.putExtra("deliveredOn", deliveredOn);
-                                slideactivity.putExtra("restaurantName", restaurantName);
-                                slideactivity.putExtra("orderID", orderID);
-                                slideactivity.putExtra("restaurantPhone", restaurantPhone);
-                                slideactivity.putExtra("key", key);
-                                Bundle bndlanimation =
-                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                startActivity(slideactivity, bndlanimation);
+                                myRef.child("appLocked").setValue(false);
+                                //proceed to account
+                                locked = false;
+                                finish();
                             } else {
+                                locked = true;
                                 pinCombo = new int[4];
                                 resetPinEnter(false);
                                 SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
@@ -375,6 +369,7 @@ public class SecurityPin extends AppCompatActivity {
                         }
                     });
                 }
+
             }
         }
     }
@@ -445,5 +440,25 @@ public class SecurityPin extends AppCompatActivity {
         pin2.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
         pin3.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
         pin4.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadActivity();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try {
+            if (locked == true) {
+
+                this.finishAffinity();
+            }
+        } catch (Exception e){
+            Log.e(TAG, "onDestroy: ", e);
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.malcolmmaima.dishi.Controller;
 
 import android.app.ActivityManager;
-import android.app.ActivityOptions;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,20 +12,14 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -42,19 +35,10 @@ import com.malcolmmaima.dishi.Model.ReceiptModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.BlockedAccount;
 import com.malcolmmaima.dishi.View.Activities.Chat;
-import com.malcolmmaima.dishi.View.Activities.CustomerActivity;
-import com.malcolmmaima.dishi.View.Activities.MainActivity;
 import com.malcolmmaima.dishi.View.Activities.MyNotifications;
 import com.malcolmmaima.dishi.View.Activities.ReceiptActivity;
-import com.malcolmmaima.dishi.View.Activities.RestaurantActivity;
 import com.malcolmmaima.dishi.View.Activities.RiderActivity;
-import com.malcolmmaima.dishi.View.Activities.SecurityPin;
-import com.malcolmmaima.dishi.View.Activities.SetupAccountType;
-import com.malcolmmaima.dishi.View.Activities.SetupProfile;
-import com.malcolmmaima.dishi.View.Activities.SplashActivity;
-import com.malcolmmaima.dishi.View.Activities.SystemMaintenance;
 import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewMyOrders;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
@@ -64,8 +48,6 @@ import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import io.fabric.sdk.android.services.common.SafeToast;
 
 /**
  * https://androidwave.com/foreground-service-android-example/
@@ -86,7 +68,6 @@ public class ForegroundService extends Service {
     String restaurantName, lastName;
     final int[] unreadCounter = {0};
     NotificationManager manager;
-    Boolean pinSet;
 
     //We use this two variables as our notification ID because they are unique and attached to a user phone number
     String lastFourDigits = "";     //substring containing last 4 characters
@@ -164,16 +145,6 @@ public class ForegroundService extends Service {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
-
-                    try {
-                        if(dataSnapshot.child("pin").exists()){
-                            pinSet = true;
-                        } else {
-                            pinSet = false;
-                        }
-                    } catch (Exception e){
-                        Log.e(TAG, "onDataChange: ", e);
-                    }
 
                     try {
                         if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")) {
@@ -1731,44 +1702,22 @@ public class ForegroundService extends Service {
             }
         }
 
-        if(pinSet == true){
-            Intent intent = new Intent(this, SecurityPin.class);
-            intent.putExtra("type", "ReceiptNotification");
-            intent.putExtra("orderOn", newReceipt.getInitiatedOn());
-            intent.putExtra("deliveredOn", newReceipt.getDeliveredOn());
-            intent.putExtra("restaurantName", "vendorName");
-            intent.putExtra("orderID", newReceipt.getOrderID());
-            intent.putExtra("restaurantPhone", newReceipt.getRestaurant());
-            intent.putExtra("key", newReceipt.key);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.setContentIntent(contentIntent);
-            Notification notification = builder.build();
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            notification.defaults |= Notification.DEFAULT_SOUND;
-            notification.icon |= Notification.BADGE_ICON_LARGE;
-            manager.notify(notifId, notification);
-        }
-
-        else {
-            Intent intent = new Intent(this, targetActivity);
-            intent.putExtra("orderOn", newReceipt.getInitiatedOn());
-            intent.putExtra("deliveredOn", newReceipt.getDeliveredOn());
-            intent.putExtra("restaurantName", "vendorName");
-            intent.putExtra("orderID", newReceipt.getOrderID());
-            intent.putExtra("restaurantPhone", newReceipt.getRestaurant());
-            intent.putExtra("key", newReceipt.key);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.setContentIntent(contentIntent);
-            Notification notification = builder.build();
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            notification.defaults |= Notification.DEFAULT_SOUND;
-            notification.icon |= Notification.BADGE_ICON_LARGE;
-            manager.notify(notifId, notification);
-        }
+        Intent intent = new Intent(this, targetActivity);
+        intent.putExtra("orderOn", newReceipt.getInitiatedOn());
+        intent.putExtra("deliveredOn", newReceipt.getDeliveredOn());
+        intent.putExtra("restaurantName", "vendorName");
+        intent.putExtra("orderID", newReceipt.getOrderID());
+        intent.putExtra("restaurantPhone", newReceipt.getRestaurant());
+        intent.putExtra("key", newReceipt.key);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notification.defaults |= Notification.DEFAULT_SOUND;
+        notification.icon |= Notification.BADGE_ICON_LARGE;
+        manager.notify(notifId, notification);
     }
 
     /**

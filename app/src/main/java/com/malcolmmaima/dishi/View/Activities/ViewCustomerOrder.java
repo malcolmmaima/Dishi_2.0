@@ -1014,16 +1014,20 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         MenuItem item = menu.findItem(R.id.addRider);
         item.setVisible(false);
 
-        if(address.equals("pick")){
-            item.setVisible(false);
-        } else {
-            if(accType.equals("2")){
-                item.setVisible(true);
-            }
-
-            if(accType.equals("3")){
+        try {
+            if (address.equals("pick")) {
                 item.setVisible(false);
+            } else {
+                if (accType.equals("2")) {
+                    item.setVisible(true);
+                }
+
+                if (accType.equals("3")) {
+                    item.setVisible(false);
+                }
             }
+        } catch (Exception e){
+            Log.e(TAG, "onCreateOptionsMenu: ", e);
         }
         return true;
     }
