@@ -68,7 +68,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     List<ProductDetailsModel> list;
     String myPhone, phone, customerName, restaurantPhone, initiatedTime, address;
     FirebaseUser user;
-    DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus;
+    DatabaseReference riderRequests, customerOrderItems, myLocationRef, myRidersRef, riderStatus, myRef;
     ValueEventListener customerOrderItemsListener, myRidersListener, currentRiderListener, riderStatusListener;
     MyTextView_Roboto_Medium myOrderID, restaurantName, totalBill;
     MyTextView_Roboto_Regular subTotal, deliveryChargeAmount, payment, customerRemarks, riderName,
@@ -99,18 +99,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadViewCustomer();
-    }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        loadViewCustomer();
-    }
-
-    private void loadViewCustomer() {
-        setContentView(R.layout.activity_view_customer_order);
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
@@ -118,857 +107,985 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
-            //Initialize variables
-            deliveryCharge = 0.0;
-            totalAmount = 0.0;
-
-            //Data passed from adapter
-            phone = getIntent().getStringExtra("phone"); //From adapters
-            customerName = getIntent().getStringExtra("name");
-            restaurantPhone = getIntent().getStringExtra("restaurantPhone");
-            accType = getIntent().getStringExtra("accountType");
-            restaurantname = getIntent().getStringExtra("restaurantName");
-            restaurantProfile = getIntent().getStringExtra("restaurantProfile");
-
-            Toolbar topToolBar = findViewById(R.id.toolbar);
-            setSupportActionBar(topToolBar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            setTitle(customerName);
-
-            subTotal = findViewById(R.id.subTotal);
-            deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
-            payment = findViewById(R.id.payment);
-            totalBill = findViewById(R.id.totalBill);
-            recyclerview = findViewById(R.id.rview);
-            confirmOrder = findViewById(R.id.btn_confirm);
-            confirmOrder.setTag("confirm");
-            declineOrder = findViewById(R.id.btn_decline);
-            declineOrder.setTag("active");
-            DeliveryAddress = findViewById(R.id.DeliveryAddress);
-            customerRemarks = findViewById(R.id.customerRemarks);
-            riderName = findViewById(R.id.riderName);
-            riderIcon = findViewById(R.id.riderIcon);
-            profilePic = findViewById(R.id.profilePic);
-            OrderStatus = findViewById(R.id.card_order_status);
-            acceptOrd = findViewById(R.id.confirmOrd);
-            timeStamp = findViewById(R.id.timeStamp);
-            acceptOrd.setTag("accept");
-            restaurantName = findViewById(R.id.restaurantName);
-            restaurantName.setText(restaurantname);
-            myOrderID = findViewById(R.id.myOrderID);
-            trackOrderTxt = findViewById(R.id.trackOrderTxt);
-
-            /**
-             * Load image url onto imageview
-             */
-            try {
-                //Load retaurant image
-                Picasso.with(ViewCustomerOrder.this).load(restaurantProfile).fit().centerCrop()
-                        .placeholder(R.drawable.default_profile)
-                        .error(R.drawable.default_profile)
-                        .into(profilePic);
-            } catch (Exception e){
-
-            }
-
-            restaurantName.setOnClickListener(new View.OnClickListener() {
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onClick(final View v) {
-                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                    builder.setTitle(restaurantname);
-                    builder.setItems(restaurantActions, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                            if(which == 0){
-                                Intent slideactivity = new Intent(ViewCustomerOrder.this, ViewRestaurant.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                slideactivity.putExtra("restaurant_phone", restaurantPhone);
-                                slideactivity.putExtra("distance", 0.0);
-                                slideactivity.putExtra("profilePic", restaurantProfile);
-                                Bundle bndlanimation =
-                                        null;
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                    bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
-                                }
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                    startActivity(slideactivity, bndlanimation);
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(ViewCustomerOrder.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadViewCustomer();
                                 }
                             }
-                            if(which == 1){
-                                Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                slideactivity.putExtra("fromPhone", myPhone);
-                                slideactivity.putExtra("toPhone", restaurantPhone);
-                                Bundle bndlanimation =
-                                        null;
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                    bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        loadViewCustomer();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(ViewCustomerOrder.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadViewCustomer();
                                 }
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                    startActivity(slideactivity, bndlanimation);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        loadViewCustomer();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(ViewCustomerOrder.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            } else {
+                                loadViewCustomer();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    loadViewCustomer();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void loadViewCustomer() {
+        setContentView(R.layout.activity_view_customer_order);
+
+        //Initialize variables
+        deliveryCharge = 0.0;
+        totalAmount = 0.0;
+
+        //Data passed from adapter
+        phone = getIntent().getStringExtra("phone"); //From adapters
+        customerName = getIntent().getStringExtra("name");
+        restaurantPhone = getIntent().getStringExtra("restaurantPhone");
+        accType = getIntent().getStringExtra("accountType");
+        restaurantname = getIntent().getStringExtra("restaurantName");
+        restaurantProfile = getIntent().getStringExtra("restaurantProfile");
+
+        Toolbar topToolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(topToolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setTitle(customerName);
+
+        subTotal = findViewById(R.id.subTotal);
+        deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
+        payment = findViewById(R.id.payment);
+        totalBill = findViewById(R.id.totalBill);
+        recyclerview = findViewById(R.id.rview);
+        confirmOrder = findViewById(R.id.btn_confirm);
+        confirmOrder.setTag("confirm");
+        declineOrder = findViewById(R.id.btn_decline);
+        declineOrder.setTag("active");
+        DeliveryAddress = findViewById(R.id.DeliveryAddress);
+        customerRemarks = findViewById(R.id.customerRemarks);
+        riderName = findViewById(R.id.riderName);
+        riderIcon = findViewById(R.id.riderIcon);
+        profilePic = findViewById(R.id.profilePic);
+        OrderStatus = findViewById(R.id.card_order_status);
+        acceptOrd = findViewById(R.id.confirmOrd);
+        timeStamp = findViewById(R.id.timeStamp);
+        acceptOrd.setTag("accept");
+        restaurantName = findViewById(R.id.restaurantName);
+        restaurantName.setText(restaurantname);
+        myOrderID = findViewById(R.id.myOrderID);
+        trackOrderTxt = findViewById(R.id.trackOrderTxt);
+
+        /**
+         * Load image url onto imageview
+         */
+        try {
+            //Load retaurant image
+            Picasso.with(ViewCustomerOrder.this).load(restaurantProfile).fit().centerCrop()
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
+                    .into(profilePic);
+        } catch (Exception e){
+
+        }
+
+        restaurantName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                builder.setTitle(restaurantname);
+                builder.setItems(restaurantActions, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if(which == 0){
+                            Intent slideactivity = new Intent(ViewCustomerOrder.this, ViewRestaurant.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            slideactivity.putExtra("restaurant_phone", restaurantPhone);
+                            slideactivity.putExtra("distance", 0.0);
+                            slideactivity.putExtra("profilePic", restaurantProfile);
+                            Bundle bndlanimation =
+                                    null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                startActivity(slideactivity, bndlanimation);
+                            }
+                        }
+                        if(which == 1){
+                            Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            slideactivity.putExtra("fromPhone", myPhone);
+                            slideactivity.putExtra("toPhone", restaurantPhone);
+                            Bundle bndlanimation =
+                                    null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                startActivity(slideactivity, bndlanimation);
+                            }
+                        }
+
+                        if(which == 2){
+                            final AlertDialog callAlert = new AlertDialog.Builder(v.getContext())
+                                    //set message, title, and icon
+                                    .setMessage("Call " + restaurantname + "?")
+                                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                    //set three option buttons
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            String phone = restaurantPhone;
+                                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                            startActivity(intent);
+                                        }
+                                    }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            //do nothing
+
+                                        }
+                                    })//setNegativeButton
+
+                                    .create();
+                            callAlert.show();
+                        }
+
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(ViewCustomerOrder.this, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", restaurantProfile);
+                startActivity(slideactivity);
+            }
+        });
+
+        if(accType.equals("2")){
+            OrderStatus.setVisibility(View.GONE);
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+            customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
+            myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
+        }
+
+        if(accType.equals("3")){
+            OrderStatus.setVisibility(View.VISIBLE);
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+            customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+phone);
+            myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone);
+        }
+
+        /**
+         * On create view fetch my location coordinates
+         */
+
+        try {
+            liveLocationModel = null;
+            locationListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                        //SafeToast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+
+                        /**
+                         * Compute distance between customer and restaurant
+                         */
+
+                        CalculateDistance calculateDistance = new CalculateDistance();
+                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                liveLocationModel.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
+
+                        SafeToast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            myLocationRef.addListenerForSingleValueEvent(locationListener);
+        } catch (Exception e){
+
+        }
+
+
+        /**
+         * Initialize cart items total and keep track of items
+         */
+        customerOrderItemsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(!dataSnapshot.exists()){
+                    finish();
+                    SafeToast.makeText(ViewCustomerOrder.this, "Order Complete!", Toast.LENGTH_LONG).show();
+                } else {
+                    total[0] = 0;
+
+                    list = new ArrayList<>();
+
+                    String remarks = dataSnapshot.child("remarks").getValue(String.class);
+                    String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                    String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                    address = dataSnapshot.child("address").getValue(String.class);
+                    payment.setText(paymentMethod);
+                    myOrderID.setText("ORDER ID: #"+orderID);
+                    initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+
+                    if(address.equals("pick")){
+                        DeliveryAddress.setEnabled(false);
+                        trackOrderTxt.setText("Customer will pick order");
+                        riderName.setVisibility(View.GONE);
+                        riderIcon.setVisibility(View.GONE);
+                    }
+
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+
+                        int second = 1800; //30minutes
+
+                        @Override
+                        public void run() {
+                            if (second <= 0) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Orer id taking too long
+                                        timer.cancel();
+                                    }
+                                });
+
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        //Get today's date
+                                        GetCurrentDate currentDate = new GetCurrentDate();
+                                        String currDate = currentDate.getDate();
+
+                                        //Get dates
+                                        String dtEnd = currDate;
+                                        String dtStart = initiatedTime;
+
+                                        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+                                        //Format both current date and date status update was posted
+                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+                                        try {
+
+                                            //Convert String date values to Date values
+                                            Date dateStart;
+                                            Date dateEnd;
+
+                                            //Date dateStart = format.parse(dtStart);
+                                            String[] timeS = Split(initiatedTime);
+                                            String[] timeT = Split(currDate);
+
+                                            /**
+                                             * timeS[0] = date
+                                             * timeS[1] = hr
+                                             * timeS[2] = min
+                                             * timeS[3] = seconds
+                                             * timeS[4] = timezone
+                                             */
+
+                                            //post timeStamp
+                                            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                timeS[4] = "GMT+03:00";
+
+                                                //2020-04-27:20:37:32:GMT+03:00
+                                                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                                                dateStart = format.parse(dtStart);
+                                            } else {
+                                                dateStart = format.parse(dtStart);
+                                            }
+
+                                            //my device current date
+                                            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                                timeT[4] = "GMT+03:00";
+
+                                                //2020-04-27:20:37:32:GMT+03:00
+                                                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                                                dateEnd = format.parse(dtEnd);
+                                            } else {
+                                                dateEnd = format.parse(dtEnd);
+                                            }
+
+                                            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                                            //Now compute timeAgo duration
+                                            TimeAgo timeAgo = new TimeAgo();
+
+                                            timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                            Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                        }
+
+                                        second--;
+                                    }
+                                });
+                            }
+
+                        }
+                    }, 0, 1000);
+
+                    try {
+                        riderPhone = dataSnapshot.child("rider").getValue(String.class);
+                    } catch (Exception e){
+
+                    }
+
+                    customerRemarks.setText("Remarks: "+remarks);
+                    for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
+
+                        try {
+                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                            prod.setKey(items.getKey());
+                            prod.accountType = accType;
+                            list.add(prod);
+
+                            if(prod.getConfirmed() == true){
+                                int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
+                                total[0] = total[0] + adapterTotal;
+                                totalAmount = total[0] + deliveryCharge;
+                            }
+                        } catch (Exception e){
+
+                        }
+                    }
+                    subTotal.setText("Ksh "+total[0]);
+
+                    if(!list.isEmpty()){
+                        Collections.reverse(list);
+                        ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this, list, ViewCustomerOrder.this);
+                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
+                        recyclerview.setLayoutManager(layoutmanager);
+                        recyclerview.setItemAnimator( new DefaultItemAnimator());
+                        recycler.notifyDataSetChanged();
+                        recyclerview.setAdapter(recycler);
+
+
+                    }
+
+                    totalBill.setText("ksh " + totalAmount);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        customerOrderItems.addValueEventListener(customerOrderItemsListener);
+
+        /**
+         * Fetch my riders list
+         */
+        myRidersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myRiders = new ArrayList<String>();
+                ridersName = new ArrayList<String>();
+
+                for(final DataSnapshot rider : dataSnapshot.getChildren()){
+                    DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+rider.getKey());
+                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            try {
+                                riderUser = dataSnapshot.getValue(UserModel.class);
+
+                                myRiders.add(rider.getKey());
+                                ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+                try {
+                    Collections.reverse(myRiders);
+                    Collections.reverse(ridersName);
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myRidersRef.addValueEventListener(myRidersListener);
+
+        /**
+         * fetch current rider
+         */
+        currentRiderListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    riderName.setText("You are the default rider for this order. Assign rider top right icon.");
+                }
+
+                else {
+                    final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
+                    riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            riderUser = dataSnapshot.getValue(UserModel.class);
+                            riderName.setText(riderUser.getFirstname()+" "+riderUser.getLastname());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    if(accType.equals("2")){
+                        try {
+                            //SafeToast.makeText(ViewCustomerOrder.this, "rider: "+ riderPhone, Toast.LENGTH_LONG).show();
+                            riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + riderPhone + "/" + myPhone + "/" + phone);
+                        } catch (Exception e){
+
+                        }
+                    }
+
+                    if(accType.equals("3")){
+                        riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone+"/"+restaurantPhone+"/"+phone);
+
+                        /**
+                         * Close this activity for rider if restaurant has assigned the order to a different rider
+                         */
+                        if(!myPhone.equals(dataSnapshot.getValue())){
+                            finish();
+                            SafeToast.makeText(ViewCustomerOrder.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    riderStatusListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
+                            String riderOrderStatus = dtSnapshot.getValue(String.class);
+                            //SafeToast.makeText(ViewCustomerOrder.this, "status: " + riderOrderStatus, Toast.LENGTH_SHORT).show();
+                            if(riderOrderStatus == null && riderPhone == null){
+                                Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
+                                riderName.setText("Rider does not exist");
+                                //customerOrderItems.child("rider").removeValue(); //bug
+                            }
+
+                            try {
+                                if (riderOrderStatus.equals("accepted")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    acceptOrd.setTag("decline");
+                                    acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
+                                    confirmOrder.setVisibility(View.VISIBLE);
+                                }
+
+                                if (riderOrderStatus.equals("assigned")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    acceptOrd.setTag("accept");
+                                    acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                    confirmOrder.setVisibility(View.GONE);
+                                }
+
+                                if (riderOrderStatus.equals("declined")) {
+                                    riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    acceptOrd.setTag("accept");
+                                    acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                    confirmOrder.setVisibility(View.GONE);
+                                }
+
+                                if(accType.equals("2")){
+                                    confirmOrder.setVisibility(View.VISIBLE);
+                                }
+                            } catch (Exception e){
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    };
+                    try {
+                        riderStatus.addValueEventListener(riderStatusListener);
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
+
+        riderName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+
+                if(riderPhone != null && !riderPhone.equals(myPhone)){
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                    builder.setTitle(riderName.getText().toString());
+                    builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, final int which) {
+                            if(which == 0){
+                                if(riderPhone != null){
+                                    Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                }
+
+                                else {
+                                    Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+
+                            if(which == 1){
+                                if(riderPhone != null){
+                                    Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    slideactivity.putExtra("fromPhone", myPhone);
+                                    slideactivity.putExtra("toPhone", riderPhone);
+                                    Bundle bndlanimation =
+                                            null;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                                    }
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        startActivity(slideactivity, bndlanimation);
+                                    }
+                                }
+
+                                else {
+                                    Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
                                 }
                             }
 
                             if(which == 2){
-                                final AlertDialog callAlert = new AlertDialog.Builder(v.getContext())
-                                        //set message, title, and icon
-                                        .setMessage("Call " + restaurantname + "?")
-                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                        //set three option buttons
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                String phone = restaurantPhone;
-                                                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
-                                                startActivity(intent);
-                                            }
-                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                //do nothing
+                                if(riderPhone != null){
+                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
+                                    startActivity(intent);
+                                }
 
-                                            }
-                                        })//setNegativeButton
+                                else {
+                                    Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                                }
 
-                                        .create();
-                                callAlert.show();
                             }
-
                         }
                     });
                     builder.create();
                     builder.show();
                 }
-            });
-
-            profilePic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent slideactivity = new Intent(ViewCustomerOrder.this, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", restaurantProfile);
-                    startActivity(slideactivity);
-                }
-            });
-
-            if(accType.equals("2")){
-                OrderStatus.setVisibility(View.GONE);
-                myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
-                customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+phone);
-                myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+myPhone);
-            }
-
-            if(accType.equals("3")){
-                OrderStatus.setVisibility(View.VISIBLE);
-                myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
-                customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+phone);
-                myRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/"+restaurantPhone);
-            }
-
-            /**
-             * On create view fetch my location coordinates
-             */
-
-            try {
-                liveLocationModel = null;
-                locationListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        try {
-                            liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                            //SafeToast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-
-                            /**
-                             * Compute distance between customer and restaurant
-                             */
-
-                            CalculateDistance calculateDistance = new CalculateDistance();
-                            Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                    liveLocationModel.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
-
-                            SafeToast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                };
-                myLocationRef.addListenerForSingleValueEvent(locationListener);
-            } catch (Exception e){
 
             }
+        });
+        acceptOrd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(acceptOrd.getTag().equals("accept")){
 
-
-            /**
-             * Initialize cart items total and keep track of items
-             */
-            customerOrderItemsListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                    if(!dataSnapshot.exists()){
-                        finish();
-                        SafeToast.makeText(ViewCustomerOrder.this, "Order Complete!", Toast.LENGTH_LONG).show();
-                    } else {
-                        total[0] = 0;
-
-                        list = new ArrayList<>();
-
-                        String remarks = dataSnapshot.child("remarks").getValue(String.class);
-                        String orderID = dataSnapshot.child("orderID").getValue(String.class);
-                        String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
-                        address = dataSnapshot.child("address").getValue(String.class);
-                        payment.setText(paymentMethod);
-                        myOrderID.setText("ORDER ID: #"+orderID);
-                        initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
-
-                        if(address.equals("pick")){
-                            DeliveryAddress.setEnabled(false);
-                            trackOrderTxt.setText("Customer will pick order");
-                            riderName.setVisibility(View.GONE);
-                            riderIcon.setVisibility(View.GONE);
-                        }
-
-                        timer = new Timer();
-                        timer.schedule(new TimerTask() {
-
-                            int second = 1800; //30minutes
-
-                            @Override
-                            public void run() {
-                                if (second <= 0) {
-                                    runOnUiThread(new Runnable() {
+                    final AlertDialog accept = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Accept ride order request?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    riderStatus.setValue("accepted");
+                                    myRidersRef.child(myPhone).setValue("active").addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void run() {
-                                            //Orer id taking too long
-                                            timer.cancel();
+                                        public void onSuccess(Void aVoid) {
+                                            acceptOrd.setTag("decline");
+                                            acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
                                         }
                                     });
 
-                                } else {
-                                    runOnUiThread(new Runnable() {
+                                }
+                            })//setPositiveButton
+
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            })
+
+                            .create();
+                    accept.show();
+
+                }
+
+                if(acceptOrd.getTag().equals("decline")){
+
+                    final AlertDialog decline = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Decline ride order request?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    riderStatus.setValue("declined");
+                                    myRidersRef.child(myPhone).setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void run() {
+                                        public void onSuccess(Void aVoid) {
+                                            acceptOrd.setTag("accept");
+                                            acceptOrd.setImageResource(R.drawable.ic_action_save);
+                                        }
+                                    });
 
-                                            //Get today's date
-                                            GetCurrentDate currentDate = new GetCurrentDate();
-                                            String currDate = currentDate.getDate();
+                                }
+                            })//setPositiveButton
 
-                                            //Get dates
-                                            String dtEnd = currDate;
-                                            String dtStart = initiatedTime;
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
 
-                                            //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                                            //Format both current date and date status update was posted
-                                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
-                                            try {
+                                }
+                            })
 
-                                                //Convert String date values to Date values
-                                                Date dateStart;
-                                                Date dateEnd;
+                            .create();
+                    decline.show();
 
-                                                //Date dateStart = format.parse(dtStart);
-                                                String[] timeS = Split(initiatedTime);
-                                                String[] timeT = Split(currDate);
+                }
 
-                                                /**
-                                                 * timeS[0] = date
-                                                 * timeS[1] = hr
-                                                 * timeS[2] = min
-                                                 * timeS[3] = seconds
-                                                 * timeS[4] = timezone
-                                                 */
+            }
+        });
 
-                                                //post timeStamp
-                                                if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                                    timeS[4] = "GMT+03:00";
+        DeliveryAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(ViewCustomerOrder.this, GeoTracking.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                                    //2020-04-27:20:37:32:GMT+03:00
-                                                    dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                                                    dateStart = format.parse(dtStart);
-                                                } else {
-                                                    dateStart = format.parse(dtStart);
-                                                }
+                if(accType.equals("2")){
+                    slideactivity.putExtra("restaurantPhone", myPhone);
+                    slideactivity.putExtra("customerPhone", phone);
+                }
 
-                                                //my device current date
-                                                if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                                    timeT[4] = "GMT+03:00";
+                if(accType.equals("3")){
+                    slideactivity.putExtra("restaurantPhone", restaurantPhone);
+                    slideactivity.putExtra("customerPhone", phone);
+                }
 
-                                                    //2020-04-27:20:37:32:GMT+03:00
-                                                    dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                                                    dateEnd = format.parse(dtEnd);
-                                                } else {
-                                                    dateEnd = format.parse(dtEnd);
-                                                }
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
 
-                                                //https://memorynotfound.com/calculate-relative-time-time-ago-java/
-                                                //Now compute timeAgo duration
-                                                TimeAgo timeAgo = new TimeAgo();
+            }
+        });
 
-                                                timeStamp.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+        customerOrderItems.child("items").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot items : dataSnapshot.getChildren()){
+                    Boolean confirmed = items.child("confirmed").getValue(Boolean.class);
+                    if(confirmed){
+                        confirmOrder.setTag("end");
+                        confirmOrder.setText("END");
+                        declineOrder.setVisibility(View.GONE);
+                    }
+                }
+            }
 
-                                            } catch (ParseException e) {
-                                                e.printStackTrace();
-                                                Log.d(TAG, "timeStamp: "+ e.getMessage());
-                                            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            second--;
+            }
+        });
+
+        confirmOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                String message = "Order Delivered?"; //default
+
+                if(address.equals("pick")){
+                    message = "Customer Picked Order?";
+                } else {
+                    message = "Order Delivered?";
+                }
+                /**
+                 * Delivered order to address, notify customer
+                 */
+                if(confirmOrder.getTag().toString().equals("end")){
+                    AlertDialog finish = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage(message)
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
                                         }
                                     });
                                 }
+                            })//setPositiveButton
 
-                            }
-                        }, 0, 1000);
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if(address.equals("pick")){
+                                        AlertDialog cancelOrder = new AlertDialog.Builder(ViewCustomerOrder.this)
+                                                .setMessage("Cancel anyway?")
+                                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                                .setCancelable(false)
+                                                //set three option buttons
+                                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                                        customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                //
+                                                            }
+                                                        });
+                                                    }
+                                                })//setPositiveButton
 
-                        try {
-                            riderPhone = dataSnapshot.child("rider").getValue(String.class);
-                        } catch (Exception e){
+                                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        //Do nothing
+                                                    }
+                                                })
 
-                        }
-
-                        customerRemarks.setText("Remarks: "+remarks);
-                        for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
-
-                            try {
-                                ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                prod.setKey(items.getKey());
-                                prod.accountType = accType;
-                                list.add(prod);
-
-                                if(prod.getConfirmed() == true){
-                                    int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
-                                    total[0] = total[0] + adapterTotal;
-                                    totalAmount = total[0] + deliveryCharge;
-                                }
-                            } catch (Exception e){
-
-                            }
-                        }
-                        subTotal.setText("Ksh "+total[0]);
-
-                        if(!list.isEmpty()){
-                            Collections.reverse(list);
-                            ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this, list, ViewCustomerOrder.this);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
-                            recyclerview.setLayoutManager(layoutmanager);
-                            recyclerview.setItemAnimator( new DefaultItemAnimator());
-                            recycler.notifyDataSetChanged();
-                            recyclerview.setAdapter(recycler);
-
-
-                        }
-
-                        totalBill.setText("ksh " + totalAmount);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            customerOrderItems.addValueEventListener(customerOrderItemsListener);
-
-            /**
-             * Fetch my riders list
-             */
-            myRidersListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    myRiders = new ArrayList<String>();
-                    ridersName = new ArrayList<String>();
-
-                    for(final DataSnapshot rider : dataSnapshot.getChildren()){
-                        DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+rider.getKey());
-                        riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                try {
-                                    riderUser = dataSnapshot.getValue(UserModel.class);
-
-                                    myRiders.add(rider.getKey());
-                                    ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
-                                } catch (Exception e){
-                                    Log.e(TAG, "onDataChange: ", e);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-
-                    try {
-                        Collections.reverse(myRiders);
-                        Collections.reverse(ridersName);
-                    } catch (Exception e){
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            myRidersRef.addValueEventListener(myRidersListener);
-
-            /**
-             * fetch current rider
-             */
-            currentRiderListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.exists()){
-                        riderName.setText("You are the default rider for this order. Assign rider top right icon.");
-                    }
-
-                    else {
-                        final DatabaseReference riderUserInfo = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getValue());
-                        riderUserInfo.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                riderUser = dataSnapshot.getValue(UserModel.class);
-                                riderName.setText(riderUser.getFirstname()+" "+riderUser.getLastname());
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        if(accType.equals("2")){
-                            try {
-                                //SafeToast.makeText(ViewCustomerOrder.this, "rider: "+ riderPhone, Toast.LENGTH_LONG).show();
-                                riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + riderPhone + "/" + myPhone + "/" + phone);
-                            } catch (Exception e){
-
-                            }
-                        }
-
-                        if(accType.equals("3")){
-                            riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myPhone+"/"+restaurantPhone+"/"+phone);
-
-                            /**
-                             * Close this activity for rider if restaurant has assigned the order to a different rider
-                             */
-                            if(!myPhone.equals(dataSnapshot.getValue())){
-                                finish();
-                                SafeToast.makeText(ViewCustomerOrder.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
-                            }
-                        }
-
-                        riderStatusListener = new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
-                                String riderOrderStatus = dtSnapshot.getValue(String.class);
-                                //SafeToast.makeText(ViewCustomerOrder.this, "status: " + riderOrderStatus, Toast.LENGTH_SHORT).show();
-                                if(riderOrderStatus == null && riderPhone == null){
-                                    Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
-                                    riderName.setText("Rider does not exist");
-                                    //customerOrderItems.child("rider").removeValue(); //bug
-                                }
-
-                                try {
-                                    if (riderOrderStatus.equals("accepted")) {
-                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN);
-                                        acceptOrd.setTag("decline");
-                                        acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
-                                        confirmOrder.setVisibility(View.VISIBLE);
-                                    }
-
-                                    if (riderOrderStatus.equals("assigned")) {
-                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN);
-                                        acceptOrd.setTag("accept");
-                                        acceptOrd.setImageResource(R.drawable.ic_action_save);
-                                        confirmOrder.setVisibility(View.GONE);
-                                    }
-
-                                    if (riderOrderStatus.equals("declined")) {
-                                        riderIcon.setColorFilter(ContextCompat.getColor(ViewCustomerOrder.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
-                                        acceptOrd.setTag("accept");
-                                        acceptOrd.setImageResource(R.drawable.ic_action_save);
-                                        confirmOrder.setVisibility(View.GONE);
-                                    }
-
-                                    if(accType.equals("2")){
-                                        confirmOrder.setVisibility(View.VISIBLE);
-                                    }
-                                } catch (Exception e){
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        };
-                        try {
-                            riderStatus.addValueEventListener(riderStatusListener);
-                        } catch (Exception e){
-
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            customerOrderItems.child("rider").addValueEventListener(currentRiderListener);
-
-            riderName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if(riderPhone != null && !riderPhone.equals(myPhone)){
-                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                        builder.setTitle(riderName.getText().toString());
-                        builder.setItems(riderOptions, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, final int which) {
-                                if(which == 0){
-                                    if(riderPhone != null){
-                                        Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
-                                    }
-
-                                    else {
-                                        Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
+                                                .create();
+                                        cancelOrder.show();
                                     }
                                 }
+                            })
 
-                                if(which == 1){
-                                    if(riderPhone != null){
-                                        Intent slideactivity = new Intent(ViewCustomerOrder.this, Chat.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            .create();
+                    finish.show();
 
-                                        slideactivity.putExtra("fromPhone", myPhone);
-                                        slideactivity.putExtra("toPhone", riderPhone);
-                                        Bundle bndlanimation =
-                                                null;
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                            bndlanimation = ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
+                }
+                /**
+                 * Accept order
+                 */
+                else {
+                    AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Accept " + customerName + "'s order?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    int j = 0;
+                                    //set product item status to confirmed
+                                    for(int i = 0; i<list.size(); i++){
+                                        if(list.get(i).getConfirmed() == true){
+                                            j++;
+                                            customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(true);
                                         }
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                            startActivity(slideactivity, bndlanimation);
-                                        }
-                                    }
 
-                                    else {
-                                        Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
-                                    }
-                                }
+                                        if(i==list.size()-1){ //loop has reached the end
 
-                                if(which == 2){
-                                    if(riderPhone != null){
-                                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", riderPhone, null));
-                                        startActivity(intent);
-                                    }
-
-                                    else {
-                                        Snackbar.make(v.getRootView(), "You're the default rider", Snackbar.LENGTH_LONG).show();
-                                    }
-
-                                }
-                            }
-                        });
-                        builder.create();
-                        builder.show();
-                    }
-
-                }
-            });
-            acceptOrd.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(acceptOrd.getTag().equals("accept")){
-
-                        final AlertDialog accept = new AlertDialog.Builder(ViewCustomerOrder.this)
-                                .setMessage("Accept ride order request?")
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        riderStatus.setValue("accepted");
-                                        myRidersRef.child(myPhone).setValue("active").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                acceptOrd.setTag("decline");
-                                                acceptOrd.setImageResource(R.drawable.ic_clear_white_36dp);
-                                            }
-                                        });
-
-                                    }
-                                })//setPositiveButton
-
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                                    }
-                                })
-
-                                .create();
-                        accept.show();
-
-                    }
-
-                    if(acceptOrd.getTag().equals("decline")){
-
-                        final AlertDialog decline = new AlertDialog.Builder(ViewCustomerOrder.this)
-                                .setMessage("Decline ride order request?")
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        riderStatus.setValue("declined");
-                                        myRidersRef.child(myPhone).setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                acceptOrd.setTag("accept");
-                                                acceptOrd.setImageResource(R.drawable.ic_action_save);
-                                            }
-                                        });
-
-                                    }
-                                })//setPositiveButton
-
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                                    }
-                                })
-
-                                .create();
-                        decline.show();
-
-                    }
-
-                }
-            });
-
-            DeliveryAddress.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent slideactivity = new Intent(ViewCustomerOrder.this, GeoTracking.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    if(accType.equals("2")){
-                        slideactivity.putExtra("restaurantPhone", myPhone);
-                        slideactivity.putExtra("customerPhone", phone);
-                    }
-
-                    if(accType.equals("3")){
-                        slideactivity.putExtra("restaurantPhone", restaurantPhone);
-                        slideactivity.putExtra("customerPhone", phone);
-                    }
-
-                    Bundle bndlanimation =
-                            ActivityOptions.makeCustomAnimation(ViewCustomerOrder.this, R.anim.animation,R.anim.animation2).toBundle();
-                    startActivity(slideactivity, bndlanimation);
-
-                }
-            });
-
-            customerOrderItems.child("items").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for(DataSnapshot items : dataSnapshot.getChildren()){
-                        Boolean confirmed = items.child("confirmed").getValue(Boolean.class);
-                        if(confirmed){
-                            confirmOrder.setTag("end");
-                            confirmOrder.setText("END");
-                            declineOrder.setVisibility(View.GONE);
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            confirmOrder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    String message = "Order Delivered?"; //default
-
-                    if(address.equals("pick")){
-                        message = "Customer Picked Order?";
-                    } else {
-                        message = "Order Delivered?";
-                    }
-                    /**
-                     * Delivered order to address, notify customer
-                     */
-                    if(confirmOrder.getTag().toString().equals("end")){
-                        AlertDialog finish = new AlertDialog.Builder(ViewCustomerOrder.this)
-                                .setMessage(message)
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
-                                            }
-                                        });
-                                    }
-                                })//setPositiveButton
-
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        if(address.equals("pick")){
-                                            AlertDialog cancelOrder = new AlertDialog.Builder(ViewCustomerOrder.this)
-                                                    .setMessage("Cancel anyway?")
-                                                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                                    .setCancelable(false)
-                                                    //set three option buttons
-                                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    //
-                                                                }
-                                                            });
-                                                        }
-                                                    })//setPositiveButton
-
-                                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                                            //Do nothing
-                                                        }
-                                                    })
-
-                                                    .create();
-                                            cancelOrder.show();
-                                        }
-                                    }
-                                })
-
-                                .create();
-                        finish.show();
-
-                    }
-                    /**
-                     * Accept order
-                     */
-                    else {
-                        AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
-                                .setMessage("Accept " + customerName + "'s order?")
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        int j = 0;
-                                        //set product item status to confirmed
-                                        for(int i = 0; i<list.size(); i++){
-                                            if(list.get(i).getConfirmed() == true){
-                                                j++;
-                                                customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(true);
-                                            }
-
-                                            if(i==list.size()-1){ //loop has reached the end
-
-                                                if(j==0){
-                                                    Snackbar.make(v.getRootView(), "You must select available order items", Snackbar.LENGTH_LONG).show();
-                                                }
+                                            if(j==0){
+                                                Snackbar.make(v.getRootView(), "You must select available order items", Snackbar.LENGTH_LONG).show();
                                             }
                                         }
                                     }
-                                })//setPositiveButton
+                                }
+                            })//setPositiveButton
 
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        //Do nothing
-                                    }
-                                })
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
 
-                                .create();
-                        confirmOrd.show();
-                    }
-
-
+                            .create();
+                    confirmOrd.show();
                 }
-            });
 
-            declineOrder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    if(declineOrder.getTag().equals("declined")){
-                        customerOrderItems.removeValue();
-                    }
 
-                    else {
-                        AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
-                                .setMessage("Decline " + customerName + "'s order?")
-                                //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                .setCancelable(false)
-                                //set three option buttons
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        int j = 0;
-                                        //set product item status to confirmed
-                                        for(int i = 0; i<list.size(); i++){
-                                            customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(false);
+            }
+        });
 
-                                            if(i==list.size()-1){ //loop has reached the end
-                                                confirmOrder.setVisibility(View.GONE);
-                                                declineOrder.setTag("declined");
-                                                declineOrder.setText("DELETE");
-                                                Snackbar.make(v.getRootView(), "Order declined", Snackbar.LENGTH_LONG).show();
-                                            }
+        declineOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if(declineOrder.getTag().equals("declined")){
+                    customerOrderItems.removeValue();
+                }
+
+                else {
+                    AlertDialog confirmOrd = new AlertDialog.Builder(ViewCustomerOrder.this)
+                            .setMessage("Decline " + customerName + "'s order?")
+                            //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                            .setCancelable(false)
+                            //set three option buttons
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    int j = 0;
+                                    //set product item status to confirmed
+                                    for(int i = 0; i<list.size(); i++){
+                                        customerOrderItems.child("items").child(list.get(i).getKey()).child("confirmed").setValue(false);
+
+                                        if(i==list.size()-1){ //loop has reached the end
+                                            confirmOrder.setVisibility(View.GONE);
+                                            declineOrder.setTag("declined");
+                                            declineOrder.setText("DELETE");
+                                            Snackbar.make(v.getRootView(), "Order declined", Snackbar.LENGTH_LONG).show();
                                         }
                                     }
-                                })//setPositiveButton
+                                }
+                            })//setPositiveButton
 
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        //Do nothing
-                                    }
-                                })
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Do nothing
+                                }
+                            })
 
-                                .create();
-                        confirmOrd.show();
-                    }
-
+                            .create();
+                    confirmOrd.show();
                 }
-            });
 
-            //Back button on toolbar
-            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish(); // Go back to previous activity
-                }
-            });
-            //topToolBar.setLogo(R.drawable.logo);
-            //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
+            }
+        });
 
-        }
+        //Back button on toolbar
+        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // Go back to previous activity
+            }
+        });
+        //topToolBar.setLogo(R.drawable.logo);
+        //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
     }
 
     @Override

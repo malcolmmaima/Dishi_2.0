@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("pinType", "login");
                                                                             slideactivity.putExtra("accType", "1");
                                                                             startActivity(slideactivity);
                                                                         }
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("pinType", "login");
                                                                             slideactivity.putExtra("accType", "2");
                                                                             startActivity(slideactivity);
                                                                         }
@@ -376,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                            slideactivity.putExtra("type", "login");
+                                                                            slideactivity.putExtra("pinType", "login");
                                                                             slideactivity.putExtra("accType", "3");
                                                                             startActivity(slideactivity);
                                                                         }
@@ -629,7 +629,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                     //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                     Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                                    slideactivity.putExtra("type", "login");
+                                                                                    slideactivity.putExtra("pinType", "login");
                                                                                     slideactivity.putExtra("accType", "2");
                                                                                     startActivity(slideactivity);
                                                                                 }
@@ -660,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                     //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                     Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                                    slideactivity.putExtra("type", "login");
+                                                                                    slideactivity.putExtra("pinType", "login");
                                                                                     slideactivity.putExtra("accType", "3");
                                                                                     startActivity(slideactivity);
                                                                                 }
