@@ -184,6 +184,7 @@ public class RestaurantActivity extends AppCompatActivity
     }
 
     private void loadActivity() {
+        setContentView(R.layout.activity_restaurant);
         TAG = "RestaurantActivity";
 
         imageURL = "";
