@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.Controller.Utils;
 
 import android.app.Activity;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -10,6 +11,7 @@ import android.widget.FrameLayout;
  */
 public class CommentKeyBoardFix
 {
+    String TAG = "CommentKeyBoardFix";
     private View mChildOfContent;
     private int usableHeightPrevious;
     private FrameLayout.LayoutParams frameLayoutParams;
@@ -17,10 +19,14 @@ public class CommentKeyBoardFix
 
     public CommentKeyBoardFix(Activity activity)
     {
-        FrameLayout content = activity.findViewById(android.R.id.content);
-        mChildOfContent = content.getChildAt(0);
-        mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(this::possiblyResizeChildOfContent);
-        frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
+        try {
+            FrameLayout content = activity.findViewById(android.R.id.content);
+            mChildOfContent = content.getChildAt(0);
+            mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(this::possiblyResizeChildOfContent);
+            frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
+        } catch (Exception e){
+            Log.e(TAG, "CommentKeyBoardFix: ", e);
+        }
     }
 
     private void possiblyResizeChildOfContent()

@@ -113,6 +113,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_view_status);
         try {
             //keep toolbar pinned at top. push edittext on keyboard load
             new CommentKeyBoardFix(this);
@@ -169,8 +170,6 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     private void loadActivity() {
-
-        setContentView(R.layout.activity_view_status);
         rootView = findViewById(R.id.parentlayout);
         profileName = findViewById(R.id.profileName);
         userUpdate = findViewById(R.id.userUpdate);

@@ -224,7 +224,7 @@ public class CustomerActivity extends AppCompatActivity
                                 }
                             });
                         } else {
-                            loadActivity();
+                            //loadActivity();
                         }
                     }
 

@@ -138,30 +138,34 @@ public class SecurityPin extends AppCompatActivity {
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    locked = dataSnapshot.getValue(Boolean.class);
-                                    if(locked == false){
-                                        //proceed to account
-                                        if(accountType.equals("1")){
-                                            Intent slideactivity = new Intent(SecurityPin.this, CustomerActivity.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            Bundle bndlanimation =
-                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                            startActivity(slideactivity, bndlanimation);
+                                    try {
+                                        locked = dataSnapshot.getValue(Boolean.class);
+                                        if (locked == false) {
+                                            //proceed to account
+                                            if (accountType.equals("1")) {
+                                                Intent slideactivity = new Intent(SecurityPin.this, CustomerActivity.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                Bundle bndlanimation =
+                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                startActivity(slideactivity, bndlanimation);
+                                            }
+                                            if (accountType.equals("2")) {
+                                                Intent slideactivity = new Intent(SecurityPin.this, RestaurantActivity.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                Bundle bndlanimation =
+                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                startActivity(slideactivity, bndlanimation);
+                                            }
+                                            if (accountType.equals("3")) {
+                                                Intent slideactivity = new Intent(SecurityPin.this, RiderActivity.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                Bundle bndlanimation =
+                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                startActivity(slideactivity, bndlanimation);
+                                            }
                                         }
-                                        if(accountType.equals("2")){
-                                            Intent slideactivity = new Intent(SecurityPin.this, RestaurantActivity.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            Bundle bndlanimation =
-                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                            startActivity(slideactivity, bndlanimation);
-                                        }
-                                        if(accountType.equals("3")){
-                                            Intent slideactivity = new Intent(SecurityPin.this, RiderActivity.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            Bundle bndlanimation =
-                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                                            startActivity(slideactivity, bndlanimation);
-                                        }
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onDataChange: ", e);
                                     }
                                 }
 

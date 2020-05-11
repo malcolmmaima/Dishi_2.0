@@ -460,7 +460,7 @@ public class RestaurantActivity extends AppCompatActivity
                                 }
                             });
                         } else {
-                            loadActivity();
+                            //loadActivity();
                         }
                     }
 

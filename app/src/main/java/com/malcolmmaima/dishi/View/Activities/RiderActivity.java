@@ -210,7 +210,7 @@ public class RiderActivity extends AppCompatActivity
                                 }
                             });
                         } else {
-                            loadActivity();
+                            //loadActivity();
                         }
                     }
 
