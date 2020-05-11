@@ -75,7 +75,7 @@ import static android.view.View.INVISIBLE;
 public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "ViewStatusActivity";
-    DatabaseReference postRef, authorUserDetailsRef;
+    DatabaseReference postRef, authorUserDetailsRef, myRef;
     ValueEventListener likesListener, commentsListener, authorUserDetailsRefListener, postRefListener;
     MyTextView_Roboto_Regular postedToName, userUpdate, likesTotal, commentsTotal;
     MyTextView_Roboto_Light timePosted;
@@ -113,768 +113,160 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_status);
+        try {
+            //keep toolbar pinned at top. push edittext on keyboard load
+            new CommentKeyBoardFix(this);
+        } catch (Exception e){
+            Log.e(TAG, "onCreate: ", e);
+        }
+        //Hide keyboard on activity load
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
-            //keep toolbar pinned at top. push edittext on keyboard load
-            new CommentKeyBoardFix(this);
-            //Hide keyboard on activity load
-            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
 
-            rootView = findViewById(R.id.parentlayout);
-            profileName = findViewById(R.id.profileName);
-            userUpdate = findViewById(R.id.userUpdate);
-            profilePic = findViewById(R.id.profilePic);
-            likePost = findViewById(R.id.likePost);
-            comments = findViewById(R.id.comments);
-            sharePost = findViewById(R.id.sharePost);
-            likesTotal = findViewById(R.id.likesTotal);
-            commentsTotal = findViewById(R.id.commentsTotal);
-            postStatus = findViewById(R.id.postStatus);
-            statusPost = findViewById(R.id.inputComment);
-            imageUpload = findViewById(R.id.camera);
-            imageUpload.setVisibility(View.GONE);
-            selectedImage = findViewById(R.id.selectedImage);
-            progressBar = findViewById(R.id.progressBar);
-            recyclerView = findViewById(R.id.rview);
-            recyclerView.setNestedScrollingEnabled(false);
-            commentsIcon = findViewById(R.id.commentsIcon);
-            timePosted = findViewById(R.id.timePosted);
-            emoji = findViewById(R.id.emoji);
-            emoji.setVisibility(View.GONE);
-            imageShare = findViewById(R.id.imageShare);
-            statusOptions = findViewById(R.id.statusOptions);
-            postedToPic = findViewById(R.id.postedToPic);
-            postedToName = findViewById(R.id.postedToName);
-
-            Toolbar topToolBar = findViewById(R.id.toolbar);
-            setSupportActionBar(topToolBar);
-
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-            setTitle("Comments");
-
-            //Back button on toolbar
-            topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish(); //Go back to previous activity
-                }
-            });
-            //topToolBar.setLogo(R.drawable.logo);
-            //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
-
-            author = getIntent().getStringExtra("author");
-            postedTo = getIntent().getStringExtra("postedTo");
-            key = getIntent().getStringExtra("key");
-
-            String intentType = getIntent().getStringExtra("type");
-
-            DatabaseReference postedToRef = FirebaseDatabase.getInstance().getReference("users/"+postedTo);
-
-            if(postedTo.equals(myPhone) || postedTo.equals(author)){
-                postedToPic.setVisibility(View.GONE);
-                postedToName.setVisibility(View.GONE);
-            } else {
-                postedToPic.setVisibility(View.VISIBLE);
-                postedToName.setVisibility(View.VISIBLE);
-
-                postedToRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        UserModel postedToUser = dataSnapshot.getValue(UserModel.class);
-
-                        postedToName.setText(postedToUser.getFirstname()+" "+postedToUser.getLastname());
-                        //Set profile pic
-                        Picasso.with(ViewStatus.this).load(postedToUser.getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(postedToPic);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }
-
-            postedToName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent slideactivity = new Intent(ViewStatus.this, ViewProfile.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
-                    slideactivity.putExtra("phone", postedTo);
-                    Bundle bndlanimation =
-                            ActivityOptions.makeCustomAnimation(ViewStatus.this, R.anim.animation,R.anim.animation2).toBundle();
-                    startActivity(slideactivity, bndlanimation);
-                }
-            });
-
-            if(intentType != null){
-                //update the notification in db to seen = true
-                if(intentType.equals("notification")){
-                    String notifKey = getIntent().getStringExtra("notifKey");
-                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
-
-                    //update all notifications status to seen = true
-                    notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            notificationRef.child(notifKey).child("seen").setValue(true);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-
-            postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo);
-            authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
-
-            // get the Firebase  storage reference
-            storage = FirebaseStorage.getInstance();
-            storageReference = storage.getReference();
-
-            // SwipeRefreshLayout
-            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-            mSwipeRefreshLayout.setOnRefreshListener(ViewStatus.this);
-            mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                    android.R.color.holo_green_dark,
-                    android.R.color.holo_orange_dark,
-                    android.R.color.holo_blue_dark);
-
-            /**
-             * Showing Swipe Refresh animation on activity create
-             * As animation won't start on onCreate, post runnable is used
-             */
-            mSwipeRefreshLayout.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    fetchComments();
-                }
-            });
-
-            //Get author's user details
-            authorUserDetailsRefListener = new ValueEventListener() {
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.exists()){
-                        likePost.setEnabled(false);
-                        statusPost.setEnabled(false);
-                        imageUpload.setEnabled(false);
-                        imageUpload.setVisibility(View.GONE);
-                        postStatus.setEnabled(false);
-                        profilePic.setEnabled(false);
-                        emoji.setEnabled(false);
-                    }
-                    else {
-                        try {
-                            authorUser = dataSnapshot.getValue(UserModel.class);
-                            profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
-
-                            Picasso.with(ViewStatus.this).load(authorUser.getProfilePic()).fit().centerCrop()
-                                    .placeholder(R.drawable.default_profile)
-                                    .error(R.drawable.default_profile)
-                                    .into(profilePic);
-                        } catch (Exception e){ }
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            authorUserDetailsRef.addValueEventListener(authorUserDetailsRefListener);
-
-            //Get post details
-            try {
-                postRefListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
-                            finish();
-                            SafeToast.makeText(ViewStatus.this, "Post no longer exists!", Toast.LENGTH_LONG).show();
-                        } else {
-                            try {
-                                viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
-
-                                //Get today's date
-                                GetCurrentDate currentDate = new GetCurrentDate();
-                                String currDate = currentDate.getDate();
-
-                                //Get date status update was posted
-                                String dtEnd = currDate;
-                                String dtStart = viewPost.getTimePosted();
-
-                                //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-                                //Format both current date and date status update was posted
-                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
-                                try {
-
-                                    //Convert String date values to Date values
-                                    Date dateStart;
-                                    Date dateEnd;
-
-                                    //Date dateStart = format.parse(dtStart);
-                                    String[] timeS = Split(viewPost.getTimePosted());
-                                    String[] timeT = Split(currDate);
-
-                                    /**
-                                     * timeS[0] = date
-                                     * timeS[1] = hr
-                                     * timeS[2] = min
-                                     * timeS[3] = seconds
-                                     * timeS[4] = timezone
-                                     */
-
-                                    //post timeStamp
-                                    if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                        timeS[4] = "GMT+03:00";
-
-                                        //2020-04-27:20:37:32:GMT+03:00
-                                        dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                                        dateStart = format.parse(dtStart);
-                                    } else {
-                                        dateStart = format.parse(dtStart);
-                                    }
-
-                                    //my device current date
-                                    if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                                        timeT[4] = "GMT+03:00";
-
-                                        //2020-04-27:20:37:32:GMT+03:00
-                                        dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                                        dateEnd = format.parse(dtEnd);
-                                    } else {
-                                        dateEnd = format.parse(dtEnd);
-                                    }
-
-                                    //https://memorynotfound.com/calculate-relative-time-time-ago-java/
-                                    //Now compute timeAgo duration
-                                    TimeAgo timeAgo = new TimeAgo();
-
-                                    timePosted.setText(timeAgo.toRelative(dateStart, dateEnd, 1));
-
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                    Log.d(TAG, "timeStamp: "+ e.getMessage());
-                                }
-
-                                if(viewPost.getStatus().equals("")){
-                                    userUpdate.setVisibility(View.GONE);
-                                } else {
-                                    userUpdate.setVisibility(View.VISIBLE);
-                                    userUpdate.setText(viewPost.getStatus());
-                                }
-
-                                if(viewPost.getImageShare() != null){
-                                    imageShare.setVisibility(View.VISIBLE);
-                                    try {
-                                        Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
-                                                .placeholder(R.drawable.gray_gradient_background)
-                                                .error(R.drawable.gray_gradient_background)
-                                                .into(imageShare);
-                                    } catch (Exception e){}
-                                } else {
-                                    imageShare.setVisibility(View.GONE);
-                                }
-                            } catch (Exception e) {
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                };
-                postRef.child(key).addValueEventListener(postRefListener);
-
-            } catch (Exception e){}
-
-            //creating a popup menu
-            PopupMenu popup = new PopupMenu(ViewStatus.this, statusOptions);
-            //inflating menu from xml resource
-            popup.inflate(R.menu.status_options_menu);
-
-            Menu myMenu = popup.getMenu();
-            MenuItem deleteOption = myMenu.findItem(R.id.delete);
-            MenuItem reportOption = myMenu.findItem(R.id.report);
-
-            try {
-                //delete posts
-                if (postedTo.equals(myPhone) || author.equals(myPhone)) {
-                    try {
-                        deleteOption.setVisible(true);
-                    } catch (Exception e) {
-                    }
-                } else {
-                    try {
-                        deleteOption.setVisible(false);
-                    } catch (Exception e) {
-                    }
-                }
-
-                //Can only report posts that i havent authored
-                if (!myPhone.equals(author)) {
-                    try {
-                        reportOption.setVisible(true);
-                    } catch (Exception e) {
-                    }
-                } else {
-                    try {
-                        reportOption.setVisible(false);
-                    } catch (Exception e) {
-                    }
-                }
-
-            } catch (Exception e){
-                Log.e(TAG, "onCreate: ", e);
-            }
-
-            //status options
-            statusOptions.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    //adding click listener
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.delete:
-                                    final AlertDialog deletePost = new AlertDialog.Builder(ViewStatus.this)
-                                            //set message, title, and icon
-                                            .setMessage("Delete post?")
-                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                            //set three option buttons
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int whichButton) {
-                                                    DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+postedTo+"/"+key);
-                                                    postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            finish();
-                                                            Toast.makeText(ViewStatus.this, "Deleted!", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-                                                }
-                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int whichButton) {
-                                                    //do nothing
-
-                                                }
-                                            })//setNegativeButton
-
-                                            .create();
-                                    deletePost.show();
-                                    return (true);
-                                case R.id.report:
-                                    if(!myPhone.equals(author)){
-                                        final AlertDialog reportStatus = new AlertDialog.Builder(ViewStatus.this)
-                                                //set message, title, and icon
-                                                .setMessage("Report this status?")
-                                                //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
-                                                //set three option buttons
-                                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                                        Intent slideactivity = new Intent(ViewStatus.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                        slideactivity.putExtra("type", "statusUpdate");
-                                                        slideactivity.putExtra("author", author);
-                                                        slideactivity.putExtra("postedTo", postedTo);
-                                                        slideactivity.putExtra("statusKey", key);
-                                                        startActivity(slideactivity);
-                                                    }
-                                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                                        //do nothing
-                                                    }
-                                                })//setNegativeButton
-
-                                                .create();
-                                        reportStatus.show();
-                                    } else {
-                                        SafeToast.makeText(ViewStatus.this, "Not allowed!", Toast.LENGTH_SHORT).show();
-                                    }
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-                    });
-                    //displaying the popup
-                    popup.show();
-
-                }
-            });
-
-            imageShare.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
-                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        slideactivity.putExtra("imageURL", viewPost.getImageShare());
-                        startActivity(slideactivity);
-                    } catch (Exception e){}
-                }
-            });
-
-            profileName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    if(!myPhone.equals(author)){
-                        Intent slideactivity = new Intent(ViewStatus.this, ViewProfile.class)
-                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        slideactivity.putExtra("phone", viewPost.getAuthor());
-                        Bundle bndlanimation =
-                                ActivityOptions.makeCustomAnimation(ViewStatus.this, R.anim.animation,R.anim.animation2).toBundle();
-                        startActivity(slideactivity, bndlanimation);
-                    } else {
-                        finish();
-                    }
-                }
-            });
-
-            userUpdate.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    setClipboard(ViewStatus.this, userUpdate.getText().toString());
-                    return false;
-                }
-            });
-
-            emoji.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    emojIcon.ShowEmojIcon();
-                }
-            });
-
-            profilePic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", authorUser.getProfilePic());
-                    startActivity(slideactivity);
-                }
-            });
-
-            statusPost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if(hasFocus){
-                        emoji.setVisibility(View.VISIBLE);
-                        postStatus.setVisibility(View.VISIBLE);
-                        imageUpload.setVisibility(View.VISIBLE);
-                    }
-                    else {
-
-                        if(statusPost.getText().toString().length() > 1){
-                            postStatus.setVisibility(View.VISIBLE);
-                            imageUpload.setVisibility(View.VISIBLE);
-                            emoji.setVisibility(View.VISIBLE);
-                        } else {
-                            postStatus.setVisibility(View.GONE);
-                            imageUpload.setVisibility(View.GONE);
-                            emoji.setVisibility(View.GONE);
-                        }
-
-                    }
-                }
-            });
-
-            emojIcon = new EmojIconActions(ViewStatus.this, rootView, statusPost, emoji);
-            emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
-            emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
-            emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
-                @Override
-                public void onKeyboardOpen() {
-                    Log.e(TAG, "Keyboard opened!");
-                }
-
-                @Override
-                public void onKeyboardClose() {
-                    emojIcon.closeEmojIcon();
-                    Log.e(TAG, "Keyboard closed");
-                }
-            });
-
-            imageUpload.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //https://www.geeksforgeeks.org/android-how-to-upload-an-image-on-firebase-storage/
-                    SelectImage();
-                }
-            });
-
-            postStatus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                    statusPost.setEnabled(false);
-                    imageUpload.setEnabled(false);
-                    postStatus.setEnabled(false);
-
-                    if(statusPost.getText().toString().equals("") && selectedImage.isShown()){
-                        uploadImage(); //This will upload image then on successful upload call uploadContent()
-                    }
-
-                    else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        statusPost.setEnabled(true);
-                        imageUpload.setEnabled(true);
-                        postStatus.setEnabled(true);
-                        SafeToast.makeText(ViewStatus.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
-                    }
-
-                    else {
-                        if(selectedImage.isShown()){
-                            uploadImage(); //This will upload image then on successful upload call uploadContent()
-                        } else {
-                            String imgLink = null;
-                            uploadContent(imgLink);
-                        }
-
-                    }
-
-                }
-
-            });
-
-            //Fetch status update likes
-            likesListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    try {
-                        int total = (int) dataSnapshot.getChildrenCount();
-                        Double totalLikes = Double.valueOf(total);
-
-                        //below 1000
-                        if(totalLikes < 1000){
-                            DecimalFormat value = new DecimalFormat("#");
-                            likesTotal.setText(""+value.format(totalLikes));
-                        }
-
-                        // 1000 to 999,999
-                        else if(totalLikes >= 1000 && totalLikes <= 999999){
-                            if(totalLikes % 1000 == 0){ //No remainder
-                                DecimalFormat value = new DecimalFormat("#####");
-                                likesTotal.setText(""+value.format(total/1000)+"K");
-                            }
-
-                            else { //Has remainder 999.9K
-                                DecimalFormat value = new DecimalFormat("######.#");
-                                Double divided = totalLikes/1000;
-                                if(value.format(divided).equals("1000")){
-                                    likesTotal.setText("1M"); //if rounded off
-                                } else {
-                                    likesTotal.setText(""+value.format(divided)+"K");
-                                }
-                            }
-                        }
-
-                        // 1,000,0000 to 999,999,999
-                        else if(totalLikes >= 1000000 && totalLikes <= 999999999){
-                            if(totalLikes % 1000000 == 0) { //No remainder
-                                DecimalFormat value = new DecimalFormat("#");
-                                likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
-                            }
-
-                            else { //Has remainder 9.9M, 999.9M etc
-                                DecimalFormat value = new DecimalFormat("#.#");
-                                if(value.format(totalLikes/1000000).equals("1000")){
-                                    likesTotal.setText("1B"); //if rounded off
-                                } else {
-                                    likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
-                                }
-                            }
-                        }
-                    } catch (Exception e){}
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            postRef.child(key).child("likes").addValueEventListener(likesListener);
-
-            commentsListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    try {
-                        try {
-                            int total = (int) dataSnapshot.getChildrenCount();
-                            Double totalComments = Double.valueOf(total);
-
-                            //below 1000
-                            if(totalComments < 1000){
-                                DecimalFormat value = new DecimalFormat("#");
-                                commentsTotal.setText(""+value.format(totalComments));
-                            }
-
-                            // 1000 to 999,999
-                            else if(totalComments >= 1000 && totalComments <= 999999){
-                                if(totalComments % 1000 == 0){ //No remainder
-                                    DecimalFormat value = new DecimalFormat("#####");
-                                    commentsTotal.setText(""+value.format(total/1000)+"K");
-                                }
-
-                                else { //Has remainder 999.9K
-                                    DecimalFormat value = new DecimalFormat("######.#");
-                                    Double divided = totalComments/1000;
-                                    if(value.format(divided).equals("1000")){
-                                        commentsTotal.setText("1M"); //if rounded off
-                                    } else {
-                                        commentsTotal.setText(""+value.format(divided)+"K");
-                                    }
-                                }
-                            }
-
-                            // 1,000,0000 to 999,999,999
-                            else if(totalComments >= 1000000 && totalComments <= 999999999){
-                                if(totalComments % 1000000 == 0) { //No remainder
-                                    DecimalFormat value = new DecimalFormat("#");
-                                    commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
-                                }
-
-                                else { //Has remainder 9.9M, 999.9M etc
-                                    DecimalFormat value = new DecimalFormat("#.#");
-                                    if(value.format(totalComments/1000000).equals("1000")){
-                                        commentsTotal.setText("1B"); //if rounded off
-                                    } else {
-                                        commentsTotal.setText(""+value.format(totalComments/1000000)+"M");
-                                    }
-                                }
-                            }
-                        } catch (Exception e){}
-                    } catch (Exception e){}
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            postRef.child(key).child("comments").addValueEventListener(commentsListener);
-
-            //On loading adapter fetch the like status
-            postRef.child(key).child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.exists()){
-                        likePost.setTag(R.drawable.unliked);
-                        likePost.setImageResource(R.drawable.unliked);
-                    } else {
-                        likePost.setTag(R.drawable.liked);
-                        likePost.setImageResource(R.drawable.liked);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            likePost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int id = (int)likePost.getTag();
-                    if( id == R.drawable.unliked){
-                        //Add to my favourites
-                        postRef.child(key).child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onSuccess(Void aVoid) {
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(!author.equals(myPhone)){
-                                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+author);
-
-                                    String notifKey = notificationRef.push().getKey();
-                                    GetCurrentDate currentDate = new GetCurrentDate();
-
-                                    //send notification
-                                    NotificationModel liked = new NotificationModel();
-                                    liked.setFrom(myPhone);
-                                    liked.setType("likedstatus");
-                                    liked.setImage("");
-                                    liked.setSeen(false);
-                                    liked.setTimeStamp(currentDate.getDate());
-                                    liked.setMessage(key);
-                                    liked.setAuthor(author);
-                                    liked.setPostedTo(postedTo);
-
-                                    notificationRef.child(notifKey).setValue(liked); //send to db
-
-                                    //Also send the notification to the person's wall where this status update appears
-                                    if(!postedTo.equals(myPhone) && !postedTo.equals(author)){
-                                        DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+postedTo);
-                                        String notif2key = notificationRef2.push().getKey();
-
-                                        notificationRef2.child(notif2key).setValue(liked); //send to db
-                                    }
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(ViewStatus.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadActivity();
                                 }
+                            }
 
-                                likePost.setTag(R.drawable.liked);
-                                likePost.setImageResource(R.drawable.liked);
-                                //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
                             }
                         });
-
-
-                    } else{
-                        //Remove from my favourites
-                        postRef.child(key).child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                likePost.setTag(R.drawable.unliked);
-                                likePost.setImageResource(R.drawable.unliked);
-                            }
-                        });
-
+                    } else {
+                        loadActivity();
                     }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                 }
             });
         }
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
+    private void loadActivity() {
 
-        FirebaseUser user_ = FirebaseAuth.getInstance().getCurrentUser();
-        String myPhone_ = user_.getPhoneNumber(); //Current logged in user phone number
+        setContentView(R.layout.activity_view_status);
+        rootView = findViewById(R.id.parentlayout);
+        profileName = findViewById(R.id.profileName);
+        userUpdate = findViewById(R.id.userUpdate);
+        profilePic = findViewById(R.id.profilePic);
+        likePost = findViewById(R.id.likePost);
+        comments = findViewById(R.id.comments);
+        sharePost = findViewById(R.id.sharePost);
+        likesTotal = findViewById(R.id.likesTotal);
+        commentsTotal = findViewById(R.id.commentsTotal);
+        postStatus = findViewById(R.id.postStatus);
+        statusPost = findViewById(R.id.inputComment);
+        imageUpload = findViewById(R.id.camera);
+        imageUpload.setVisibility(View.GONE);
+        selectedImage = findViewById(R.id.selectedImage);
+        progressBar = findViewById(R.id.progressBar);
+        recyclerView = findViewById(R.id.rview);
+        recyclerView.setNestedScrollingEnabled(false);
+        commentsIcon = findViewById(R.id.commentsIcon);
+        timePosted = findViewById(R.id.timePosted);
+        emoji = findViewById(R.id.emoji);
+        emoji.setVisibility(View.GONE);
+        imageShare = findViewById(R.id.imageShare);
+        statusOptions = findViewById(R.id.statusOptions);
+        postedToPic = findViewById(R.id.postedToPic);
+        postedToName = findViewById(R.id.postedToName);
 
-        String author_ = intent.getStringExtra("author");
-        String postedTo_ = intent.getStringExtra("postedTo");
-        String key_ = intent.getStringExtra("key");
-        String type_ = intent.getStringExtra("type");
+        Toolbar topToolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(topToolBar);
 
-        if(type_ != null){
-            //update the notification in db as seen
-            if(type_.equals("notification")){
-                String notifKey = intent.getStringExtra("notifKey");
-                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone_);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        setTitle("Comments");
+
+        //Back button on toolbar
+        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); //Go back to previous activity
+            }
+        });
+        //topToolBar.setLogo(R.drawable.logo);
+        //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
+
+        author = getIntent().getStringExtra("author");
+        postedTo = getIntent().getStringExtra("postedTo");
+        key = getIntent().getStringExtra("key");
+
+        String intentType = getIntent().getStringExtra("type");
+
+        DatabaseReference postedToRef = FirebaseDatabase.getInstance().getReference("users/"+postedTo);
+
+        if(postedTo.equals(myPhone) || postedTo.equals(author)){
+            postedToPic.setVisibility(View.GONE);
+            postedToName.setVisibility(View.GONE);
+        } else {
+            postedToPic.setVisibility(View.VISIBLE);
+            postedToName.setVisibility(View.VISIBLE);
+
+            postedToRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    UserModel postedToUser = dataSnapshot.getValue(UserModel.class);
+
+                    postedToName.setText(postedToUser.getFirstname()+" "+postedToUser.getLastname());
+                    //Set profile pic
+                    Picasso.with(ViewStatus.this).load(postedToUser.getProfilePic()).fit().centerCrop()
+                            .placeholder(R.drawable.default_profile)
+                            .error(R.drawable.default_profile)
+                            .into(postedToPic);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        postedToName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(ViewStatus.this, ViewProfile.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
+                slideactivity.putExtra("phone", postedTo);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(ViewStatus.this, R.anim.animation,R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+            }
+        });
+
+        if(intentType != null){
+            //update the notification in db to seen = true
+            if(intentType.equals("notification")){
+                String notifKey = getIntent().getStringExtra("notifKey");
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
 
                 //update all notifications status to seen = true
                 notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -891,15 +283,32 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             }
         }
 
-        Log.d(TAG, "onNewIntent: \nauthor: "+author_+"\npostedTo: "+postedTo_+"\nkey: "+key_);
+        postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo);
+        authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author);
 
-        postRef = FirebaseDatabase.getInstance().getReference("posts/"+postedTo_);
-        authorUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+author_);
-
-        fetchComments();
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(ViewStatus.this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+                fetchComments();
+            }
+        });
 
         //Get author's user details
         authorUserDetailsRefListener = new ValueEventListener() {
@@ -1038,7 +447,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                 }
             };
-            postRef.child(key_).addValueEventListener(postRefListener);
+            postRef.child(key).addValueEventListener(postRefListener);
 
         } catch (Exception e){}
 
@@ -1053,7 +462,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
         try {
             //delete posts
-            if (postedTo_.equals(myPhone_) || author_.equals(myPhone_)) {
+            if (postedTo.equals(myPhone) || author.equals(myPhone)) {
                 try {
                     deleteOption.setVisible(true);
                 } catch (Exception e) {
@@ -1066,7 +475,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             }
 
             //Can only report posts that i havent authored
-            if (!myPhone_.equals(author_)) {
+            if (!myPhone.equals(author)) {
                 try {
                     reportOption.setVisible(true);
                 } catch (Exception e) {
@@ -1081,6 +490,218 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         } catch (Exception e){
             Log.e(TAG, "onCreate: ", e);
         }
+
+        //status options
+        statusOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.delete:
+                                final AlertDialog deletePost = new AlertDialog.Builder(ViewStatus.this)
+                                        //set message, title, and icon
+                                        .setMessage("Delete post?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+postedTo+"/"+key);
+                                                postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        finish();
+                                                        Toast.makeText(ViewStatus.this, "Deleted!", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                deletePost.show();
+                                return (true);
+                            case R.id.report:
+                                if(!myPhone.equals(author)){
+                                    final AlertDialog reportStatus = new AlertDialog.Builder(ViewStatus.this)
+                                            //set message, title, and icon
+                                            .setMessage("Report this status?")
+                                            //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                            //set three option buttons
+                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    Intent slideactivity = new Intent(ViewStatus.this, ReportAbuse.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    slideactivity.putExtra("type", "statusUpdate");
+                                                    slideactivity.putExtra("author", author);
+                                                    slideactivity.putExtra("postedTo", postedTo);
+                                                    slideactivity.putExtra("statusKey", key);
+                                                    startActivity(slideactivity);
+                                                }
+                                            }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    //do nothing
+                                                }
+                                            })//setNegativeButton
+
+                                            .create();
+                                    reportStatus.show();
+                                } else {
+                                    SafeToast.makeText(ViewStatus.this, "Not allowed!", Toast.LENGTH_SHORT).show();
+                                }
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
+
+        imageShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", viewPost.getImageShare());
+                    startActivity(slideactivity);
+                } catch (Exception e){}
+            }
+        });
+
+        profileName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(!myPhone.equals(author)){
+                    Intent slideactivity = new Intent(ViewStatus.this, ViewProfile.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    slideactivity.putExtra("phone", viewPost.getAuthor());
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(ViewStatus.this, R.anim.animation,R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
+                } else {
+                    finish();
+                }
+            }
+        });
+
+        userUpdate.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                setClipboard(ViewStatus.this, userUpdate.getText().toString());
+                return false;
+            }
+        });
+
+        emoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emojIcon.ShowEmojIcon();
+            }
+        });
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", authorUser.getProfilePic());
+                startActivity(slideactivity);
+            }
+        });
+
+        statusPost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    emoji.setVisibility(View.VISIBLE);
+                    postStatus.setVisibility(View.VISIBLE);
+                    imageUpload.setVisibility(View.VISIBLE);
+                }
+                else {
+
+                    if(statusPost.getText().toString().length() > 1){
+                        postStatus.setVisibility(View.VISIBLE);
+                        imageUpload.setVisibility(View.VISIBLE);
+                        emoji.setVisibility(View.VISIBLE);
+                    } else {
+                        postStatus.setVisibility(View.GONE);
+                        imageUpload.setVisibility(View.GONE);
+                        emoji.setVisibility(View.GONE);
+                    }
+
+                }
+            }
+        });
+
+        emojIcon = new EmojIconActions(ViewStatus.this, rootView, statusPost, emoji);
+        emojIcon.setUseSystemEmoji(false); //if we set this to true then the default emojis for chat wil be the system emojis
+        emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
+        emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
+            @Override
+            public void onKeyboardOpen() {
+                Log.e(TAG, "Keyboard opened!");
+            }
+
+            @Override
+            public void onKeyboardClose() {
+                emojIcon.closeEmojIcon();
+                Log.e(TAG, "Keyboard closed");
+            }
+        });
+
+        imageUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //https://www.geeksforgeeks.org/android-how-to-upload-an-image-on-firebase-storage/
+                SelectImage();
+            }
+        });
+
+        postStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSwipeRefreshLayout.setRefreshing(true);
+                statusPost.setEnabled(false);
+                imageUpload.setEnabled(false);
+                postStatus.setEnabled(false);
+
+                if(statusPost.getText().toString().equals("") && selectedImage.isShown()){
+                    uploadImage(); //This will upload image then on successful upload call uploadContent()
+                }
+
+                else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    statusPost.setEnabled(true);
+                    imageUpload.setEnabled(true);
+                    postStatus.setEnabled(true);
+                    SafeToast.makeText(ViewStatus.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                }
+
+                else {
+                    if(selectedImage.isShown()){
+                        uploadImage(); //This will upload image then on successful upload call uploadContent()
+                    } else {
+                        String imgLink = null;
+                        uploadContent(imgLink);
+                    }
+
+                }
+
+            }
+
+        });
 
         //Fetch status update likes
         likesListener = new ValueEventListener() {
@@ -1138,7 +759,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
             }
         };
-        postRef.child(key_).child("likes").addValueEventListener(likesListener);
+        postRef.child(key).child("likes").addValueEventListener(likesListener);
 
         commentsListener = new ValueEventListener() {
             @Override
@@ -1197,10 +818,10 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
             }
         };
-        postRef.child(key_).child("comments").addValueEventListener(commentsListener);
+        postRef.child(key).child("comments").addValueEventListener(commentsListener);
 
         //On loading adapter fetch the like status
-        postRef.child(key_).child("likes").child(myPhone_).addListenerForSingleValueEvent(new ValueEventListener() {
+        postRef.child(key).child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.exists()){
@@ -1209,6 +830,155 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                 } else {
                     likePost.setTag(R.drawable.liked);
                     likePost.setImageResource(R.drawable.liked);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        likePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = (int)likePost.getTag();
+                if( id == R.drawable.unliked){
+                    //Add to my favourites
+                    postRef.child(key).child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                            if(!author.equals(myPhone)){
+                                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+author);
+
+                                String notifKey = notificationRef.push().getKey();
+                                GetCurrentDate currentDate = new GetCurrentDate();
+
+                                //send notification
+                                NotificationModel liked = new NotificationModel();
+                                liked.setFrom(myPhone);
+                                liked.setType("likedstatus");
+                                liked.setImage("");
+                                liked.setSeen(false);
+                                liked.setTimeStamp(currentDate.getDate());
+                                liked.setMessage(key);
+                                liked.setAuthor(author);
+                                liked.setPostedTo(postedTo);
+
+                                notificationRef.child(notifKey).setValue(liked); //send to db
+
+                                //Also send the notification to the person's wall where this status update appears
+                                if(!postedTo.equals(myPhone) && !postedTo.equals(author)){
+                                    DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+postedTo);
+                                    String notif2key = notificationRef2.push().getKey();
+
+                                    notificationRef2.child(notif2key).setValue(liked); //send to db
+                                }
+                            }
+
+                            likePost.setTag(R.drawable.liked);
+                            likePost.setImageResource(R.drawable.liked);
+                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                } else{
+                    //Remove from my favourites
+                    postRef.child(key).child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            likePost.setTag(R.drawable.unliked);
+                            likePost.setImageResource(R.drawable.unliked);
+                        }
+                    });
+
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getInstance().getCurrentUser() == null){
+            finish();
+            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+        } else {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            myPhone = user.getPhoneNumber(); //Current logged in user phone number
+            myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+
+            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(ViewStatus.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                } else {
+                                    loadActivity();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        loadActivity();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                            if(locked == true){
+                                Intent slideactivity = new Intent(ViewStatus.this, SecurityPin.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("pinType", "resume");
+                                startActivity(slideactivity);
+                            } else {
+                                loadActivity();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    loadActivity();
                 }
             }
 

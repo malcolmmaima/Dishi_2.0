@@ -184,7 +184,6 @@ public class RestaurantActivity extends AppCompatActivity
     }
 
     private void loadActivity() {
-        setContentView(R.layout.activity_restaurant);
         TAG = "RestaurantActivity";
 
         imageURL = "";
@@ -451,7 +450,7 @@ public class RestaurantActivity extends AppCompatActivity
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
                                     } else {
-                                        loadActivity();
+                                        //loadActivity(); //redundant
                                     }
                                 }
 

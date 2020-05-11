@@ -121,6 +121,7 @@ public class CustomerActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_customer);
         //get auth state
         mAuth = FirebaseAuth.getInstance();
         //User is logged in
@@ -213,7 +214,7 @@ public class CustomerActivity extends AppCompatActivity
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
                                     } else {
-                                        loadActivity();
+                                        //loadActivity();
                                     }
                                 }
 
@@ -244,7 +245,6 @@ public class CustomerActivity extends AppCompatActivity
     }
 
     private void loadActivity() {
-        setContentView(R.layout.activity_customer);
         TAG = "CustomerActivity";
         imageURL = "";
 

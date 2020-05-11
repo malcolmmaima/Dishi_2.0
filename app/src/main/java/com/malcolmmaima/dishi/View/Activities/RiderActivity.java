@@ -200,7 +200,7 @@ public class RiderActivity extends AppCompatActivity
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
                                     } else {
-                                        loadActivity();
+                                        //loadActivity(); //redundant
                                     }
                                 }
 
