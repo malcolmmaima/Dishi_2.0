@@ -59,10 +59,11 @@ public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     String TAG = "ForeGroundService";
     DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, notificationRef, myMessages;
-    DatabaseReference myRideOrderRequests, receiptsRef, incomingMessages;
+    DatabaseReference myRideOrderRequests, receiptsRef, incomingMessages, myBlockedUsers;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     ValueEventListener myRideOrderRequestsListener;
-    ChildEventListener notificationsListener, receiptsListener, myMessagesListener, myRestaurantOrdersListener, myRideRequestsListener;
+    ChildEventListener notificationsListener, receiptsListener, myMessagesListener,
+            myRestaurantOrdersListener, myRideRequestsListener;
     ChildEventListener incomingMessagesListener;
     String myPhone;
     FirebaseUser user;
@@ -157,7 +158,7 @@ public class ForegroundService extends Service {
             myUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
             notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
             receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
-
+            myBlockedUsers = FirebaseDatabase.getInstance().getReference("blocked/"+myPhone);
         } catch(Exception e){}
 
 
@@ -545,7 +546,20 @@ public class ForegroundService extends Service {
                     //Always check notification settings before sending a notification
                     try {
                         if (myUserDetails.getSocialNotification() == true) {
-                            sendSocialNotification(notifId, newNotification);
+                            //don't send user notifications from users they've blocked
+                            myBlockedUsers.child(newNotification.getFrom()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(!dataSnapshot.exists()){
+                                        sendSocialNotification(notifId, newNotification);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                         }
                     } catch (Exception e){
                         Log.e(TAG, "onChildAdded: ", e);
