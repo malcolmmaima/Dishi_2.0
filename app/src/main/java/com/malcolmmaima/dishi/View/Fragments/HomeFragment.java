@@ -37,6 +37,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.R;
@@ -62,7 +63,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     RecyclerView recyclerview;
     String myPhone;
 
-    DatabaseReference followingRef, myPostUpdates;
+    DatabaseReference followingRef, myPostUpdates, myBlockedUsersRef;
     FirebaseUser user;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -72,6 +73,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     Button postBtn;
     ImageButton imageUpload;
     ImageView selectedImage;
+    MyTextView_Roboto_Regular emptyTag;
     private ProgressBar progressBar;
     View rootView;
     EmojIconActions emojIcon;
@@ -109,8 +111,10 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
         followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
         myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+myPhone);
+        myBlockedUsersRef = FirebaseDatabase.getInstance().getReference("blocked/"+myPhone);
 
-        icon = v.findViewById(R.id.menuIcon);
+        icon = v.findViewById(R.id.newsFeedIcon);
+        emptyTag = v.findViewById(R.id.empty_tag);
         recyclerview = v.findViewById(R.id.rview);
         imageUpload = v.findViewById(R.id.camera);
         selectedImage = v.findViewById(R.id.selectedImage);
@@ -133,6 +137,13 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
+
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadNewsFeed();
+            }
+        });
 
         myStatusUpdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -258,6 +269,36 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         Log.e(TAG, "onDataChange: ", e);
                     }
                 }
+
+                try {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    if (!statusUpdates.isEmpty()) {
+
+                        //Sort by most recent (based on timeStamp)
+                        Collections.reverse(statusUpdates);
+                        try {
+                            Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+
+                        icon.setVisibility(View.GONE);
+                        emptyTag.setVisibility(View.GONE);
+                        recyclerview.setVisibility(View.VISIBLE);
+                        recyclerview.setVisibility(View.VISIBLE);
+                        NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
+                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                        recyclerview.setLayoutManager(layoutmanager);
+
+                        recycler.notifyDataSetChanged();
+                        recyclerview.setAdapter(recycler);
+                    }
+                }
+
+                catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
+                    recyclerview.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -270,7 +311,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mSwipeRefreshLayout.setRefreshing(true);
                 for(DataSnapshot following : dataSnapshot.getChildren()){
+
                     //for each 'following' user ... go to their posts node and fetch status updates
                     DatabaseReference newsFeedPosts = FirebaseDatabase.getInstance().getReference("posts/"+following.getKey());
                     newsFeedPosts.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -281,40 +324,96 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 try {
                                     StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
                                     statusUpdateModel.key = updates.getKey();
-                                    statusUpdates.add(statusUpdateModel);
+                                    //Check if (following) user is someone i have blocked
+                                    myBlockedUsersRef.child(following.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(!dataSnapshot.exists()){
+                                                //Log.d(TAG, "not blocked: "+following.getKey());
+                                                statusUpdates.add(statusUpdateModel); //only add posts to newsfeed if i have not blocked the author of the post
+                                            } else {
+                                                //Log.d(TAG, "blocked: "+following.getKey());
+                                            }
+
+                                            try {
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                if (!statusUpdates.isEmpty()) {
+
+                                                    //Sort by most recent (based on timeStamp)
+                                                    Collections.reverse(statusUpdates);
+                                                    try {
+                                                        Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+                                                    } catch (Exception e){
+                                                        Log.e(TAG, "onDataChange: ", e);
+                                                    }
+
+                                                    icon.setVisibility(View.GONE);
+                                                    emptyTag.setVisibility(View.GONE);
+                                                    recyclerview.setVisibility(View.VISIBLE);
+                                                    recyclerview.setVisibility(View.VISIBLE);
+                                                    NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+
+                                                    recycler.notifyDataSetChanged();
+                                                    recyclerview.setAdapter(recycler);
+                                                } else {
+                                                    emptyTag.setVisibility(View.VISIBLE);
+                                                    icon.setVisibility(View.VISIBLE);
+                                                    recyclerview.setVisibility(View.GONE);
+                                                }
+                                            }
+
+                                            catch (Exception e){
+                                                Log.e(TAG, "onDataChange: ", e);
+                                                recyclerview.setVisibility(View.VISIBLE);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
                                 } catch (Exception e){
                                     Log.e(TAG, "onDataChange: ", e);
                                 }
                             }
 
-                            try {
-                                mSwipeRefreshLayout.setRefreshing(false);
-                                if (!statusUpdates.isEmpty()) {
-
-                                    //Sort by most recent (based on timeStamp)
-                                    try {
-                                        Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
-                                    } catch (Exception e){}
-
-                                    icon.setVisibility(View.GONE);
-                                    recyclerview.setVisibility(View.VISIBLE);
-                                    recyclerview.setVisibility(View.VISIBLE);
-                                    NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                                    recyclerview.setLayoutManager(layoutmanager);
-
-                                    recycler.notifyDataSetChanged();
-                                    recyclerview.setAdapter(recycler);
-                                } else {
-                                    icon.setVisibility(View.VISIBLE);
-                                    recyclerview.setVisibility(View.GONE);
-                                }
-                            }
-
-                            catch (Exception e){
-                                Log.e(TAG, "onDataChange: ", e);
-                                recyclerview.setVisibility(View.VISIBLE);
-                            }
+//                            try {
+//                                mSwipeRefreshLayout.setRefreshing(false);
+//                                if (!statusUpdates.isEmpty()) {
+//
+//                                    //Sort by most recent (based on timeStamp)
+//                                    Collections.reverse(statusUpdates);
+//                                    try {
+//                                        Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+//                                    } catch (Exception e){
+//                                        Log.e(TAG, "onDataChange: ", e);
+//                                    }
+//
+//                                    icon.setVisibility(View.GONE);
+//                                    emptyTag.setVisibility(View.GONE);
+//                                    recyclerview.setVisibility(View.VISIBLE);
+//                                    recyclerview.setVisibility(View.VISIBLE);
+//                                    NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
+//                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+//                                    recyclerview.setLayoutManager(layoutmanager);
+//
+//                                    recycler.notifyDataSetChanged();
+//                                    recyclerview.setAdapter(recycler);
+//                                } else {
+//                                    emptyTag.setVisibility(View.VISIBLE);
+//                                    icon.setVisibility(View.VISIBLE);
+//                                    recyclerview.setVisibility(View.GONE);
+//                                }
+//                            }
+//
+//                            catch (Exception e){
+//                                Log.e(TAG, "onDataChange: ", e);
+//                                recyclerview.setVisibility(View.VISIBLE);
+//                            }
                         }
 
                         @Override
@@ -358,6 +457,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 statusUpdates.add(0,statusUpdate);
 
                 icon.setVisibility(View.GONE);
+                emptyTag.setVisibility(View.GONE);
                 recyclerview.setVisibility(View.VISIBLE);
                 StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());

@@ -79,7 +79,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
     @Override
     public void onBindViewHolder(@NonNull final NewsFeedAdapter.MyHolder holder, final int position) {
 
-        StatusUpdateModel statusUpdateModel = listdata.get(position);
+        final StatusUpdateModel statusUpdateModel = listdata.get(position);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone = user.getPhoneNumber(); //Current logged in user phone number
         UserModel [] postUser = new UserModel[listdata.size()];
@@ -225,7 +225,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
              */
 
             //post timeStamp
-            if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+            if(!timeS[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
                 timeS[4] = "GMT+03:00";
 
                 //2020-04-27:20:37:32:GMT+03:00
@@ -236,7 +236,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             }
 
             //my device current date
-            if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+            if(!timeT[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
                 timeT[4] = "GMT+03:00";
 
                 //2020-04-27:20:37:32:GMT+03:00
@@ -496,8 +496,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
                                                         try {
-                                                            listdata.remove(position);
-                                                            notifyItemRemoved(position);
+                                                            listdata.remove(holder.getAdapterPosition());
+                                                            notifyItemRemoved(holder.getAdapterPosition());
                                                         } catch (Exception e){
                                                             Log.e(TAG, "NewsFeedAdapter: error ", e);
                                                         }

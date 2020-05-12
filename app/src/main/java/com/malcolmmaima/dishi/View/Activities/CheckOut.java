@@ -345,7 +345,7 @@ public class CheckOut extends AppCompatActivity {
                                      */
 
                                     //post timeStamp
-                                    if(timeS[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                    if(!timeS[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
                                         timeS[4] = "GMT+03:00";
 
                                         //2020-04-27:20:37:32:GMT+03:00
@@ -356,7 +356,7 @@ public class CheckOut extends AppCompatActivity {
                                     }
 
                                     //my device current date
-                                    if(timeT[4].equals("EAT")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                                    if(!timeT[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
                                         timeT[4] = "GMT+03:00";
 
                                         //2020-04-27:20:37:32:GMT+03:00
