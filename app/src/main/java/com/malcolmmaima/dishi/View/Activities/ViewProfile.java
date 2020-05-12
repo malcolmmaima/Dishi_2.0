@@ -82,8 +82,9 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     RecyclerView recyclerview;
 
     DatabaseReference profileRef, myPostUpdates, profileFollowers,
-            followersCounterRef, followingCounterref, followRequests, myRef;
-    ValueEventListener myListener, profileFollowersListener, followersCounterListener, followingCounterListener;
+            followersCounterRef, followingCounterref, followRequests, myRef, myBlockedUsers;
+    ValueEventListener myListener, profileFollowersListener, followersCounterListener,
+            followingCounterListener, blockedUsersListener;
     FirebaseUser user;
 
     CircleImageView profilePhoto;
@@ -329,7 +330,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         followersCounterRef = FirebaseDatabase.getInstance().getReference("followers/"+phone);
         followingCounterref = FirebaseDatabase.getInstance().getReference("following/"+phone);
         followRequests = FirebaseDatabase.getInstance().getReference("followRequests/"+phone);
-
+        myBlockedUsers = FirebaseDatabase.getInstance().getReference("blocked/"+myPhone);
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -871,6 +872,37 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         inflater.inflate(R.menu.menu_profile_view, menu);
         myMenu = menu;
 
+        MenuItem blockOption = myMenu.findItem(R.id.userBlock);
+        MenuItem unblockOption = myMenu.findItem(R.id.userUnBlock);
+        blockOption.setVisible(false);
+        unblockOption.setVisible(false);
+
+        blockedUsersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    blockOption.setVisible(true);
+                    unblockOption.setVisible(false);
+                } else {
+                    for(DataSnapshot blocked : dataSnapshot.getChildren()){
+                        if(blocked.getKey().equals(phone)){
+                            unblockOption.setVisible(true);
+                            blockOption.setVisible(false);
+                        } else {
+                            blockOption.setVisible(true);
+                            unblockOption.setVisible(false);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myBlockedUsers.addValueEventListener(blockedUsersListener);
+
         return true;
     }
 
@@ -894,7 +926,33 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             return true;
 
         case R.id.userBlock:
+            AlertDialog blockuser = new AlertDialog.Builder(ViewProfile.this)
+                    //set message, title, and icon
+                    .setMessage("Block "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname())
+                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                    //set three option buttons
+                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            myBlockedUsers.child(phone).setValue("blocked").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    try {
+                                        Snackbar.make(rootView, "Blocked", Snackbar.LENGTH_LONG).show();
+                                    } catch (Exception er){
+                                        Log.e(TAG, "onSuccess: ", er);
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            //do nothing
+                        }
+                    })//setNegativeButton
 
+                    .create();
+            blockuser.show();
             return true;
 
         case R.id.userReport:
@@ -920,6 +978,36 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
 
                     .create();
             reportUser.show();
+            return true;
+
+        case R.id.userUnBlock:
+            AlertDialog unBlockUser = new AlertDialog.Builder(ViewProfile.this)
+                    //set message, title, and icon
+                    .setMessage("Unblock "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname())
+                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                    //set three option buttons
+                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            myBlockedUsers.child(phone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    try {
+                                        Snackbar.make(rootView, "Unblocked", Snackbar.LENGTH_LONG).show();
+                                    } catch (Exception er){
+                                        Log.e(TAG, "onSuccess: ", er);
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            //do nothing
+                        }
+                    })//setNegativeButton
+
+                    .create();
+            unBlockUser.show();
             return true;
 
     }
@@ -1180,6 +1268,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             profileFollowers.removeEventListener(profileFollowersListener);
             followersCounterRef.removeEventListener(followersCounterListener);
             followingCounterref.removeEventListener(followingCounterListener);
+            myBlockedUsers.removeEventListener(blockedUsersListener);
         } catch (Exception e){
 
         }

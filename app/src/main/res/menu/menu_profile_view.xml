@@ -5,12 +5,17 @@
     <item
         android:id="@+id/sendMessage"
         android:icon="@drawable/ic_send_black_48dp"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:title="Message"/>
 
     <item
         android:id="@+id/userBlock"
         android:title="Block"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/userUnBlock"
+        android:title="Unblock"
         app:showAsAction="never" />
     <item
         android:id="@+id/userReport"
