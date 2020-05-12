@@ -5,7 +5,10 @@
     tools:context=".Views.Activities.Inbox">
 
     <item
-        android:id="@+id/newChat" android:icon="@drawable/ic_add_black_48dp" app:showAsAction="always"   android:title="New Chat"/>
+        android:id="@+id/newChat"
+        android:icon="@drawable/ic_add_black_48dp"
+        app:showAsAction="always"
+        android:title="New Chat"/>
 
 
 </menu>

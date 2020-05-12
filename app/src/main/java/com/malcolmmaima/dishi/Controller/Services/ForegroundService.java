@@ -405,6 +405,7 @@ public class ForegroundService extends Service {
         myMessagesListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot incoming, @Nullable String s) {
+                deleteCache(getApplicationContext());
                 customerChat = true;
                 restaurantChat = true;
                 riderChat = true;

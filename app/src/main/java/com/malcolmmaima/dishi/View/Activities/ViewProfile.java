@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -889,7 +891,36 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 startActivity(slideactivity, bndlanimation);
             }
-            return  (true);
+            return true;
+
+        case R.id.userBlock:
+
+            return true;
+
+        case R.id.userReport:
+            AlertDialog reportUser = new AlertDialog.Builder(ViewProfile.this)
+                    //set message, title, and icon
+                    .setMessage("Report "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname())
+                    //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                    //set three option buttons
+                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            Intent slideactivity = new Intent(ViewProfile.this, ReportAbuse.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            slideactivity.putExtra("type", "userReport");
+                            slideactivity.putExtra("user", phone);
+                            startActivity(slideactivity);
+                        }
+                    })
+                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            //do nothing
+                        }
+                    })//setNegativeButton
+
+                    .create();
+            reportUser.show();
+            return true;
 
     }
         return(super.onOptionsItemSelected(item));

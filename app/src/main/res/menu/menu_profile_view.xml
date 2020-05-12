@@ -7,4 +7,13 @@
         android:icon="@drawable/ic_send_black_48dp"
         app:showAsAction="always"
         android:title="Message"/>
+
+    <item
+        android:id="@+id/userBlock"
+        android:title="Block"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/userReport"
+        android:title="Report"
+        app:showAsAction="never" />
 </menu>

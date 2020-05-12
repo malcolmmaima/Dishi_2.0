@@ -39,7 +39,7 @@ public class ReportAbuse extends AppCompatActivity {
     AppCompatButton reportBtn;
     AppCompatImageView option1Tick, option2Tick, option3Tick, option4Tick;
     int selectedOption;
-    String reportType, productOwner, productKey, author, postedTo, statusKey,commentKey, reviewKey, myPhone;
+    String reportType, productOwner, productKey, author, postedTo, statusKey,commentKey, reviewKey, myPhone, userReported;
     FirebaseUser user;
     String [] reportOptions = {"It's suspicious or spam","It displays abusive content", "Copyright infringement", "Other"};
     FirebaseAuth mAuth;
@@ -146,6 +146,12 @@ public class ReportAbuse extends AppCompatActivity {
                 postedTo = getIntent().getStringExtra("postedTo");
                 reviewKey = getIntent().getStringExtra("reviewKey");
             }
+
+            //Report users
+            if(reportType.equals("userReport")){
+                userReported = getIntent().getStringExtra("user");
+            }
+
 
             //keep toolbar pinned at top. push edittext on keyboard load
             new CommentKeyBoardFix(this);
@@ -333,6 +339,39 @@ public class ReportAbuse extends AppCompatActivity {
 
                         //Now create a new unique reference and post the report POJO then exit
                         DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/reviewUpdates/"+reviewKey+"/userReports/"+myPhone);
+                        userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                try {
+                                    progressDialog.dismiss();
+                                    finish();
+                                    Toast.makeText(ReportAbuse.this, "Report sent!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e){}
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    progressDialog.dismiss();
+                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } catch (Exception err){}
+                            }
+                        });
+                    }
+
+                    if(reportType.equals("userReport")){
+                        DatabaseReference userReportsRef = FirebaseDatabase.getInstance().getReference("reports/users/"+userReported+"/userReports/"+myPhone);
+
+                        //Get today's date
+                        GetCurrentDate currentDate = new GetCurrentDate();
+
+                        //Bundle our report into a model (POJO)
+                        AbuseReportModel newReport = new AbuseReportModel();
+                        newReport.setDescription(describe.getText().toString().trim());
+                        newReport.setComplaint(reportOptions[selectedOption-1]);
+                        newReport.setReportedOn(currentDate.getDate());
+
                         userReportsRef.setValue(newReport).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
