@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Activities.Blo"
+    tools:context=".View.Activities.MyBlockedAccounts"
     android:id="@+id/parentlayout">
 
     <androidx.appcompat.widget.Toolbar
@@ -22,29 +22,54 @@
         app:view_borderColor="@color/colorPrimaryDark">
 
     </androidx.appcompat.widget.Toolbar>
-    <ScrollView
-        android:layout_below="@id/toolbar"
-        android:layout_height="match_parent"
-        android:layout_width="fill_parent">
 
-        <LinearLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_below="@id/toolbar"
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:orientation="vertical">
+            android:background="@color/colorBackroundWhite"
+            tools:context=".View.Fragments.FragmentFollowing">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="In development"
-                android:textSize="20sp"
                 android:layout_gravity="center"
-                android:layout_margin="20dp"
-                />
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/blockedIcon"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:src="@drawable/blocked_icon"/>
 
-    </ScrollView>
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    android:id="@+id/empty_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="15dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="EMPTY"
+                    android:textSize="20sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/rview" />
+
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
