@@ -600,6 +600,7 @@ public class CustomerActivity extends AppCompatActivity
                     //set three option buttons
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
+                            myRef.child("appLocked").setValue(true);
                             //Log out
                             //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
 

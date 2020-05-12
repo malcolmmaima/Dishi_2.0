@@ -67,7 +67,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     private static final String TAG = "ChatActivity";
     DatabaseReference recipientRef, recipientMessagesRef,
             myMessagedRef, followingRef, followerRef, myRef,
-            recipientBlockedUsers, myBlockedUsers;
+            recipientBlockedUsers, myBlockedUsers, activeOrdersRef;
     ValueEventListener recipientListener, myMessagesListener,
             followingListener, followerListener, accountTypeListener, blockedUsersListener;
     UserModel recipientUser;
@@ -106,6 +106,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber(); //Current logged in user phone number
                 myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                activeOrdersRef = FirebaseDatabase.getInstance().getReference("orders/"+myPhone);
                 myBlockedUsers = FirebaseDatabase.getInstance().getReference("blocked/"+myPhone);
                 myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -602,59 +603,114 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                         /**
                          * As a privacy concern, we don't want to expose people's phone numbers under chat ... only show phone if following/follower is mutual
                          */
-                        followingListener = new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists()){
-                                    //Toast.makeText(Chat.this, "Following => true", Toast.LENGTH_SHORT).show();
-                                    followerListener = new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if(dataSnapshot.exists()){
-                                                //Toast.makeText(Chat.this, "Follower => true", Toast.LENGTH_SHORT).show();
-                                                try {
-                                                    call.setVisible(true);
-                                                    call.setEnabled(true);
-                                                } catch (Exception e){
+
+                        String phoneVisibilty = dataSnapshot.child("phoneVisibility").getValue(String.class);
+                        if(phoneVisibilty.equals("none")){
+                            call.setVisible(false);
+                            call.setEnabled(false);
+
+                            /**
+                             * if I am a vendor, check if i have an active order with this recipient, if true show phone if not dont't
+                             */
+
+                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        UserModel myDetails = dataSnapshot.getValue(UserModel.class);
+                                        if (myDetails.getAccount_type().equals("2")) {
+                                            //I am vendor. now check if i have an active order with the recipient
+                                            activeOrdersRef.child(recipientUser_.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    //(i) a vendor has an active order in progress with recipient
+                                                    if (dataSnapshot.exists()) {
+                                                        call.setVisible(true);
+                                                        call.setEnabled(true);
+                                                    } else { //(i) vendor do not have an active order with recipient
+                                                        call.setVisible(false);
+                                                        call.setEnabled(false);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                                 }
-                                            } else {
-                                                //Toast.makeText(Chat.this, "Follower => false", Toast.LENGTH_SHORT).show();
-                                                try {
-                                                    call.setVisible(false);
-                                                    call.setEnabled(false);
-                                                } catch (Exception e){
-
-                                                }
-                                            }
+                                            });
                                         }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    };
-                                    try {
-                                        followerRef.addValueEventListener(followerListener);
-                                    } catch (Exception e){}
-                                } else {
-                                    //Toast.makeText(Chat.this, "Following => false", Toast.LENGTH_SHORT).show();
-                                    try {
-                                        call.setVisible(false);
-                                        call.setEnabled(false);
                                     } catch (Exception e){
-
+                                        Log.e(TAG, "onDataChange: ", e);
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        };
+                                }
+                            });
+                        }
 
-                        followingRef.addValueEventListener(followingListener);
+                        if(phoneVisibilty.equals("mutual")){
+                            followingListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(dataSnapshot.exists()){
+                                        //Toast.makeText(Chat.this, "Following => true", Toast.LENGTH_SHORT).show();
+                                        followerListener = new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if(dataSnapshot.exists()){
+                                                    //Toast.makeText(Chat.this, "Follower => true", Toast.LENGTH_SHORT).show();
+                                                    try {
+                                                        call.setVisible(true);
+                                                        call.setEnabled(true);
+                                                    } catch (Exception e){
+
+                                                    }
+                                                } else {
+                                                    //Toast.makeText(Chat.this, "Follower => false", Toast.LENGTH_SHORT).show();
+                                                    try {
+                                                        call.setVisible(false);
+                                                        call.setEnabled(false);
+                                                    } catch (Exception e){
+
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        };
+                                        try {
+                                            followerRef.addValueEventListener(followerListener);
+                                        } catch (Exception e){}
+                                    } else {
+                                        //Toast.makeText(Chat.this, "Following => false", Toast.LENGTH_SHORT).show();
+                                        try {
+                                            call.setVisible(false);
+                                            call.setEnabled(false);
+                                        } catch (Exception e){
+
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            };
+                            followingRef.addValueEventListener(followingListener);
+                        }
+
+                        if(phoneVisibilty.equals("everyone")){
+                            call.setVisible(true);
+                            call.setEnabled(true);
+                        }
+
                     }
                 } catch (Exception e){
 
