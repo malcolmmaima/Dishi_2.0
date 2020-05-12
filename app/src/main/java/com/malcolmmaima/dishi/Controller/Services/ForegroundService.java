@@ -45,6 +45,7 @@ import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -58,10 +59,11 @@ public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     String TAG = "ForeGroundService";
     DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, notificationRef, myMessages;
-    DatabaseReference myRideOrderRequests, receiptsRef;
+    DatabaseReference myRideOrderRequests, receiptsRef, incomingMessages;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     ValueEventListener myRideOrderRequestsListener;
     ChildEventListener notificationsListener, receiptsListener, myMessagesListener, myRestaurantOrdersListener, myRideRequestsListener;
+    ChildEventListener incomingMessagesListener;
     String myPhone;
     FirebaseUser user;
     UserModel myUserDetails;
@@ -111,11 +113,11 @@ public class ForegroundService extends Service {
             if (mDatabase == null) {
                 mDatabase = FirebaseDatabase.getInstance();
                 try {
-                    mDatabase.setPersistenceEnabled(true);
+                    //mDatabase.setPersistenceEnabled(true);
                 } catch (Exception e){
                     Log.e(TAG, "onCreate: ", e);
                 }
-                Log.d(TAG, "diskPersistence: "+ true);
+                //Log.d(TAG, "diskPersistence: "+ true);
             }
 
         } catch (Exception e){
@@ -135,9 +137,6 @@ public class ForegroundService extends Service {
         restaurantChat = false;
         riderChat = false;
 
-        customerChat = false;
-        restaurantChat = false;
-        riderChat = false;
 
         unreadCounter[0] = 0;
     }
@@ -368,13 +367,13 @@ public class ForegroundService extends Service {
                                 //initialize chat notifications listener
                                 startChatNotifications();
                             }
-
                         }
 
                         if (myUserDetails.getChatNotification() == false) {
                             //initialize chat notifications listener
                             try {
                                 myMessages.removeEventListener(myMessagesListener);
+                                incomingMessages.removeEventListener(incomingMessagesListener);
                             } catch (Exception e) {
                                 Log.e(TAG, "onDataChange: ", e);
                             }
@@ -402,7 +401,6 @@ public class ForegroundService extends Service {
      * Initialize Chat listener: this is a global listener for all account types
      */
     private void startChatNotifications() {
-        unreadCounter[0] = 0;
         myMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
         myMessagesListener = new ChildEventListener() {
             @Override
@@ -411,15 +409,16 @@ public class ForegroundService extends Service {
                 restaurantChat = true;
                 riderChat = true;
 
-                DatabaseReference incomingMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+incoming.getKey());
-                incomingMessages.addChildEventListener(new ChildEventListener() {
+                unreadCounter[0] = 0;
+                incomingMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+incoming.getKey());
+                incomingMessagesListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot message, @Nullable String s) {
                         MessageModel messages = message.getValue(MessageModel.class);
                         try {
-                            if (!messages.getSender().equals(myPhone) && messages.getRead() != true) {
+                            if (!messages.getSender().equals(myPhone) && messages.getRead() == false) {
                                 //Fire up notification for the new chat messages
-                                unreadCounter[0]++;
+                                unreadCounter[0] = unreadCounter[0] +1;
                                 String incomingPhone = messages.getSender();
                                 if (incomingPhone.length() > 5) {
                                     lastFiveDigits = incomingPhone.substring(incomingPhone.length() - 5); //We'll use this as the notification's unique ID
@@ -499,7 +498,8 @@ public class ForegroundService extends Service {
                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
-                });
+                };
+                incomingMessages.addChildEventListener(incomingMessagesListener);
             }
 
             @Override
@@ -1799,15 +1799,25 @@ public class ForegroundService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d("ForeGroundService", "ForegroundService: stopped");
-
+        deleteCache(this);
         customerNotifications = false;
         restaurantNotifications = false;
         riderNotifications = false;
 
+        customerSocial = false;
+        restaurantSocial = false;
+        riderSocial = false;
+
+        customerChat = false;
+        restaurantChat = false;
+        riderChat = false;
+
+        unreadCounter[0] = 0;
 
         stopService(new Intent(ForegroundService.this, TrackingService.class));
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
+            incomingMessages.removeEventListener(incomingMessagesListener);
             myUserDetailsRef.removeEventListener(myUserDetailsListener);
             notificationRef.removeEventListener(notificationsListener);
             myMessages.removeEventListener(myMessagesListener);
@@ -1822,6 +1832,30 @@ public class ForegroundService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    public static void deleteCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) { e.printStackTrace();}
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
     }
 
 }
