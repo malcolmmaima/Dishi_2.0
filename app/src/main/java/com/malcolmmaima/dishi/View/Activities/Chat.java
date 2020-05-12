@@ -65,8 +65,11 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
     private static final String TAG = "ChatActivity";
-    DatabaseReference recipientRef, recipientMessagesRef, myMessagedRef, followingRef, followerRef, myRef;
-    ValueEventListener recipientListener, myMessagesListener, followingListener, followerListener, accountTypeListener;
+    DatabaseReference recipientRef, recipientMessagesRef,
+            myMessagedRef, followingRef, followerRef, myRef,
+            recipientBlockedUsers, myBlockedUsers;
+    ValueEventListener recipientListener, myMessagesListener,
+            followingListener, followerListener, accountTypeListener, blockedUsersListener;
     UserModel recipientUser;
     Menu myMenu;
     MessageModel chatMessage;
@@ -103,6 +106,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber(); //Current logged in user phone number
                 myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                myBlockedUsers = FirebaseDatabase.getInstance().getReference("blocked/"+myPhone);
                 myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -161,6 +165,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             //Toast.makeText(this, "from = myphone", Toast.LENGTH_SHORT).show();
             recipientRef = FirebaseDatabase.getInstance().getReference("users/"+fromPhone);
             recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
+            recipientBlockedUsers = FirebaseDatabase.getInstance().getReference("blocked/"+fromPhone);
             myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
             followingRef = FirebaseDatabase.getInstance().getReference("following/"+toPhone+"/"+fromPhone);
             followerRef = FirebaseDatabase.getInstance().getReference("followers/"+toPhone+"/"+fromPhone);
@@ -169,6 +174,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         else {
             recipientRef = FirebaseDatabase.getInstance().getReference("users/"+toPhone);
             recipientMessagesRef = FirebaseDatabase.getInstance().getReference("messages/"+toPhone+"/"+fromPhone);
+            recipientBlockedUsers = FirebaseDatabase.getInstance().getReference("blocked/"+toPhone);
             myMessagedRef = FirebaseDatabase.getInstance().getReference("messages/"+fromPhone+"/"+toPhone);
             followingRef = FirebaseDatabase.getInstance().getReference("following/"+fromPhone+"/"+toPhone);
             followerRef = FirebaseDatabase.getInstance().getReference("followers/"+fromPhone+"/"+toPhone);
@@ -418,14 +424,46 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     dm.setTimeStamp(getDate());
                     dm.setMessage(message.trim());
                     dm.setRead(false);
-                    recipientMessagesRef.child(key).setValue(dm);
-                    myMessagedRef.child(key).setValue(dm).addOnFailureListener(new OnFailureListener() {
+
+                    recipientBlockedUsers.child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onFailure(@NonNull Exception e) {
-                            emojiconEditText.setText(dm.getMessage());
-                            SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){ //I have been blocked by recipient
+                                myMessagedRef.child(key).setValue(dm).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        try {
+                                            arrayAdapter.notifyDataSetChanged();
+                                        } catch (Exception er){
+                                            Log.e(TAG, "onFailure: ", er);
+                                        }
+                                        emojiconEditText.setText(dm.getMessage());
+                                        SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            } else { //not blocked
+                                recipientMessagesRef.child(key).setValue(dm);
+                                myMessagedRef.child(key).setValue(dm).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        try {
+                                            arrayAdapter.notifyDataSetChanged();
+                                        } catch (Exception er){
+                                            Log.e(TAG, "onFailure: ", er);
+                                        }
+                                        emojiconEditText.setText(dm.getMessage());
+                                        SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
                         }
                     });
+
                     messages.add(dm);
                     emojiconEditText.setText("");
                     arrayAdapter.notifyDataSetChanged();
@@ -535,9 +573,14 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.chat_menu, menu);
         myMenu = menu;
-        MenuItem item = menu.findItem(R.id.chat_call);
+        MenuItem call = menu.findItem(R.id.chat_call);
+        MenuItem blockOption = menu.findItem(R.id.chat_block);
+        MenuItem unblockOption = menu.findItem(R.id.chat_unblock);
+
         try {
-            item.setVisible(false);
+            call.setVisible(false);
+            blockOption.setVisible(false);
+            unblockOption.setVisible(false);
         } catch (Exception e){}
 
         /**
@@ -552,8 +595,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                         //Automatically show phone for restaurant accounts
                         try {
-                            myMenu.findItem(R.id.chat_call).setVisible(true);
-                            myMenu.findItem(R.id.chat_call).setEnabled(true);
+                            call.setVisible(true);
+                            call.setEnabled(true);
                         } catch (Exception e){ }
                     } else { //Rider and customer accounts
                         /**
@@ -570,16 +613,16 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                             if(dataSnapshot.exists()){
                                                 //Toast.makeText(Chat.this, "Follower => true", Toast.LENGTH_SHORT).show();
                                                 try {
-                                                    myMenu.findItem(R.id.chat_call).setVisible(true);
-                                                    myMenu.findItem(R.id.chat_call).setEnabled(true);
+                                                    call.setVisible(true);
+                                                    call.setEnabled(true);
                                                 } catch (Exception e){
 
                                                 }
                                             } else {
                                                 //Toast.makeText(Chat.this, "Follower => false", Toast.LENGTH_SHORT).show();
                                                 try {
-                                                    myMenu.findItem(R.id.chat_call).setVisible(false);
-                                                    myMenu.findItem(R.id.chat_call).setEnabled(false);
+                                                    call.setVisible(false);
+                                                    call.setEnabled(false);
                                                 } catch (Exception e){
 
                                                 }
@@ -597,8 +640,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                 } else {
                                     //Toast.makeText(Chat.this, "Following => false", Toast.LENGTH_SHORT).show();
                                     try {
-                                        myMenu.findItem(R.id.chat_call).setVisible(false);
-                                        myMenu.findItem(R.id.chat_call).setEnabled(false);
+                                        call.setVisible(false);
+                                        call.setEnabled(false);
                                     } catch (Exception e){
 
                                     }
@@ -624,6 +667,36 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             }
         };
         recipientRef.addValueEventListener(accountTypeListener);
+
+        /**
+         * blocked Users listener
+         * */
+        blockedUsersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    blockOption.setVisible(true);
+                    unblockOption.setVisible(false);
+                } else {
+                    for(DataSnapshot blocked : dataSnapshot.getChildren()){
+                        if(blocked.getKey().equals(recipientUser.getPhone())){
+                            unblockOption.setVisible(true);
+                            blockOption.setVisible(false);
+                            call.setEnabled(false);
+                        } else {
+                            blockOption.setVisible(true);
+                            unblockOption.setVisible(false);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myBlockedUsers.addValueEventListener(blockedUsersListener);
 
         return true;
     }
@@ -657,6 +730,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     Log.e(TAG, "onOptionsItemSelected: ", e);
                 }
                 return  true;
+
             case R.id.chat_view_profile:
                try {
                    Intent slideactivity = new Intent(Chat.this, ViewProfile.class)
@@ -679,9 +753,65 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                 return true; */
 
             case R.id.chat_block:
-                //TODO add custom dialog box
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "In development", Snackbar.LENGTH_LONG);
-                snackbar.show();
+                AlertDialog blockuser = new AlertDialog.Builder(Chat.this)
+                        //set message, title, and icon
+                        .setMessage("Block "+recipientUser.getFirstname() + " " + recipientUser.getLastname()+"?")
+                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                myBlockedUsers.child(recipientUser.getPhone()).setValue("blocked").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        try {
+                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Blocked", Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                        } catch (Exception er){
+                                            Log.e(TAG, "onSuccess: ", er);
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //do nothing
+                            }
+                        })//setNegativeButton
+
+                        .create();
+                blockuser.show();
+                return true;
+
+            case R.id.chat_unblock:
+                AlertDialog unBlockUser = new AlertDialog.Builder(Chat.this)
+                        //set message, title, and icon
+                        .setMessage("Unblock "+recipientUser.getFirstname() + " " + recipientUser.getLastname()+"?")
+                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                myBlockedUsers.child(recipientUser.getPhone()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        try {
+                                            Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Unblocked", Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                        } catch (Exception er){
+                                            Log.e(TAG, "onSuccess: ", er);
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //do nothing
+                            }
+                        })//setNegativeButton
+
+                        .create();
+                unBlockUser.show();
                 return true;
             case R.id.chat_clearchat:
                 AlertDialog clearChat = new AlertDialog.Builder(Chat.this)
@@ -753,6 +883,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
         try {
             myMessagedRef.removeEventListener(myMessagesListener);
+            myBlockedUsers.removeEventListener(blockedUsersListener);
             //there may be instances where these two listeners are not triggered
             followerRef.removeEventListener(followerListener);
             followingRef.removeEventListener(followingListener);

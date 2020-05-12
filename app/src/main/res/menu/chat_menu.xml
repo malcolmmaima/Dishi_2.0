@@ -28,6 +28,11 @@
                     android:id="@+id/chat_block"
                     android:title="Block"
                     app:showAsAction="never" />
+
+                <item
+                    android:id="@+id/chat_unblock"
+                    android:title="Unblock"
+                    app:showAsAction="never" />
                 <item
                     android:id="@+id/chat_clearchat"
                     android:title="Clear Chat"

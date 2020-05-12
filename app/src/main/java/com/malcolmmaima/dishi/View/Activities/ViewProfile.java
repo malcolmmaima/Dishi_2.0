@@ -928,7 +928,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         case R.id.userBlock:
             AlertDialog blockuser = new AlertDialog.Builder(ViewProfile.this)
                     //set message, title, and icon
-                    .setMessage("Block "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname())
+                    .setMessage("Block "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname()+"?")
                     //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                     //set three option buttons
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -958,7 +958,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         case R.id.userReport:
             AlertDialog reportUser = new AlertDialog.Builder(ViewProfile.this)
                     //set message, title, and icon
-                    .setMessage("Report "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname())
+                    .setMessage("Report "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname()+"?")
                     //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                     //set three option buttons
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -983,7 +983,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         case R.id.userUnBlock:
             AlertDialog unBlockUser = new AlertDialog.Builder(ViewProfile.this)
                     //set message, title, and icon
-                    .setMessage("Unblock "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname())
+                    .setMessage("Unblock "+myUserDetails.getFirstname() + " " + myUserDetails.getLastname()+"?")
                     //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
                     //set three option buttons
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
