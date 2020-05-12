@@ -32,14 +32,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.ForegroundService;
-import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
+import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.Controller.Utils.AppLifecycleObserver;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Adapter.ChatListAdapter;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
 import com.malcolmmaima.dishi.View.Fragments.HistoryFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
@@ -64,19 +63,13 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 

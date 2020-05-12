@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.Controller;
+package com.malcolmmaima.dishi.Controller.Services;
 
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -68,6 +68,9 @@ public class ForegroundService extends Service {
     String restaurantName, lastName;
     final int[] unreadCounter = {0};
     NotificationManager manager;
+    Boolean customerNotifications, restaurantNotifications, riderNotifications;
+    Boolean customerSocial, restaurantSocial, riderSocial;
+    Boolean customerChat, restaurantChat, riderChat;
 
     //We use this two variables as our notification ID because they are unique and attached to a user phone number
     String lastFourDigits = "";     //substring containing last 4 characters
@@ -81,8 +84,6 @@ public class ForegroundService extends Service {
     NotificationChannel channel;
 
     private static FirebaseDatabase mDatabase;
-
-
 
     @Override
     public void onCreate() {
@@ -120,6 +121,25 @@ public class ForegroundService extends Service {
         } catch (Exception e){
             Log.e(TAG, "onDataChange: ", e);
         }
+
+        //I use these values to prevent the notification-types from triggering everytime something changes in my 'users/' node
+        customerNotifications = false;
+        restaurantNotifications = false;
+        riderNotifications = false;
+
+        customerSocial = false;
+        restaurantSocial = false;
+        riderSocial = false;
+
+        customerChat = false;
+        restaurantChat = false;
+        riderChat = false;
+
+        customerChat = false;
+        restaurantChat = false;
+        riderChat = false;
+
+        unreadCounter[0] = 0;
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
@@ -145,6 +165,7 @@ public class ForegroundService extends Service {
         /**
          * Get logged in user details
          */
+
         myUserDetailsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -153,7 +174,7 @@ public class ForegroundService extends Service {
                     try {
                         if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")) {
                             //Check notification settings
-                            if (myUserDetails.getOrderNotification() == true) {
+                            if (myUserDetails.getOrderNotification() == true && customerNotifications == false) {
                                 startCustomerNotifications();
                             } else {
                                 try {
@@ -170,7 +191,7 @@ public class ForegroundService extends Service {
 
                     try {
                         if (myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")) {
-                            if (myUserDetails.getOrderNotification() == true) {
+                            if (myUserDetails.getOrderNotification() == true && restaurantNotifications == false) {
                                 startRestaurantNotifications();
                             } else {
                                 try {
@@ -187,7 +208,7 @@ public class ForegroundService extends Service {
                     try {
                         if (myUserDetails.getAccount_type().equals("3") && myUserDetails.getVerified().equals("true")) {
                             try {
-                                if (myUserDetails.getOrderNotification() == true) {
+                                if (myUserDetails.getOrderNotification() == true && riderNotifications == false) {
                                     startRiderNotifications();
                                 } else {
                                     try {
@@ -287,11 +308,30 @@ public class ForegroundService extends Service {
                         Log.e(TAG, "onDataChange: ", e);
                     }
                     try {
-                        //start/stop social notifications depending on notification settings
-                        if (myUserDetails.getSocialNotification() == true) {
-                            //initialize social media notifications
-                            startSocialNotifications();
+                        if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")){
+                            //start/stop social notifications depending on notification settings
+                            if (myUserDetails.getSocialNotification() && customerSocial == false) {
+                                //initialize social media notifications
+                                startSocialNotifications();
+                            }
                         }
+
+                        if (myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")){
+                            //start/stop social notifications depending on notification settings
+                            if (myUserDetails.getSocialNotification() && restaurantSocial == false) {
+                                //initialize social media notifications
+                                startSocialNotifications();
+                            }
+                        }
+
+                        if (myUserDetails.getAccount_type().equals("3") && myUserDetails.getVerified().equals("true")){
+                            //start/stop social notifications depending on notification settings
+                            if (myUserDetails.getSocialNotification() && riderSocial == false) {
+                                //initialize social media notifications
+                                startSocialNotifications();
+                            }
+                        }
+
 
                         if (myUserDetails.getSocialNotification() == false) {
                             try {
@@ -305,10 +345,30 @@ public class ForegroundService extends Service {
                     }
 
                     try {
-                        //start/stop chat notifications depending on notification settings
-                        if (myUserDetails.getChatNotification() == true) {
-                            //initialize chat notifications listener
-                            startChatNotifications();
+                        if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")){
+                            //start/stop chat notifications depending on notification settings
+                            if (myUserDetails.getChatNotification() == true && customerChat == false) {
+                                //initialize chat notifications listener
+                                startChatNotifications();
+                            }
+
+                        }
+
+                        if (myUserDetails.getAccount_type().equals("2") && myUserDetails.getVerified().equals("true")){
+                            //start/stop chat notifications depending on notification settings
+                            if (myUserDetails.getChatNotification() == true && restaurantChat == false) {
+                                //initialize chat notifications listener
+                                startChatNotifications();
+                            }
+                        }
+
+                        if (myUserDetails.getAccount_type().equals("3") && myUserDetails.getVerified().equals("true")){
+                            //start/stop chat notifications depending on notification settings
+                            if (myUserDetails.getChatNotification() == true && riderChat == false) {
+                                //initialize chat notifications listener
+                                startChatNotifications();
+                            }
+
                         }
 
                         if (myUserDetails.getChatNotification() == false) {
@@ -319,6 +379,7 @@ public class ForegroundService extends Service {
                                 Log.e(TAG, "onDataChange: ", e);
                             }
                         }
+
                     } catch (Exception ee){
                         Log.e(TAG, "onDataChange: ", ee);
                     }
@@ -341,16 +402,19 @@ public class ForegroundService extends Service {
      * Initialize Chat listener: this is a global listener for all account types
      */
     private void startChatNotifications() {
+        unreadCounter[0] = 0;
         myMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone);
         myMessagesListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot incoming, @Nullable String s) {
+                customerChat = true;
+                restaurantChat = true;
+                riderChat = true;
 
                 DatabaseReference incomingMessages = FirebaseDatabase.getInstance().getReference("messages/"+myPhone+"/"+incoming.getKey());
                 incomingMessages.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot message, @Nullable String s) {
-
                         MessageModel messages = message.getValue(MessageModel.class);
                         try {
                             if (!messages.getSender().equals(myPhone) && messages.getRead() != true) {
@@ -363,19 +427,19 @@ public class ForegroundService extends Service {
                                 int notifId = Integer.parseInt(lastFiveDigits); //new Random().nextInt();
                                 int rand = new Random().nextInt(10);
                                 DatabaseReference incomingUserDetails = FirebaseDatabase.getInstance().getReference("users/"+messages.getSender());
-                                int finalUnreadCounter = unreadCounter[0];
+
                                 incomingUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                                         if(dataSnapshot.exists()){
                                             UserModel incomingUser = dataSnapshot.getValue(UserModel.class);
+
 
                                             //compose our notification and send
                                             String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
                                             String msg;
-                                            if(finalUnreadCounter != 1){
-                                                msg = finalUnreadCounter + " new messages";
+                                            if(unreadCounter[0] != 1){
+                                                msg = unreadCounter[0] + " new messages";
 
                                             } else {
                                                 msg = messages.getMessage();
@@ -467,6 +531,11 @@ public class ForegroundService extends Service {
         notificationsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                customerSocial = true;
+                restaurantSocial = true;
+                riderSocial = true;
+
                 try {
                     NotificationModel newNotification = dataSnapshot.getValue(NotificationModel.class);
                     newNotification.key = dataSnapshot.getKey();
@@ -523,6 +592,7 @@ public class ForegroundService extends Service {
         myRideRequestsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot restaurants, @Nullable String s) {
+                riderNotifications = true;
                 /**
                  * For each restaurant, get the customers i have been assigned to and their user details
                  */
@@ -624,7 +694,7 @@ public class ForegroundService extends Service {
         myRestaurantOrdersListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot customerPhones, @Nullable String s) {
-                int itemCount = (int) customerPhones.child("items").getChildrenCount();
+                restaurantNotifications = true;
                 String orderID = customerPhones.child("orderID").getValue(String.class);
                 //Get user details
                 DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+customerPhones.getKey());
@@ -648,14 +718,8 @@ public class ForegroundService extends Service {
                                 lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
                             }
                             int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
+                            sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, ViewCustomerOrder.class, customerPhone, title);
 
-                            try {
-                                if (myUserDetails.getOrderNotification() == true) {
-                                    sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, ViewCustomerOrder.class, customerPhone, title);
-                                }
-                            } catch (Exception e){
-                                Log.e(TAG, "onDataChange: ", e);
-                            }
                         } catch (Exception e){}
                     }
 
@@ -697,6 +761,7 @@ public class ForegroundService extends Service {
         myOrdersListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                customerNotifications = true;
                 if(dataSnapshot.exists()){
                     for(DataSnapshot providers : dataSnapshot.getChildren()){
                         final String provider = providers.getKey();
@@ -952,7 +1017,7 @@ public class ForegroundService extends Service {
 
     private void sendCustomerOrderNotification(int notifId, String type, String title, String message, Class targetActivity, String customerPhone, String customerName){
 
-        if(type.equals("newOrderRequest")){
+        if(type.equals("newOrderRequest") && myUserDetails.getOrderNotification() == true){
             Notification.Builder builder = null;
             Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -1734,6 +1799,12 @@ public class ForegroundService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d("ForeGroundService", "ForegroundService: stopped");
+
+        customerNotifications = false;
+        restaurantNotifications = false;
+        riderNotifications = false;
+
+
         stopService(new Intent(ForegroundService.this, TrackingService.class));
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {

@@ -1,11 +1,10 @@
-package com.malcolmmaima.dishi.Controller;
+package com.malcolmmaima.dishi.Controller.Services;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import com.google.firebase.auth.FirebaseUser;
@@ -29,7 +28,6 @@ import android.app.Notification;
 import android.content.pm.PackageManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;

@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.malcolmmaima.dishi.Controller.ForegroundService;
-import com.malcolmmaima.dishi.Controller.TrackingService;
+import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
+import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.R;
 
 public class BlockedAccount extends AppCompatActivity {

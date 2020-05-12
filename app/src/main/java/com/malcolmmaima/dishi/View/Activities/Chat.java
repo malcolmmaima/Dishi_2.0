@@ -117,8 +117,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
-                                    } else {
-                                        loadChat();
                                     }
                                 }
 
@@ -127,8 +125,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                                 }
                             });
-                        } else {
-                            loadChat();
                         }
                     }
 
@@ -137,6 +133,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                     }
                 });
+
+                loadChat();
             } catch (Exception e){}
         }
 
@@ -499,8 +497,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
-                                    } else {
-                                        loadChat();
                                     }
                                 }
 
@@ -509,8 +505,6 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                                 }
                             });
-                        } else {
-                            loadChat();
                         }
                     }
 
@@ -519,6 +513,8 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
                     }
                 });
+
+                loadChat();
             } catch (Exception e){}
         }
     }

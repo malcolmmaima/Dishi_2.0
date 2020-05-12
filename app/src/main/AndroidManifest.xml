@@ -111,11 +111,11 @@
             android:value="false" />
 
         <service
-            android:name=".Controller.TrackingService"
+            android:name=".Controller.Services.TrackingService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Controller.ForegroundService"
+            android:name=".Controller.Services.ForegroundService"
             android:enabled="true"
             android:exported="true" />
     </application>
