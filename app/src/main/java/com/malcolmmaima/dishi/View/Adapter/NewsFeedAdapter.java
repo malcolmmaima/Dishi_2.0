@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewShareFoodItems;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
@@ -85,6 +87,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         UserModel [] postUser = new UserModel[listdata.size()];
         UserModel [] postedTo = new UserModel[listdata.size()];
 
+        holder.foodShare.setVisibility(View.GONE); //by default dont show unless it's an order share
         holder.postedToPic.setVisibility(View.GONE);
         holder.postedTo.setVisibility(View.GONE);
         /**
@@ -785,6 +788,20 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             }
         });
 
+        if(statusUpdateModel.getReceiptKey() != null){
+            holder.foodShare.setVisibility(View.VISIBLE);
+        }
+
+        holder.foodShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(context, ViewShareFoodItems.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("receiptKey", statusUpdateModel.getReceiptKey());
+                context.startActivity(slideactivity);
+            }
+        });
+
         holder.sharePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -823,6 +840,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         MyTextView_Roboto_Light timePosted;
         TextView statusOptions;
         ImageView profilePic, postedToPic,imageShare, likePost, comments, sharePost;
+        RelativeLayout foodShare;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -842,6 +860,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             statusOptions = itemView.findViewById(R.id.statusOptions);
             postedToPic = itemView.findViewById(R.id.postedToPic);
             postedTo = itemView.findViewById(R.id.postedTo);
+            foodShare = itemView.findViewById(R.id.foodShare);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
