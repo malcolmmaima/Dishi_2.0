@@ -9,6 +9,7 @@ public class StatusUpdateModel {
     public String postedTo;
     public String commentKey;
     public String imageShare;
+    public String receiptKey; // temporary holder for passing receipt key for status FoodShare post types
 
 
     public String getCommentKey() {
@@ -57,5 +58,13 @@ public class StatusUpdateModel {
 
     public void setImageShare(String imageShare) {
         this.imageShare = imageShare;
+    }
+
+    public String getReceiptKey() {
+        return receiptKey;
+    }
+
+    public void setReceiptKey(String receiptKey) {
+        this.receiptKey = receiptKey;
     }
 }

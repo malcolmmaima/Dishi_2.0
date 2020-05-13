@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewShareFoodItems;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
 
@@ -83,6 +85,8 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone = user.getPhoneNumber(); //Current logged in user phone number
         UserModel [] postUser = new UserModel[listdata.size()];
+
+        holder.foodShare.setVisibility(View.GONE); //by default dont show unless it's an order share
 
         /**
          * Adapter animation
@@ -204,6 +208,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
+
         //set post details
         if(statusUpdateModel.getStatus().equals("")){
             holder.userUpdate.setVisibility(View.GONE);
@@ -234,6 +239,20 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                     slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
                     context.startActivity(slideactivity);
                 } catch (Exception e){}
+            }
+        });
+
+        if(statusUpdateModel.getReceiptKey() != null){
+            holder.foodShare.setVisibility(View.VISIBLE);
+        }
+
+        holder.foodShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(context, ViewShareFoodItems.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("receiptKey", statusUpdateModel.getReceiptKey());
+                context.startActivity(slideactivity);
             }
         });
 
@@ -769,6 +788,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         MyTextView_Roboto_Light timePosted;
         TextView statusOptions;
         ImageView profilePic, imageShare, likePost, comments, sharePost;
+        RelativeLayout foodShare;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -786,6 +806,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             cardView = itemView.findViewById(R.id.card_view);
             timePosted = itemView.findViewById(R.id.timePosted);
             statusOptions = itemView.findViewById(R.id.statusOptions);
+            foodShare = itemView.findViewById(R.id.foodShare);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {

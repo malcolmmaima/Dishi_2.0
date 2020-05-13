@@ -36,8 +36,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
@@ -56,6 +59,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     Context context;
     List<ProductDetailsModel> listdata;
     long DURATION = 200;
+    ValueEventListener locationListener;
+    DatabaseReference myLocationRef;
+    String myPhone;
 
     public ProductAdapter(Context context, List<ProductDetailsModel> listdata) {
         this.listdata = listdata;
@@ -74,6 +80,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     public void onBindViewHolder(final ProductAdapter.MyHolder holder, final int position) {
         final ProductDetailsModel productDetailsModel = listdata.get(position);
         int[] clickCount = new int[listdata.size()];
+        final LiveLocationModel[] liveLocationModel = {new LiveLocationModel()};
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+
+        //Get my Location details
+        locationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                liveLocationModel[0] = dataSnapshot.getValue(LiveLocationModel.class);
+                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myLocationRef.addValueEventListener(locationListener);
         /**
          * Adapter animation
          */
@@ -82,6 +108,94 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         /**
          * Set widget values
          **/
+
+        //get vendor user data
+        DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ productDetailsModel.getOwner());
+        userData.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                if (user.getLiveStatus() == true) {
+                    Log.d(TAG, productDetailsModel.getOwner()+": liveStatus = true");
+
+                    if (user.getLocationType().equals("default")){
+                        //if location type is default then fetch static location
+                        DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + productDetailsModel.getOwner() + "/my_location");
+                        defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                try {
+                                    StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
+
+                                    /**
+                                     * Now lets compute distance of each restaurant with customer location
+                                     */
+                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                    Double dist = calculateDistance.distance(liveLocationModel[0].getLatitude(),
+                                            liveLocationModel[0].getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
+
+                                    productDetailsModel.setDistance(dist);
+                                    if (dist < 1.0) {
+                                        holder.distanceAway.setText(dist * 1000 + "m away");
+                                    } else {
+                                        holder.distanceAway.setText(dist + "km away");
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+
+                    else if (user.getLocationType().equals("live")) {
+                        DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + productDetailsModel.getOwner());
+                        restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                try {
+                                    LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
+                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                    Double dist = calculateDistance.distance(liveLocationModel[0].getLatitude(),
+                                            liveLocationModel[0].getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+
+                                    productDetailsModel.setDistance(dist);
+
+                                    if (dist < 1.0) {
+                                        holder.distanceAway.setText(dist * 1000 + "m away");
+                                    } else {
+                                        holder.distanceAway.setText(dist + "km away");
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         holder.foodPrice.setText("Ksh "+ productDetailsModel.getPrice());
         holder.foodName.setText(productDetailsModel.getName());
@@ -115,9 +229,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         } catch (Exception e){
 
         }
-
-        FirebaseUser  user = FirebaseAuth.getInstance().getCurrentUser();
-        String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         //creating a popup menu
         PopupMenu popup = new PopupMenu(context, holder.productOptions);
@@ -313,7 +424,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
          * Add item to cart
          */
 
-        if(!productDetailsModel.accountType.equals("1")){
+        try {
+            if (!productDetailsModel.accountType.equals("1")) {
+                holder.addToCart.setVisibility(View.GONE);
+            }
+        } catch (Exception e){
             holder.addToCart.setVisibility(View.GONE);
         }
 

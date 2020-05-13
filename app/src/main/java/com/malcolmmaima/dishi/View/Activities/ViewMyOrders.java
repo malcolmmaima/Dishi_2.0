@@ -36,12 +36,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.auth.User;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.ReceiptModel;
+import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
@@ -63,7 +65,7 @@ public class ViewMyOrders extends AppCompatActivity {
     List<ProductDetailsModel> list;
     String myPhone, phone, restaurantName, riderPhone, initiatedTime, address, orderID, paymentMethod;
     FirebaseUser user;
-    DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus, myRef;
+    DatabaseReference customerOrderItems, myOrders, myOrdersHistory, riderStatus, myRef, myPostUpdates;
     ValueEventListener customerOrderItemsListener, currentRiderListener, riderStatusListener;
     MyTextView_Roboto_Medium myOrderID, totalBill;
     MyTextView_Roboto_Regular subTotal, deliveryChargeAmount, payment, myRemarks, riderName, timeStamp, trackOrderTxt;
@@ -148,6 +150,7 @@ public class ViewMyOrders extends AppCompatActivity {
         customerOrderItems = FirebaseDatabase.getInstance().getReference("orders/"+phone+"/"+myPhone);
         myOrdersHistory = FirebaseDatabase.getInstance().getReference("orders_history/"+myPhone);
         myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+        myPostUpdates = FirebaseDatabase.getInstance().getReference("posts/"+myPhone);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -643,6 +646,65 @@ public class ViewMyOrders extends AppCompatActivity {
                                 receipt.setPaymentMethod(paymentMethod);
                                 receipt.setRestaurant(phone);
                                 receipt.setSeen(false);
+
+                                //Post status update if i've set shareOrders in settings to ON
+                                myRef.child("shareOrders").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.exists()){
+                                            Boolean sharedOrders = dataSnapshot.getValue(Boolean.class);
+
+                                            if(sharedOrders == true){
+
+                                                DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
+                                                userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot userVendor) {
+                                                        receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 1){
+                                                                    UserModel vendor = userVendor.getValue(UserModel.class);
+                                                                    vendor.setPhone(phone);
+
+                                                                    GetCurrentDate currentDate = new GetCurrentDate();
+                                                                    String postDate = currentDate.getDate();
+
+                                                                    String message = vendor.getFirstname()+" "+vendor.getLastname()+" successfully delivered my order :-) #DishiFoodie";
+                                                                    StatusUpdateModel statusUpdate = new StatusUpdateModel();
+                                                                    statusUpdate.setReceiptKey(nodeKey);
+                                                                    statusUpdate.setStatus(message);
+                                                                    statusUpdate.setAuthor(myPhone);
+                                                                    statusUpdate.setPostedTo(myPhone);
+                                                                    statusUpdate.setTimePosted(postDate);
+                                                                    statusUpdate.setImageShare(null);
+                                                                    String key = myPostUpdates.push().getKey();
+                                                                    myPostUpdates.child(key).setValue(statusUpdate);
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
 
                                 receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override

@@ -2,11 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.malcolmmaima.dishi">
 
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
     <application
         android:allowBackup="true"
         android:icon="@drawable/dishi_icon"
@@ -14,7 +9,7 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".View.Activities.ViewShareFoodItems"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -25,8 +20,7 @@
         -->
         <activity
             android:name=".View.Maps.ViewMapLocation"
-            android:label="@string/title_activity_maps"></activity>
-
+            android:label="@string/title_activity_maps" />
         <activity android:name=".View.Activities.DeviceBlocked" />
         <activity
             android:name=".View.Activities.SecurityPin"
@@ -111,10 +105,10 @@
         <activity
             android:name=".View.Activities.CustomerActivity"
             android:label="@string/title_activity_customer" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/logo_notification" />
