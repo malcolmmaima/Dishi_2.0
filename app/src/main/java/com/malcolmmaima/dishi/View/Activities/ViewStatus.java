@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,6 +96,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     View rootView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String key, postedTo;
+    RelativeLayout foodShare;
 
     // instance for firebase storage and StorageReference
     FirebaseStorage storage;
@@ -195,6 +197,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         statusOptions = findViewById(R.id.statusOptions);
         postedToPic = findViewById(R.id.postedToPic);
         postedToName = findViewById(R.id.postedToName);
+        foodShare = findViewById(R.id.foodShare);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -435,6 +438,20 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                             } else {
                                 imageShare.setVisibility(View.GONE);
                             }
+
+                            if(viewPost.getReceiptKey() != null){
+                                foodShare.setVisibility(View.VISIBLE);
+                            }
+
+                            foodShare.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent slideactivity = new Intent(ViewStatus.this, ViewShareFoodItems.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("receiptKey", viewPost.getReceiptKey());
+                                    startActivity(slideactivity);
+                                }
+                            });
                         } catch (Exception e) {
                         }
                     }
@@ -489,6 +506,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         } catch (Exception e){
             Log.e(TAG, "onCreate: ", e);
         }
+
 
         //status options
         statusOptions.setOnClickListener(new View.OnClickListener() {
