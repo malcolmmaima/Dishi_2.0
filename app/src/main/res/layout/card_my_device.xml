@@ -41,7 +41,7 @@
             android:id="@+id/deviceName"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"/>
-<!--
+
         <TextView
             android:id="@+id/deviceOptions"
             android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:text="&#8942;"
             android:textAppearance="?android:textAppearanceLarge" />
--->
+
         <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -85,6 +85,15 @@
             android:layout_marginRight="35dp"
             android:layout_marginBottom="10dp"
             android:textColor="#666"/>
+
+        <ImageView
+            android:layout_below="@id/deviceOptions"
+            android:id="@+id/blockedIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/blocked_icon_64dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

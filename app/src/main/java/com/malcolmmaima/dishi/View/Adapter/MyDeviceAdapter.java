@@ -77,9 +77,12 @@ public class MyDeviceAdapter extends RecyclerView.Adapter<MyDeviceAdapter.MyHold
 
     public void onBindViewHolder(final MyDeviceAdapter.MyHolder holder, final int position) {
         final MyDeviceModel myDevice = listdata.get(position);
-
-
         setAnimation(holder.itemView, position);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String myPhone = user.getPhoneNumber(); //Current logged in user phone number
+
+        holder.blockedIcon.setVisibility(View.GONE);
 
         holder.deviceName.setText(""+myDevice.getDeviceModel());
         holder.deviceID.setText("ID: "+myDevice.getDeviceID());
@@ -98,6 +101,142 @@ public class MyDeviceAdapter extends RecyclerView.Adapter<MyDeviceAdapter.MyHold
             e.printStackTrace();
             Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
+
+        //creating a popup menu
+        PopupMenu popup = new PopupMenu(context, holder.deviceOptions);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.device_options_menu);
+
+        Menu myMenu = popup.getMenu();
+        MenuItem blockOption = myMenu.findItem(R.id.blockDevice);
+        MenuItem unblockOption = myMenu.findItem(R.id.unblockDevice);
+
+        try {
+
+            if(myDevice.getBlocked() == true){
+                unblockOption.setVisible(true);
+                blockOption.setVisible(false);
+                holder.blockedIcon.setVisibility(View.VISIBLE);
+            }
+             else {
+                unblockOption.setVisible(false);
+                blockOption.setVisible(true);
+                holder.blockedIcon.setVisibility(View.GONE);
+            }
+
+
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ",e);
+        }
+
+        holder.deviceOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.blockDevice:
+                                final AlertDialog block = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Block "+myDevice.getDeviceModel()+"?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference myDevicesRef = FirebaseDatabase.getInstance().getReference("mydevices/"+myPhone+"/"+myDevice.getDeviceID());
+                                                myDevicesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        if(dataSnapshot.exists()){ //A bit redundant but just to make sure
+                                                            myDevicesRef.child("blocked").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    try {
+                                                                        holder.blockedIcon.setVisibility(View.VISIBLE);
+                                                                        unblockOption.setVisible(true);
+                                                                        blockOption.setVisible(false);
+                                                                    } catch (Exception e){
+                                                                        Log.e(TAG, "onSuccess: ", e);
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                block.show();
+                                return (true);
+
+                            case R.id.unblockDevice:
+                                final AlertDialog unBlock = new AlertDialog.Builder(context)
+                                        //set message, title, and icon
+                                        .setMessage("Unblock "+myDevice.getDeviceModel()+"?")
+                                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference myDevicesRef = FirebaseDatabase.getInstance().getReference("mydevices/"+myPhone+"/"+myDevice.getDeviceID());
+                                                myDevicesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        if(dataSnapshot.exists()){ //A bit redundant but just to make sure
+                                                            myDevicesRef.child("blocked").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    try {
+                                                                        holder.blockedIcon.setVisibility(View.GONE);
+                                                                        unblockOption.setVisible(false);
+                                                                        blockOption.setVisible(true);
+                                                                    } catch (Exception e){
+                                                                        Log.e(TAG, "onSuccess: ", e);
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //do nothing
+
+                                            }
+                                        })//setNegativeButton
+
+                                        .create();
+                                unBlock.show();
+                                return (true);
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                //displaying the popup
+                popup.show();
+
+            }
+        });
 
         /**
          * Click listener on our card
@@ -140,7 +279,8 @@ public class MyDeviceAdapter extends RecyclerView.Adapter<MyDeviceAdapter.MyHold
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium deviceName;
         MyTextView_Roboto_Regular deviceID, deviceIP, loginDate;
-
+        ImageView blockedIcon;
+        TextView deviceOptions;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -149,6 +289,8 @@ public class MyDeviceAdapter extends RecyclerView.Adapter<MyDeviceAdapter.MyHold
             deviceID = itemView.findViewById(R.id.deviceID);
             deviceIP = itemView.findViewById(R.id.deviceIP);
             loginDate = itemView.findViewById(R.id.deviceLoginDate);
+            blockedIcon = itemView.findViewById(R.id.blockedIcon);
+            deviceOptions = itemView.findViewById(R.id.deviceOptions);
             cardView = itemView.findViewById(R.id.card_view);
 
             //Long Press

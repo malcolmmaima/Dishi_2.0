@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- TODO Hopefully add more options later -->
+    <item
+        android:id="@+id/blockDevice"
+        app:showAsAction="never"
+        android:title="Block"/>
+
+    <item
+        android:id="@+id/unblockDevice"
+        app:showAsAction="never"
+        android:title="Unblock"/>
+
+</menu>

@@ -5,6 +5,7 @@ public class MyDeviceModel {
     String ipAddress;
     String deviceModel;
     String lastLogin;
+    Boolean blocked;
 
     public String getDeviceID() {
         return deviceID;
@@ -36,5 +37,13 @@ public class MyDeviceModel {
 
     public void setLastLogin(String lastLogin) {
         this.lastLogin = lastLogin;
+    }
+
+    public Boolean getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(Boolean blocked) {
+        this.blocked = blocked;
     }
 }

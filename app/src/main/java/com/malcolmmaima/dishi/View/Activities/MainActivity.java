@@ -612,6 +612,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                         myDevice.setDeviceModel(DeviceName.getDeviceName());
                                                         myDevice.setIpAddress(getLocalIpAddress());
                                                         myDevice.setLastLogin(currentDate.getDate());
+                                                        myDevice.setBlocked(false);
                                                         myDevicesRef.child(android_id).setValue(myDevice);
                                                         /**
                                                          * End of log device
