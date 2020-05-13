@@ -197,11 +197,14 @@
 
             </RelativeLayout>
 
+            <!-- TODO: work on sync ussers phone contacts to dishi for friend matching-->
             <View
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="0.7dp"
                 android:background="#b1b1b1"/>
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
@@ -221,6 +224,8 @@
 
 
             </LinearLayout>
+
+            <!-- TODO: end of sync -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.7dp"
@@ -302,6 +307,7 @@
                 android:background="#b1b1b1"/>
 
             <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Bold
+                android:id="@+id/myRatesTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"

@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Bold;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -45,6 +46,7 @@ public class AccountSettings extends AppCompatActivity {
             accountPrivacy, accountPin, loginActivity, deliveryCharges, deleteMyAccount;
     LinearLayout shareOrdersOption;
     MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt, pinStatus, deliveryChargeAmount;
+    MyTextView_Roboto_Bold myRatesTitle;
     View setViewPhoneBorder, shareOrdersOptionBorder, myRatesBorder;
     int chckdItem = 0;
     int chckItem2 = 0;
@@ -128,6 +130,8 @@ public class AccountSettings extends AppCompatActivity {
         myRatesBorder = findViewById(R.id.myRatesBorder);
         myRatesBorder.setVisibility(View.GONE);
         deleteMyAccount = findViewById(R.id.deleteMyAccount);
+        myRatesTitle = findViewById(R.id.myRatesTitle);
+        myRatesTitle.setVisibility(View.GONE);
 
         shareOrdersOptionBorder = findViewById(R.id.shareOrdersOptionBorder);
         shareOrdersOptionBorder.setVisibility(View.GONE);
@@ -191,6 +195,7 @@ public class AccountSettings extends AppCompatActivity {
                         if(myUserDetails.getAccount_type().equals("2")){
                             deliveryCharges.setVisibility(View.VISIBLE);
                             myRatesBorder.setVisibility(View.VISIBLE);
+                            myRatesTitle.setVisibility(View.VISIBLE);
                         }
                     } else {
                         setViewPhone.setVisibility(View.VISIBLE);

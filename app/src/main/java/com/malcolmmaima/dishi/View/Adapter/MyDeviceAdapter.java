@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -112,18 +113,23 @@ public class MyDeviceAdapter extends RecyclerView.Adapter<MyDeviceAdapter.MyHold
         MenuItem unblockOption = myMenu.findItem(R.id.unblockDevice);
 
         try {
-
-            if(myDevice.getBlocked() == true){
-                unblockOption.setVisible(true);
-                blockOption.setVisible(false);
-                holder.blockedIcon.setVisibility(View.VISIBLE);
+            //get device id
+            final String android_id = Settings.Secure.getString(context.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+            if(myDevice.getDeviceID().equals(android_id)){ // you can't block your current logged in device
+                holder.deviceOptions.setVisibility(View.GONE);
+            } else {
+                if(myDevice.getBlocked() == true){
+                    unblockOption.setVisible(true);
+                    blockOption.setVisible(false);
+                    holder.blockedIcon.setVisibility(View.VISIBLE);
+                }
+                else {
+                    unblockOption.setVisible(false);
+                    blockOption.setVisible(true);
+                    holder.blockedIcon.setVisibility(View.GONE);
+                }
             }
-             else {
-                unblockOption.setVisible(false);
-                blockOption.setVisible(true);
-                holder.blockedIcon.setVisibility(View.GONE);
-            }
-
 
         } catch (Exception e){
             Log.e(TAG, "onBindViewHolder: ",e);
