@@ -663,7 +663,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                         receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 1){
+                                                                if(dataSnapshot.exists()){
                                                                     UserModel vendor = userVendor.getValue(UserModel.class);
                                                                     vendor.setPhone(phone);
 
