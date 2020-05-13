@@ -20,7 +20,7 @@ import com.malcolmmaima.dishi.R;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
-public class DeleteAccount extends AppCompatActivity {
+public class DeleteDeactivate extends AppCompatActivity {
 
     String myPhone;
     DatabaseReference myRef;
@@ -30,7 +30,7 @@ public class DeleteAccount extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_delete_account);
+        setContentView(R.layout.activity_delete_deactivate);
 
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
@@ -50,7 +50,7 @@ public class DeleteAccount extends AppCompatActivity {
                                 Boolean locked = dataSnapshot.getValue(Boolean.class);
 
                                 if(locked == true){
-                                    Intent slideactivity = new Intent(DeleteAccount.this, SecurityPin.class)
+                                    Intent slideactivity = new Intent(DeleteDeactivate.this, SecurityPin.class)
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("pinType", "resume");
                                     startActivity(slideactivity);
@@ -78,7 +78,7 @@ public class DeleteAccount extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle("Delete Account");
+        setTitle("Delete / Deactivate");
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -109,7 +109,7 @@ public class DeleteAccount extends AppCompatActivity {
                             Boolean locked = dataSnapshot.getValue(Boolean.class);
 
                             if(locked == true){
-                                Intent slideactivity = new Intent(DeleteAccount.this, SecurityPin.class)
+                                Intent slideactivity = new Intent(DeleteDeactivate.this, SecurityPin.class)
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Activities.DeleteAccount"
+    tools:context=".View.Activities.DeleteDeactivate"
     android:id="@+id/parentlayout">
 
     <androidx.appcompat.widget.Toolbar

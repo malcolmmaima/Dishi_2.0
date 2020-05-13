@@ -18,8 +18,8 @@
         <activity android:name=".View.Activities.MyBlockedAccounts" />
         <activity android:name=".View.Activities.HelpActivity" />
         <activity android:name=".View.Activities.NotificationSettings" />
-        <activity android:name=".View.Activities.PrivacySecurity" />
-        <activity android:name=".View.Activities.DeleteAccount" />
+        <activity android:name=".View.Activities.AccountSettings" />
+        <activity android:name=".View.Activities.DeleteDeactivate" />
         <activity android:name=".View.Activities.AboutActivity" />
         <activity
             android:name=".View.Activities.ReceiptActivity"
@@ -61,7 +61,6 @@
             android:launchMode="singleTask" />
         <activity android:name=".View.Activities.CheckOut" />
         <activity android:name=".View.Activities.DeliverCharges" />
-        <activity android:name=".View.Activities.AccountSettings" />
         <activity
             android:name=".View.Activities.MyCart"
             android:label="@string/title_activity_my_cart" />
