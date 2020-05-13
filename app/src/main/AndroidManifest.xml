@@ -9,8 +9,10 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.SecurityPin"
-            android:launchMode="singleTask"></activity>
+        <activity android:name=".View.Activities.DeviceBlocked"></activity>
+        <activity
+            android:name=".View.Activities.SecurityPin"
+            android:launchMode="singleTask" />
         <activity android:name=".View.Activities.DeviceLoginActivity" />
         <activity android:name=".View.Activities.MyLocation" />
         <activity android:name=".View.Activities.MyBlockedAccounts" />
