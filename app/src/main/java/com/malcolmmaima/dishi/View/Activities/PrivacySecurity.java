@@ -497,9 +497,39 @@ public class PrivacySecurity extends AppCompatActivity {
         loginActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent blockedActivity = new Intent(PrivacySecurity.this, DeviceLoginActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(blockedActivity);
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            //Only allow authorised users to access this page
+                            myRef.child("appLocked").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Intent blockedActivity = new Intent(PrivacySecurity.this, DeviceLoginActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(blockedActivity);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Snackbar snackbar = Snackbar
+                                            .make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
+                            });
+                        } else { //User hasn't set security pin so load activity
+                            Intent blockedActivity = new Intent(PrivacySecurity.this, DeviceLoginActivity.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(blockedActivity);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         });
     }
