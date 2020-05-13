@@ -583,206 +583,204 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         holder.likePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = (int)holder.likePost.getTag();
-                if( id == R.drawable.unliked){
-                    //Add to my favourites
-                    postDetails.child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            //update likes count
-                            postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    try {
-                                        int total = (int) dataSnapshot.getChildrenCount();
-                                        Double totalLikes = Double.valueOf(total);
+                try {
+                    int id = (int) holder.likePost.getTag();
+                    if (id == R.drawable.unliked) {
+                        //Add to my favourites
+                        postDetails.child("likes").child(myPhone).setValue("like").addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                //update likes count
+                                postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+                                            int total = (int) dataSnapshot.getChildrenCount();
+                                            Double totalLikes = Double.valueOf(total);
 
-                                        //below 1000
-                                        if(totalLikes < 1000){
-                                            DecimalFormat value = new DecimalFormat("#");
-                                            holder.likesTotal.setText(""+value.format(totalLikes));
-                                        }
-
-                                        // 1000 to 999,999
-                                        else if(totalLikes >= 1000 && totalLikes <= 999999){
-                                            if(totalLikes % 1000 == 0){ //No remainder
-                                                DecimalFormat value = new DecimalFormat("#####");
-                                                holder.likesTotal.setText(""+value.format(total/1000)+"K");
-                                            }
-
-                                            else { //Has remainder 999.9K
-                                                DecimalFormat value = new DecimalFormat("######.#");
-                                                Double divided = totalLikes/1000;
-                                                if(value.format(divided).equals("1000")){
-                                                    holder.likesTotal.setText("1M"); //if rounded off
-                                                } else {
-                                                    holder.likesTotal.setText(""+value.format(divided)+"K");
-                                                }
-                                            }
-                                        }
-
-                                        // 1,000,0000 to 999,999,999
-                                        else if(totalLikes >= 1000000 && totalLikes <= 999999999){
-                                            if(totalLikes % 1000000 == 0) { //No remainder
+                                            //below 1000
+                                            if (totalLikes < 1000) {
                                                 DecimalFormat value = new DecimalFormat("#");
-                                                holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                                holder.likesTotal.setText("" + value.format(totalLikes));
                                             }
 
-                                            else { //Has remainder 9.9M, 999.9M etc
-                                                DecimalFormat value = new DecimalFormat("#.#");
-                                                if(value.format(totalLikes/1000000).equals("1000")){
-                                                    holder.likesTotal.setText("1B"); //if rounded off
-                                                } else {
-                                                    holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                            // 1000 to 999,999
+                                            else if (totalLikes >= 1000 && totalLikes <= 999999) {
+                                                if (totalLikes % 1000 == 0) { //No remainder
+                                                    DecimalFormat value = new DecimalFormat("#####");
+                                                    holder.likesTotal.setText("" + value.format(total / 1000) + "K");
+                                                } else { //Has remainder 999.9K
+                                                    DecimalFormat value = new DecimalFormat("######.#");
+                                                    Double divided = totalLikes / 1000;
+                                                    if (value.format(divided).equals("1000")) {
+                                                        holder.likesTotal.setText("1M"); //if rounded off
+                                                    } else {
+                                                        holder.likesTotal.setText("" + value.format(divided) + "K");
+                                                    }
                                                 }
                                             }
+
+                                            // 1,000,0000 to 999,999,999
+                                            else if (totalLikes >= 1000000 && totalLikes <= 999999999) {
+                                                if (totalLikes % 1000000 == 0) { //No remainder
+                                                    DecimalFormat value = new DecimalFormat("#");
+                                                    holder.likesTotal.setText("" + value.format(totalLikes / 1000000) + "M");
+                                                } else { //Has remainder 9.9M, 999.9M etc
+                                                    DecimalFormat value = new DecimalFormat("#.#");
+                                                    if (value.format(totalLikes / 1000000).equals("1000")) {
+                                                        holder.likesTotal.setText("1B"); //if rounded off
+                                                    } else {
+                                                        holder.likesTotal.setText("" + value.format(totalLikes / 1000000) + "M");
+                                                    }
+                                                }
+                                            }
+
+                                            postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    if (!dataSnapshot.exists()) {
+                                                        holder.likePost.setTag(R.drawable.unliked);
+                                                        holder.likePost.setImageResource(R.drawable.unliked);
+                                                    } else {
+                                                        holder.likePost.setTag(R.drawable.liked);
+                                                        holder.likePost.setImageResource(R.drawable.liked);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        } catch (Exception e) {
                                         }
+                                    }
 
-                                        postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if(!dataSnapshot.exists()){
-                                                    holder.likePost.setTag(R.drawable.unliked);
-                                                    holder.likePost.setImageResource(R.drawable.unliked);
-                                                } else {
-                                                    holder.likePost.setTag(R.drawable.liked);
-                                                    holder.likePost.setImageResource(R.drawable.liked);
-                                                }
-                                            }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-                                    } catch (Exception e){}
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-
-                            //send notification
-                            if(!statusUpdateModel.getAuthor().equals(myPhone)){
-                                DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+statusUpdateModel.getAuthor());
-
-                                String notifKey = notificationRef.push().getKey();
-                                GetCurrentDate currentDate = new GetCurrentDate();
+                                    }
+                                });
 
                                 //send notification
-                                NotificationModel liked = new NotificationModel();
-                                liked.setFrom(myPhone);
-                                liked.setType("likedstatus");
-                                liked.setImage("");
-                                liked.setSeen(false);
-                                liked.setTimeStamp(currentDate.getDate());
-                                liked.setMessage(statusUpdateModel.key);
-                                liked.setAuthor(statusUpdateModel.getAuthor());
-                                liked.setPostedTo(statusUpdateModel.getPostedTo());
+                                if (!statusUpdateModel.getAuthor().equals(myPhone)) {
+                                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/" + statusUpdateModel.getAuthor());
 
-                                notificationRef.child(notifKey).setValue(liked); //send to db
+                                    String notifKey = notificationRef.push().getKey();
+                                    GetCurrentDate currentDate = new GetCurrentDate();
 
-                                //Also send the notification to the person's wall where this status update appears
-                                if(!statusUpdateModel.getPostedTo().equals(myPhone) && !statusUpdateModel.postedTo.equals(statusUpdateModel.getAuthor())){
-                                    DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/"+statusUpdateModel.getPostedTo());
-                                    String notif2key = notificationRef2.push().getKey();
+                                    //send notification
+                                    NotificationModel liked = new NotificationModel();
+                                    liked.setFrom(myPhone);
+                                    liked.setType("likedstatus");
+                                    liked.setImage("");
+                                    liked.setSeen(false);
+                                    liked.setTimeStamp(currentDate.getDate());
+                                    liked.setMessage(statusUpdateModel.key);
+                                    liked.setAuthor(statusUpdateModel.getAuthor());
+                                    liked.setPostedTo(statusUpdateModel.getPostedTo());
 
-                                    notificationRef2.child(notif2key).setValue(liked); //send to db
+                                    notificationRef.child(notifKey).setValue(liked); //send to db
+
+                                    //Also send the notification to the person's wall where this status update appears
+                                    if (!statusUpdateModel.getPostedTo().equals(myPhone) && !statusUpdateModel.postedTo.equals(statusUpdateModel.getAuthor())) {
+                                        DatabaseReference notificationRef2 = FirebaseDatabase.getInstance().getReference("notifications/" + statusUpdateModel.getPostedTo());
+                                        String notif2key = notificationRef2.push().getKey();
+
+                                        notificationRef2.child(notif2key).setValue(liked); //send to db
+                                    }
                                 }
+    //                            holder.likePost.setTag(R.drawable.liked);
+    //                            holder.likePost.setImageResource(R.drawable.liked);
+                                //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
                             }
-//                            holder.likePost.setTag(R.drawable.liked);
-//                            holder.likePost.setImageResource(R.drawable.liked);
-                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                        });
 
 
-                } else{
-                    //Remove from my favourites
-                    postDetails.child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            //update likes count
-                            postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    try {
-                                        int total = (int) dataSnapshot.getChildrenCount();
-                                        Double totalLikes = Double.valueOf(total);
+                    } else {
+                        //Remove from my favourites
+                        postDetails.child("likes").child(myPhone).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                //update likes count
+                                postDetails.child("likes").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+                                            int total = (int) dataSnapshot.getChildrenCount();
+                                            Double totalLikes = Double.valueOf(total);
 
-                                        //below 1000
-                                        if(totalLikes < 1000){
-                                            DecimalFormat value = new DecimalFormat("#");
-                                            holder.likesTotal.setText(""+value.format(totalLikes));
-                                        }
-
-                                        // 1000 to 999,999
-                                        else if(totalLikes >= 1000 && totalLikes <= 999999){
-                                            if(totalLikes % 1000 == 0){ //No remainder
-                                                DecimalFormat value = new DecimalFormat("#####");
-                                                holder.likesTotal.setText(""+value.format(total/1000)+"K");
-                                            }
-
-                                            else { //Has remainder 999.9K
-                                                DecimalFormat value = new DecimalFormat("######.#");
-                                                Double divided = totalLikes/1000;
-                                                if(value.format(divided).equals("1000")){
-                                                    holder.likesTotal.setText("1M"); //if rounded off
-                                                } else {
-                                                    holder.likesTotal.setText(""+value.format(divided)+"K");
-                                                }
-                                            }
-                                        }
-
-                                        // 1,000,0000 to 999,999,999
-                                        else if(totalLikes >= 1000000 && totalLikes <= 999999999){
-                                            if(totalLikes % 1000000 == 0) { //No remainder
+                                            //below 1000
+                                            if (totalLikes < 1000) {
                                                 DecimalFormat value = new DecimalFormat("#");
-                                                holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                                holder.likesTotal.setText("" + value.format(totalLikes));
                                             }
 
-                                            else { //Has remainder 9.9M, 999.9M etc
-                                                DecimalFormat value = new DecimalFormat("#.#");
-                                                if(value.format(totalLikes/1000000).equals("1000")){
-                                                    holder.likesTotal.setText("1B"); //if rounded off
-                                                } else {
-                                                    holder.likesTotal.setText(""+value.format(totalLikes/1000000)+"M");
+                                            // 1000 to 999,999
+                                            else if (totalLikes >= 1000 && totalLikes <= 999999) {
+                                                if (totalLikes % 1000 == 0) { //No remainder
+                                                    DecimalFormat value = new DecimalFormat("#####");
+                                                    holder.likesTotal.setText("" + value.format(total / 1000) + "K");
+                                                } else { //Has remainder 999.9K
+                                                    DecimalFormat value = new DecimalFormat("######.#");
+                                                    Double divided = totalLikes / 1000;
+                                                    if (value.format(divided).equals("1000")) {
+                                                        holder.likesTotal.setText("1M"); //if rounded off
+                                                    } else {
+                                                        holder.likesTotal.setText("" + value.format(divided) + "K");
+                                                    }
                                                 }
                                             }
+
+                                            // 1,000,0000 to 999,999,999
+                                            else if (totalLikes >= 1000000 && totalLikes <= 999999999) {
+                                                if (totalLikes % 1000000 == 0) { //No remainder
+                                                    DecimalFormat value = new DecimalFormat("#");
+                                                    holder.likesTotal.setText("" + value.format(totalLikes / 1000000) + "M");
+                                                } else { //Has remainder 9.9M, 999.9M etc
+                                                    DecimalFormat value = new DecimalFormat("#.#");
+                                                    if (value.format(totalLikes / 1000000).equals("1000")) {
+                                                        holder.likesTotal.setText("1B"); //if rounded off
+                                                    } else {
+                                                        holder.likesTotal.setText("" + value.format(totalLikes / 1000000) + "M");
+                                                    }
+                                                }
+                                            }
+
+                                            postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    if (!dataSnapshot.exists()) {
+                                                        holder.likePost.setTag(R.drawable.unliked);
+                                                        holder.likePost.setImageResource(R.drawable.unliked);
+                                                    } else {
+                                                        holder.likePost.setTag(R.drawable.liked);
+                                                        holder.likePost.setImageResource(R.drawable.liked);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        } catch (Exception e) {
                                         }
+                                    }
 
-                                        postDetails.child("likes").child(myPhone).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if(!dataSnapshot.exists()){
-                                                    holder.likePost.setTag(R.drawable.unliked);
-                                                    holder.likePost.setImageResource(R.drawable.unliked);
-                                                } else {
-                                                    holder.likePost.setTag(R.drawable.liked);
-                                                    holder.likePost.setImageResource(R.drawable.liked);
-                                                }
-                                            }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    }
+                                });
+    //                            holder.likePost.setTag(R.drawable.unliked);
+    //                            holder.likePost.setImageResource(R.drawable.unliked);
+                            }
+                        });
 
-                                            }
-                                        });
-                                    } catch (Exception e){}
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-//                            holder.likePost.setTag(R.drawable.unliked);
-//                            holder.likePost.setImageResource(R.drawable.unliked);
-                        }
-                    });
-
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
                 }
             }
         });

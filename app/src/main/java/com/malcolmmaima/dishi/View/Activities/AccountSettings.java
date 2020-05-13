@@ -30,8 +30,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Bold;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Maps.ViewMapLocation;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
@@ -39,13 +41,14 @@ public class AccountSettings extends AppCompatActivity {
 
     String TAG = "AccountSettings";
     String myPhone;
-    DatabaseReference myRef;
+    DatabaseReference myRef, myBlockedUsersRef, myLocationRef;
     ValueEventListener myRefListener;
     Switch shareOrders, syncContacts;
     RelativeLayout setViewPhone, blockedAccounts, myLocationSettings,
             accountPrivacy, accountPin, loginActivity, deliveryCharges, deleteMyAccount;
     LinearLayout shareOrdersOption;
-    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt, pinStatus, deliveryChargeAmount;
+    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt, pinStatus,
+            deliveryChargeAmount, blockedCounter;
     MyTextView_Roboto_Bold myRatesTitle;
     View setViewPhoneBorder, shareOrdersOptionBorder, myRatesBorder;
     int chckdItem = 0;
@@ -76,6 +79,8 @@ public class AccountSettings extends AppCompatActivity {
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();
+            myBlockedUsersRef = FirebaseDatabase.getInstance().getReference("blocked/"+myPhone);
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
             myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -115,6 +120,7 @@ public class AccountSettings extends AppCompatActivity {
         setViewPhone.setVisibility(View.GONE);
 
         blockedAccounts = findViewById(R.id.blockedAccounts);
+        blockedCounter = findViewById(R.id.blockedCounter);
         myLocationSettings = findViewById(R.id.myLocationSettings);
         accountPrivacy = findViewById(R.id.accountPrivacy);
         accountPin = findViewById(R.id.accountPin);
@@ -245,6 +251,27 @@ public class AccountSettings extends AppCompatActivity {
             }
         };
         myRef.addValueEventListener(myRefListener);
+
+        myBlockedUsersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        int totalBlocked = (int) dataSnapshot.getChildrenCount();
+                        blockedCounter.setText("" + totalBlocked);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                } else {
+                    blockedCounter.setText("None");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //switches
         shareOrders.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -442,9 +469,35 @@ public class AccountSettings extends AppCompatActivity {
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(locationActivity);
                     } else {
-                        Intent blockedActivity = new Intent(AccountSettings.this, MyLocation.class)
-                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(blockedActivity);
+                        myLocationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    try {
+                                        LiveLocationModel myLocation = dataSnapshot.getValue(LiveLocationModel.class);
+
+                                        Intent locationActivity = new Intent(AccountSettings.this, ViewMapLocation.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        locationActivity.putExtra("lat", myLocation.getLatitude());
+                                        locationActivity.putExtra("lon", myLocation.getLongitude());
+                                        startActivity(locationActivity);
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onDataChange: ", e);
+                                    }
+                                }
+
+                                else {
+                                    Snackbar snackbar = Snackbar
+                                            .make(findViewById(R.id.parentlayout), "Your location not found", Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 } catch (Exception e){
                     Log.e(TAG, "onClick: ", e);
@@ -644,6 +697,7 @@ public class AccountSettings extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        //Check account lock status
         myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -666,6 +720,28 @@ public class AccountSettings extends AppCompatActivity {
 
                         }
                     });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //Get total number of blocked users
+        myBlockedUsersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        int totalBlocked = (int) dataSnapshot.getChildrenCount();
+                        blockedCounter.setText("" + totalBlocked);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                } else {
+                    blockedCounter.setText("None");
                 }
             }
 

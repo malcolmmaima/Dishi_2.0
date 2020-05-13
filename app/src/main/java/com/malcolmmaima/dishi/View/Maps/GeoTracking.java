@@ -523,15 +523,16 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            }); } catch (Exception e){
+            });
+        } catch (Exception e){
             Log.d("dishi", "GeoFireActivity: "+ e);
         }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        confirmOrd.setEnabled(false);
-        callNduthi.setEnabled(false);
+        confirmOrd.setEnabled(true);
+        callNduthi.setEnabled(true);
 
         mMap = googleMap;
 

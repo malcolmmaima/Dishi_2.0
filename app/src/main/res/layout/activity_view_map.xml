@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Activities.MyLocation"
+    tools:context=".View.Maps.ViewMapLocation"
     android:id="@+id/parentlayout">
 
     <androidx.appcompat.widget.Toolbar
@@ -22,29 +22,35 @@
         app:view_borderColor="@color/colorPrimaryDark">
 
     </androidx.appcompat.widget.Toolbar>
-    <ScrollView
+    <fragment
         android:layout_below="@id/toolbar"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="fill_parent">
-
-        <LinearLayout
+        tools:context=".View.Maps.ViewMapLocation">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="In development"
-                android:textSize="20sp"
-                android:layout_gravity="center"
-                android:layout_margin="20dp"
-                />
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_alignParentRight="true"
+                >
 
-        </LinearLayout>
+                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:id="@+id/verticalSeekbar"
+                    android:max="20"
+                    android:splitTrack="false"
+                    app:seekBarRotation="CW270"
+                    />
+            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
 
-    </ScrollView>
+        </RelativeLayout>
+    </fragment>
 
 </RelativeLayout>

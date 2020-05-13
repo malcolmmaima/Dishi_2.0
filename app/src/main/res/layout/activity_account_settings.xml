@@ -123,7 +123,7 @@
                     android:text="Blocked accounts"/>
 
                 <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-
+                    android:id="@+id/blockedCounter"
                     android:textSize="15sp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"

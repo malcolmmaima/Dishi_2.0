@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.malcolmmaima.dishi">
 
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the 'MyLocation' functionality.
+    -->
     <application
         android:allowBackup="true"
         android:icon="@drawable/dishi_icon"
@@ -9,12 +14,24 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.DeviceBlocked"></activity>
+
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
+        <activity
+            android:name=".View.Maps.ViewMapLocation"
+            android:label="@string/title_activity_maps"></activity>
+
+        <activity android:name=".View.Activities.DeviceBlocked" />
         <activity
             android:name=".View.Activities.SecurityPin"
             android:launchMode="singleTask" />
         <activity android:name=".View.Activities.DeviceLoginActivity" />
-        <activity android:name=".View.Activities.MyLocation" />
         <activity android:name=".View.Activities.MyBlockedAccounts" />
         <activity android:name=".View.Activities.HelpActivity" />
         <activity android:name=".View.Activities.NotificationSettings" />
@@ -94,6 +111,9 @@
         <activity
             android:name=".View.Activities.CustomerActivity"
             android:label="@string/title_activity_customer" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -104,9 +124,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
@@ -120,8 +137,8 @@
             android:enabled="true"
             android:exported="true" />
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
