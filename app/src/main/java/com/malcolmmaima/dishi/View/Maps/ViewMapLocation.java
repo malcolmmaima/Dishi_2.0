@@ -17,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,6 +29,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
+import com.malcolmmaima.dishi.Controller.Services.TrackingService;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AboutActivity;
 import com.malcolmmaima.dishi.View.Activities.SecurityPin;
@@ -40,11 +43,13 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
     Double latitude, longitude;
     FirebaseUser user;
     String myPhone;
-    DatabaseReference myRef;
+    DatabaseReference myRef, myLocationRef;
     int zoomLevel;
     VerticalSeekBar zoomMap;
     FirebaseAuth mAuth;
     LatLng mapLocation;
+    ValueEventListener LocationListener;
+    Marker myMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,7 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
 
             myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -189,12 +195,41 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
+        //Incase user has stopped tracking service
+        startService(new Intent(this, TrackingService.class));
+
+        mMap = googleMap;
+        //Initialize Location
         mapLocation = new LatLng(latitude, longitude);
-        mMap.addMarker(new MarkerOptions().position(mapLocation).title("Current Location"));
+        myMarker = mMap.addMarker(new MarkerOptions().position(mapLocation).title("My Location"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(mapLocation));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mapLocation, zoomLevel));
+
+        LocationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myMarker.remove();
+                try {
+                    LiveLocationModel myRealtimeLocation = dataSnapshot.getValue(LiveLocationModel.class);
+                    latitude = myRealtimeLocation.getLatitude();
+                    longitude = myRealtimeLocation.getLongitude();
+
+                    mapLocation = new LatLng(latitude, longitude);
+                    myMarker = mMap.addMarker(new MarkerOptions().position(mapLocation).title("Current Location"));
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLng(mapLocation));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mapLocation, zoomLevel));
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myLocationRef.addValueEventListener(LocationListener);
     }
 
     @Override
@@ -238,6 +273,16 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
 
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            myLocationRef.removeEventListener(LocationListener);
+        } catch (Exception e){
+            Log.e(TAG, "onDestroy: ", e);
         }
     }
 }
