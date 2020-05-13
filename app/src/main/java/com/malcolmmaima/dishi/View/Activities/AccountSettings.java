@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -42,7 +44,7 @@ public class AccountSettings extends AppCompatActivity {
     RelativeLayout setViewPhone, blockedAccounts, myLocationSettings,
             accountPrivacy, accountPin, loginActivity, deliveryCharges, deleteMyAccount;
     LinearLayout shareOrdersOption;
-    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt, pinStatus;
+    MyTextView_Roboto_Regular phoneVisibilityTxt, accountPrivacyTxt, pinStatus, deliveryChargeAmount;
     View setViewPhoneBorder, shareOrdersOptionBorder, myRatesBorder;
     int chckdItem = 0;
     int chckItem2 = 0;
@@ -50,6 +52,7 @@ public class AccountSettings extends AppCompatActivity {
     UserModel myUserDetails;
     FirebaseAuth mAuth;
     FirebaseUser user;
+    String [] pinOptions = {"Change PIN", "Remove PIN"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +124,7 @@ public class AccountSettings extends AppCompatActivity {
         setViewPhoneBorder.setVisibility(View.GONE);
         deliveryCharges = findViewById(R.id.myRiderRates);
         deliveryCharges.setVisibility(View.GONE);
+        deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
         myRatesBorder = findViewById(R.id.myRatesBorder);
         myRatesBorder.setVisibility(View.GONE);
         deleteMyAccount = findViewById(R.id.deleteMyAccount);
@@ -221,6 +225,12 @@ public class AccountSettings extends AppCompatActivity {
                     }
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
+                }
+
+                try {
+                    deliveryChargeAmount.setText("Ksh "+myUserDetails.getDelivery_charge()+"/Km");
+                } catch (Exception error){
+                    Log.e(TAG, "onDataChange: ", error);
                 }
             }
 
@@ -499,10 +509,44 @@ public class AccountSettings extends AppCompatActivity {
         accountPin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent securityPin = new Intent(AccountSettings.this, SecurityPin.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                securityPin.putExtra("pinType", "setPin");
-                startActivity(securityPin);
+
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(AccountSettings.this);
+                builder.setItems(pinOptions, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Accept rider request
+                        if(which == 0){
+                            Intent securityPin = new Intent(AccountSettings.this, SecurityPin.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            securityPin.putExtra("pinType", "setPin");
+                            startActivity(securityPin);
+                        }
+                        if(which == 1){
+                            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(dataSnapshot.exists()){
+                                        Intent securityPin = new Intent(AccountSettings.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        securityPin.putExtra("pinType", "removePin");
+                                        startActivity(securityPin);
+                                    } else {
+                                        Snackbar snackbar = Snackbar
+                                                .make(findViewById(R.id.parentlayout), "You don't have a PIN set yet", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+
+                    }
+                });
+                builder.create();
+                builder.show();
             }
         });
 

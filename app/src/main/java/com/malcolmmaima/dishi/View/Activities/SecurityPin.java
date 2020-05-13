@@ -188,6 +188,12 @@ public class SecurityPin extends AppCompatActivity {
                 title2.setText("login to your account");
             }
 
+            if(pinType.equals("removePin")){
+                logout.setVisibility(View.GONE);
+                title1.setText("Confirm your current");
+                title2.setText("PIN to remove");
+            }
+
             num0.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -414,6 +420,38 @@ public class SecurityPin extends AppCompatActivity {
                                 pinCombo = new int[4];
                                 resetPinEnter(false);
                                 SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+                if(pinType.equals("removePin")){
+                    myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            try {
+                                loginPin = dataSnapshot.getValue(String.class);
+                                if (myPin.equals(loginPin)) {
+                                    myRef.child("appLocked").removeValue();
+                                    myRef.child("pin").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            finish();
+                                            SafeToast.makeText(SecurityPin.this, "PIN removed!", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                } else {
+                                    finish();
+                                    SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                                }
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
                             }
                         }
 

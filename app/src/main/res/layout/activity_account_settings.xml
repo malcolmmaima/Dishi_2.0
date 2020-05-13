@@ -331,6 +331,7 @@
                     android:text="Delivery Charge"/>
 
                 <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    android:id="@+id/deliveryChargeAmount"
                     android:textSize="15sp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
