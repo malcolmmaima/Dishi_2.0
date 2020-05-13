@@ -340,8 +340,9 @@
                     android:text="Ksh 0/Km"/>
 
             </RelativeLayout>
-
+            <!-- TODO: implement delete / deactivate module -->
             <View
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="0.7dp"
                 android:background="#b1b1b1"/>
@@ -351,6 +352,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:textSize="18sp"
+                android:visibility="gone"
                 android:textColor="@color/colorPrimary"
                 android:text="Account"/>
 
@@ -359,6 +361,7 @@
                 android:layout_height="0.7dp"
                 android:background="#b1b1b1"/>
             <RelativeLayout
+                android:visibility="gone"
                 android:id="@+id/deleteMyAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
