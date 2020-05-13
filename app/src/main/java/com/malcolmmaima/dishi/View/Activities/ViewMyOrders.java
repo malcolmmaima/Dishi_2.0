@@ -321,48 +321,31 @@ public class ViewMyOrders extends AppCompatActivity {
 
                         myRemarks.setText("Remarks: "+remarks);
                         if (completed == true) {
+                            String message;
+                            if(address.equals("pick")){
+                                message = "Have you picked your order?";
+                            } else {
+                                message = "Order has been delivered?";
+                            }
                             final AlertDialog finish = new AlertDialog.Builder(ViewMyOrders.this)
-                                    .setMessage("Order Delivered?")
+                                    .setMessage(message)
                                     //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
                                     .setCancelable(false)
                                     //set three option buttons
                                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
+                                            ReceiptModel receipt = new ReceiptModel();
+                                            String nodeKey = receiptsRef.push().getKey();
+                                            GetCurrentDate currentDate = new GetCurrentDate();
+
+                                            customerOrderItems.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
-
-                                                        try {
-                                                            tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
-                                                        } catch (Exception e){}
-                                                        try {
-                                                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                            prod.setKey(items.getKey());
-
-                                                            /**
-                                                             * Move order items to history node
-                                                             */
-                                                            myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-
-                                                                            myOrders.child(phone).removeValue();
-                                                                            DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                                    ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
-
-                                                                            rider.removeValue();
-
-                                                                        }
-                                                                    });
-                                                                }
-                                                            });
-
-                                                        } catch (Exception e) {
-
+                                                    for(DataSnapshot items : dataSnapshot.getChildren()){
+                                                        ProductDetailsModel item = items.getValue(ProductDetailsModel.class);
+                                                        if(item.getConfirmed() == true){
+                                                            receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                         }
                                                     }
                                                 }
@@ -373,6 +356,124 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 }
                                             });
 
+                                            receipt.setDeliveredOn(currentDate.getDate());
+                                            receipt.setInitiatedOn(initiatedTime);
+                                            receipt.setOrderID(orderID);
+                                            receipt.setPaymentMethod(paymentMethod);
+                                            receipt.setRestaurant(phone);
+                                            receipt.setSeen(false);
+
+                                            //Post status update if i've set shareOrders in settings to ON
+                                            myRef.child("shareOrders").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    if(dataSnapshot.exists()){
+                                                        Boolean sharedOrders = dataSnapshot.getValue(Boolean.class);
+
+                                                        if(sharedOrders == true){
+
+                                                            DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
+                                                            userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot userVendor) {
+                                                                    receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                            if(dataSnapshot.exists()){
+                                                                                UserModel vendor = userVendor.getValue(UserModel.class);
+                                                                                vendor.setPhone(phone);
+
+                                                                                GetCurrentDate currentDate = new GetCurrentDate();
+                                                                                String postDate = currentDate.getDate();
+
+                                                                                String message = vendor.getFirstname()+" "+vendor.getLastname()+" successfully delivered my order :-) #DishiFoodie";
+                                                                                StatusUpdateModel statusUpdate = new StatusUpdateModel();
+                                                                                statusUpdate.setReceiptKey(nodeKey);
+                                                                                statusUpdate.setStatus(message);
+                                                                                statusUpdate.setAuthor(myPhone);
+                                                                                statusUpdate.setPostedTo(myPhone);
+                                                                                statusUpdate.setTimePosted(postDate);
+                                                                                statusUpdate.setImageShare(null);
+                                                                                String key = myPostUpdates.push().getKey();
+                                                                                myPostUpdates.child(key).setValue(statusUpdate);
+                                                                            }
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                        }
+                                                                    });
+
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+
+                                            receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
+                                                                try {
+                                                                    //We need to capture the rider phone before the node is removed. this will allow us to
+                                                                    //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
+                                                                    //which would mean in turn we are unable to update the rider status
+                                                                    tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                                } catch (Exception e){}
+                                                                try {
+                                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                                    prod.setKey(items.getKey());
+
+                                                                    /**
+                                                                     * Move order items to history node
+                                                                     */
+                                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
+
+                                                                                    //Log.d("SuccessOrder", "update rider status => del: \nmy_ride_requests/"+tempRiderPhoneHolder+"/"+phone+"/"+myPhone);
+                                                                                    myOrders.child(phone).removeValue();
+                                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                            ("my_ride_requests/"+tempRiderPhoneHolder[0]+"/"+phone+"/"+myPhone);
+
+                                                                                    rider.removeValue();
+
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+
+                                                                } catch (Exception e){
+
+                                                                }
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+                                                }
+                                            });
                                         }
                                     })//setPositiveButton
 

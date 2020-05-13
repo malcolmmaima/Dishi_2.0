@@ -798,6 +798,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                 Intent slideactivity = new Intent(context, ViewShareFoodItems.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("receiptKey", statusUpdateModel.getReceiptKey());
+                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
                 context.startActivity(slideactivity);
             }
         });

@@ -449,6 +449,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                                     Intent slideactivity = new Intent(ViewStatus.this, ViewShareFoodItems.class)
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("receiptKey", viewPost.getReceiptKey());
+                                    slideactivity.putExtra("author", viewPost.getAuthor());
                                     startActivity(slideactivity);
                                 }
                             });

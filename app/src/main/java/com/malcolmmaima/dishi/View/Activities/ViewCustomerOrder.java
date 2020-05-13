@@ -447,11 +447,15 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     myOrderID.setText("ORDER ID: #"+orderID);
                     initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
-                    if(address.equals("pick")){
-                        DeliveryAddress.setEnabled(false);
-                        trackOrderTxt.setText("Customer will pick order");
-                        riderName.setVisibility(View.GONE);
-                        riderIcon.setVisibility(View.GONE);
+                    try {
+                        if(address.equals("pick")){
+                            DeliveryAddress.setEnabled(false);
+                            trackOrderTxt.setText("Customer will pick order");
+                            riderName.setVisibility(View.GONE);
+                            riderIcon.setVisibility(View.GONE);
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
                     }
 
                     timer = new Timer();

@@ -1761,7 +1761,13 @@ public class ForegroundService extends Service {
     }
 
     private void sendReceiptNotification(ReceiptModel newReceipt) {
-        int notifId = new Random().nextInt();
+        String temp = String.valueOf(new Random().nextInt());
+        String receiptID = newReceipt.getOrderID();
+        if (receiptID.length() > 3) {
+            temp = receiptID.substring(receiptID.length() - 2); //We'll use this as the notification's unique ID
+        }
+        int notifId = Integer.parseInt(temp); //new Random().nextInt();
+
         Class targetActivity = ReceiptActivity.class;
         Notification.Builder builder = null;
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

@@ -38,7 +38,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "ViewShareFoodItems";
     FirebaseAuth mAuth;
-    String myPhone, receiptKey, accountType;
+    String myPhone, receiptKey, accountType, authorPhone;
     DatabaseReference myRef, receiptRef, myLocationRef;
     List<ProductDetailsModel> list;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -82,10 +82,12 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             receiptKey = getIntent().getStringExtra("receiptKey");
+            authorPhone = getIntent().getStringExtra("author");
+
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
-            receiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone+"/"+receiptKey);
+            receiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+authorPhone+"/"+receiptKey);
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
             myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -178,7 +180,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
                             recycler.notifyDataSetChanged();
                             recyclerview.setAdapter(recycler);
                         } else {
-                            finish();
+                            //finish();
                             SafeToast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
                         }
                     }
