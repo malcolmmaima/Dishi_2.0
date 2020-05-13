@@ -542,8 +542,6 @@ public class ViewRestaurant extends AppCompatActivity {
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);
-                            } else {
-                                loadActivity();
                             }
                         }
 
@@ -552,8 +550,6 @@ public class ViewRestaurant extends AppCompatActivity {
 
                         }
                     });
-                } else {
-                    loadActivity();
                 }
             }
 

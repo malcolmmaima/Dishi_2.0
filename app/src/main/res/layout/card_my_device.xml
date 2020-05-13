@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:elevation="8dp"
+    card_view:cardCornerRadius="5dp"
+    android:focusableInTouchMode="false"
+    android:padding="10dp"
+    card_view:view_shadowDx="5dp"
+    card_view:view_shadowDy="0dp"
+    card_view:view_borderWidth="2dp"
+    card_view:view_borderColor="#cccccc"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical"
+        android:padding="5dp"
+        >
+        <ImageView
+            android:id="@+id/phoneIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/locked_phone_64dp"
+            />
+
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_toRightOf="@id/phoneIcon"
+            android:textSize="15sp"
+            android:text="Loading..."
+            android:id="@+id/deviceName"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"/>
+<!--
+        <TextView
+            android:id="@+id/deviceOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="3dp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:text="&#8942;"
+            android:textAppearance="?android:textAppearanceLarge" />
+-->
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/phoneIcon"
+            android:text="loading..."
+            android:id="@+id/deviceID"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="35dp"
+            android:layout_below="@id/deviceName"
+            android:textColor="#666"/>
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            android:layout_below="@id/deviceID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/phoneIcon"
+            android:text="loading..."
+            android:id="@+id/deviceIP"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="35dp"
+            android:textColor="#666"/>
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            android:layout_below="@id/deviceIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/phoneIcon"
+            android:text="loading..."
+            android:id="@+id/deviceLoginDate"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="#666"/>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

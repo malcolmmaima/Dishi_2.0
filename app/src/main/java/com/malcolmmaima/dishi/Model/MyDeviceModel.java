@@ -4,6 +4,7 @@ public class MyDeviceModel {
     String deviceID;
     String ipAddress;
     String deviceModel;
+    String lastLogin;
 
     public String getDeviceID() {
         return deviceID;
@@ -27,5 +28,13 @@ public class MyDeviceModel {
 
     public void setDeviceModel(String deviceModel) {
         this.deviceModel = deviceModel;
+    }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
     }
 }

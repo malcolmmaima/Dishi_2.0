@@ -497,7 +497,7 @@ public class PrivacySecurity extends AppCompatActivity {
         loginActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent blockedActivity = new Intent(PrivacySecurity.this, LoginActivity.class)
+                Intent blockedActivity = new Intent(PrivacySecurity.this, DeviceLoginActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(blockedActivity);
             }

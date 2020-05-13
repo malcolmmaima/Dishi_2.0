@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".View.Activities.SecurityPin"
             android:launchMode="singleTask"></activity>
-        <activity android:name=".View.Activities.LoginActivity" />
+        <activity android:name=".View.Activities.DeviceLoginActivity" />
         <activity android:name=".View.Activities.MyLocation" />
         <activity android:name=".View.Activities.MyBlockedAccounts" />
         <activity android:name=".View.Activities.HelpActivity" />

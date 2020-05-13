@@ -268,6 +268,7 @@ public class SecurityPin extends AppCompatActivity {
             logout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    myRef.child("appLocked").setValue(true);
                     stopService(new Intent(SecurityPin.this, ForegroundService.class));
                     stopService(new Intent(SecurityPin.this, TrackingService.class));
                     FirebaseAuth.getInstance().signOut();

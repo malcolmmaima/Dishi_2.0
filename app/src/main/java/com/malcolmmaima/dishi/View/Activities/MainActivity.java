@@ -49,6 +49,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.android.device.DeviceName;
 import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.MyDeviceModel;
 import com.malcolmmaima.dishi.R;
 
@@ -299,11 +300,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                     //get device id
                                                     final String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                                                             Settings.Secure.ANDROID_ID);
+                                                    GetCurrentDate currentDate = new GetCurrentDate();
 
-                                                    WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
                                                     MyDeviceModel myDevice = new MyDeviceModel();
                                                     myDevice.setDeviceModel(DeviceName.getDeviceName());
                                                     myDevice.setIpAddress(getLocalIpAddress());
+                                                    myDevice.setLastLogin(currentDate.getDate());
                                                     myDevicesRef.child(android_id).setValue(myDevice);
                                                     /**
                                                      * End of log
@@ -604,11 +606,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                         final String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                                                                 Settings.Secure.ANDROID_ID);
 
-                                                        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+                                                        GetCurrentDate currentDate = new GetCurrentDate();
 
                                                         MyDeviceModel myDevice = new MyDeviceModel();
                                                         myDevice.setDeviceModel(DeviceName.getDeviceName());
                                                         myDevice.setIpAddress(getLocalIpAddress());
+                                                        myDevice.setLastLogin(currentDate.getDate());
                                                         myDevicesRef.child(android_id).setValue(myDevice);
                                                         /**
                                                          * End of log device
