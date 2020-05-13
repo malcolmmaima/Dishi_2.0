@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,9 +47,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.jaredrummler.android.device.DeviceName;
 import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
+import com.malcolmmaima.dishi.Model.MyDeviceModel;
 import com.malcolmmaima.dishi.R;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
         //getSupportActionBar().setTitle("Dishi");
         startNotificationService();
+
+        DeviceName.init(this);
 
         TAG = "MainActivity";
         // Assigning Id to ProgressDialog.
@@ -234,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (mVerified) {
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                         myPhone = user.getPhoneNumber(); //Current logged in user phone number
-
+                        DatabaseReference myDevicesRef = FirebaseDatabase.getInstance().getReference("mydevices/"+myPhone);
                         FirebaseDatabase db = FirebaseDatabase.getInstance();
                         final DatabaseReference dbRef = db.getReference("users/" + myPhone);
 
@@ -282,6 +293,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                 //SafeToast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
                                                 if(verified.toString().equals("true")){
+                                                    /**
+                                                     * Always log logged in devices for security purposes
+                                                     */
+                                                    //get device id
+                                                    final String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                                                            Settings.Secure.ANDROID_ID);
+
+                                                    WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+                                                    MyDeviceModel myDevice = new MyDeviceModel();
+                                                    myDevice.setDeviceModel(DeviceName.getDeviceName());
+                                                    myDevice.setIpAddress(getLocalIpAddress());
+                                                    myDevicesRef.child(android_id).setValue(myDevice);
+                                                    /**
+                                                     * End of log
+                                                     */
+
                                                     //User is verified, so we need to check their account type and redirect accordingly
                                                     dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override public void onDataChange(DataSnapshot dataSnapshot) {
@@ -313,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                         }
 
                                                                         else {
+
                                                                             //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                             Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -568,6 +596,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                     //SafeToast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
                                                     if(verified.equals("true")){
+                                                        /**
+                                                         * Always log logged in devices for security purposes
+                                                         */
+                                                        DatabaseReference myDevicesRef = FirebaseDatabase.getInstance().getReference("mydevices/"+myPhone);
+                                                        //get device id
+                                                        final String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                                                                Settings.Secure.ANDROID_ID);
+
+                                                        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+
+                                                        MyDeviceModel myDevice = new MyDeviceModel();
+                                                        myDevice.setDeviceModel(DeviceName.getDeviceName());
+                                                        myDevice.setIpAddress(getLocalIpAddress());
+                                                        myDevicesRef.child(android_id).setValue(myDevice);
+                                                        /**
+                                                         * End of log device
+                                                         */
                                                         //User is verified, so we need to check their account type and redirect accordingly
                                                         dbRef.child("account_type").addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override public void onDataChange(DataSnapshot dataSnapshot) {
@@ -832,6 +877,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             return false;
         }
+    }
+
+    public static String getLocalIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     public void checkConnection(){
