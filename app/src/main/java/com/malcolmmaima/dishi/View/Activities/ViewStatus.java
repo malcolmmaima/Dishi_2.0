@@ -198,6 +198,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postedToPic = findViewById(R.id.postedToPic);
         postedToName = findViewById(R.id.postedToName);
         foodShare = findViewById(R.id.foodShare);
+        foodShare.setVisibility(View.GONE);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -985,8 +986,6 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);
-                            } else {
-                                loadActivity();
                             }
                         }
 
@@ -995,8 +994,6 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                         }
                     });
-                } else {
-                    loadActivity();
                 }
             }
 

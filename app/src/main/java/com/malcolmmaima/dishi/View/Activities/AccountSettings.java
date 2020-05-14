@@ -3,9 +3,12 @@ package com.malcolmmaima.dishi.View.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -30,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Bold;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
@@ -156,6 +160,9 @@ public class AccountSettings extends AppCompatActivity {
         myRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                //restart foregroundservice on settings change
+                startNotificationService();
 
                 myUserDetails = dataSnapshot.getValue(UserModel.class);
                 try {
@@ -750,6 +757,18 @@ public class AccountSettings extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void startNotificationService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        serviceIntent.putExtra("title", "Dishi");
+        serviceIntent.putExtra("message", "Welcome to Dishi");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            ContextCompat.startForegroundService(this, serviceIntent);
+
+        }
     }
 
     @Override

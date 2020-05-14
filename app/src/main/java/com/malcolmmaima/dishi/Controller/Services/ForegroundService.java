@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -71,9 +72,18 @@ public class ForegroundService extends Service {
     String restaurantName, lastName;
     final int[] unreadCounter = {0};
     NotificationManager manager;
-    Boolean customerNotifications, restaurantNotifications, riderNotifications;
-    Boolean customerSocial, restaurantSocial, riderSocial;
-    Boolean customerChat, restaurantChat, riderChat;
+
+    Boolean customerNotifications = false;
+    Boolean restaurantNotifications = false;
+    Boolean riderNotifications = false;
+
+    Boolean customerSocial = false;
+    Boolean restaurantSocial = false;
+    Boolean riderSocial = false;
+
+    Boolean customerChat = false;
+    Boolean restaurantChat = false;
+    Boolean riderChat = false;
 
     //We use this two variables as our notification ID because they are unique and attached to a user phone number
     String lastFourDigits = "";     //substring containing last 4 characters
@@ -126,18 +136,6 @@ public class ForegroundService extends Service {
         }
 
         //I use these values to prevent the notification-types from triggering everytime something changes in my 'users/' node
-        customerNotifications = false;
-        restaurantNotifications = false;
-        riderNotifications = false;
-
-        customerSocial = false;
-        restaurantSocial = false;
-        riderSocial = false;
-
-        customerChat = false;
-        restaurantChat = false;
-        riderChat = false;
-
 
         unreadCounter[0] = 0;
     }
@@ -391,7 +389,7 @@ public class ForegroundService extends Service {
             }
         };
         try {
-            myUserDetailsRef.addValueEventListener(myUserDetailsListener);
+            myUserDetailsRef.addListenerForSingleValueEvent(myUserDetailsListener);
         } catch (Exception e){}
 
         //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
@@ -538,7 +536,13 @@ public class ForegroundService extends Service {
                 restaurantSocial = true;
                 riderSocial = true;
 
+
                 try {
+                    if(dataSnapshot.getKey() == s){
+                        Log.d(TAG, dataSnapshot.getKey()+": exists ("+s+")");
+                    } else {
+                        Log.d(TAG, dataSnapshot.getKey()+": doesn't exists("+s+")");
+                    }
                     NotificationModel newNotification = dataSnapshot.getValue(NotificationModel.class);
                     newNotification.key = dataSnapshot.getKey();
                     int notifId = new Random().nextInt();
@@ -550,7 +554,7 @@ public class ForegroundService extends Service {
                             myBlockedUsers.child(newNotification.getFrom()).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if(!dataSnapshot.exists()){
+                                    if(!dataSnapshot.exists() && !newNotification.key.equals(s)){
                                         sendSocialNotification(notifId, newNotification);
                                     }
                                 }
@@ -1821,17 +1825,6 @@ public class ForegroundService extends Service {
         super.onDestroy();
         Log.d("ForeGroundService", "ForegroundService: stopped");
         deleteCache(this);
-        customerNotifications = false;
-        restaurantNotifications = false;
-        riderNotifications = false;
-
-        customerSocial = false;
-        restaurantSocial = false;
-        riderSocial = false;
-
-        customerChat = false;
-        restaurantChat = false;
-        riderChat = false;
 
         unreadCounter[0] = 0;
 
@@ -1839,7 +1832,7 @@ public class ForegroundService extends Service {
         restaurants.clear(); //Clear the tracker used in our send notification function
         try {
             incomingMessages.removeEventListener(incomingMessagesListener);
-            myUserDetailsRef.removeEventListener(myUserDetailsListener);
+            //myUserDetailsRef.removeEventListener(myUserDetailsListener); is currently a singleval listener
             notificationRef.removeEventListener(notificationsListener);
             myMessages.removeEventListener(myMessagesListener);
             myOrdersRef.removeEventListener(myRestaurantOrdersListener);
