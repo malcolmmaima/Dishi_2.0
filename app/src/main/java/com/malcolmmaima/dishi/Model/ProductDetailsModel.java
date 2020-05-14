@@ -6,6 +6,9 @@ public class ProductDetailsModel {
     public String price;
     public String description;
     public String imageURL;
+    public String imageUrlSmall;
+    public String imageUrlMedium;
+    public String imageUrlBig;
     public  String storageLocation;
     public String key; //When deleting menu items from firebase, this key value will help delete individual items from the menu node
     public String owner;
@@ -114,5 +117,29 @@ public class ProductDetailsModel {
 
     public void setConfirmed(Boolean confirmed) {
         this.confirmed = confirmed;
+    }
+
+    public String getImageUrlSmall() {
+        return imageUrlSmall;
+    }
+
+    public void setImageUrlSmall(String imageUrlSmall) {
+        this.imageUrlSmall = imageUrlSmall;
+    }
+
+    public String getImageUrlMedium() {
+        return imageUrlMedium;
+    }
+
+    public void setImageUrlMedium(String imageUrlMedium) {
+        this.imageUrlMedium = imageUrlMedium;
+    }
+
+    public String getImageUrlBig() {
+        return imageUrlBig;
+    }
+
+    public void setImageUrlBig(String imageUrlBig) {
+        this.imageUrlBig = imageUrlBig;
     }
 }

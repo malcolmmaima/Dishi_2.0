@@ -63,7 +63,9 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
     Context context;
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
-    String TAG = "StatusAdapter";
+    String TAG = "NewsFeedAdapter";
+    int index;
+    String stringToBeInserted;
 
     public NewsFeedAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -100,7 +102,6 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
         DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
 
-
         if(statusUpdateModel.getAuthor().equals(statusUpdateModel.getPostedTo())){
             holder.postedToPic.setVisibility(View.GONE);
             holder.postedTo.setVisibility(View.GONE);
@@ -120,6 +121,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                             holder.postedTo.setVisibility(View.VISIBLE);
                             postedTo[position] = dataSnapshot.getValue(UserModel.class);
                             holder.postedTo.setText(postedTo[position].getFirstname() + " " + postedTo[position].getLastname());
+
 
                             //Set profile pic
                             Picasso.with(context).load(postedTo[position].getProfilePic()).fit().centerCrop()

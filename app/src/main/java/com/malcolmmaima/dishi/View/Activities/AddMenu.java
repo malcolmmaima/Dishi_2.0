@@ -38,6 +38,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
@@ -649,13 +650,16 @@ public class AddMenu extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(Object o) {
-
+                                        GenerateThumbnails thumbnails = new GenerateThumbnails();
                                         ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
                                         productDetailsModel.setName(name);
                                         productDetailsModel.setPrice(price);
                                         productDetailsModel.setDescription(description);
                                         productDetailsModel.setImageURL(o.toString());
+                                        productDetailsModel.setImageUrlSmall(thumbnails.GenerateSmall(o.toString()));
+                                        productDetailsModel.setImageUrlMedium(thumbnails.GenerateMedium(o.toString()));
+                                        productDetailsModel.setImageUrlBig(thumbnails.GenerateBig(o.toString()));
                                         productDetailsModel.setOwner(myPhone);
                                         productDetailsModel.setStorageLocation(storageReference2nd.getPath());
                                         productDetailsModel.setUploadDate(getDate());
@@ -804,7 +808,7 @@ public class AddMenu extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(Object o) {
-
+                                        GenerateThumbnails thumbnails = new GenerateThumbnails();
                                         String name = productName.getText().toString().trim();
                                         String price = productPrice.getText().toString().trim();
                                         String description = productDescription.getText().toString().trim();
@@ -816,6 +820,9 @@ public class AddMenu extends AppCompatActivity {
                                         productDetailsModel.setPrice(price);
                                         productDetailsModel.setDescription(description);
                                         productDetailsModel.setImageURL(o.toString());
+                                        productDetailsModel.setImageUrlSmall(thumbnails.GenerateSmall(o.toString()));
+                                        productDetailsModel.setImageUrlMedium(thumbnails.GenerateMedium(o.toString()));
+                                        productDetailsModel.setImageUrlBig(thumbnails.GenerateBig(o.toString()));
                                         productDetailsModel.setStorageLocation(storageReference2nd.getPath());
                                         productDetailsModel.setOwner(myPhone);
                                         productDetailsModel.setUploadDate(getDate());
