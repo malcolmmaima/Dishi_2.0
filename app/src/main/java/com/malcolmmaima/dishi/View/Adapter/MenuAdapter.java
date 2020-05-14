@@ -94,10 +94,20 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
         holder.foodPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
-                context.startActivity(slideactivity);
+                if(productDetailsModel.getImageUrlBig() != null){
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", productDetailsModel.getImageUrlBig());
+                    context.startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
+                    context.startActivity(slideactivity);
+                }
+
             }
         });
 
@@ -106,10 +116,21 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
-                    .placeholder(R.drawable.menu)
-                    .error(R.drawable.menu)
-                    .into(holder.foodPic);
+            if(productDetailsModel.getImageUrlSmall() != null){
+                Picasso.with(context).load(productDetailsModel.getImageUrlSmall()).fit().centerCrop()
+                        .placeholder(R.drawable.menu)
+                        .error(R.drawable.menu)
+                        .into(holder.foodPic);
+            }
+
+            else { //for older versions of the app or if something went wrong during image upload then use original image
+                Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
+                        .placeholder(R.drawable.menu)
+                        .error(R.drawable.menu)
+                        .into(holder.foodPic);
+            }
+
+
         } catch (Exception e){
 
         }
