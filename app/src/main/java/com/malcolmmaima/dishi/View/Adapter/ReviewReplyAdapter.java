@@ -89,14 +89,25 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
                 try {
                     commentUser[position] = dataSnapshot.getValue(UserModel.class);
 
+                    if(commentUser[position].getProfilePicSmall() != null){
+                        //Set profile pic
+                        Picasso.with(context).load(commentUser[position].getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
 
-                    //Set profile pic
-                    Picasso.with(context).load(commentUser[position].getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(holder.profilePic);
+                        holder.profileName.setText(commentUser[position].getFirstname() + " " + commentUser[position].getLastname());
+                    }
 
-                    holder.profileName.setText(commentUser[position].getFirstname() + " " + commentUser[position].getLastname());
+                    else {
+                        //Set profile pic
+                        Picasso.with(context).load(commentUser[position].getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+
+                        holder.profileName.setText(commentUser[position].getFirstname() + " " + commentUser[position].getLastname());
+                    }
                 } catch (Exception e){
                     Log.d(TAG, "onDataChange: "+e.getMessage());
                 }
@@ -162,10 +173,20 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", commentUser[position].getProfilePic());
-                context.startActivity(slideactivity);
+
+                if(commentUser[position].getProfilePicSmall() != null){
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", commentUser[position].getProfilePicBig());
+                    context.startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", commentUser[position].getProfilePic());
+                    context.startActivity(slideactivity);
+                }
             }
         });
 
