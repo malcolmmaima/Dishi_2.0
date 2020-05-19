@@ -87,11 +87,20 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
          * Load image url onto imageview
          */
         try {
-            //Load food image
-            Picasso.with(context).load(restaurantDetails.getProfilePic()).fit().centerCrop()
-                    //.placeholder(R.drawable.shop)
-                    .error(R.drawable.shop)
-                    .into(holder.profilePic);
+            //Load image
+            if(restaurantDetails.getProfilePicBig() != null){
+                Picasso.with(context).load(restaurantDetails.getProfilePicBig()).fit().centerCrop()
+                        //.placeholder(R.drawable.shop)
+                        .error(R.drawable.shop)
+                        .into(holder.profilePic);
+            }
+
+            else {
+                Picasso.with(context).load(restaurantDetails.getProfilePic()).fit().centerCrop()
+                        //.placeholder(R.drawable.shop)
+                        .error(R.drawable.shop)
+                        .into(holder.profilePic);
+            }
         } catch (Exception e){
 
         }
