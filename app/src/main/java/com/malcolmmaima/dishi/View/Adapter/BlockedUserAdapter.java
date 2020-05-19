@@ -151,10 +151,19 @@ public class BlockedUserAdapter extends RecyclerView.Adapter<BlockedUserAdapter.
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", userModel.getProfilePic());
-                context.startActivity(slideactivity);
+                if(userModel.getProfilePicBig() != null){
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", userModel.getProfilePicBig());
+                    context.startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", userModel.getProfilePic());
+                    context.startActivity(slideactivity);
+                }
             }
         });
 
@@ -163,11 +172,20 @@ public class BlockedUserAdapter extends RecyclerView.Adapter<BlockedUserAdapter.
          * Load image url onto imageview
          */
         try {
-            //Load food image
-            Picasso.with(context).load(userModel.getProfilePic()).fit().centerCrop()
-                    .placeholder(R.drawable.default_profile)
-                    .error(R.drawable.default_profile)
-                    .into(holder.profilePic);
+            //Load user image
+            if(userModel.getProfilePicSmall() != null){
+                Picasso.with(context).load(userModel.getProfilePicSmall()).fit().centerCrop()
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
+                        .into(holder.profilePic);
+            }
+
+            else {
+                Picasso.with(context).load(userModel.getProfilePic()).fit().centerCrop()
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
+                        .into(holder.profilePic);
+            }
         } catch (Exception e){
 
         }
