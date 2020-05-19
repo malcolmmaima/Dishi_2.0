@@ -159,19 +159,38 @@ public class ChatListAdapter extends BaseAdapter {
         } catch (Exception e){}
 
         try {
-            //Load food image
-            Picasso.with(context).load(data.get(position).getProfilePic()).fit().centerCrop()
-                    .placeholder(R.drawable.default_profile)
-                    .error(R.drawable.default_profile)
-                    .into(picture);
+            //Load image
+            if(data.get(position).getProfilePicSmall() != null){
+                Picasso.with(context).load(data.get(position).getProfilePicSmall()).fit().centerCrop()
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
+                        .into(picture);
+            }
+
+            else {
+                Picasso.with(context).load(data.get(position).getProfilePic()).fit().centerCrop()
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
+                        .into(picture);
+            }
         } catch (Exception e){
 
         }
         picture.setOnClickListener(v -> {
-            Intent slideactivity = new Intent(context, ViewImage.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            slideactivity.putExtra("imageURL", data.get(position).getProfilePic());
-            context.startActivity(slideactivity);
+
+            if(data.get(position).getProfilePicBig() != null){
+                Intent slideactivity = new Intent(context, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", data.get(position).getProfilePicBig());
+                context.startActivity(slideactivity);
+            }
+
+            else {
+                Intent slideactivity = new Intent(context, ViewImage.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("imageURL", data.get(position).getProfilePic());
+                context.startActivity(slideactivity);
+            }
         });
 
         return view;
