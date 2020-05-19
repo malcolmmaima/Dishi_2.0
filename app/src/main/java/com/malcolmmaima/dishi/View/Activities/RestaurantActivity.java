@@ -79,7 +79,7 @@ public class RestaurantActivity extends AppCompatActivity
 
     FloatingActionButton addMenu;
     Menu myMenu;
-    String myPhone, imageURL;
+    String myPhone, imageURL, imageURLBig;
     private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
     private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener, lastQueryListener;
     private FirebaseAuth mAuth;
@@ -268,14 +268,24 @@ public class RestaurantActivity extends AppCompatActivity
                     }
 
                     imageURL = user.getProfilePic();
+                    imageURLBig = user.getProfilePicBig();
 
                     //Set username on drawer header
                     navUsername.setText(user.getFirstname() + " " + user.getLastname());
 
-                    Picasso.with(RestaurantActivity.this).load(user.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePic);
+                    if(user.getProfilePicSmall() != null){
+                        Picasso.with(RestaurantActivity.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    }
+
+                    else {
+                        Picasso.with(RestaurantActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    }
 
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: " + e);
@@ -316,7 +326,15 @@ public class RestaurantActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //Make sure image url is not empty
-                if(!imageURL.equals("")){
+                if(imageURLBig != null){
+                    Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("imageURL", imageURLBig);
+                    startActivity(slideactivity);
+                }
+
+                else if(imageURL != null){
                     Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

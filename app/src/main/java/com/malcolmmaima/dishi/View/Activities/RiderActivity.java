@@ -73,7 +73,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class RiderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    String myPhone, imageURL;
+    String myPhone, imageURL, imageURLBig;
     Menu myMenu;
     private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
     private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener;
@@ -289,13 +289,23 @@ public class RiderActivity extends AppCompatActivity
                             finish();
                         }
                         imageURL = user.getProfilePic();
+                        imageURLBig = user.getProfilePicBig();
                         //Set username on drawer header
                         navUsername.setText(user.getFirstname() + " " + user.getLastname());
 
-                        Picasso.with(RiderActivity.this).load(user.getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(profilePic);
+                        if(user.getProfilePicSmall() != null){
+                            Picasso.with(RiderActivity.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+                        }
+
+                        else {
+                            Picasso.with(RiderActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+                        }
 
                     } catch (Exception e){
                         Log.e(TAG, "onDataChange: " + e);
@@ -340,7 +350,16 @@ public class RiderActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //Make sure image url is not empty
-                if(!imageURL.equals("")){
+                if(imageURLBig != null){
+
+                    Intent slideactivity = new Intent(RiderActivity.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("imageURL", imageURLBig);
+                    startActivity(slideactivity);
+                }
+
+                else if(imageURL != null){
                     Intent slideactivity = new Intent(RiderActivity.this, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

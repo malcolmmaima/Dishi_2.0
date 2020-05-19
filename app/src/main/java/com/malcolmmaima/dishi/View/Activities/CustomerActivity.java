@@ -80,7 +80,7 @@ public class CustomerActivity extends AppCompatActivity
     private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
     private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener;
     private FirebaseAuth mAuth;
-    private String TAG, imageURL;
+    private String TAG, imageURL, imageURLBig;
     Menu myMenu;
     private static final int PERMISSIONS_REQUEST = 100;
 
@@ -299,11 +299,21 @@ public class CustomerActivity extends AppCompatActivity
                     //Set username on drawer header
                     navUsername.setText(user.getFirstname() + " " + user.getLastname());
                     imageURL = user.getProfilePic();
+                    imageURLBig = user.getProfilePicBig();
 
-                    Picasso.with(CustomerActivity.this).load(user.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePic);
+                    if(user.getProfilePicSmall() != null){
+                        Picasso.with(CustomerActivity.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    }
+
+                    else {
+                        Picasso.with(CustomerActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    }
 
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: " + e);
@@ -346,7 +356,15 @@ public class CustomerActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //Make sure image url is not empty
-                if(!imageURL.equals("")){
+                if(imageURLBig != null){
+                    Intent slideactivity = new Intent(CustomerActivity.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    slideactivity.putExtra("imageURL", imageURLBig);
+                    startActivity(slideactivity);
+                }
+
+                else if(imageURL != null){
                     Intent slideactivity = new Intent(CustomerActivity.this, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
