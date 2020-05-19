@@ -19,7 +19,14 @@ public class GenerateThumbnails {
 
     public String GenerateSmall(String original){
 
-        indexSmall = original.indexOf(".jpg")-1;
+        if(original.contains(".jpg")){
+            indexSmall = original.indexOf(".jpg")-1;
+        }
+
+        else if(original.contains(".png")){
+            indexSmall = original.indexOf(".png")-1;
+        }
+
 
         // Create a new string
         String newString = new String();
@@ -42,7 +49,14 @@ public class GenerateThumbnails {
     }
 
     public String GenerateMedium(String original){
-        indexMedium = original.indexOf(".jpg")-1;
+
+        if(original.contains(".jpg")){
+            indexMedium = original.indexOf(".jpg")-1;
+        }
+
+        else if(original.contains(".png")){
+            indexMedium = original.indexOf(".png")-1;
+        }
 
         // Create a new string
         String newString = new String();
@@ -65,7 +79,14 @@ public class GenerateThumbnails {
     }
 
     public String GenerateBig(String original){
-        indexBig = original.indexOf(".jpg")-1;
+
+        if(original.contains(".jpg")){
+            indexBig = original.indexOf(".jpg")-1;
+        }
+
+        else if(original.contains(".png")){
+            indexBig = original.indexOf(".png")-1;
+        }
 
         // Create a new string
         String newString = new String();

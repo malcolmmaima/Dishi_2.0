@@ -40,6 +40,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 
@@ -281,6 +282,10 @@ public class SetupProfile extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(Object o) {
+                                        GenerateThumbnails thumbnails = new GenerateThumbnails();
+                                        myRef.child(myPhone).child("profilePicSmall").setValue(thumbnails.GenerateSmall(o.toString()));
+                                        myRef.child(myPhone).child("profilePicMedium").setValue(thumbnails.GenerateMedium(o.toString()));
+                                        myRef.child(myPhone).child("profilePicBig").setValue(thumbnails.GenerateBig(o.toString()));
                                         myRef.child(myPhone).child("profilePic").setValue(o.toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {

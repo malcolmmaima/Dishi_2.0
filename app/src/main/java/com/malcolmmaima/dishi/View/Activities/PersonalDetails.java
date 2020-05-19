@@ -45,6 +45,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
@@ -57,7 +58,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class PersonalDetails extends AppCompatActivity {
 
     private static final String TAG = "PersonalDetails";
-    private String myPhone, email, firstname, lastname, bio, imageURL;
+    private String myPhone, email, firstname, lastname, bio, imageURL, imageURLSmall, imageURLBig;
     private EditText mEmail, mFirstName, mLastName, mBio, mPhone;
     CircleImageView profilePic;
     private Button saveDetails;
@@ -163,7 +164,7 @@ public class PersonalDetails extends AppCompatActivity {
                         try {
                             UserModel user = dataSnapshot.getValue(UserModel.class);
 
-                            imageURL = user.getProfilePic();
+                            imageURL = user.getProfilePicBig();
 
                             email = user.getEmail();
                             firstname = user.getFirstname();
@@ -177,10 +178,21 @@ public class PersonalDetails extends AppCompatActivity {
                             mBio.setText(""+user.getBio());
                             mPhone.setText(myPhone);
 
-                            Picasso.with(PersonalDetails.this).load(user.getProfilePic()).fit().centerCrop()
-                                    .placeholder(R.drawable.default_profile)
-                                    .error(R.drawable.default_profile)
-                                    .into(profilePic);
+                            //set resized image
+                            if(user.getProfilePicSmall() != null){
+                                Picasso.with(PersonalDetails.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                                        .placeholder(R.drawable.default_profile)
+                                        .error(R.drawable.default_profile)
+                                        .into(profilePic);
+                            }
+
+                            else { //resized doesn't exist, set original unresized image
+                                Picasso.with(PersonalDetails.this).load(user.getProfilePic()).fit().centerCrop()
+                                        .placeholder(R.drawable.default_profile)
+                                        .error(R.drawable.default_profile)
+                                        .into(profilePic);
+                            }
+
 
                         } catch (Exception e){
                             Log.e(TAG, "onDataChange: " + e);
@@ -379,8 +391,6 @@ public class PersonalDetails extends AppCompatActivity {
                     //If data hasn't changed
                     dataStatus();
 
-
-
                 }
             });
         }
@@ -469,6 +479,10 @@ public class PersonalDetails extends AppCompatActivity {
 
                                 @Override
                                 public void onSuccess(Object o) {
+                                    GenerateThumbnails thumbnails = new GenerateThumbnails();
+                                    myRef.child("profilePicSmall").setValue(thumbnails.GenerateSmall(o.toString()));
+                                    myRef.child("profilePicMedium").setValue(thumbnails.GenerateMedium(o.toString()));
+                                    myRef.child("profilePicBig").setValue(thumbnails.GenerateBig(o.toString()));
                                     myRef.child("profilePic").setValue(o.toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

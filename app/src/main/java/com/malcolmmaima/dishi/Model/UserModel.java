@@ -20,6 +20,9 @@ public class UserModel {
     String accountPrivacy;
     String locationType;
     String profilePic;
+    String profilePicSmall;
+    String profilePicMedium;
+    String profilePicBig;
     String signupDate;
     String verified;
     Integer followers;
@@ -141,6 +144,30 @@ public class UserModel {
 
     public String getProfilePic() {
         return profilePic;
+    }
+
+    public String getProfilePicSmall() {
+        return profilePicSmall;
+    }
+
+    public void setProfilePicSmall(String profilePicSmall) {
+        this.profilePicSmall = profilePicSmall;
+    }
+
+    public String getProfilePicMedium() {
+        return profilePicMedium;
+    }
+
+    public void setProfilePicMedium(String profilePicMedium) {
+        this.profilePicMedium = profilePicMedium;
+    }
+
+    public String getProfilePicBig() {
+        return profilePicBig;
+    }
+
+    public void setProfilePicBig(String profilePicBig) {
+        this.profilePicBig = profilePicBig;
     }
 
     public String getSignupDate() {

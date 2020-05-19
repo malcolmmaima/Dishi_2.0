@@ -89,6 +89,7 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
                 try {
                     commentUser[position] = dataSnapshot.getValue(UserModel.class);
 
+
                     //Set profile pic
                     Picasso.with(context).load(commentUser[position].getProfilePic()).fit().centerCrop()
                             .placeholder(R.drawable.default_profile)
