@@ -118,10 +118,19 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
                     postUser[position] = dataSnapshot.getValue(UserModel.class);
 
                     //Set profile pic
-                    Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(holder.profilePic);
+                    if(postUser[position].getProfilePicSmall() != null){
+                        Picasso.with(context).load(postUser[position].getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+                    }
+
+                    else {
+                        Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+                    }
 
                     holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
                 } catch (Exception e){
@@ -504,10 +513,19 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
-                context.startActivity(slideactivity);
+                if(postUser[position].getProfilePicBig() != null){
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", postUser[position].getProfilePicBig()); //resized verion of the original donwnloaded
+                    context.startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
+                    context.startActivity(slideactivity);
+                }
             }
         });
 
