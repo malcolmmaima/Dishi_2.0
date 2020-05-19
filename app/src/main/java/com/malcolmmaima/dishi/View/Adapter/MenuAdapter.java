@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ import java.util.List;
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
+    String TAG = "MenuAdapter";
     Context context;
     List<ProductDetailsModel> listdata;
     long DURATION = 200;
@@ -97,14 +99,14 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
                 if(productDetailsModel.getImageUrlBig() != null){
                     Intent slideactivity = new Intent(context, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", productDetailsModel.getImageUrlBig());
+                    slideactivity.putExtra("imageURL", productDetailsModel.getImageUrlBig()); //resized 680x680
                     context.startActivity(slideactivity);
                 }
 
                 else {
                     Intent slideactivity = new Intent(context, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", productDetailsModel.getImageURL());
+                    slideactivity.putExtra("imageURL", productDetailsModel.getImageURL()); //the original unresized image
                     context.startActivity(slideactivity);
                 }
 
@@ -132,7 +134,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
 
         } catch (Exception e){
-
+            Log.e(TAG, "onBindViewHolder: ", e);
         }
 
     }
