@@ -205,10 +205,19 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", restaurantDetails.getProfilePic());
-                context.startActivity(slideactivity);
+                if(restaurantDetails.getProfilePicBig() != null){
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", restaurantDetails.getProfilePicBig());
+                    context.startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", restaurantDetails.getProfilePic());
+                    context.startActivity(slideactivity);
+                }
             }
         });
 
@@ -217,11 +226,20 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
          * Load image url onto imageview
          */
         try {
-            //Load food image
-            Picasso.with(context).load(restaurantDetails.getProfilePic()).fit().centerCrop()
-                    .placeholder(R.drawable.default_profile)
-                    .error(R.drawable.default_profile)
-                    .into(holder.profilePic);
+            //Load image
+            if(restaurantDetails.getProfilePicSmall() != null){
+                Picasso.with(context).load(restaurantDetails.getProfilePicSmall()).fit().centerCrop()
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
+                        .into(holder.profilePic);
+            }
+
+            else {
+                Picasso.with(context).load(restaurantDetails.getProfilePic()).fit().centerCrop()
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
+                        .into(holder.profilePic);
+            }
         } catch (Exception e){
 
         }

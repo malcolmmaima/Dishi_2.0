@@ -366,10 +366,19 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                     recipientUser.setPhone(toPhone);
                     name.setText(recipientUser.getFirstname() + " " + recipientUser.getLastname());
 
-                    Picasso.with(Chat.this).load(recipientUser.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePic);
+                    if(recipientUser.getProfilePicSmall() != null){
+                        Picasso.with(Chat.this).load(recipientUser.getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    }
+
+                    else {
+                        Picasso.with(Chat.this).load(recipientUser.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePic);
+                    }
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
                 }
@@ -386,10 +395,19 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(Chat.this, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", recipientUser.getProfilePic());
-                    startActivity(slideactivity);
+                    if(recipientUser.getProfilePicBig() != null){
+                        Intent slideactivity = new Intent(Chat.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", recipientUser.getProfilePicBig());
+                        startActivity(slideactivity);
+                    }
+
+                    else {
+                        Intent slideactivity = new Intent(Chat.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", recipientUser.getProfilePic());
+                        startActivity(slideactivity);
+                    }
                 } catch (Exception e){}
 
             }

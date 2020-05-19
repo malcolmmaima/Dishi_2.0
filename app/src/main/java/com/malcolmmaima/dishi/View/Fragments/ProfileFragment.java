@@ -381,11 +381,20 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 } catch (Exception e){}
 
                 try {
-                    //Load food image
-                    Picasso.with(getContext()).load(myUserDetails.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(profilePhoto);
+                    //Load image
+                    if(myUserDetails.getProfilePicSmall() != null){
+                        Picasso.with(getContext()).load(myUserDetails.getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePhoto);
+                    }
+
+                    else {
+                        Picasso.with(getContext()).load(myUserDetails.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(profilePhoto);
+                    }
                 } catch (Exception e){
 
                 }
@@ -450,11 +459,23 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(getContext(), ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", myUserDetails.getProfilePic());
-                    startActivity(slideactivity);
-                } catch (Exception e){}
+
+                    if(myUserDetails.getProfilePicBig() != null){
+                        Intent slideactivity = new Intent(getContext(), ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", myUserDetails.getProfilePicBig());
+                        startActivity(slideactivity);
+                    }
+
+                    else {
+                        Intent slideactivity = new Intent(getContext(), ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", myUserDetails.getProfilePic());
+                        startActivity(slideactivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                }
             }
         });
 

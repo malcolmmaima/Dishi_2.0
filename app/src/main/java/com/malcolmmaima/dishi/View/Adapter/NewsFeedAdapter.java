@@ -124,10 +124,19 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
 
                             //Set profile pic
-                            Picasso.with(context).load(postedTo[position].getProfilePic()).fit().centerCrop()
-                                    .placeholder(R.drawable.default_profile)
-                                    .error(R.drawable.default_profile)
-                                    .into(holder.postedToPic);
+                            if(postedTo[position].getProfilePicSmall() != null){
+                                Picasso.with(context).load(postedTo[position].getProfilePicSmall()).fit().centerCrop()
+                                        .placeholder(R.drawable.default_profile)
+                                        .error(R.drawable.default_profile)
+                                        .into(holder.postedToPic);
+                            }
+
+                            else {
+                                Picasso.with(context).load(postedTo[position].getProfilePic()).fit().centerCrop()
+                                        .placeholder(R.drawable.default_profile)
+                                        .error(R.drawable.default_profile)
+                                        .into(holder.postedToPic);
+                            }
                         } catch (Exception e){
                             Log.e(TAG, "onDataChange: ", e);
                         }
@@ -145,12 +154,21 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(context, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", postedTo[position].getProfilePic());
-                    context.startActivity(slideactivity);
-                } catch (Exception e){
+                    if(postedTo[position].getProfilePicBig() != null){
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", postedTo[position].getProfilePicBig());
+                        context.startActivity(slideactivity);
+                    }
 
+                    else {
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", postedTo[position].getProfilePic());
+                        context.startActivity(slideactivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
                 }
             }
         });
@@ -182,10 +200,19 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                         postUser[position] = dataSnapshot.getValue(UserModel.class);
 
                         //Set profile pic
-                        Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(holder.profilePic);
+                        if(postUser[position].getProfilePicSmall() != null){
+                            Picasso.with(context).load(postUser[position].getProfilePicSmall()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(holder.profilePic);
+                        }
+
+                        else {
+                            Picasso.with(context).load(postUser[position].getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(holder.profilePic);
+                        }
 
                         holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
                     } catch (Exception e){
@@ -575,12 +602,21 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             @Override
             public void onClick(View view) {
                 try {
-                    Intent slideactivity = new Intent(context, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
-                    context.startActivity(slideactivity);
-                } catch (Exception e){
+                    if(postUser[position].getProfilePicBig() != null){
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", postUser[position].getProfilePicBig());
+                        context.startActivity(slideactivity);
+                    }
 
+                    else {
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", postUser[position].getProfilePic());
+                        context.startActivity(slideactivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
                 }
             }
         });

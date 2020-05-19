@@ -109,12 +109,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                  * Load image url onto imageview
                  */
                 try {
-                    Picasso.with(context).load(userData.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(holder.profilePic);
-                } catch (Exception e){
 
+                    if(userData.getProfilePicSmall() != null){
+                        Picasso.with(context).load(userData.getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+                    }
+
+                    else {
+                        Picasso.with(context).load(userData.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
                 }
             }
 
@@ -845,10 +855,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         try {
                             UserModel thisUser = dataSnapshot.getValue(UserModel.class);
 
-                            Intent slideactivity = new Intent(context, ViewImage.class)
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            slideactivity.putExtra("imageURL", thisUser.getProfilePic());
-                            context.startActivity(slideactivity);
+                            if(thisUser.getProfilePicBig() != null){
+                                Intent slideactivity = new Intent(context, ViewImage.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("imageURL", thisUser.getProfilePicBig());
+                                context.startActivity(slideactivity);
+                            }
+
+                            else {
+                                Intent slideactivity = new Intent(context, ViewImage.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                slideactivity.putExtra("imageURL", thisUser.getProfilePic());
+                                context.startActivity(slideactivity);
+                            }
                         } catch (Exception e){
                             Log.e(TAG, "onClick: ", e);
                         }

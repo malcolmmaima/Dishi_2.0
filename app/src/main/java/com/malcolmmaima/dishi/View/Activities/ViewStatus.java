@@ -240,10 +240,20 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                     postedToName.setText(postedToUser.getFirstname()+" "+postedToUser.getLastname());
                     //Set profile pic
-                    Picasso.with(ViewStatus.this).load(postedToUser.getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(postedToPic);
+
+                    if(postedToUser.getProfilePicSmall() != null){
+                        Picasso.with(ViewStatus.this).load(postedToUser.getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(postedToPic);
+                    }
+
+                    else {
+                        Picasso.with(ViewStatus.this).load(postedToUser.getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(postedToPic);
+                    }
                 }
 
                 @Override
@@ -633,10 +643,19 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", authorUser.getProfilePic());
-                startActivity(slideactivity);
+                if(authorUser.getProfilePicBig() !=null){
+                    Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", authorUser.getProfilePicBig());
+                    startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", authorUser.getProfilePic());
+                    startActivity(slideactivity);
+                }
             }
         });
 

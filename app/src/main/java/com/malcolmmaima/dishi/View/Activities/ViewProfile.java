@@ -638,12 +638,24 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     } catch (Exception e){}
 
                     try {
-                        //Load food image
-                        Picasso.with(ViewProfile.this).load(myUserDetails.getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(profilePhoto);
-                    } catch (Exception e){}
+                        //Load image
+                        if(myUserDetails.getProfilePicSmall() != null){
+                            Picasso.with(ViewProfile.this).load(myUserDetails.getProfilePicSmall()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePhoto);
+                        }
+
+                        else {
+                            Picasso.with(ViewProfile.this).load(myUserDetails.getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePhoto);
+                        }
+
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
                 }
 
             }
@@ -780,10 +792,20 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(ViewProfile.this, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", myUserDetails.getProfilePic());
-                    startActivity(slideactivity);
+
+                    if(myUserDetails.getProfilePicBig() != null){
+                        Intent slideactivity = new Intent(ViewProfile.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", myUserDetails.getProfilePicBig());
+                        startActivity(slideactivity);
+                    }
+
+                    else {
+                        Intent slideactivity = new Intent(ViewProfile.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", myUserDetails.getProfilePic());
+                        startActivity(slideactivity);
+                    }
                 } catch (Exception e){}
             }
         });
