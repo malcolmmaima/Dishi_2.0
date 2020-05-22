@@ -92,6 +92,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         holder.foodShare.setVisibility(View.GONE); //by default dont show unless it's an order share
         holder.postedToPic.setVisibility(View.GONE);
         holder.postedTo.setVisibility(View.GONE);
+        holder.imageShare.setVisibility(View.GONE);
+        holder.mediaItems.setVisibility(View.GONE);
         /**
          * Adapter animation
          */
@@ -299,14 +301,28 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
         //imageShare
         if(statusUpdateModel.getImageShare() != null){
+            holder.mediaItems.setVisibility(View.VISIBLE);
             holder.imageShare.setVisibility(View.VISIBLE);
             try {
-                Picasso.with(context).load(statusUpdateModel.getImageShare()).fit().centerCrop()
-                        .placeholder(R.drawable.gray_gradient_background)
-                        .error(R.drawable.gray_gradient_background)
-                        .into(holder.imageShare);
-            } catch (Exception e){}
+
+                if(statusUpdateModel.getImageShareMedium() != null){
+                    Picasso.with(context).load(statusUpdateModel.getImageShareMedium()).fit().centerCrop()
+                            .placeholder(R.drawable.gray_gradient_background)
+                            .error(R.drawable.gray_gradient_background)
+                            .into(holder.imageShare);
+                }
+
+                else {
+                    Picasso.with(context).load(statusUpdateModel.getImageShare()).fit().centerCrop()
+                            .placeholder(R.drawable.gray_gradient_background)
+                            .error(R.drawable.gray_gradient_background)
+                            .into(holder.imageShare);
+                }
+            } catch (Exception e){
+                Log.e(TAG, "onBindViewHolder: ", e);
+            }
         } else {
+            holder.mediaItems.setVisibility(View.GONE);
             holder.imageShare.setVisibility(View.GONE);
         }
 
@@ -314,11 +330,23 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(context, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
-                    context.startActivity(slideactivity);
-                } catch (Exception e){}
+
+                    if(statusUpdateModel.getImageShareBig() != null){
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", statusUpdateModel.getImageShareBig());
+                        context.startActivity(slideactivity);
+                    }
+
+                    else {
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
+                        context.startActivity(slideactivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                }
             }
         });
 
@@ -827,6 +855,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         });
 
         if(statusUpdateModel.getReceiptKey() != null){
+            holder.mediaItems.setVisibility(View.VISIBLE);
             holder.foodShare.setVisibility(View.VISIBLE);
         }
 
@@ -879,7 +908,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         MyTextView_Roboto_Light timePosted;
         TextView statusOptions;
         ImageView profilePic, postedToPic,imageShare, likePost, comments, sharePost;
-        RelativeLayout foodShare;
+        RelativeLayout foodShare, mediaItems;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -900,6 +929,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             postedToPic = itemView.findViewById(R.id.postedToPic);
             postedTo = itemView.findViewById(R.id.postedTo);
             foodShare = itemView.findViewById(R.id.foodShare);
+            mediaItems = itemView.findViewById(R.id.mediaItems);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {

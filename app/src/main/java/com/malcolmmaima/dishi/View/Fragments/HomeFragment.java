@@ -1,6 +1,7 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,6 +40,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.R;
@@ -435,13 +438,19 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         //Get current date
         GetCurrentDate currentDate = new GetCurrentDate();
         String postDate = currentDate.getDate();
+        GenerateThumbnails thumbnails = new GenerateThumbnails();
 
         StatusUpdateModel statusUpdate = new StatusUpdateModel();
         statusUpdate.setStatus(myStatusUpdate.getText().toString().trim());
         statusUpdate.setAuthor(myPhone);
         statusUpdate.setPostedTo(myPhone);
         statusUpdate.setTimePosted(postDate);
-        statusUpdate.setImageShare(imgLink);
+        if(imgLink != null){
+            statusUpdate.setImageShare(imgLink);
+            statusUpdate.setImageShareSmall(thumbnails.GenerateSmall(imgLink));
+            statusUpdate.setImageShareMedium(thumbnails.GenerateMedium(imgLink));
+            statusUpdate.setImageShareBig(thumbnails.GenerateBig(imgLink));
+        }
         String key = myPostUpdates.push().getKey();
         myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -550,7 +559,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     = storageReference
                     .child(
                             "Users/"+myPhone+"/"
-                                    + UUID.randomUUID().toString());
+                                    + System.currentTimeMillis()+ "." + GetFileExtension(filePath));
 
             // adding listeners on upload
             // or failure of image
@@ -612,6 +621,18 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 }
                             });
         }
+    }
+
+    // Creating Method to get the selected image file Extension from File Path URI.
+    public String GetFileExtension(Uri uri) {
+
+        ContentResolver contentResolver = getContext().getContentResolver();
+
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
+        // Returning the file Extension.
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri)) ;
+
     }
 
     @Override
