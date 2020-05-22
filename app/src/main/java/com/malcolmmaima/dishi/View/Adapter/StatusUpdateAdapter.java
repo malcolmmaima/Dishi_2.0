@@ -231,8 +231,8 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         if(statusUpdateModel.getImageShare() != null){
             holder.imageShare.setVisibility(View.VISIBLE);
             try {
-                if(statusUpdateModel.getImageShareMedium() != null){
-                    Picasso.with(context).load(statusUpdateModel.getImageShareMedium()).fit().centerCrop()
+                if(statusUpdateModel.getImageShareBig() != null){
+                    Picasso.with(context).load(statusUpdateModel.getImageShareBig()).fit().centerCrop()
                             .placeholder(R.drawable.gray_gradient_background)
                             .error(R.drawable.gray_gradient_background)
                             .into(holder.imageShare);
@@ -256,11 +256,22 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(context, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
-                    context.startActivity(slideactivity);
-                } catch (Exception e){}
+                    if(statusUpdateModel.getImageShareBig() != null){
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", statusUpdateModel.getImageShareBig());
+                        context.startActivity(slideactivity);
+                    }
+
+                    else {
+                        Intent slideactivity = new Intent(context, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", statusUpdateModel.getImageShare());
+                        context.startActivity(slideactivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                }
             }
         });
 
