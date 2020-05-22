@@ -1240,13 +1240,14 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+author);
 
                     String notifKey = notificationRef.push().getKey();
+                    GenerateThumbnails thumbnails1 = new GenerateThumbnails();
 
                     //send notification
                     NotificationModel commentedStatus = new NotificationModel();
                     commentedStatus.setFrom(myPhone);
                     commentedStatus.setAuthor(author);
                     commentedStatus.setType("commentedstatus");
-                    commentedStatus.setImage(imgLink);
+                    commentedStatus.setImage(thumbnails1.GenerateSmall(imgLink));
                     commentedStatus.setSeen(false);
                     commentedStatus.setTimeStamp(time);
                     commentedStatus.setMessage(commentKey);

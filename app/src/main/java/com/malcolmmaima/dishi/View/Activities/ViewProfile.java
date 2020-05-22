@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -54,6 +56,7 @@ import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.StatusUpdateModel;
@@ -1152,7 +1155,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     = storageReference
                     .child(
                             "Users/"+myPhone+"/"
-                                    + UUID.randomUUID().toString()); //switched from 'phone' to 'myPhone' ...
+                                    + System.currentTimeMillis()+ "." + GetFileExtension(filePath)); //switched from 'phone' to 'myPhone' ...
             // since we'll be limiting account quotas we dont want to charge someone's account for something they didn't upload
 
             // adding listeners on upload
@@ -1221,13 +1224,20 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         //Get current date
         GetCurrentDate currentDate = new GetCurrentDate();
         String postDate = currentDate.getDate();
+        GenerateThumbnails thumbnails = new GenerateThumbnails();
 
         StatusUpdateModel statusUpdate = new StatusUpdateModel();
         statusUpdate.setStatus(myStatusUpdate.getText().toString().trim());
         statusUpdate.setAuthor(myPhone);
         statusUpdate.setPostedTo(phone);
         statusUpdate.setTimePosted(postDate);
-        statusUpdate.setImageShare(imgLink);
+
+        if(imgLink != null){
+            statusUpdate.setImageShare(imgLink);
+            statusUpdate.setImageShareSmall(thumbnails.GenerateSmall(imgLink));
+            statusUpdate.setImageShareMedium(thumbnails.GenerateMedium(imgLink));
+            statusUpdate.setImageShareBig(thumbnails.GenerateBig(imgLink));
+        }
         String key = myPostUpdates.push().getKey();
         myPostUpdates.child(key).setValue(statusUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -1239,12 +1249,13 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("notifications/"+phone);
 
                 String notifKey = notificationRef.push().getKey();
+                GenerateThumbnails thumbnails1 = new GenerateThumbnails();
 
                 //send notification
                 NotificationModel postedOnWall = new NotificationModel();
                 postedOnWall.setFrom(myPhone);
                 postedOnWall.setType("postedwall");
-                postedOnWall.setImage(imgLink);
+                postedOnWall.setImage(thumbnails1.GenerateSmall(imgLink));
                 postedOnWall.setSeen(false);
                 postedOnWall.setTimeStamp(postDate);
                 postedOnWall.setMessage(key);
@@ -1279,6 +1290,18 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 }
             }
         });
+    }
+
+    // Creating Method to get the selected image file Extension from File Path URI.
+    public String GetFileExtension(Uri uri) {
+
+        ContentResolver contentResolver = getContentResolver();
+
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
+        // Returning the file Extension.
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri)) ;
+
     }
 
     @Override

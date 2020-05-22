@@ -223,11 +223,22 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
         if(statusUpdateModel.getImageShare() != null){
             holder.imageShare.setVisibility(View.VISIBLE);
             try {
-                Picasso.with(context).load(statusUpdateModel.getImageShare()).fit().centerCrop()
-                        .placeholder(R.drawable.gray_gradient_background)
-                        .error(R.drawable.gray_gradient_background)
-                        .into(holder.imageShare);
-            } catch (Exception e){}
+                if(statusUpdateModel.getImageShareMedium() != null){
+                    Picasso.with(context).load(statusUpdateModel.getImageShareMedium()).fit().centerCrop()
+                            .placeholder(R.drawable.gray_gradient_background)
+                            .error(R.drawable.gray_gradient_background)
+                            .into(holder.imageShare);
+                }
+
+                else {
+                    Picasso.with(context).load(statusUpdateModel.getImageShare()).fit().centerCrop()
+                            .placeholder(R.drawable.gray_gradient_background)
+                            .error(R.drawable.gray_gradient_background)
+                            .into(holder.imageShare);
+                }
+            } catch (Exception e){
+                Log.e(TAG, "onBindViewHolder: ", e);
+            }
         } else {
             holder.imageShare.setVisibility(View.GONE);
         }

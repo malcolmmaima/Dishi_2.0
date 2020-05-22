@@ -331,7 +331,7 @@ public class ViewRestaurant extends AppCompatActivity {
          * Load image url onto imageview
          */
         try {
-            //Load food image
+            //Load image
             Picasso.with(ViewRestaurant.this).load(profilePic).fit().centerCrop()
                     .placeholder(R.drawable.shop)
                     .error(R.drawable.shop)

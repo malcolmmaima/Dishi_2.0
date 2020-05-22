@@ -151,7 +151,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                             .error(R.drawable.gray_gradient_background)
                             .into(holder.imageShare);
                 }
-            } catch (Exception e){}
+            } catch (Exception e){
+                Log.e(TAG, "onBindViewHolder: ", e);
+            }
         } else {
             holder.imageShare.setVisibility(View.GONE);
         }
