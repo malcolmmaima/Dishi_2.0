@@ -304,9 +304,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             holder.mediaItems.setVisibility(View.VISIBLE);
             holder.imageShare.setVisibility(View.VISIBLE);
             try {
-
-                if(statusUpdateModel.getImageShareMedium() != null){
-                    Picasso.with(context).load(statusUpdateModel.getImageShareMedium()).fit().centerCrop()
+                if(statusUpdateModel.getImageShareBig() != null){
+                    Picasso.with(context).load(statusUpdateModel.getImageShareBig()).fit().centerCrop()
                             .placeholder(R.drawable.gray_gradient_background)
                             .error(R.drawable.gray_gradient_background)
                             .into(holder.imageShare);

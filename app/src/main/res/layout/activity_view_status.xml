@@ -85,7 +85,6 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp">
 
-
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -122,35 +121,53 @@
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/lin"
+                        <RelativeLayout
+                            android:id="@+id/statusHeader"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_toRightOf="@id/profilePic"
-                            android:orientation="vertical">
+                            android:layout_height="wrap_content">
 
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
-                                android:id="@+id/profileName"
+                            <com.alexzh.circleimageview.CircleImageView
+                                android:id="@+id/profilePic"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/default_profile"
+                                app:view_borderColor="#cccccc"
+                                app:view_borderWidth="2dp"
+                                app:view_shadowDx="2dp"
+                                app:view_shadowDy="0dp"
+                                app:view_shadowRadius="2dp" />
+
+                            <LinearLayout
+                                android:id="@+id/lin"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp"
-                                android:text="loading..."
-                                android:textSize="15sp"
-                                android:textColor="@color/colorAccent" />
+                                android:layout_toRightOf="@id/profilePic"
+                                android:orientation="vertical">
 
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-                                android:id="@+id/userUpdate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginRight="20dp"
-                                android:text="loading... "
-                                android:textSize="15sp" />
+                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                                    android:id="@+id/profileName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp"
+                                    android:text="loading..."
+                                    android:textSize="15sp"
+                                    android:textColor="@color/colorAccent" />
 
-                        </LinearLayout>
+                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                                    android:id="@+id/userUpdate"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="20dp"
+                                    android:text="loading... "
+                                    android:textSize="15sp" />
+
+                            </LinearLayout>
+                        </RelativeLayout>
 
                         <LinearLayout
-                            android:layout_below="@id/lin"
+                            android:layout_below="@id/statusHeader"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
@@ -163,6 +180,7 @@
                                 android:layout_marginLeft="5dp"
                                 android:layout_marginTop="10dp"
                                 android:layout_marginBottom="10dp"
+                                android:background="@drawable/gray_gradient_background"
                                 android:layout_toRightOf="@id/profilePic"
                                 android:visibility="gone" />
 
@@ -384,18 +402,6 @@
 
                             </RelativeLayout>
                         </LinearLayout>
-
-                        <com.alexzh.circleimageview.CircleImageView
-                            android:id="@+id/profilePic"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/default_profile"
-                            app:view_borderColor="#cccccc"
-                            app:view_borderWidth="2dp"
-                            app:view_shadowDx="2dp"
-                            app:view_shadowDy="0dp"
-                            app:view_shadowRadius="2dp" />
 
                     </RelativeLayout>
 

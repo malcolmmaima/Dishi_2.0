@@ -444,11 +444,22 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                             if(viewPost.getImageShare() != null){
                                 imageShare.setVisibility(View.VISIBLE);
                                 try {
-                                    Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
-                                            .placeholder(R.drawable.gray_gradient_background)
-                                            .error(R.drawable.gray_gradient_background)
-                                            .into(imageShare);
-                                } catch (Exception e){}
+                                    if(viewPost.getImageShareBig() != null){
+                                        Picasso.with(ViewStatus.this).load(viewPost.getImageShareBig()).fit().centerCrop()
+                                                .placeholder(R.drawable.gray_gradient_background)
+                                                .error(R.drawable.gray_gradient_background)
+                                                .into(imageShare);
+                                    }
+
+                                    else {
+                                        Picasso.with(ViewStatus.this).load(viewPost.getImageShare()).fit().centerCrop()
+                                                .placeholder(R.drawable.gray_gradient_background)
+                                                .error(R.drawable.gray_gradient_background)
+                                                .into(imageShare);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
                             } else {
                                 imageShare.setVisibility(View.GONE);
                             }
@@ -603,11 +614,22 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             @Override
             public void onClick(View v) {
                 try {
-                    Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    slideactivity.putExtra("imageURL", viewPost.getImageShare());
-                    startActivity(slideactivity);
-                } catch (Exception e){}
+                    if(viewPost.getImageShareBig() != null){
+                        Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", viewPost.getImageShareBig());
+                        startActivity(slideactivity);
+                    }
+
+                    else {
+                        Intent slideactivity = new Intent(ViewStatus.this, ViewImage.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("imageURL", viewPost.getImageShare());
+                        startActivity(slideactivity);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                }
             }
         });
 
