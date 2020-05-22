@@ -124,10 +124,19 @@ public class SettingsActivity extends AppCompatActivity {
                         userName.setText(user.getFirstname() + " " + user.getLastname());
                         phoneNumber.setText(myPhone);
 
-                        Picasso.with(SettingsActivity.this).load(user.getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(profilePic);
+                        if(user.getProfilePicSmall() != null){
+                            Picasso.with(SettingsActivity.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+                        }
+
+                        else {
+                            Picasso.with(SettingsActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+                        }
 
                     } catch (Exception e){
                         Log.e(TAG, "onDataChange: " + e);

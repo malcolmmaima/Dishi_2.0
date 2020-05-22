@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "770782711846-jn3usqk14dcmch23mni5tnltb4om9avf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.malcolmmaima.dishi",
+            "certificate_hash": "1d5797ea03aacb87995db8a476771af0b376dae1"
+          }
+        },
+        {
           "client_id": "770782711846-rq291vpfr24i2nh29qen94euu9vfs5bh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

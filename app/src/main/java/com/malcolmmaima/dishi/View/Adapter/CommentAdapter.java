@@ -97,10 +97,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
                     commentUser[position] = dataSnapshot.getValue(UserModel.class);
 
                     //Set profile pic
-                    Picasso.with(context).load(commentUser[position].getProfilePic()).fit().centerCrop()
-                            .placeholder(R.drawable.default_profile)
-                            .error(R.drawable.default_profile)
-                            .into(holder.profilePic);
+
+                    if(commentUser[position].getProfilePicSmall() != null){
+                        Picasso.with(context).load(commentUser[position].getProfilePicSmall()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+                    }
+
+                    else {
+                        Picasso.with(context).load(commentUser[position].getProfilePic()).fit().centerCrop()
+                                .placeholder(R.drawable.default_profile)
+                                .error(R.drawable.default_profile)
+                                .into(holder.profilePic);
+                    }
 
                     holder.profileName.setText(commentUser[position].getFirstname() + " " + commentUser[position].getLastname());
                 } catch (Exception e){
@@ -275,10 +285,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         holder.profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(context, ViewImage.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("imageURL", commentUser[position].getProfilePic());
-                context.startActivity(slideactivity);
+                if(commentUser[position].getProfilePicSmall() != null){
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", commentUser[position].getProfilePicSmall());
+                    context.startActivity(slideactivity);
+                }
+
+                else {
+                    Intent slideactivity = new Intent(context, ViewImage.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("imageURL", commentUser[position].getProfilePic());
+                    context.startActivity(slideactivity);
+                }
             }
         });
 

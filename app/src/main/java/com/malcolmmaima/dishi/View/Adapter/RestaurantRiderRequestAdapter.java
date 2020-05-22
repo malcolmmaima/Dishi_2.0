@@ -120,19 +120,39 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
 
                                     }
                                     if(which == 1){
-                                        Intent slideactivity = new Intent(context, ViewRestaurant.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                        slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
-                                        slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
-                                        slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
-                                        Bundle bndlanimation =
-                                                null;
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                            bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                                        if(restaurantDetails.getProfilePicBig() != null){
+                                            Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                            slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                            slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                            slideactivity.putExtra("profilePic", restaurantDetails.getProfilePicBig());
+                                            Bundle bndlanimation =
+                                                    null;
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                context.startActivity(slideactivity, bndlanimation);
+                                            }
                                         }
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                            context.startActivity(slideactivity, bndlanimation);
+
+                                        else {
+                                            Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                            slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                            slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                            slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
+                                            Bundle bndlanimation =
+                                                    null;
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                context.startActivity(slideactivity, bndlanimation);
+                                            }
                                         }
                                     }
 
