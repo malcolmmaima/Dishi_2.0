@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -48,6 +50,7 @@ import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CommentKeyBoardFix;
+import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.NotificationModel;
@@ -1142,7 +1145,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     = storageReference
                     .child(
                             "Users/"+myPhone+"/"
-                                    + UUID.randomUUID().toString()); //switched from 'phone' to 'myPhone' ...
+                                    + System.currentTimeMillis()+ "." + GetFileExtension(filePath));
             // since we'll be limiting account quotas we dont want to charge someone's account for something they didn't upload
 
             // adding listeners on upload
@@ -1210,13 +1213,19 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     private void uploadContent(String imgLink) {
         GetCurrentDate getCurrentDate = new GetCurrentDate();
         String time = getCurrentDate.getDate();
+        GenerateThumbnails thumbnails = new GenerateThumbnails();
 
         final StatusUpdateModel comment = new StatusUpdateModel();
         comment.setStatus(statusPost.getText().toString().trim());
         comment.setTimePosted(time);
         comment.setAuthor(myPhone);
         comment.setPostedTo(postedTo);
-        comment.setImageShare(imgLink);
+        if(imgLink != null){
+            comment.setImageShare(imgLink);
+            comment.setImageShareSmall(thumbnails.GenerateSmall(imgLink));
+            comment.setImageShareMedium(thumbnails.GenerateMedium(imgLink));
+            comment.setImageShareBig(thumbnails.GenerateBig(imgLink));
+        }
 
         String commentKey = postRef.push().getKey();
         postRef.child(key).child("comments").child(commentKey).setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -1302,6 +1311,18 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         String[] arrSplit = timeStamp.split(":");
 
         return arrSplit;
+    }
+
+    // Creating Method to get the selected image file Extension from File Path URI.
+    public String GetFileExtension(Uri uri) {
+
+        ContentResolver contentResolver = getContentResolver();
+
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
+        // Returning the file Extension.
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri)) ;
+
     }
 
     @Override
