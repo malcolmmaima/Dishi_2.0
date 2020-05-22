@@ -85,17 +85,6 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp">
 
-                        <ImageView
-                            android:id="@+id/imageShare"
-                            android:layout_width="match_parent"
-                            android:layout_height="240dp"
-                            android:layout_below="@id/lin"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_toRightOf="@id/profilePic"
-                            android:visibility="gone" />
-
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -160,222 +149,241 @@
 
                         </LinearLayout>
 
-                        <!-- -->
-                        <RelativeLayout
-                            android:id="@+id/foodShare"
-                            android:background="@color/colorBackroundWhite"
+                        <LinearLayout
                             android:layout_below="@id/lin"
-                            android:layout_toRightOf="@id/profilePic"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_gravity="center_vertical"
-                            >
-
-                            <ImageView
-                                android:id="@+id/foodPic"
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:src="@drawable/delivery_bike"
-                                android:scaleType="fitXY"
-                                android:background="@color/pureWhite"
-                                android:foregroundGravity="center_vertical"
-                                />
-
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/colorPrimaryDark"
-                                android:textSize="15sp"
-                                android:text="View Items"
-                                android:id="@+id/foodName"
-                                android:layout_marginTop="10dp"
-                                android:layout_marginLeft="5dp"
-                                android:layout_toRightOf="@id/foodPic"
-                                android:layout_toLeftOf="@+id/foodPrice"/>
-
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Detailed list of items I ordered"
-                                android:textSize="15sp"
-                                android:id="@+id/foodDescription"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginRight="35dp"
-                                android:layout_marginBottom="10dp"
-                                android:layout_below="@id/foodName"
-                                android:layout_toRightOf="@id/foodPic"
-                                android:layout_toEndOf="@id/foodPic"
-                                android:textColor="#666"/>
-
-                        </RelativeLayout>
-                        <!-- -->
-
-                        <RelativeLayout
-                            android:id="@+id/cardActions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/foodShare"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_toRightOf="@id/profilePic"
-                            android:gravity="center|left">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center|right">
-
-                                <ImageView
-                                    android:id="@+id/likePost"
-                                    android:layout_width="30dp"
-                                    android:layout_height="30dp"
-                                    android:backgroundTint="@color/lightgray"
-                                    android:paddingTop="2dp"
-                                    android:layout_marginRight="5dp"
-                                    android:paddingBottom="2dp"
-                                    android:src="@drawable/unliked" />
-
-                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-                                    android:id="@+id/likesTotal"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:layout_marginRight="5dp"/>
-
-                                <ImageView
-                                    android:id="@+id/comments"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    android:backgroundTint="@color/lightgray"
-                                    android:padding="6dp"
-                                    android:layout_marginRight="5dp"
-                                    android:src="@drawable/comment" />
-
-                                <ImageView
-                                    android:id="@+id/sharePost"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    android:backgroundTint="@color/lightgray"
-                                    android:paddingLeft="5dp"
-                                    android:paddingBottom="6dp"
-                                    android:src="@drawable/share"
-                                    android:visibility="gone" />
-
-                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-                                    android:id="@+id/commentsTotal"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0" />
-
-                            </LinearLayout>
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/cardActions"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="3.2"
                             android:orientation="vertical">
 
-                            <FrameLayout
-                                android:id="@+id/frame"
+                            <ImageView
+                                android:id="@+id/imageShare"
+                                android:layout_width="match_parent"
+                                android:layout_height="240dp"
+                                android:layout_below="@id/lin"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginBottom="10dp"
+                                android:layout_toRightOf="@id/profilePic"
+                                android:visibility="gone" />
+
+                            <!-- -->
+                            <RelativeLayout
+                                android:id="@+id/foodShare"
+                                android:background="@color/colorBackroundWhite"
+                                android:layout_below="@id/lin"
+                                android:layout_toRightOf="@id/profilePic"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal">
-
-                                <ImageButton
-                                    android:id="@+id/emoji"
-                                    android:layout_width="36dp"
-                                    android:layout_height="40dp"
-                                    android:layout_gravity="right|bottom"
-                                    android:background="@drawable/layout_bg1"
-                                    android:elevation="1dp"
-                                    android:padding="5dp"
-                                    android:scaleType="fitCenter"
-                                    android:src="@drawable/emoji" />
-
-                                <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
-                                    android:id="@+id/inputComment"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignParentBottom="true"
-                                    android:autofillHints=""
-                                    android:background="@drawable/layout_bg"
-                                    android:hint="Say something..."
-                                    android:inputType="textMultiLine"
-                                    android:maxHeight="100dp"
-                                    android:minHeight="36dp"
-                                    android:padding="10dp"
-                                    android:paddingRight="20dp"
-                                    android:shadowRadius="10"
-                                    android:textSize="18sp"
-                                    emojicon:emojiconSize="28sp" />
-
-                            </FrameLayout>
-
-                            <RelativeLayout
-                                android:id="@+id/statusActions"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_below="@id/frame"
-
-                                android:orientation="horizontal">
-
-                                <Button
-                                    android:id="@+id/postStatus"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="35dp"
-                                    android:layout_below="@id/progressBar"
-                                    android:layout_alignParentRight="true"
-                                    android:clickable="true"
-                                    android:shadowRadius="5"
-                                    android:text="Post" />
-
-
-                                <ImageButton
-                                    android:id="@+id/camera"
-                                    android:layout_width="30dp"
-                                    android:layout_height="40dp"
-                                    android:layout_below="@id/progressBar"
-                                    android:layout_marginStart="15dp"
-                                    android:layout_marginLeft="15dp"
-                                    android:layout_marginEnd="5dp"
-                                    android:layout_toLeftOf="@id/postStatus"
-                                    android:background="@drawable/layout_bg1"
-                                    android:contentDescription="TODO"
-                                    android:scaleType="fitCenter"
-                                    android:src="@drawable/camera"
-                                    android:visibility="visible" />
+                                android:orientation="horizontal"
+                                android:layout_gravity="center_vertical"
+                                android:visibility="gone"
+                                >
 
                                 <ImageView
-                                    android:id="@+id/selectedImage"
-                                    android:layout_width="70dp"
-                                    android:layout_height="70dp"
-                                    android:layout_below="@id/progressBar"
-                                    android:layout_alignParentLeft="true"
-                                    android:layout_margin="5dp"
-                                    android:visibility="gone" />
+                                    android:id="@+id/foodPic"
+                                    android:layout_width="80dp"
+                                    android:layout_height="80dp"
+                                    android:src="@drawable/delivery_bike"
+                                    android:scaleType="fitXY"
+                                    android:background="@color/pureWhite"
+                                    android:foregroundGravity="center_vertical"
+                                    />
 
-                                <ProgressBar
-                                    android:id="@+id/progressBar"
-                                    style="?android:attr/progressBarStyleHorizontal"
+                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/colorPrimaryDark"
+                                    android:textSize="15sp"
+                                    android:text="View Items"
+                                    android:id="@+id/foodName"
+                                    android:layout_marginTop="10dp"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_toRightOf="@id/foodPic"
+                                    android:layout_toLeftOf="@+id/foodPrice"/>
+
+                                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Detailed list of items I ordered"
+                                    android:textSize="15sp"
+                                    android:id="@+id/foodDescription"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="35dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:layout_below="@id/foodName"
+                                    android:layout_toRightOf="@id/foodPic"
+                                    android:layout_toEndOf="@id/foodPic"
+                                    android:textColor="#666"/>
+
+                            </RelativeLayout>
+                            <!-- -->
+
+                            <RelativeLayout
+                                android:id="@+id/cardActions"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/foodShare"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_toRightOf="@id/profilePic"
+                                android:gravity="center|left">
+
+                                <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_alignParentLeft="true"
-                                    android:layout_alignParentTop="true"
-                                    android:indeterminate="false"
-                                    android:max="100"
-                                    android:minWidth="200dp"
-                                    android:minHeight="20dp"
-                                    android:progress="1"
-                                    android:visibility="gone" />
+                                    android:gravity="center|right">
+
+                                    <ImageView
+                                        android:id="@+id/likePost"
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:backgroundTint="@color/lightgray"
+                                        android:paddingTop="2dp"
+                                        android:layout_marginRight="5dp"
+                                        android:paddingBottom="2dp"
+                                        android:src="@drawable/unliked" />
+
+                                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                                        android:id="@+id/likesTotal"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0"
+                                        android:layout_marginRight="5dp"/>
+
+                                    <ImageView
+                                        android:id="@+id/comments"
+                                        android:layout_width="40dp"
+                                        android:layout_height="40dp"
+                                        android:backgroundTint="@color/lightgray"
+                                        android:padding="6dp"
+                                        android:layout_marginRight="5dp"
+                                        android:src="@drawable/comment" />
+
+                                    <ImageView
+                                        android:id="@+id/sharePost"
+                                        android:layout_width="40dp"
+                                        android:layout_height="40dp"
+                                        android:backgroundTint="@color/lightgray"
+                                        android:paddingLeft="5dp"
+                                        android:paddingBottom="6dp"
+                                        android:src="@drawable/share"
+                                        android:visibility="gone" />
+
+                                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                                        android:id="@+id/commentsTotal"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0" />
+
+                                </LinearLayout>
                             </RelativeLayout>
 
-                        </RelativeLayout>
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/cardActions"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="3.2"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:id="@+id/frame"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal">
+
+                                    <ImageButton
+                                        android:id="@+id/emoji"
+                                        android:layout_width="36dp"
+                                        android:layout_height="40dp"
+                                        android:layout_gravity="right|bottom"
+                                        android:background="@drawable/layout_bg1"
+                                        android:elevation="1dp"
+                                        android:padding="5dp"
+                                        android:scaleType="fitCenter"
+                                        android:src="@drawable/emoji" />
+
+                                    <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                                        android:id="@+id/inputComment"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:autofillHints=""
+                                        android:background="@drawable/layout_bg"
+                                        android:hint="Say something..."
+                                        android:inputType="textMultiLine"
+                                        android:maxHeight="100dp"
+                                        android:minHeight="36dp"
+                                        android:padding="10dp"
+                                        android:paddingRight="20dp"
+                                        android:shadowRadius="10"
+                                        android:textSize="18sp"
+                                        emojicon:emojiconSize="28sp" />
+
+                                </FrameLayout>
+
+                                <RelativeLayout
+                                    android:id="@+id/statusActions"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_below="@id/frame"
+
+                                    android:orientation="horizontal">
+
+                                    <Button
+                                        android:id="@+id/postStatus"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="35dp"
+                                        android:layout_below="@id/progressBar"
+                                        android:layout_alignParentRight="true"
+                                        android:clickable="true"
+                                        android:shadowRadius="5"
+                                        android:text="Post" />
+
+
+                                    <ImageButton
+                                        android:id="@+id/camera"
+                                        android:layout_width="30dp"
+                                        android:layout_height="40dp"
+                                        android:layout_below="@id/progressBar"
+                                        android:layout_marginStart="15dp"
+                                        android:layout_marginLeft="15dp"
+                                        android:layout_marginEnd="5dp"
+                                        android:layout_toLeftOf="@id/postStatus"
+                                        android:background="@drawable/layout_bg1"
+                                        android:contentDescription="TODO"
+                                        android:scaleType="fitCenter"
+                                        android:src="@drawable/camera"
+                                        android:visibility="visible" />
+
+                                    <ImageView
+                                        android:id="@+id/selectedImage"
+                                        android:layout_width="70dp"
+                                        android:layout_height="70dp"
+                                        android:layout_below="@id/progressBar"
+                                        android:layout_alignParentLeft="true"
+                                        android:layout_margin="5dp"
+                                        android:visibility="gone" />
+
+                                    <ProgressBar
+                                        android:id="@+id/progressBar"
+                                        style="?android:attr/progressBarStyleHorizontal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentLeft="true"
+                                        android:layout_alignParentTop="true"
+                                        android:indeterminate="false"
+                                        android:max="100"
+                                        android:minWidth="200dp"
+                                        android:minHeight="20dp"
+                                        android:progress="1"
+                                        android:visibility="gone" />
+                                </RelativeLayout>
+
+                            </RelativeLayout>
+                        </LinearLayout>
 
                         <com.alexzh.circleimageview.CircleImageView
                             android:id="@+id/profilePic"

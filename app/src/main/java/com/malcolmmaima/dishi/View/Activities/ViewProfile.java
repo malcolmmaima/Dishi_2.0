@@ -1255,7 +1255,9 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 NotificationModel postedOnWall = new NotificationModel();
                 postedOnWall.setFrom(myPhone);
                 postedOnWall.setType("postedwall");
-                postedOnWall.setImage(thumbnails1.GenerateSmall(imgLink));
+                if(imgLink != null){
+                    postedOnWall.setImage(thumbnails1.GenerateSmall(imgLink));
+                }
                 postedOnWall.setSeen(false);
                 postedOnWall.setTimeStamp(postDate);
                 postedOnWall.setMessage(key);

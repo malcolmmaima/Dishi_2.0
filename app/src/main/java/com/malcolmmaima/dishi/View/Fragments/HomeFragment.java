@@ -462,17 +462,25 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 mSwipeRefreshLayout.setRefreshing(false);
                 myStatusUpdate.setText("");
                 myStatusUpdate.clearFocus();
-                statusUpdate.key = key;
-                statusUpdates.add(0,statusUpdate);
+                loadNewsFeed();
 
-                icon.setVisibility(View.GONE);
-                emptyTag.setVisibility(View.GONE);
-                recyclerview.setVisibility(View.VISIBLE);
-                StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
-                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                recyclerview.setLayoutManager(layoutmanager);
-                recycler.notifyItemInserted(0);
-                recyclerview.setAdapter(recycler);
+                /**
+                 * A bit buggy ... messes adapter UI a bit ... will revisit
+                 *
+                 *                 myStatusUpdate.setText("");
+                 *                 myStatusUpdate.clearFocus();
+                 *                 statusUpdate.key = key;
+                 *                 statusUpdates.add(0,statusUpdate);
+                 *
+                 *                 icon.setVisibility(View.GONE);
+                 *                 emptyTag.setVisibility(View.GONE);
+                 *                 recyclerview.setVisibility(View.VISIBLE);
+                 *                 StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
+                 *                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                 *                 recyclerview.setLayoutManager(layoutmanager);
+                 *                 recycler.notifyItemInserted(0);
+                 *                 recyclerview.setAdapter(recycler);
+                 */
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

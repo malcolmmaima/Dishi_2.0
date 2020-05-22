@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:clickable="true"
     android:layout_width="match_parent"
@@ -17,252 +18,262 @@
     >
 
     <RelativeLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="5dp"
         >
 
-        <com.alexzh.circleimageview.CircleImageView
-            android:id="@+id/profilePic"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/default_profile"
-            app:view_shadowRadius="2dp"
-            app:view_shadowDx="2dp"
-            app:view_shadowDy="0dp"
-            app:view_borderWidth="2dp"
-            app:view_borderColor="#cccccc"
-            android:background="@color/pureWhite"
-            android:scaleType="fitXY"
-            />
-
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorAccent"
-            android:textSize="15sp"
-            android:text="loading..."
-            android:id="@+id/profileName"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/profilePic"/>
-
-        <com.alexzh.circleimageview.CircleImageView
-            android:id="@+id/postedToPic"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/default_profile"
-            app:view_shadowRadius="2dp"
-            app:view_shadowDx="2dp"
-            app:view_shadowDy="0dp"
-            app:view_borderWidth="2dp"
-            app:view_borderColor="#cccccc"
-            android:background="@color/pureWhite"
-            android:scaleType="fitXY"
-            android:layout_below="@id/profileName"
-            android:layout_toRightOf="@id/profilePic"
-            android:layout_marginBottom="5dp"
-            />
-
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/darkblue"
-            android:text="loading..."
-            android:textSize="15sp"
-            android:id="@+id/postedTo"
-            android:visibility="visible"
-            android:layout_below="@id/profileName"
-            android:layout_toRightOf="@id/postedToPic"/>
-
-        <LinearLayout
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
-                android:layout_gravity="start"
-                android:id="@+id/timePosted"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:textColor="#666"
-                android:textSize="10sp"
-                android:text="loading..."/>
-
-            <TextView
-                android:id="@+id/statusOptions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginRight="3dp"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:text="&#8942;"
-                android:textAppearance="?android:textAppearanceLarge" />
-
-        </LinearLayout>
-
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            >
-
-        </RelativeLayout>
-
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:text="loading..."
-            android:id="@+id/userUpdate"
-            android:visibility="visible"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="25dp"
-            android:layout_toRightOf="@id/postedTo"
-            android:layout_toEndOf="@id/profilePic"
-            android:layout_below="@id/postedTo"/>
-
-        <RelativeLayout
-            android:id="@+id/mediaItems"
+            android:id="@+id/statusHeader"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/userUpdate"
-            android:layout_toRightOf="@id/profilePic"
-            android:layout_gravity="center_vertical">
-
-            <ImageView
-                android:id="@+id/imageShare"
-                android:layout_width="match_parent"
-                android:layout_height="240dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
-                android:visibility="gone"
+            android:layout_height="wrap_content">
+            <com.alexzh.circleimageview.CircleImageView
+                android:id="@+id/profilePic"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/default_profile"
+                app:view_shadowRadius="2dp"
+                app:view_shadowDx="2dp"
+                app:view_shadowDy="0dp"
+                app:view_borderWidth="2dp"
+                app:view_borderColor="#cccccc"
+                android:background="@color/pureWhite"
+                android:scaleType="fitXY"
                 />
 
-            <!-- -->
-            <RelativeLayout
-                android:id="@+id/foodShare"
-                android:background="@color/colorBackroundWhite"
-                android:layout_below="@id/imageShare"
-                android:layout_width="match_parent"
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                >
+                android:textColor="@color/colorAccent"
+                android:textSize="15sp"
+                android:text="loading..."
+                android:id="@+id/profileName"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/profilePic"/>
 
-                <ImageView
-                    android:id="@+id/foodPic"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/delivery_bike"
-                    android:scaleType="fitXY"
-                    android:background="@color/pureWhite"
-                    android:foregroundGravity="center_vertical"
-                    />
+            <com.alexzh.circleimageview.CircleImageView
+                android:id="@+id/postedToPic"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/default_profile"
+                app:view_shadowRadius="2dp"
+                app:view_shadowDx="2dp"
+                app:view_shadowDy="0dp"
+                app:view_borderWidth="2dp"
+                app:view_borderColor="#cccccc"
+                android:background="@color/pureWhite"
+                android:scaleType="fitXY"
+                android:layout_below="@id/profileName"
+                android:layout_toRightOf="@id/profilePic"
+                android:layout_marginBottom="5dp"
+                />
 
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="15sp"
-                    android:text="View Items"
-                    android:id="@+id/foodName"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_toRightOf="@id/foodPic"
-                    android:layout_toLeftOf="@+id/foodPrice"/>
-
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Detailed list of items I ordered"
-                    android:textSize="15sp"
-                    android:id="@+id/foodDescription"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="35dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_below="@id/foodName"
-                    android:layout_toRightOf="@id/foodPic"
-                    android:layout_toEndOf="@id/foodPic"
-                    android:textColor="#666"/>
-
-            </RelativeLayout>
-            <!-- -->
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/cardActions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/mediaItems"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@id/profilePic"
-            android:gravity="center|left">
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/darkblue"
+                android:text="loading..."
+                android:textSize="15sp"
+                android:id="@+id/postedTo"
+                android:visibility="visible"
+                android:layout_below="@id/profileName"
+                android:layout_toRightOf="@id/postedToPic"/>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center|right"
-                >
+                android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/likePost"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginRight="5dp"
-                    android:backgroundTint="@color/lightgray"
-                    android:src="@drawable/unliked" />
-
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
+                    android:layout_gravity="start"
+                    android:id="@+id/timePosted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:layout_marginRight="5dp"
-                    android:id="@+id/likesTotal"
-                    />
+                    android:fontFamily="sans-serif-light"
+                    android:textColor="#666"
+                    android:textSize="10sp"
+                    android:text="loading..."/>
 
-                <ImageView
-                    android:id="@+id/comments"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="6dp"
-                    android:layout_marginRight="5dp"
-                    android:backgroundTint="@color/lightgray"
-                    android:src="@drawable/comment" />
-
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                <TextView
+                    android:id="@+id/statusOptions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:id="@+id/commentsTotal"
-                    android:layout_marginRight="5dp"
-                    />
-
-                <ImageView
-                    android:id="@+id/sharePost"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:paddingRight="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingBottom="6dp"
-                    android:visibility="gone"
-                    android:backgroundTint="@color/lightgray"
-                    android:src="@drawable/share" />
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="3dp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:text="&#8942;"
+                    android:textAppearance="?android:textAppearanceLarge" />
 
             </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                >
+
+            </RelativeLayout>
+
+            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="loading..."
+                android:id="@+id/userUpdate"
+                android:visibility="visible"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@id/postedTo"
+                android:layout_toEndOf="@id/profilePic"
+                android:layout_below="@id/postedTo"/>
+
         </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/statusContent"
+            android:layout_below="@id/statusHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/mediaItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/imageShare"
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/gray_gradient_background"
+                    android:visibility="invisible"
+                    />
+
+                <!-- -->
+                <RelativeLayout
+                    android:id="@+id/foodShare"
+                    android:background="@color/colorBackroundWhite"
+                    android:layout_below="@id/imageShare"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    >
+
+                    <ImageView
+                        android:id="@+id/foodPic"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/delivery_bike"
+                        android:scaleType="fitXY"
+                        android:background="@color/pureWhite"
+                        android:foregroundGravity="center_vertical"
+                        />
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="15sp"
+                        android:text="View Items"
+                        android:id="@+id/foodName"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/foodPic"
+                        android:layout_toLeftOf="@+id/foodPrice"/>
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Detailed list of items I ordered"
+                        android:textSize="15sp"
+                        android:id="@+id/foodDescription"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="35dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_below="@id/foodName"
+                        android:layout_toRightOf="@id/foodPic"
+                        android:layout_toEndOf="@id/foodPic"
+                        android:textColor="#666"/>
+
+                </RelativeLayout>
+                <!-- -->
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_below="@+id/statusContent"
+                android:id="@+id/cardActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center|left">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|right"
+                    >
+
+                    <ImageView
+                        android:id="@+id/likePost"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginRight="5dp"
+                        android:backgroundTint="@color/lightgray"
+                        android:src="@drawable/unliked" />
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:layout_marginRight="5dp"
+                        android:id="@+id/likesTotal"
+                        />
+
+                    <ImageView
+                        android:id="@+id/comments"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="6dp"
+                        android:layout_marginRight="5dp"
+                        android:backgroundTint="@color/lightgray"
+                        android:src="@drawable/comment" />
+
+                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/commentsTotal"
+                        android:layout_marginRight="5dp"
+                        />
+
+                    <ImageView
+                        android:id="@+id/sharePost"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:paddingRight="5dp"
+                        android:paddingLeft="5dp"
+                        android:paddingBottom="6dp"
+                        android:visibility="gone"
+                        android:backgroundTint="@color/lightgray"
+                        android:src="@drawable/share" />
+
+                </LinearLayout>
+            </RelativeLayout>
+
+        </LinearLayout>
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

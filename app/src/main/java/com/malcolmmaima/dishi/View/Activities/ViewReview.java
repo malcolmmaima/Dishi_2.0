@@ -1091,7 +1091,9 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                     NotificationModel review = new NotificationModel();
                     review.setFrom(myPhone);
                     review.setType("commentedreview");
-                    review.setImage(thumbnails1.GenerateSmall(imgLink));
+                    if(imgLink != null){
+                        review.setImage(thumbnails1.GenerateSmall(imgLink));
+                    }
                     review.setSeen(false);
                     review.setTimeStamp(time);
                     review.setMessage(key); // the reference to that particular review reply

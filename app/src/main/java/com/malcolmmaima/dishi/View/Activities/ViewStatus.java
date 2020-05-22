@@ -1247,7 +1247,9 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     commentedStatus.setFrom(myPhone);
                     commentedStatus.setAuthor(author);
                     commentedStatus.setType("commentedstatus");
-                    commentedStatus.setImage(thumbnails1.GenerateSmall(imgLink));
+                    if(imgLink != null){
+                        commentedStatus.setImage(thumbnails1.GenerateSmall(imgLink));
+                    }
                     commentedStatus.setSeen(false);
                     commentedStatus.setTimeStamp(time);
                     commentedStatus.setMessage(commentKey);

@@ -288,7 +288,10 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     NotificationModel review = new NotificationModel();
                     review.setFrom(myPhone);
                     review.setType("postedreview");
-                    review.setImage(thumbnails1.GenerateSmall(imgLink));
+
+                    if(imgLink != null){
+                        review.setImage(thumbnails1.GenerateSmall(imgLink));
+                    }
                     review.setSeen(false);
                     review.setTimeStamp(postDate);
                     review.setMessage(key); // the reference to that particular review
