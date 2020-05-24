@@ -340,15 +340,27 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                     emoji.setEnabled(false);
                 }
                 else {
+                    imageUpload.setVisibility(View.VISIBLE);
                     try {
                         authorUser = dataSnapshot.getValue(UserModel.class);
                         profileName.setText(authorUser.getFirstname()+" "+authorUser.getLastname());
 
-                        Picasso.with(ViewStatus.this).load(authorUser.getProfilePic()).fit().centerCrop()
-                                .placeholder(R.drawable.default_profile)
-                                .error(R.drawable.default_profile)
-                                .into(profilePic);
-                    } catch (Exception e){ }
+                        if(authorUser.getProfilePicSmall() != null){
+                            Picasso.with(ViewStatus.this).load(authorUser.getProfilePicSmall()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+                        }
+
+                        else {
+                            Picasso.with(ViewStatus.this).load(authorUser.getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(profilePic);
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e );
+                    }
                 }
 
             }
