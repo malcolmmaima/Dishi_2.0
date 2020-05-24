@@ -142,6 +142,22 @@ public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
         Log.d("ForeGroundService", "ForegroundService: started");
+
+        //https://stackoverflow.com/questions/44425584/context-startforegroundservice-did-not-then-call-service-startforeground
+        if (Build.VERSION.SDK_INT >= 26) {
+            channel = new NotificationChannel(CHANNEL_ID,
+                    "Dishi",
+                    NotificationManager.IMPORTANCE_HIGH);
+
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("Dishi")
+                    .setContentText("Welcome to Dishi").build();
+
+            startForeground(1, notification);
+        }
+
         manager = ((NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE));
 
 

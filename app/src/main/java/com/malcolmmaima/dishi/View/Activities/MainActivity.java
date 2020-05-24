@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -85,11 +86,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String TAG;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        /**
+         * onStart check to see if ForegroundService is already running, if not then start
+         */
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getSupportActionBar().setTitle("Dishi");
-        startNotificationService();
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
 
         DeviceName.init(this);
 
@@ -553,6 +582,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onResume() {
         super.onResume();
         checkConnection();
+
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {

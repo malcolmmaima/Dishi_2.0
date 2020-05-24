@@ -57,8 +57,14 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadSplash();
 
+        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+        if(serviceRunning != true){
+            startNotificationService();
+        }
+
+        loadSplash();
     }
 
     private void loadSplash() {
