@@ -48,6 +48,7 @@ import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewShareFoodItems;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -67,6 +68,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
     String TAG = "NewsFeedAdapter";
     int index;
     String stringToBeInserted;
+    HashTagHelper mTextHashTagHelper;
 
     public NewsFeedAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -298,10 +300,25 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         } else {
             holder.userUpdate.setVisibility(View.VISIBLE);
             holder.userUpdate.setText(statusUpdateModel.getStatus());
+
+            //Handle hyperlinks
             try {
                 Linkify.addLinks(holder.userUpdate, Linkify.ALL);
             } catch(Exception e){
                 Log.e(TAG, "onBindViewHolder: ", e);
+            }
+
+            //handle hashtags
+            if(statusUpdateModel.getStatus().contains("#")){
+                mTextHashTagHelper = HashTagHelper.Creator.create(context.getResources().getColor(R.color.colorPrimary),
+                        new HashTagHelper.OnHashTagClickListener() {
+                            @Override
+                            public void onHashTagClicked(String hashTag) {
+                                Toast.makeText(context, "Handle hashtag: "+ hashTag, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                mTextHashTagHelper.handle(holder.userUpdate);
             }
         }
 

@@ -147,7 +147,9 @@ public class MyChatAdapter extends BaseAdapter {
              * timeS[4] = timezone
              */
             timeStamp.setText(timeS[1]+":"+timeS[2]);
-        } catch (Exception e){}
+        } catch (Exception e){
+            Log.e(TAG, "getView: ", e);
+        }
 
         return view;
     }

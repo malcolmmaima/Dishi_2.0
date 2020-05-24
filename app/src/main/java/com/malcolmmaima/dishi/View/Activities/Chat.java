@@ -283,7 +283,9 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                         arrayAdapter.notifyDataSetChanged();
                                     }
                                 });
-                            } catch (Exception e){}
+                            } catch (Exception e){
+                                Log.e(TAG, "onActionItemClicked: ", e);
+                            }
 
                             if(i==selectedMsgs.size()-1){
                                 selectedMsgs.clear();
