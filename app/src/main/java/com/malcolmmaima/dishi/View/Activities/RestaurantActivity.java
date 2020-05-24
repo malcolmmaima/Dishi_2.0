@@ -701,7 +701,7 @@ public class RestaurantActivity extends AppCompatActivity
 
         switch(item.getItemId()) {
             case R.id.search:
-                Intent searchActivity = new Intent(RestaurantActivity.this, SearchActivity.class)
+                Intent searchActivity = new Intent(RestaurantActivity.this, NewSearchActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(searchActivity, bndlanimation);
                 return(true);
