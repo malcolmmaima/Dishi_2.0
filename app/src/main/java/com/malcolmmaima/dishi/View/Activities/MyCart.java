@@ -233,7 +233,7 @@ public class MyCart extends AppCompatActivity {
                                              */
 
                                             AlertDialog multiple = new AlertDialog.Builder(MyCart.this)
-                                                    .setMessage("You are about to order from more than one restaurant")
+                                                    .setMessage("You are about to order from more than one vendor")
                                                     //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
                                                     .setCancelable(false)
                                                     //set three option buttons

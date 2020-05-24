@@ -3,6 +3,8 @@ package com.malcolmmaima.dishi.View.Adapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -34,6 +36,7 @@ public class MyChatAdapter extends BaseAdapter {
     FirebaseUser user;
     String myPhone;
     long DURATION = 200;
+    String TAG = "MyChatAdapter";
 
     public MyChatAdapter(Activity activity, ArrayList<MessageModel> data)
     {
@@ -124,6 +127,12 @@ public class MyChatAdapter extends BaseAdapter {
 
             TextView text = view.findViewById(R.id.text);
             text.setText(data.get(position).getMessage());
+
+            try {
+                Linkify.addLinks(text, Linkify.ALL);
+            } catch(Exception e){
+                Log.e(TAG, "ChatLink: ", e);
+            }
 
             TextView timeStamp = view.findViewById(R.id.timeStamp);
 

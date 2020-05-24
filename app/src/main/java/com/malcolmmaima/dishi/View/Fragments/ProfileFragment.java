@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,6 +68,7 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 import static android.app.Activity.RESULT_OK;
+import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
 public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "ProfileFragment";
@@ -287,6 +289,11 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     myUserDetails = dataSnapshot.getValue(UserModel.class);
                     profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
                     profileBio.setText(myUserDetails.getBio());
+                    try {
+                        Linkify.addLinks(profileBio, Linkify.ALL);
+                    } catch(Exception e){
+                        Log.e(TAG, "onBindViewHolder: ", e);
+                    }
 
                     Double totalFollowers = Double.valueOf(myUserDetails.getFollowers());
                     Double totalFollowing = Double.valueOf(myUserDetails.getFollowing());

@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -540,6 +541,12 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                         myUserDetails = dataSnapshot.getValue(UserModel.class);
                         profileName.setText(myUserDetails.getFirstname() + " " + myUserDetails.getLastname());
                         profileBio.setText(myUserDetails.getBio());
+
+                        try {
+                            Linkify.addLinks(profileBio, Linkify.ALL);
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
 
                         if(myUserDetails.getAccount_type().equals("2")){
                             viewRestaurant.setVisibility(View.VISIBLE);

@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -451,6 +452,11 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                             } else {
                                 userUpdate.setVisibility(View.VISIBLE);
                                 userUpdate.setText(viewPost.getStatus());
+                                try {
+                                    Linkify.addLinks(userUpdate, Linkify.ALL);
+                                } catch(Exception e){
+                                    Log.e(TAG, "onBindViewHolder: ", e);
+                                }
                             }
 
                             if(viewPost.getImageShare() != null){

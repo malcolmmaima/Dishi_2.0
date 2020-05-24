@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -225,6 +226,11 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         } else {
             holder.userUpdate.setVisibility(View.VISIBLE);
             holder.userUpdate.setText(statusUpdateModel.getStatus());
+            try {
+                Linkify.addLinks(holder.userUpdate, Linkify.ALL);
+            } catch(Exception e){
+                Log.e(TAG, "onBindViewHolder: ", e);
+            }
         }
 
         //imageShare

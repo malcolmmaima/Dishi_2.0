@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,6 +73,7 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 import static android.view.View.INVISIBLE;
+import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
 public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -362,6 +364,11 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                             } else {
                                 userUpdate.setVisibility(View.VISIBLE);
                                 userUpdate.setText(viewPost.getStatus());
+                                try {
+                                    Linkify.addLinks(userUpdate, Linkify.ALL);
+                                } catch(Exception e){
+                                    Log.e(TAG, "onBindViewHolder: ", e);
+                                }
                             }
 
                             if(viewPost.getImageShare() != null){
