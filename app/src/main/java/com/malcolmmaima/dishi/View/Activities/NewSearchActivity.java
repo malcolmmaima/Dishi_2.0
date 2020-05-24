@@ -241,6 +241,8 @@ public class NewSearchActivity extends AppCompatActivity {
 
     private void searchDB(String searchString) {
         setupViewPager(viewPager, searchString);
+        viewPager.setCurrentItem(0,false);
+        tabLayout.getTabAt(0).select();
     }
 
     public String getSearchValue() {
