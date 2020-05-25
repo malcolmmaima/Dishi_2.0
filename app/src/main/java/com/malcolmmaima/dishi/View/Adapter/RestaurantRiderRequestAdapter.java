@@ -8,10 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -40,6 +42,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<RestaurantRiderRequestAdapter.MyHolder>{
+    String TAG = "RestaurantRiderRequestAdapter";
     Context context;
     List<UserModel> listdata;
     long DURATION = 200;
@@ -80,9 +83,30 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
          * Set widget values
          **/
 
+        holder.pendingTask.setVisibility(View.GONE);
         holder.customerName.setText(restaurantDetails.getFirstname() + " " + restaurantDetails.getLastname());
-        holder.distanceAway.setText("loading...");
 
+        myRestaurantsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    try {
+                        Boolean accepted = dataSnapshot.getValue(Boolean.class);
+                        if (accepted == false) {
+                            holder.pendingTask.setVisibility(View.VISIBLE);
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         /**
          * Click listener on our card
@@ -90,122 +114,172 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                restaurantRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                holder.progressBar.setVisibility(View.VISIBLE);
+                myRestaurantsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        holder.progressBar.setVisibility(View.GONE);
                         if(dataSnapshot.exists()){
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setTitle(restaurantDetails.getFirstname()+" "+restaurantDetails.getLastname());
-                            builder.setItems(restaurantActions2, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //Accept rider request
-                                    if(which == 0){
-                                        //Update the respective nodes
-                                        restaurantRidersRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
+                            try {
+                                Boolean accepted = dataSnapshot.getValue(Boolean.class);
+                                if (accepted == true) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                    builder.setTitle(restaurantDetails.getFirstname() + " " + restaurantDetails.getLastname());
+                                    builder.setItems(restaurantActions2, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //Accept rider request
+                                            if (which == 0) {
+                                                holder.progressBar.setVisibility(View.VISIBLE);
+                                                //Update the respective nodes
+                                                restaurantRidersRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        myRestaurantsRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                try {
+                                                                    listdata.remove(position);
+                                                                    notifyItemRemoved(position);
+                                                                    Snackbar snackbar = Snackbar.make(v.getRootView(), "Removed Successfully", Snackbar.LENGTH_LONG);
+                                                                    snackbar.show();
+                                                                } catch (Exception e) {
+                                                                    Log.e(TAG, "onSuccess: ", e);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                            if (which == 1) {
+
+                                                if (restaurantDetails.getProfilePicBig() != null) {
+                                                    Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                    slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                                    slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                                    slideactivity.putExtra("profilePic", restaurantDetails.getProfilePicBig());
+                                                    Bundle bndlanimation =
+                                                            null;
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                        bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                                                    }
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                        context.startActivity(slideactivity, bndlanimation);
+                                                    }
+                                                } else {
+                                                    Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                    slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                                    slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                                    slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
+                                                    Bundle bndlanimation =
+                                                            null;
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                        bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                                                    }
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                        context.startActivity(slideactivity, bndlanimation);
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    });
+                                    builder.create();
+                                    builder.show();
+                                }
+
+                                else {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                    builder.setTitle(restaurantDetails.getFirstname() + " " + restaurantDetails.getLastname());
+                                    builder.setItems(restaurantActions, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //Accept rider request
+                                            if (which == 0) {
+                                                holder.progressBar.setVisibility(View.VISIBLE);
+                                                //Update the respective nodes
+                                                restaurantRidersRef.setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        myRestaurantsRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                holder.progressBar.setVisibility(View.GONE);
+                                                                holder.pendingTask.setVisibility(View.GONE);
+                                                                Snackbar snackbar = Snackbar.make(v.getRootView(), "Request Accepted", Snackbar.LENGTH_LONG);
+                                                                snackbar.show();
+                                                            }
+                                                        });
+
+                                                    }
+                                                });
+                                            }
+                                            if (which == 1) {
+                                                holder.progressBar.setVisibility(View.VISIBLE);
                                                 myRestaurantsRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
                                                         try {
                                                             listdata.remove(position);
                                                             notifyItemRemoved(position);
-                                                            Snackbar snackbar = Snackbar.make(v.getRootView(), "Removed Successfully", Snackbar.LENGTH_LONG);
+                                                            Snackbar snackbar = Snackbar.make(v.getRootView(), "Request Declined", Snackbar.LENGTH_LONG);
                                                             snackbar.show();
-                                                        } catch (Exception e){}
+                                                        } catch (Exception e) {
+                                                            Log.e(TAG, "onSuccess: ", e);
+                                                        }
                                                     }
                                                 });
                                             }
-                                        });
 
-                                    }
-                                    if(which == 1){
+                                            if (which == 2) {
 
-                                        if(restaurantDetails.getProfilePicBig() != null){
-                                            Intent slideactivity = new Intent(context, ViewRestaurant.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                            slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
-                                            slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
-                                            slideactivity.putExtra("profilePic", restaurantDetails.getProfilePicBig());
-                                            Bundle bndlanimation =
-                                                    null;
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                                bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                                            }
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                                context.startActivity(slideactivity, bndlanimation);
-                                            }
-                                        }
-
-                                        else {
-                                            Intent slideactivity = new Intent(context, ViewRestaurant.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                            slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
-                                            slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
-                                            slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
-                                            Bundle bndlanimation =
-                                                    null;
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                                bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                                            }
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                                context.startActivity(slideactivity, bndlanimation);
-                                            }
-                                        }
-                                    }
-
-                                }
-                            });
-                            builder.create();
-                            builder.show();
-                        }
-
-                        else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setTitle(restaurantDetails.getFirstname()+" "+restaurantDetails.getLastname());
-                            builder.setItems(restaurantActions, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //Accept rider request
-                                    if(which == 0){
-                                        //Update the respective nodes
-                                        restaurantRidersRef.setValue("inactive").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                myRestaurantsRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Snackbar snackbar = Snackbar.make(v.getRootView(), "Request Accepted", Snackbar.LENGTH_LONG);
-                                                        snackbar.show();
-                                                    }
-                                                });
-
-                                            }
-                                        });
-                                    }
-                                    if(which == 1){
-                                        myRestaurantsRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
                                                 try {
-                                                    listdata.remove(position);
-                                                    notifyItemRemoved(position);
-                                                    Snackbar snackbar = Snackbar.make(v.getRootView(), "Request Declined", Snackbar.LENGTH_LONG);
-                                                    snackbar.show();
-                                                } catch (Exception e){}
-                                            }
-                                        });
-                                    }
+                                                    if (restaurantDetails.getProfilePicBig() != null) {
+                                                        Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                    if(which == 2){
-                                        Snackbar snackbar = Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG);
-                                        snackbar.show();
-                                    }
+                                                        slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                                        slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                                        slideactivity.putExtra("profilePic", restaurantDetails.getProfilePicBig());
+                                                        Bundle bndlanimation =
+                                                                null;
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                            bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                                                        }
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                            context.startActivity(slideactivity, bndlanimation);
+                                                        }
+                                                    } else {
+                                                        Intent slideactivity = new Intent(context, ViewRestaurant.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                        slideactivity.putExtra("restaurant_phone", restaurantDetails.getPhone());
+                                                        slideactivity.putExtra("distance", 0.0); //pass default value, distance will be computed in the Viewrestaurant activity
+                                                        slideactivity.putExtra("profilePic", restaurantDetails.getProfilePic());
+                                                        Bundle bndlanimation =
+                                                                null;
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                            bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                                                        }
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                            context.startActivity(slideactivity, bndlanimation);
+                                                        }
+                                                    }
+                                                } catch (Exception e) {
+                                                    Log.e(TAG, "onClick: ", e);
+                                                }
+                                            }
+                                        }
+                                    });
+                                    builder.create();
+                                    builder.show();
                                 }
-                            });
-                            builder.create();
-                            builder.show();
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
                         }
                     }
 
@@ -261,7 +335,7 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
                         .into(holder.profilePic);
             }
         } catch (Exception e){
-
+            Log.e(TAG, "onBindViewHolder: ", e);
         }
 
     }
@@ -292,17 +366,17 @@ public class RestaurantRiderRequestAdapter extends RecyclerView.Adapter<Restaura
 
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium customerName;
-        TextView orderQty,distanceAway;
-        ImageView profilePic;
+        ImageView profilePic, pendingTask;
+        ProgressBar progressBar;
         CardView cardView;
 
         public MyHolder(View itemView) {
             super(itemView);
             customerName = itemView.findViewById(R.id.customerName);
-            orderQty = itemView.findViewById(R.id.orderQty);
             profilePic = itemView.findViewById(R.id.profilePic);
             cardView = itemView.findViewById(R.id.card_view);
-            distanceAway = itemView.findViewById(R.id.distanceAway);
+            pendingTask = itemView.findViewById(R.id.pendingRequest);
+            progressBar = itemView.findViewById(R.id.progressBar);
 
 //            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 //            final String myPhone = user.getPhoneNumber(); //Current logged in user phone number

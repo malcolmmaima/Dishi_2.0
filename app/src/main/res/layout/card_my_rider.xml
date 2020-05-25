@@ -48,6 +48,7 @@
             android:text="Rider Name"
             android:id="@+id/riderName"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"/>
 
 

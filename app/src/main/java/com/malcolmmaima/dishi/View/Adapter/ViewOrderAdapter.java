@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import java.util.List;
 
 public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHolder>{
 
+    String TAG = "ViewOrderAdapter";
     Context context;
     List<ProductDetailsModel> listdata;
     long DURATION = 200;
@@ -112,12 +114,22 @@ public class ViewOrderAdapter extends RecyclerView.Adapter<ViewOrderAdapter.MyHo
          */
         try {
             //Load food image
-            Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
-                    .placeholder(R.drawable.menu)
-                    .error(R.drawable.menu)
-                    .into(holder.foodPic);
-        } catch (Exception e){
 
+            if(productDetailsModel.getImageUrlSmall() != null){
+                Picasso.with(context).load(productDetailsModel.getImageUrlSmall()).fit().centerCrop()
+                        .placeholder(R.drawable.menu)
+                        .error(R.drawable.menu)
+                        .into(holder.foodPic);
+            }
+
+            else {
+                Picasso.with(context).load(productDetailsModel.getImageURL()).fit().centerCrop()
+                        .placeholder(R.drawable.menu)
+                        .error(R.drawable.menu)
+                        .into(holder.foodPic);
+            }
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ", e);
         }
 
     }

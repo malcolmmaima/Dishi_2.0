@@ -125,6 +125,7 @@ public class SecurityPin extends AppCompatActivity {
             }
 
             if(pinType.equals("login")){
+                progressBar.setVisibility(View.VISIBLE);
                 accountType = getIntent().getStringExtra("accType");
                 logout.setVisibility(View.VISIBLE);
                 title1.setText("Your pin is required to");
@@ -137,6 +138,7 @@ public class SecurityPin extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     try {
+                                        progressBar.setVisibility(View.GONE);
                                         locked = dataSnapshot.getValue(Boolean.class);
                                         if (locked == false) {
                                             //proceed to account
@@ -304,6 +306,7 @@ public class SecurityPin extends AppCompatActivity {
             }
 
             if(counter == 4){
+                progressBar.setVisibility(View.VISIBLE);
                 pin4.setColorFilter(ContextCompat.getColor(SecurityPin.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
                 myPin = ""+pinCombo[0]+""+pinCombo[1]+""+pinCombo[2]+""+pinCombo[3]+"";
 
@@ -317,6 +320,7 @@ public class SecurityPin extends AppCompatActivity {
                                 myRef.child("pendingPin").setValue(myPin).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        progressBar.setVisibility(View.GONE);
                                         progressBar.setVisibility(View.GONE);
                                         title1.setText("Enter your new preferred");
                                         title2.setText("four digit security PIN");
@@ -361,6 +365,7 @@ public class SecurityPin extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             loginPin = dataSnapshot.getValue(String.class);
+                            progressBar.setVisibility(View.GONE);
 
                             if(myPin.equals(loginPin)){
                                 locked = false;
@@ -388,6 +393,7 @@ public class SecurityPin extends AppCompatActivity {
                                     startActivity(slideactivity, bndlanimation);
                                 }
                             } else {
+                                progressBar.setVisibility(View.GONE);
                                 locked = true;
                                 myRef.child("appLocked").setValue(true);
                                 pinCombo = new int[4];
@@ -408,7 +414,7 @@ public class SecurityPin extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             loginPin = dataSnapshot.getValue(String.class);
-
+                            progressBar.setVisibility(View.GONE);
                             if(myPin.equals(loginPin)){
                                 myRef.child("appLocked").setValue(false);
                                 //proceed to account
@@ -434,7 +440,7 @@ public class SecurityPin extends AppCompatActivity {
                     myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                            progressBar.setVisibility(View.GONE);
                             try {
                                 loginPin = dataSnapshot.getValue(String.class);
                                 if (myPin.equals(loginPin)) {

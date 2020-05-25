@@ -53,31 +53,28 @@
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
+        <ProgressBar
+            android:layout_toRightOf="@id/customerName"
+            android:layout_centerVertical="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/progressBar"
+            android:visibility="gone"/>
 
-        <ImageButton
-            android:layout_below="@id/customerName"
-            android:layout_toRightOf="@id/profilePic"
-            android:id="@+id/locationTag"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+
+        <ImageView
+            android:id="@+id/pendingRequest"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginTop="5dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/location_pin"
+            android:background="@drawable/pending_task"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:visibility="gone"
+            android:visibility="visible"
             />
-
-        <TextView
-            android:id="@+id/distanceAway"
-            android:layout_below="@id/customerName"
-            android:layout_toRightOf="@id/locationTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text=" 0 m away"
-            android:layout_marginLeft="-10dp"
-            android:layout_marginRight="5dp"
-            android:visibility="gone"/>
 
 
     </RelativeLayout>

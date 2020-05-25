@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -59,6 +60,7 @@ public class ReceiptActivity extends AppCompatActivity {
     MyTextView_Roboto_Medium totalBill, dateOrdered, dateDelivered, vendorName, vendorPhone, nameTitle;
     int totalAmount;
     Double vatCharge;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,6 +205,8 @@ public class ReceiptActivity extends AppCompatActivity {
         vendorName = findViewById(R.id.restaurantName);
         vendorPhone = findViewById(R.id.restaurantPhone);
         nameTitle = findViewById(R.id.nameTitle);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         orderedOn = getIntent().getStringExtra("orderOn");
         deliveredOn = getIntent().getStringExtra("deliveredOn");
@@ -355,6 +359,7 @@ public class ReceiptActivity extends AppCompatActivity {
                             totalAmount = 0;
                             for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                                 try {
+                                    progressBar.setVisibility(View.GONE);
                                     ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
                                     deliveredItems.add(product);
 
@@ -362,6 +367,8 @@ public class ReceiptActivity extends AppCompatActivity {
                                     totalBill.setText("Ksh " + totalAmount);
                                     totalTitle.setText("" + totalAmount);
                                 } catch (Exception e){
+                                    progressBar.setVisibility(View.GONE);
+                                    Toast.makeText(ReceiptActivity.this, "Something went wrong!", Toast.LENGTH_LONG).show();
                                     Log.e(TAG, "onDataChange: ", e);
                                 }
                             }

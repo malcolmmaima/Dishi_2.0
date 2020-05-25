@@ -125,8 +125,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("pinType", "resume");
                                     startActivity(slideactivity);
-                                } else {
-                                    loadViewCustomer();
                                 }
                             }
 
@@ -135,8 +133,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                             }
                         });
-                    } else {
-                        loadViewCustomer();
                     }
                 }
 
@@ -145,6 +141,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                 }
             });
+
+            loadViewCustomer();
         }
     }
 
@@ -1155,6 +1153,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.assign_order_menu, menu);
         myMenu = menu;
@@ -1164,7 +1163,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         try {
             if (address.equals("pick")) {
                 item.setVisible(false);
-            } else {
+            }
+
+            else {
                 if (accType.equals("2")) {
                     item.setVisible(true);
                 }

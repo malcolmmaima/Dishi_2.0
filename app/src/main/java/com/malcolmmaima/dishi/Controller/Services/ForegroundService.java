@@ -59,12 +59,12 @@ import java.util.Random;
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     String TAG = "ForeGroundService";
-    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, notificationRef, myMessages;
+    DatabaseReference databaseReference, myUserDetailsRef, myOrdersRef, myRideRequests, myVendorRequest,notificationRef, myMessages;
     DatabaseReference myRideOrderRequests, receiptsRef, incomingMessages, myBlockedUsers;
     ValueEventListener databaseListener, myOrdersListener, myUserDetailsListener;
     ValueEventListener myRideOrderRequestsListener;
     ChildEventListener notificationsListener, receiptsListener, myMessagesListener,
-            myRestaurantOrdersListener, myRideRequestsListener;
+            myRestaurantOrdersListener, myRideRequestsListener, myVendorRequestListener;
     ChildEventListener incomingMessagesListener;
     String myPhone;
     FirebaseUser user;
@@ -211,6 +211,7 @@ public class ForegroundService extends Service {
                                 } else {
                                     try {
                                         myRideRequests.removeEventListener(myRideRequestsListener);
+                                        myVendorRequest.removeEventListener(myVendorRequestListener);
                                     } catch (Exception e) {
                                         Log.e(TAG, "onDataChange: ", e);
                                     }
@@ -232,12 +233,21 @@ public class ForegroundService extends Service {
                                         DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/" + myPhone);
                                         myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                for (DataSnapshot restaurants : dataSnapshot.getChildren()) {
-                                                    //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
-                                                    DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/" + restaurants.getKey() + "/" + myPhone);
-                                                    restaurantRidersRef.setValue("inactive");
-                                                }
+                                            public void onDataChange(@NonNull DataSnapshot vendors) {
+
+                                                    for (DataSnapshot restaurants : vendors.getChildren()) {
+                                                        if(vendors.child(restaurants.getKey()).exists()){
+                                                            //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                            DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/" + restaurants.getKey() + "/" + myPhone);
+                                                            restaurantRidersRef.setValue("inactive");
+                                                        }
+
+                                                        else {
+                                                            DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/" + restaurants.getKey() + "/" + myPhone);
+                                                            restaurantRidersRef.removeValue();
+                                                        }
+                                                    }
+
                                             }
 
                                             @Override
@@ -706,6 +716,73 @@ public class ForegroundService extends Service {
             }
         };
         myRideRequests.addChildEventListener(myRideRequestsListener);
+
+        /**
+         * New Vendor requests
+         */
+        myVendorRequest = FirebaseDatabase.getInstance().getReference("my_restaurants/"+myPhone);
+        myVendorRequestListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot newVendor, @Nullable String s) {
+                //Get user details
+                DatabaseReference vendorDetails = FirebaseDatabase.getInstance().getReference("users/"+newVendor.getKey());
+                vendorDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        UserModel vendor = dataSnapshot.getValue(UserModel.class);
+
+                        //compose our notification and send
+                        String title = vendor.getFirstname()+" "+vendor.getLastname();
+                        String message = "Wants to add you as a rider. Check your vendors to accept";
+
+                        String vendorPhone = dataSnapshot.getKey();
+                        if (vendorPhone.length() > 4) {
+                            lastFourDigits = vendorPhone.substring(vendorPhone.length() - 4); //We'll use this as the notification's unique ID
+                        }
+                        int notifId = Integer.parseInt(lastFourDigits+5); //new Random().nextInt();
+                        try {
+                            if (myUserDetails.getOrderNotification() == true) {
+
+                                Boolean accepted = newVendor.getValue(Boolean.class);
+
+                                if(accepted == false){
+                                    sendVendorRequestNotification(notifId, "newRiderRequest", title, message, RiderActivity.class);
+                                }
+                            }
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        myVendorRequest.addChildEventListener(myVendorRequestListener);
     }
 
     private void startRestaurantNotifications() {
@@ -1106,6 +1183,53 @@ public class ForegroundService extends Service {
                             .setSound(soundUri)
                             .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message);
+                }
+            }
+
+            Intent intent = new Intent(this, targetActivity);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent contentIntent = PendingIntent.getActivity(this, notifId, intent, 0);
+            builder.setContentIntent(contentIntent);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.icon |= Notification.BADGE_ICON_LARGE;
+            manager.notify(notifId, notification);
+        }
+
+    }
+
+    private void sendVendorRequestNotification(int notifId, String type, String title, String message, Class targetActivity){
+
+        if(type.equals("newRiderRequest")){
+            Notification.Builder builder = null;
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    builder = new Notification.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.online_store)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setOnlyAlertOnce(true)
+                            .setContentText(message)
+                            .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                    .bigText(message));
+                } else {
+                    builder = new Notification.Builder(this)
+                            .setSmallIcon(R.drawable.online_store)
+                            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                            .setContentTitle(title)
+                            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                            .setSound(soundUri)
+                            .setOnlyAlertOnce(true)
+                            .setPriority(Notification.PRIORITY_MAX)
+                            .setContentText(message)
+                            .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
+                                    .bigText(message));
                 }
             }
 
@@ -1837,6 +1961,7 @@ public class ForegroundService extends Service {
             myMessages.removeEventListener(myMessagesListener);
             myOrdersRef.removeEventListener(myRestaurantOrdersListener);
             myRideRequests.removeEventListener(myRideRequestsListener);
+            myVendorRequest.removeEventListener(myVendorRequestListener);
             myRideOrderRequests.removeEventListener(myRideOrderRequestsListener);
             databaseReference.removeEventListener(databaseListener);
             databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);

@@ -286,6 +286,14 @@
                 android:id="@+id/totalBill"
                 android:textColor="#000"/>
         </LinearLayout>
+
+        <ProgressBar
+            android:layout_marginTop="-35dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/progressBar"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"/>
     </LinearLayout>
 
     <!-- <LinearLayout
