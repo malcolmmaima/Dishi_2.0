@@ -17,6 +17,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +41,7 @@ import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.DecimalFormat;
 
@@ -55,6 +57,7 @@ public class ViewProduct extends AppCompatActivity {
     MyTextView_Roboto_Regular distanceAway, restaurantName, productDescription, favouritesTotal;
     CircleImageView foodPic;
     FloatingActionButton add, minus;
+    HashTagHelper mTextHashTagHelper;
     int count;
     Menu myMenu;
     DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef, existingCartRef, myRef;
@@ -370,6 +373,29 @@ public class ViewProduct extends AppCompatActivity {
             productDescription.setText(description);
             restaurantName.setText(restaurantName_);
             itemCount.setText(""+count);
+
+            try {
+                Linkify.addLinks(productDescription, Linkify.ALL);
+            } catch (Exception e){
+                Log.e(TAG, "onDataChange: ", e);
+            }
+
+            //handle hashtags
+            if(description.contains("#")){
+                mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                        new HashTagHelper.OnHashTagClickListener() {
+                            @Override
+                            public void onHashTagClicked(String hashTag) {
+                                String searchHashTag = "#"+hashTag;
+                                Intent slideactivity = new Intent(ViewProduct.this, SearchActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                slideactivity.putExtra("searchString", searchHashTag);
+                                startActivity(slideactivity);
+                            }
+                        });
+
+                mTextHashTagHelper.handle(productDescription);
+            }
 
             //Since this activity is receiving the restaurant name from adapter, in the case activity transitions to this without having fetched name, then fetch a fresh
             DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getInstance().getReference("users/"+restaurant);

@@ -3,6 +3,7 @@ package com.malcolmmaima.dishi.View.Adapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Intent;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import org.w3c.dom.Text;
 
@@ -37,6 +40,7 @@ public class MyChatAdapter extends BaseAdapter {
     String myPhone;
     long DURATION = 200;
     String TAG = "MyChatAdapter";
+    HashTagHelper mTextHashTagHelper;
 
     public MyChatAdapter(Activity activity, ArrayList<MessageModel> data)
     {
@@ -130,13 +134,28 @@ public class MyChatAdapter extends BaseAdapter {
             }
 
             TextView text = view.findViewById(R.id.text);
-
+            text.setText(data.get(position).getMessage());
             try {
                 Linkify.addLinks(text, Linkify.ALL);
             } catch(Exception e){
                 Log.e(TAG, "ChatLink: ", e);
             }
-            text.setText(data.get(position).getMessage());
+            //handle hashtags
+            if(data.get(position).getMessage().contains("#")){
+                mTextHashTagHelper = HashTagHelper.Creator.create(convertView.getContext().getResources().getColor(R.color.colorPrimary),
+                        new HashTagHelper.OnHashTagClickListener() {
+                            @Override
+                            public void onHashTagClicked(String hashTag) {
+                                String searchHashTag = "#"+hashTag;
+                                Intent slideactivity = new Intent(convertView.getContext(), SearchActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                slideactivity.putExtra("searchString", searchHashTag);
+                                convertView.getContext().startActivity(slideactivity);
+                            }
+                        });
+
+                mTextHashTagHelper.handle(text);
+            }
             TextView timeStamp = view.findViewById(R.id.timeStamp);
 
             //2020-04-03:23:22:00:GMT+03:00

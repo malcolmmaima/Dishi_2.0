@@ -41,9 +41,12 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
+import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +63,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
     List<StatusUpdateModel> listdata;
     DatabaseReference postRef, commentAuthorUserDetailsRef;
     long DURATION = 200;
+    HashTagHelper mTextHashTagHelper;
 
     public CommentAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -137,6 +141,23 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
             } catch(Exception e){
                 Log.e(TAG, "onBindViewHolder: ", e);
             }
+        }
+
+        //handle hashtags
+        if(statusUpdateModel.getStatus().contains("#")){
+            mTextHashTagHelper = HashTagHelper.Creator.create(context.getResources().getColor(R.color.colorPrimary),
+                    new HashTagHelper.OnHashTagClickListener() {
+                        @Override
+                        public void onHashTagClicked(String hashTag) {
+                            String searchHashTag = "#"+hashTag;
+                            Intent slideactivity = new Intent(context, SearchActivity.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            slideactivity.putExtra("searchString", searchHashTag);
+                            context.startActivity(slideactivity);
+                        }
+                    });
+
+            mTextHashTagHelper.handle(holder.userUpdate);
         }
 
         //imageShare

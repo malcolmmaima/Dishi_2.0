@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +52,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderAdapter;
 import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -91,6 +93,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     String [] restaurantActions = {"View","Message", "Call"};
     String [] riderOptions = {"View","Message", "Call"};
     Timer timer;
+    HashTagHelper mTextHashTagHelper;
 
     final int[] total = {0};
 
@@ -556,6 +559,29 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     }
 
                     customerRemarks.setText("Remarks: "+remarks);
+
+                    try {
+                        Linkify.addLinks(customerRemarks, Linkify.ALL);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+
+                    //handle hashtags
+                    if(remarks.contains("#")){
+                        mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                                new HashTagHelper.OnHashTagClickListener() {
+                                    @Override
+                                    public void onHashTagClicked(String hashTag) {
+                                        String searchHashTag = "#"+hashTag;
+                                        Intent slideactivity = new Intent(ViewCustomerOrder.this, SearchActivity.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                        slideactivity.putExtra("searchString", searchHashTag);
+                                        startActivity(slideactivity);
+                                    }
+                                });
+
+                        mTextHashTagHelper.handle(customerRemarks);
+                    }
                     for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
                         try {

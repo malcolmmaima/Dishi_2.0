@@ -52,9 +52,12 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.FollowersFollowing;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -93,6 +96,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     Button postBtn;
     ImageButton imageUpload;
     UserModel myUserDetails;
+    HashTagHelper mTextHashTagHelper;
 
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
@@ -293,6 +297,23 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         Linkify.addLinks(profileBio, Linkify.ALL);
                     } catch(Exception e){
                         Log.e(TAG, "onBindViewHolder: ", e);
+                    }
+
+                    //handle hashtags
+                    if(myUserDetails.getBio().contains("#")){
+                        mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                                new HashTagHelper.OnHashTagClickListener() {
+                                    @Override
+                                    public void onHashTagClicked(String hashTag) {
+                                        String searchHashTag = "#"+hashTag;
+                                        Intent slideactivity = new Intent(getContext(), SearchActivity.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                        slideactivity.putExtra("searchString", searchHashTag);
+                                        startActivity(slideactivity);
+                                    }
+                                });
+
+                        mTextHashTagHelper.handle(profileBio);
                     }
 
                     Double totalFollowers = Double.valueOf(myUserDetails.getFollowers());

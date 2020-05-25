@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,9 +45,12 @@ import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProduct;
+import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.util.List;
 
@@ -62,6 +66,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
     ValueEventListener locationListener;
     DatabaseReference myLocationRef;
     String myPhone;
+    HashTagHelper mTextHashTagHelper;
 
     public ProductAdapter(Context context, List<ProductDetailsModel> listdata) {
         this.listdata = listdata;
@@ -227,7 +232,30 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                 holder.foodDescription.setText(productDetailsModel.getDescription());
             }
         } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ", e);
+        }
 
+        try {
+            Linkify.addLinks(holder.foodDescription, Linkify.ALL);
+        } catch (Exception e){
+            Log.e(TAG, "onDataChange: ", e);
+        }
+
+        //handle hashtags
+        if(productDetailsModel.getDescription().contains("#")){
+            mTextHashTagHelper = HashTagHelper.Creator.create(context.getResources().getColor(R.color.colorPrimary),
+                    new HashTagHelper.OnHashTagClickListener() {
+                        @Override
+                        public void onHashTagClicked(String hashTag) {
+                            String searchHashTag = "#"+hashTag;
+                            Intent slideactivity = new Intent(context, SearchActivity.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            slideactivity.putExtra("searchString", searchHashTag);
+                            context.startActivity(slideactivity);
+                        }
+                    });
+
+            mTextHashTagHelper.handle(holder.foodDescription);
         }
 
         //creating a popup menu

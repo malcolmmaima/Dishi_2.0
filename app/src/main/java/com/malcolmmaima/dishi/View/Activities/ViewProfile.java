@@ -65,6 +65,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -107,6 +108,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     AppCompatButton followBtn;
     UserModel myUserDetails;
 
+    HashTagHelper mTextHashTagHelper;
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     ImageView selectedImage,viewRestaurant;
@@ -546,6 +548,23 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                             Linkify.addLinks(profileBio, Linkify.ALL);
                         } catch (Exception e){
                             Log.e(TAG, "onDataChange: ", e);
+                        }
+
+                        //handle hashtags
+                        if(myUserDetails.getBio().contains("#")){
+                            mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                                    new HashTagHelper.OnHashTagClickListener() {
+                                        @Override
+                                        public void onHashTagClicked(String hashTag) {
+                                            String searchHashTag = "#"+hashTag;
+                                            Intent slideactivity = new Intent(ViewProfile.this, SearchActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                            slideactivity.putExtra("searchString", searchHashTag);
+                                            startActivity(slideactivity);
+                                        }
+                                    });
+
+                            mTextHashTagHelper.handle(profileBio);
                         }
 
                         if(myUserDetails.getAccount_type().equals("2")){

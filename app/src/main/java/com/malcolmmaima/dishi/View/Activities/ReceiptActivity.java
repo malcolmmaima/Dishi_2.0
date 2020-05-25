@@ -85,8 +85,6 @@ public class ReceiptActivity extends AppCompatActivity {
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("pinType", "resume");
                                     startActivity(slideactivity);
-                                } else {
-                                    loadReceipt();
                                 }
                             }
 
@@ -95,8 +93,6 @@ public class ReceiptActivity extends AppCompatActivity {
 
                             }
                         });
-                    } else {
-                        loadReceipt();
                     }
                 }
 
@@ -105,6 +101,8 @@ public class ReceiptActivity extends AppCompatActivity {
 
                 }
             });
+
+            loadReceipt();
         }
 
     }
@@ -135,8 +133,6 @@ public class ReceiptActivity extends AppCompatActivity {
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("pinType", "resume");
                                     startActivity(slideactivity);
-                                } else {
-                                    loadReceipt();
                                 }
                             }
 
@@ -145,8 +141,6 @@ public class ReceiptActivity extends AppCompatActivity {
 
                             }
                         });
-                    } else {
-                        loadReceipt();
                     }
                 }
 
@@ -155,6 +149,8 @@ public class ReceiptActivity extends AppCompatActivity {
 
                 }
             });
+
+            loadReceipt();
         }
     }
 
@@ -175,8 +171,6 @@ public class ReceiptActivity extends AppCompatActivity {
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);
-                            } else {
-                                loadReceipt();
                             }
                         }
 
@@ -185,8 +179,6 @@ public class ReceiptActivity extends AppCompatActivity {
 
                         }
                     });
-                } else {
-                    loadReceipt();
                 }
             }
 

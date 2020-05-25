@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,6 +49,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ViewOrderItemsAdapter;
 import com.malcolmmaima.dishi.View.Maps.GeoTracking;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -79,6 +81,7 @@ public class ViewMyOrders extends AppCompatActivity {
     final int[] total = {0};
     FirebaseAuth mAuth;
     Timer timer;
+    HashTagHelper mTextHashTagHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,8 +111,6 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
-                                    } else {
-                                        loadMyOrders();
                                     }
                                 }
 
@@ -118,8 +119,6 @@ public class ViewMyOrders extends AppCompatActivity {
 
                                 }
                             });
-                        } else {
-                            loadMyOrders();
                         }
                     }
 
@@ -128,7 +127,11 @@ public class ViewMyOrders extends AppCompatActivity {
 
                     }
                 });
+
+                loadMyOrders();
+
             } catch (Exception e){
+                Log.e(TAG, "onCreate: ", e);
                 SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
             }
         }
@@ -320,6 +323,29 @@ public class ViewMyOrders extends AppCompatActivity {
 
 
                         myRemarks.setText("Remarks: "+remarks);
+
+                        try {
+                            Linkify.addLinks(myRemarks, Linkify.ALL);
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+
+                        //handle hashtags
+                        if(remarks.contains("#")){
+                            mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                                    new HashTagHelper.OnHashTagClickListener() {
+                                        @Override
+                                        public void onHashTagClicked(String hashTag) {
+                                            String searchHashTag = "#"+hashTag;
+                                            Intent slideactivity = new Intent(ViewMyOrders.this, SearchActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                            slideactivity.putExtra("searchString", searchHashTag);
+                                            startActivity(slideactivity);
+                                        }
+                                    });
+
+                            mTextHashTagHelper.handle(myRemarks);
+                        }
                         if (completed == true) {
                             String message;
                             if(address.equals("pick")){
