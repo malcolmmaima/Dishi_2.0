@@ -226,7 +226,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                             recyclerview.setVisibility(INVISIBLE);
                                                             emptyTag.setVisibility(VISIBLE);
                                                             recyclerview.setVisibility(View.GONE);
-                                                            emptyTag.setText("NOT FOUND");
+                                                            emptyTag.setText("Nothing found");
                                                         }
                                                     } catch (Exception e){
                                                         Log.e("SearchActivity", "onDataChange: ", e);

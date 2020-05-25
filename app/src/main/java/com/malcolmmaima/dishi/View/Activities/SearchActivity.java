@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -42,6 +43,7 @@ public class SearchActivity extends AppCompatActivity {
     FragmentSearchVendors fragmentSearchVendors;
     FragmentSearchPosts fragmentSearchPosts;
 
+    int currentFrag = 0;
     EditText searchWord;
     TabLayout tabLayout;
     DatabaseReference myLocationRef;
@@ -78,6 +80,7 @@ public class SearchActivity extends AppCompatActivity {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     viewPager.setCurrentItem(tab.getPosition(),false);
+                    currentFrag = tab.getPosition();
                 }
 
                 @Override
@@ -100,6 +103,7 @@ public class SearchActivity extends AppCompatActivity {
                 @Override
                 public void onPageSelected(int position) {
                     tabLayout.getTabAt(position).select();
+                    currentFrag = position;
 
                 }
 
@@ -125,13 +129,17 @@ public class SearchActivity extends AppCompatActivity {
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                    if(locked == true){
-                                        Intent slideactivity = new Intent(SearchActivity.this, SecurityPin.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        slideactivity.putExtra("pinType", "resume");
-                                        startActivity(slideactivity);
+                                        if (locked == true) {
+                                            Intent slideactivity = new Intent(SearchActivity.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onDataChange: ", e);
                                     }
                                 }
 
@@ -206,11 +214,8 @@ public class SearchActivity extends AppCompatActivity {
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    //Toast.makeText(SearchActivity.this, "done typing", Toast.LENGTH_SHORT).show();
-
                     word = editable.toString().trim();
                     searchDB(word);
-
                 }
             });
         }
@@ -218,8 +223,8 @@ public class SearchActivity extends AppCompatActivity {
 
     private void searchDB(String searchString) {
         setupViewPager(viewPager, searchString);
-        viewPager.setCurrentItem(0,false);
-        tabLayout.getTabAt(0).select();
+        viewPager.setCurrentItem(currentFrag,false);
+        tabLayout.getTabAt(currentFrag).select();
     }
 
     public String getSearchValue() {

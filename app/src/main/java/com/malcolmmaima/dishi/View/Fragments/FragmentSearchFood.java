@@ -229,7 +229,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                             recyclerview.setVisibility(INVISIBLE);
                                                             emptyTag.setVisibility(VISIBLE);
                                                             recyclerview.setVisibility(View.GONE);
-                                                            emptyTag.setText("NOT FOUND");
+                                                            emptyTag.setText("Nothing found");
                                                         }
                                                     } catch (Exception e){
                                                         Log.e(TAG, "onDataChange: ", e);
@@ -306,7 +306,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                             recyclerview.setVisibility(INVISIBLE);
                                                             emptyTag.setVisibility(VISIBLE);
                                                             recyclerview.setVisibility(View.GONE);
-                                                            emptyTag.setText("NOT FOUND");
+                                                            emptyTag.setText("Nothing found");
                                                         }
                                                     } catch (Exception e){
                                                         Log.e(TAG, "onDataChange: ", e);

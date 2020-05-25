@@ -146,15 +146,18 @@ public class RestaurantActivity extends AppCompatActivity
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                    if(locked == true){
-                                        Intent slideactivity = new Intent(RestaurantActivity.this, SecurityPin.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        slideactivity.putExtra("pinType", "resume");
-                                        startActivity(slideactivity);
-                                    } else {
-                                        loadActivity();
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
+
+                                        if (locked == true) {
+                                            Intent slideactivity = new Intent(RestaurantActivity.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onDataChange: ", e);
                                     }
                                 }
 
@@ -163,8 +166,6 @@ public class RestaurantActivity extends AppCompatActivity
 
                                 }
                             });
-                        } else {
-                            loadActivity();
                         }
                     }
 
@@ -173,6 +174,7 @@ public class RestaurantActivity extends AppCompatActivity
 
                     }
                 });
+                loadActivity();
             } catch (Exception e){
                 Log.e(TAG, "onCreate: ", e);
             }

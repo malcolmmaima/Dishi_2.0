@@ -94,7 +94,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
             emptyTag.setText("Type something");
             emptyTag.setVisibility(VISIBLE);
         } else {
-            emptyTag.setText("NOT FOUND");
+            emptyTag.setText("Nothing found");
             mSwipeRefreshLayout.setRefreshing(true);
             DatabaseReference usersRef;
             usersRef = FirebaseDatabase.getInstance().getReference("users");

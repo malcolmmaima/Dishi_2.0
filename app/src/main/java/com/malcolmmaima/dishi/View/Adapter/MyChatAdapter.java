@@ -95,7 +95,9 @@ public class MyChatAdapter extends BaseAdapter {
                         if(dataSnapshot.exists()){
                             try {
                                 senderMessageRef.child(data.get(position).getKey()).child("read").setValue(true);
-                            } catch (Exception e){}
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
                         }
                     }
 
@@ -106,7 +108,9 @@ public class MyChatAdapter extends BaseAdapter {
                 });
 
             }
-        } catch (Exception e){}
+        } catch (Exception e){
+            Log.e(TAG, "getView: ", e);
+        }
 
 
         View view=convertView;
@@ -126,14 +130,13 @@ public class MyChatAdapter extends BaseAdapter {
             }
 
             TextView text = view.findViewById(R.id.text);
-            text.setText(data.get(position).getMessage());
 
             try {
                 Linkify.addLinks(text, Linkify.ALL);
             } catch(Exception e){
                 Log.e(TAG, "ChatLink: ", e);
             }
-
+            text.setText(data.get(position).getMessage());
             TextView timeStamp = view.findViewById(R.id.timeStamp);
 
             //2020-04-03:23:22:00:GMT+03:00

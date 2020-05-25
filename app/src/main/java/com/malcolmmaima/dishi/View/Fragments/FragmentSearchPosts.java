@@ -2,64 +2,263 @@ package com.malcolmmaima.dishi.View.Fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Model.StatusUpdateModel;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
+import com.malcolmmaima.dishi.View.Adapter.NewsFeedAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentSearchPosts#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FragmentSearchPosts extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
-    public FragmentSearchPosts() {
-        // Required empty public constructor
-    }
+public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentSearchPosts.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FragmentSearchPosts newInstance(String param1, String param2) {
+    String TAG = "FragmentSearchFood";
+    RecyclerView recyclerview;
+    MyTextView_Roboto_Regular emptyTag;
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    String searchValue, myPhone;
+    FirebaseUser user;
+    DatabaseReference followingRef, postsRef;
+
+    public static FragmentSearchPosts newInstance() {
         FragmentSearchPosts fragment = new FragmentSearchPosts();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_posts, container, false);
+        View view = inflater.inflate(R.layout.fragment_search_posts, container, false);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber();
+
+        SearchActivity activity = (SearchActivity) getActivity();
+        searchValue = activity.getSearchValue();
+
+        recyclerview = view.findViewById(R.id.rview);
+        emptyTag = view.findViewById(R.id.empty_tag);
+
+        // SwipeRefreshLayout
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                searchPosts(searchValue);
+            }
+        });
+
+        return view;
+    }
+
+    private void searchPosts(String searchValue) {
+        List<StatusUpdateModel> statusUpdates;
+
+        if(isStringNullOrWhiteSpace(searchValue)){
+            emptyTag.setText("Type something");
+            emptyTag.setVisibility(VISIBLE);
+        } else {
+            statusUpdates = new ArrayList<>();
+            mSwipeRefreshLayout.setRefreshing(true);
+            followingRef = FirebaseDatabase.getInstance().getReference("following/"+myPhone);
+            postsRef = FirebaseDatabase.getInstance().getReference("posts");
+
+            postsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot users : dataSnapshot.getChildren()){
+
+                        //Get user details
+                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users/"+users.getKey());
+                        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                UserModel userModel = dataSnapshot.getValue(UserModel.class);
+
+                                //if account type is private check to see if i follow them
+                                if(userModel.getAccountPrivacy().equals("private")){
+                                    followingRef.child(users.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(dataSnapshot.exists()){
+                                                //I do follow them so show post in search
+                                                for(DataSnapshot updates : users.getChildren()){
+                                                    try {
+                                                        StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
+                                                        statusUpdateModel.key = updates.getKey();
+                                                        if (statusUpdateModel.getStatus().toLowerCase().contains(searchValue.toLowerCase())) {
+                                                            statusUpdates.add(statusUpdateModel);
+                                                        }
+
+                                                        try {
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                            if (!statusUpdates.isEmpty()) {
+
+                                                                //Sort by most recent (based on timeStamp)
+                                                                Collections.reverse(statusUpdates);
+                                                                try {
+                                                                    Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+                                                                } catch (Exception e){
+                                                                    Log.e(TAG, "onDataChange: ", e);
+                                                                }
+
+                                                                emptyTag.setVisibility(View.GONE);
+                                                                recyclerview.setVisibility(View.VISIBLE);
+                                                                recyclerview.setVisibility(View.VISIBLE);
+                                                                NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
+                                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                                recyclerview.setLayoutManager(layoutmanager);
+
+                                                                recycler.notifyDataSetChanged();
+                                                                recyclerview.setAdapter(recycler);
+                                                            } else {
+                                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                                recyclerview.setVisibility(INVISIBLE);
+                                                                emptyTag.setVisibility(VISIBLE);
+                                                                recyclerview.setVisibility(View.GONE);
+                                                                emptyTag.setText("Nothing found");
+                                                            }
+                                                        }
+
+                                                        catch (Exception e){
+                                                            Log.e(TAG, "onDataChange: ", e);
+                                                        }
+
+                                                    } catch (Exception e){
+                                                        Log.e(TAG, "onDataChange: ", e);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+
+                                //account is public so show posts in search
+                                else {
+                                    for(DataSnapshot updates : users.getChildren()){
+                                        try {
+                                            StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
+                                            statusUpdateModel.key = updates.getKey();
+
+                                            if (statusUpdateModel.getStatus().toLowerCase().contains(searchValue.toLowerCase())) {
+                                                statusUpdates.add(statusUpdateModel);
+                                            }
+
+                                            try {
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                if (!statusUpdates.isEmpty()) {
+
+                                                    //Sort by most recent (based on timeStamp)
+                                                    Collections.reverse(statusUpdates);
+                                                    try {
+                                                        Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+                                                    } catch (Exception e){
+                                                        Log.e(TAG, "onDataChange: ", e);
+                                                    }
+
+                                                    emptyTag.setVisibility(View.GONE);
+                                                    recyclerview.setVisibility(View.VISIBLE);
+                                                    NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
+                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
+                                                    recyclerview.setLayoutManager(layoutmanager);
+
+                                                    recycler.notifyDataSetChanged();
+                                                    recyclerview.setAdapter(recycler);
+                                                } else {
+                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                    recyclerview.setVisibility(INVISIBLE);
+                                                    emptyTag.setVisibility(VISIBLE);
+                                                    recyclerview.setVisibility(View.GONE);
+                                                    emptyTag.setText("Nothing found");
+                                                }
+                                            }
+
+                                            catch (Exception e){
+                                                Log.e(TAG, "onDataChange: ", e);
+                                            }
+
+                                        } catch (Exception e){
+                                            Log.e(TAG, "onDataChange: ", e);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    public static boolean isStringNullOrWhiteSpace(String value) {
+        if (value == null) {
+            return true;
+        }
+
+        for (int i = 0; i < value.length(); i++) {
+            if (!Character.isWhitespace(value.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        searchPosts(searchValue);
     }
 }
