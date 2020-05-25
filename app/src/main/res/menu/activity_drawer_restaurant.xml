@@ -10,8 +10,8 @@
             android:title="Menu" />
         <item
             android:id="@+id/menu2"
-            android:icon="@drawable/ic_assessment_black_48dp"
-            android:title="Stats" />
+            android:icon="@drawable/review_64dp"
+            android:title="Reviews" />
 
         <item
             android:id="@+id/menu4"

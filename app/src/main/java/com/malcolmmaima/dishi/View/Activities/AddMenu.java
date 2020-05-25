@@ -295,6 +295,10 @@ public class AddMenu extends AppCompatActivity {
             } else { //Editing existing item (key != null)
 
                 setTitle("Edit Item");
+                productName.setEnabled(false);
+                productPrice.setEnabled(false);
+                productDescription.setEnabled(false);
+                save.setEnabled(false);
                 //SafeToast.makeText(this, "key: " + key, Toast.LENGTH_SHORT).show();
 
                 //Fetch item details from DB
@@ -304,6 +308,11 @@ public class AddMenu extends AppCompatActivity {
 
                         for (DataSnapshot menuDetails : dataSnapshot.getChildren()){
                             try {
+
+                                productName.setEnabled(true);
+                                productPrice.setEnabled(true);
+                                productDescription.setEnabled(true);
+                                save.setEnabled(true);
 
                                 if(menuDetails.getKey().equals("description")){
                                     description = menuDetails.getValue(String.class);

@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu1"
-            android:icon="@drawable/ic_home_black_24dp"
+            android:icon="@drawable/ic_store_black_48dp"
             android:title="My Vendors" />
         <item
             android:id="@+id/menu2"
@@ -17,12 +17,7 @@
             android:icon="@drawable/ic_home_black_24dp"
             android:title="Menu 3" />
 
-        <!--
-        <item
-            android:id="@+id/menu4"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Menu 4" />
-        -->
+
     </group>
 
     <item android:title="Account">

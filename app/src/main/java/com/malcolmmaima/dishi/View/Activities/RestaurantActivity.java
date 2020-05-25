@@ -44,9 +44,11 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.FragmentStats;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MenuFragment;
+import com.malcolmmaima.dishi.View.Fragments.MyReviewsFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyRidersFragment;
 import com.malcolmmaima.dishi.View.Fragments.RestaurantOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
+import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.Nullable;
@@ -83,7 +85,7 @@ public class RestaurantActivity extends AppCompatActivity
     private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
     private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener, lastQueryListener;
     private FirebaseAuth mAuth;
-    private String TAG;
+    private String TAG = "RestaurantActivity";
     private Query lastQuery;
     private static final int PERMISSIONS_REQUEST = 100;
 
@@ -186,7 +188,6 @@ public class RestaurantActivity extends AppCompatActivity
     }
 
     private void loadActivity() {
-        TAG = "RestaurantActivity";
 
         imageURL = "";
 
@@ -222,6 +223,7 @@ public class RestaurantActivity extends AppCompatActivity
                 }
             }
         });
+
         /**
          * Manually displaying the first fragment - one time only
          */
@@ -616,13 +618,11 @@ public class RestaurantActivity extends AppCompatActivity
         if (id == R.id.menu1) {
             setTitle("My Menu");
             fragmentClass[0] = MenuFragment.class;
-            //SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
         }
 
         else if (id == R.id.menu2) {
-            setTitle("My Stats");
-            fragmentClass[0] = FragmentStats.class;
-            //SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            setTitle("My Reviews");
+            fragmentClass[0] = MyReviewsFragment.class;
         }
 
         else if (id == R.id.menu4) {

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,6 +50,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class ViewRestaurant extends AppCompatActivity {
 
+    String TAG = "ViewRestaurant";
     FirebaseAuth mAuth;
     DatabaseReference restaurantRef, myFavourites, providerFavs, myRef;
     ImageView coverImageView, favourite, callBtn, shareRest;
@@ -97,15 +99,17 @@ public class ViewRestaurant extends AppCompatActivity {
                         myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                try {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(ViewRestaurant.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
-                                } else {
-                                    loadActivity();
+                                    if (locked == true) {
+                                        Intent slideactivity = new Intent(ViewRestaurant.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
                                 }
                             }
 
@@ -114,8 +118,6 @@ public class ViewRestaurant extends AppCompatActivity {
 
                             }
                         });
-                    } else {
-                        loadActivity();
                     }
                 }
 
@@ -124,6 +126,8 @@ public class ViewRestaurant extends AppCompatActivity {
 
                 }
             });
+
+            loadActivity();
         }
     }
 

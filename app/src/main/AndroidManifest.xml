@@ -47,7 +47,6 @@
         <activity
             android:name=".View.Activities.ReceiptActivity"
             android:launchMode="singleTask" />
-        <activity android:name=".View.Activities.ReviewsActivity" />
         <activity android:name=".View.Activities.ReportAbuse" />
         <activity android:name=".View.Activities.MyNotifications" />
         <activity android:name=".View.Activities.FollowersFollowing" />
