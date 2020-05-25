@@ -229,7 +229,7 @@ public class ReceiptActivity extends AppCompatActivity {
                         vendorPhone.setText(restaurantPhone);
                     }
 
-                    if (myDetails.getAccount_type().equals("2")) {
+                    if (myDetails.getAccount_type().equals("2") || myDetails.getAccount_type().equals("3")) {
                         nameTitle.setText("Customer");
                         vendorPhone.setText(customerPhone);
                     }

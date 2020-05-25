@@ -105,7 +105,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                     });
                 }
 
-                if(myDetails.getAccount_type().equals("2")){
+                if(myDetails.getAccount_type().equals("2") || myDetails.getAccount_type().equals("3")){
                     DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+receipt.getCustomer());
                     restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

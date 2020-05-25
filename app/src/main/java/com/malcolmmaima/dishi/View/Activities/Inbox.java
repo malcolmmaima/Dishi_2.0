@@ -394,6 +394,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
             }
         });
+        fetchMessages();
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,7 @@ import java.util.List;
 
 public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
+    String TAG = "RiderRequestsFragment";
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
@@ -81,7 +83,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
             myRideOrderRequests = db.getReference("my_ride_requests/"+myPhone);
 
         } catch (Exception e){
-
+            Log.e(TAG, "onCreateView: ", e);
         }
 
         icon = v.findViewById(R.id.menuIcon);
@@ -105,7 +107,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
 
             @Override
             public void run() {
-
+                fetchOrders(); //initialize
                 /**
                  * Listener to check if there are new ride requests
                  */
@@ -154,14 +156,18 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                 //SafeToast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e){
-
+            Log.e(TAG, "onDetach: ", e);
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        myRideOrderRequests.removeEventListener(myRideOrderRequestsChildListener);
+        try {
+            myRideOrderRequests.removeEventListener(myRideOrderRequestsChildListener);
+        } catch (Exception e){
+
+        }
     }
 
     @Override

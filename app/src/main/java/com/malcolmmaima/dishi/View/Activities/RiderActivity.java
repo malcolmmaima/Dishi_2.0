@@ -42,6 +42,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyRestaurantsFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
+import com.malcolmmaima.dishi.View.Fragments.ReceiptsFragment;
 import com.malcolmmaima.dishi.View.Fragments.RiderRequestsFragment;
 import com.squareup.picasso.Picasso;
 
@@ -513,14 +514,9 @@ public class RiderActivity extends AppCompatActivity
         }
 
         else if (id == R.id.menu2) {
-            SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
+            setTitle("Trip Receipts");
+            fragmentClass[0] = ReceiptsFragment.class;
         }
-
-        else if (id == R.id.menu3) {
-            SafeToast.makeText(this, "Clicked!", Toast.LENGTH_SHORT).show();
-        } //else if (id == R.id.menu4) {
-        //fragmentClass[0] = FragmentFour.class;
-        //}
 
         else if (id == R.id.nav_settings) {
 

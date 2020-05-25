@@ -10,12 +10,8 @@
             android:title="My Vendors" />
         <item
             android:id="@+id/menu2"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="Menu 2" />
-        <item
-            android:id="@+id/menu3"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="Menu 3" />
+            android:icon="@drawable/ic_receipt_black_48dp"
+            android:title="Receipts" />
 
 
     </group>

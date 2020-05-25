@@ -774,8 +774,47 @@ public class ForegroundService extends Service {
 
             }
         };
-
         myVendorRequest.addChildEventListener(myVendorRequestListener);
+
+        /**
+         * check for new receipts generated
+         */
+        receiptsListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                try {
+                    ReceiptModel newReceipt = dataSnapshot.getValue(ReceiptModel.class);
+                    newReceipt.key = dataSnapshot.getKey();
+                    if (newReceipt.getSeen() == false) {
+                        //Log.d(TAG, "new receipt: "+newReceipt.getOrderID());
+                        sendReceiptNotification(newReceipt);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onChildAdded: ", e);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        receiptsRef.addChildEventListener(receiptsListener);
     }
 
     private void startRestaurantNotifications() {
@@ -841,6 +880,46 @@ public class ForegroundService extends Service {
             }
         };
         myOrdersRef.addChildEventListener(myRestaurantOrdersListener);
+
+        /**
+         * check for new receipts generated
+         */
+        receiptsListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                try {
+                    ReceiptModel newReceipt = dataSnapshot.getValue(ReceiptModel.class);
+                    newReceipt.key = dataSnapshot.getKey();
+                    if (newReceipt.getSeen() == false) {
+                        //Log.d(TAG, "new receipt: "+newReceipt.getOrderID());
+                        sendReceiptNotification(newReceipt);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onChildAdded: ", e);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        receiptsRef.addChildEventListener(receiptsListener);
     }
 
     private void startCustomerNotifications() {
