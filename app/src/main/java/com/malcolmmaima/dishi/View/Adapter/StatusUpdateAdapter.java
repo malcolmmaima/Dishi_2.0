@@ -43,11 +43,13 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewShareFoodItems;
 import com.malcolmmaima.dishi.View.Activities.ViewStatus;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -65,6 +67,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     List<StatusUpdateModel> listdata;
     long DURATION = 200;
     String TAG = "StatusAdapter";
+    HashTagHelper mTextHashTagHelper;
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -231,6 +234,23 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             } catch(Exception e){
                 Log.e(TAG, "onBindViewHolder: ", e);
             }
+        }
+
+        //handle hashtags
+        if(statusUpdateModel.getStatus().contains("#")){
+            mTextHashTagHelper = HashTagHelper.Creator.create(context.getResources().getColor(R.color.colorPrimary),
+                    new HashTagHelper.OnHashTagClickListener() {
+                        @Override
+                        public void onHashTagClicked(String hashTag) {
+                            String searchHashTag = "#"+hashTag;
+                            Intent slideactivity = new Intent(context, SearchActivity.class)
+                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            slideactivity.putExtra("searchString", searchHashTag);
+                            context.startActivity(slideactivity);
+                        }
+                    });
+
+            mTextHashTagHelper.handle(holder.userUpdate);
         }
 
         //imageShare

@@ -60,6 +60,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.CommentAdapter;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -102,6 +103,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     String key, postedTo;
     RelativeLayout foodShare;
 
+    HashTagHelper mTextHashTagHelper;
     // instance for firebase storage and StorageReference
     FirebaseStorage storage;
     StorageReference storageReference;
@@ -457,6 +459,23 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                                 } catch(Exception e){
                                     Log.e(TAG, "onBindViewHolder: ", e);
                                 }
+                            }
+
+                            //handle hashtags
+                            if(viewPost.getStatus().contains("#")){
+                                mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                                        new HashTagHelper.OnHashTagClickListener() {
+                                            @Override
+                                            public void onHashTagClicked(String hashTag) {
+                                                String searchHashTag = "#"+hashTag;
+                                                Intent slideactivity = new Intent(ViewStatus.this, SearchActivity.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                                slideactivity.putExtra("searchString", searchHashTag);
+                                                startActivity(slideactivity);
+                                            }
+                                        });
+
+                                mTextHashTagHelper.handle(userUpdate);
                             }
 
                             if(viewPost.getImageShare() != null){
