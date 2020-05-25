@@ -201,6 +201,15 @@ public class SearchActivity extends AppCompatActivity {
                 }
             });
 
+            //on activity loading find out if a searchstring value has been sent with this new activity load. applies to cases when one clicks a hashtag
+            try {
+                word = getIntent().getStringExtra("searchString");
+                searchWord.setText(word);
+                viewPager.setCurrentItem(3,false);
+                tabLayout.getTabAt(3).select();
+            } catch (Exception e){
+                Log.e(TAG, "onCreate: ", e);
+            }
             searchWord.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

@@ -14,6 +14,8 @@ public class StatusUpdateModel {
     public String imageShareBig;
     public String receiptKey; // temporary holder for passing receipt key for status FoodShare post types
     public  String vendorPhone; //same as above
+    public String type; //temporary data holder we'll use in 'search posts' we want to determin if NewsFeedAdapter is triggered from FragmenSearchPosts
+    //so that we set # to unclickable to take care of redundant behaviour
 
     public String getCommentKey() {
         return commentKey;

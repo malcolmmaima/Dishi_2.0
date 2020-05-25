@@ -43,6 +43,7 @@ import com.malcolmmaima.dishi.Model.StatusUpdateModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.ReportAbuse;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewShareFoodItems;
@@ -314,7 +315,18 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                         new HashTagHelper.OnHashTagClickListener() {
                             @Override
                             public void onHashTagClicked(String hashTag) {
-                                Toast.makeText(context, "Handle hashtag: "+ hashTag, Toast.LENGTH_SHORT).show();
+                                if(statusUpdateModel.type != null){ //Meaning 'type' value has been passed from FragmentSearchPosts
+                                    if(statusUpdateModel.type.equals("searchPost")){
+                                        //do nothing
+                                    }
+                                } else {
+                                    //redirect to search (default hashtag search will be posts fragment)
+                                    String searchHashTag = "#"+hashTag;
+                                    Intent slideactivity = new Intent(context, SearchActivity.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    slideactivity.putExtra("searchString", searchHashTag);
+                                    context.startActivity(slideactivity);
+                                }
                             }
                         });
 

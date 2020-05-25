@@ -123,6 +123,7 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                                                     try {
                                                         StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
                                                         statusUpdateModel.key = updates.getKey();
+                                                        statusUpdateModel.type = "searchPost";
                                                         if (statusUpdateModel.getStatus().toLowerCase().contains(searchValue.toLowerCase())) {
                                                             statusUpdates.add(statusUpdateModel);
                                                         }
@@ -181,6 +182,7 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                                         try {
                                             StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
                                             statusUpdateModel.key = updates.getKey();
+                                            statusUpdateModel.type = "searchPost";
 
                                             if (statusUpdateModel.getStatus().toLowerCase().contains(searchValue.toLowerCase())) {
                                                 statusUpdates.add(statusUpdateModel);
