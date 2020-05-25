@@ -399,10 +399,15 @@ public class ViewProduct extends AppCompatActivity {
                 add.setEnabled(false);
                 minus.setEnabled(false);
                 fab.setEnabled(false);
+                addToFavourites.setEnabled(false);
 
                 add.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
                 minus.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
                 fab.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
+            }
+
+            if(myPhone.equals(restaurant)){
+                restaurantName.setEnabled(false);
             }
 
             /**

@@ -26,98 +26,52 @@
             />
     </androidx.appcompat.widget.Toolbar>
 
-
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_view"
-        android:clickable="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        card_view:cardCornerRadius="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:focusableInTouchMode="false"
-        card_view:view_shadowDx="2dp"
-        card_view:view_shadowDy="0dp"
-        card_view:view_borderWidth="2dp"
-        card_view:view_borderColor="#cccccc"
+    <com.google.android.material.tabs.TabLayout
         android:layout_below="@id/toolbar"
-        android:foreground="?android:attr/selectableItemBackground">
-
-        <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        >
-
-        <RadioGroup
-            android:id="@+id/searchPreference"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginRight="15dp"
-            >
-
-            <RadioButton
-                android:text="Users"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/usersRd"
-                android:checked="false"
-                android:layout_marginRight="20dp"
-                android:backgroundTint="@color/colorAccent"/>
-
-            <RadioButton
-                android:text="Food"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/foodRd"
-                android:checked="false"
-                android:layout_marginRight="20dp"
-                android:backgroundTint="@color/colorAccent"
-                />
-
-            <RadioButton
-                android:text="Vendors"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/restaurantsRd"
-                android:checked="false"
-                android:backgroundTint="@color/colorAccent"
-                />
-
-        </RadioGroup>
-    </RelativeLayout>
-    </androidx.cardview.widget.CardView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@id/card_view"
+        android:id="@+id/tablayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/rview">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <TextView
-        android:id="@+id/empty_tag"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="NO RESULTS"
-        android:textSize="40dp"
-        android:layout_margin="20dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone"/>
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabSelectedTextColor="@color/colorPrimary"
+        app:tabTextColor="@color/common_google_signin_btn_text_light_pressed">
 
-    <ProgressBar
-        android:layout_marginTop="20dp"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:id="@+id/progressBar"
-        android:layout_centerInParent="true"
-        android:visibility="visible"/>
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab1"
+            android:text="Users"
+            android:layout_width="50dp"
+            android:layout_height="30dp"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab2"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:text="Food" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab3"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:text="Vendors" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab4"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:text="Posts" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:nestedScrollingEnabled="false"
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_below="@id/tablayout"
+        android:backgroundTint="@color/colorBackroundWhite"
+        android:layout_height="match_parent">
+
+    </androidx.viewpager.widget.ViewPager>
+
 
 </RelativeLayout>

@@ -627,11 +627,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             }
         });
 
-        if(productDetailsModel.getDistance() < 1.0){
-            holder.distanceAway.setText(productDetailsModel.getDistance()*1000 + "m away");
-        } else {
-            holder.distanceAway.setText(productDetailsModel.getDistance() + "km away");
+        try {
+            if (productDetailsModel.getDistance() < 1.0) {
+                holder.distanceAway.setText(productDetailsModel.getDistance() * 1000 + "m away");
+            } else {
+                holder.distanceAway.setText(productDetailsModel.getDistance() + "km away");
 
+            }
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ", e);
         }
 
         /**

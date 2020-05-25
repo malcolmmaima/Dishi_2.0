@@ -28,7 +28,6 @@ import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.NewSearchActivity;
 import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 
@@ -103,7 +102,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
             }
         });
 
-        NewSearchActivity activity = (NewSearchActivity) getActivity();
+        SearchActivity activity = (SearchActivity) getActivity();
         searchValue = activity.getSearchValue();
 
         recyclerview = view.findViewById(R.id.rview);

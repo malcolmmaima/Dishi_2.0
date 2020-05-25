@@ -19,7 +19,8 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.NewSearchActivity"></activity>
+        <activity android:name=".View.Activities.SearchActivity"></activity>
+        <activity android:name=".View.Activities.SettingsActivity"></activity>
         <activity android:name=".View.Activities.ViewShareFoodItems" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -47,9 +48,6 @@
             android:name=".View.Activities.ReceiptActivity"
             android:launchMode="singleTask" />
         <activity android:name=".View.Activities.ReviewsActivity" />
-        <activity
-            android:name=".View.Activities.SearchActivity"
-            android:label="@string/title_activity_search" />
         <activity android:name=".View.Activities.ReportAbuse" />
         <activity android:name=".View.Activities.MyNotifications" />
         <activity android:name=".View.Activities.FollowersFollowing" />
@@ -89,7 +87,6 @@
         <activity android:name=".View.Activities.ViewProduct" />
         <activity android:name=".View.Activities.ViewImage" />
         <activity android:name=".View.Activities.PersonalDetails" />
-        <activity android:name=".View.Activities.SettingsActivity" />
         <activity android:name=".View.Activities.AddMenu" />
         <activity android:name=".View.Activities.SetupAccountType" />
         <activity android:name=".View.Activities.SplashActivity">

@@ -164,7 +164,12 @@ public class PersonalDetails extends AppCompatActivity {
                         try {
                             UserModel user = dataSnapshot.getValue(UserModel.class);
 
-                            imageURL = user.getProfilePicBig();
+                            if(user.getProfilePicBig() != null){
+                                imageURL = user.getProfilePicBig();
+                            }
+                            else {
+                                imageURL = user.getProfilePic();
+                            }
 
                             email = user.getEmail();
                             firstname = user.getFirstname();
@@ -314,18 +319,20 @@ public class PersonalDetails extends AppCompatActivity {
                             }
 
                             if(which == 2){
-                                //View current photo
-                                if(!imageURL.equals("")){
-                                    Intent slideactivity = new Intent(PersonalDetails.this, ViewImage.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                try {
+                                    //View current photo
+                                    if (!imageURL.equals("")) {
+                                        Intent slideactivity = new Intent(PersonalDetails.this, ViewImage.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                    slideactivity.putExtra("imageURL", imageURL);
-                                    startActivity(slideactivity);
-                                }
-
-                                else {
-                                    Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
-                                    snackbar.show();
+                                        slideactivity.putExtra("imageURL", imageURL);
+                                        startActivity(slideactivity);
+                                    } else {
+                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onClick: ", e);
                                 }
                             }
                         }

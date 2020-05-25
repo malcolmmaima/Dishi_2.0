@@ -28,7 +28,6 @@ import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.NewSearchActivity;
 import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Adapter.RestaurantAdapter;
 
@@ -100,7 +99,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
             }
         });
 
-        NewSearchActivity activity = (NewSearchActivity) getActivity();
+        SearchActivity activity = (SearchActivity) getActivity();
         searchValue = activity.getSearchValue();
 
         recyclerview = view.findViewById(R.id.rview);

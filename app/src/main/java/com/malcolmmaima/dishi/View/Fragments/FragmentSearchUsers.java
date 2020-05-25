@@ -3,7 +3,6 @@ package com.malcolmmaima.dishi.View.Fragments;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,7 +12,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Activities.NewSearchActivity;
+import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Adapter.FollowerFollowingAdapter;
 
 import java.util.ArrayList;
@@ -61,7 +59,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
         //String searchString;
         //searchString = getArguments().getString("search");
 
-        NewSearchActivity activity = (NewSearchActivity) getActivity();
+        SearchActivity activity = (SearchActivity) getActivity();
         searchValue = activity.getSearchValue();
 
         recyclerview = view.findViewById(R.id.rview);

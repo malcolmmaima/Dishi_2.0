@@ -1,26 +1,20 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,37 +22,32 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
-import com.malcolmmaima.dishi.Model.LiveLocationModel;
-import com.malcolmmaima.dishi.Model.ProductDetailsModel;
-import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Adapter.FollowerFollowingAdapter;
-import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
-import com.malcolmmaima.dishi.View.Adapter.RestaurantAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.malcolmmaima.dishi.View.Adapter.ViewPagerAdapter;
+import com.malcolmmaima.dishi.View.Fragments.FragmentSearchFood;
+import com.malcolmmaima.dishi.View.Fragments.FragmentSearchPosts;
+import com.malcolmmaima.dishi.View.Fragments.FragmentSearchUsers;
+import com.malcolmmaima.dishi.View.Fragments.FragmentSearchVendors;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-
 public class SearchActivity extends AppCompatActivity {
+
     String TAG = "SearchActivity";
-    ProgressBar progressBar;
+    private ViewPager viewPager;
+    ViewPagerAdapter adapter;
+    FragmentSearchUsers fragmentSearchUsers;
+    FragmentSearchFood fragmentSearchFood;
+    FragmentSearchVendors fragmentSearchVendors;
+    FragmentSearchPosts fragmentSearchPosts;
+
     EditText searchWord;
-    TextView emptyTag;
-    RecyclerView recyclerView;
+    TabLayout tabLayout;
     DatabaseReference myLocationRef;
     ValueEventListener locationListener;
-    RadioButton usersRd, foodRd, restaurantsRd;
-    RadioGroup searchPreference;
-    LiveLocationModel liveLocationModel;
     UserModel myDetails;
-    String myPhone, selectedPreference;
+    String myPhone, word;
     private FirebaseAuth mAuth;
     DatabaseReference databaseReference, myUserDetails, myRef;
     FirebaseUser user;
@@ -73,8 +62,53 @@ public class SearchActivity extends AppCompatActivity {
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
+
             //Hide keyboard on activity load
             this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+            //Initializing viewPager
+            viewPager = (ViewPager) findViewById(R.id.viewpager);
+            viewPager.setOffscreenPageLimit(4);
+            setupViewPager(viewPager, "");
+
+            //Initializing the tablayout
+            tabLayout = findViewById(R.id.tablayout);
+
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager.setCurrentItem(tab.getPosition(),false);
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    tabLayout.getTabAt(position).select();
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+
 
             mAuth = FirebaseAuth.getInstance();
             if(mAuth.getInstance().getCurrentUser() == null){
@@ -116,17 +150,7 @@ public class SearchActivity extends AppCompatActivity {
                 });
             }
 
-            progressBar = findViewById(R.id.progressBar);
-            progressBar.setVisibility(View.GONE);
             searchWord = findViewById(R.id.edtSearch);
-            searchWord.setEnabled(false);
-            emptyTag = findViewById(R.id.empty_tag);
-            recyclerView = findViewById(R.id.rview);
-
-            searchPreference = findViewById(R.id.searchPreference);
-            usersRd = findViewById(R.id.usersRd);
-            foodRd = findViewById(R.id.foodRd);
-            restaurantsRd = findViewById(R.id.restaurantsRd);
 
             Toolbar topToolBar = findViewById(R.id.toolbar);
             setSupportActionBar(topToolBar);
@@ -161,58 +185,6 @@ public class SearchActivity extends AppCompatActivity {
                 }
             });
 
-            searchPreference.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                    //Toast.makeText(SearchActivity.this, "ID: " + i, Toast.LENGTH_SHORT).show();
-
-                    int searchPrf = searchPreference.getCheckedRadioButtonId();
-                    liveLocationModel = null;
-                    locationListener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                            //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    };
-
-                    // find the radio button by returned id
-                    RadioButton radioButton = findViewById(searchPrf);
-
-                    selectedPreference = radioButton.getText().toString();
-                    //Toast.makeText(SearchActivity.this, "Selected: " + selectedPreference, Toast.LENGTH_SHORT).show();
-                    searchWord.setEnabled(true);
-                    recyclerView.setVisibility(View.GONE);
-                    if(selectedPreference.equals("Users")){
-                        emptyTag.setText("Users");
-                        emptyTag.setVisibility(VISIBLE);
-                        myLocationRef.removeEventListener(locationListener);
-                    }
-
-                    if(selectedPreference.equals("Food")){
-                        emptyTag.setText("Food");
-                        emptyTag.setVisibility(VISIBLE);
-                        myLocationRef.addValueEventListener(locationListener);
-                    }
-
-                    if(selectedPreference.equals("Vendors")){
-                        emptyTag.setText("Vendors");
-                        emptyTag.setVisibility(VISIBLE);
-                        myLocationRef.addValueEventListener(locationListener);
-
-                    }
-
-                    if(!searchWord.getText().toString().trim().equals("")){
-                        searchDB(searchWord.getText().toString().trim(), selectedPreference);
-                    }
-
-                }
-            });
 
             searchWord.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -229,592 +201,52 @@ public class SearchActivity extends AppCompatActivity {
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    //Toast.makeText(SearchActivity.this, "typing...", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(VISIBLE);
+
                 }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
                     //Toast.makeText(SearchActivity.this, "done typing", Toast.LENGTH_SHORT).show();
 
-                    String word = editable.toString().trim();
-
-                    if(isStringNullOrWhiteSpace(word)){
-                        progressBar.setVisibility(View.GONE);
-                        emptyTag.setText("Type something");
-                        emptyTag.setVisibility(VISIBLE);
-                        recyclerView.setVisibility(View.GONE);
-                        //Toast.makeText(SearchActivity.this, "empty", Toast.LENGTH_SHORT).show();
-                    } else {
-                        searchDB(word, selectedPreference);
-                    }
+                    word = editable.toString().trim();
+                    searchDB(word);
 
                 }
             });
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Boolean locked = dataSnapshot.getValue(Boolean.class);
-
-                            if(locked == true){
-                                Intent slideactivity = new Intent(SearchActivity.this, SecurityPin.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                slideactivity.putExtra("pinType", "resume");
-                                startActivity(slideactivity);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+    private void searchDB(String searchString) {
+        setupViewPager(viewPager, searchString);
+        viewPager.setCurrentItem(0,false);
+        tabLayout.getTabAt(0).select();
     }
 
-    private void searchDB(final String word, String selectedPreference) {
-
-        if(selectedPreference.equals("Users")){
-            //Toast.makeText(this, "Search users...", Toast.LENGTH_SHORT).show();
-            databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        List<UserModel> users = new ArrayList<>();
-                        //Loop through all phone numbers in the system and get user details
-                        for(DataSnapshot phones : dataSnapshot.getChildren()){
-                            //Log.d("UsersFound", "found: "+phones.getKey());
-                            try {
-                                UserModel dishiUser = phones.getValue(UserModel.class);
-                                dishiUser.setPhone(phones.getKey());
-                                //Toast.makeText(SearchActivity.this, "phone: " + phones.getKey(), Toast.LENGTH_SHORT).show();
-                                //search if character is contained in returned results
-                                String name = dishiUser.getFirstname()+" "+dishiUser.getLastname();
-                                if(!myPhone.equals(phones.getKey())){
-                                    if (name.toLowerCase().contains(word.toLowerCase())) {
-                                        users.add(dishiUser);
-                                    }
-                                    else if(word.toLowerCase().contains(name.toLowerCase())){
-                                        users.add(dishiUser);
-                                    }
-                                    //search if word is equal to user name object
-                                    else if(word.toLowerCase() == name.toLowerCase()){
-                                        users.add(dishiUser);
-                                    }
-                                    else if(name.toLowerCase().equals(word.toLowerCase())) {
-                                        users.add(dishiUser);
-                                    }
-                                }
-
-                            } catch (Exception e){
-                                progressBar.setVisibility(View.GONE);
-                                emptyTag.setVisibility(VISIBLE);
-                                emptyTag.setText("TRY AGAIN");
-                                recyclerView.setVisibility(View.GONE);
-                            }
-
-                            if (!users.isEmpty()) {
-                                recyclerView.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                                recyclerView.setVisibility(VISIBLE);
-                                FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(SearchActivity.this, users);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                recyclerView.setLayoutManager(layoutmanager);
-                                //recyclerView.setItemAnimator(new SlideInLeftAnimator());
-
-                                recycler.notifyDataSetChanged();
-
-//                                recyclerView.getItemAnimator().setAddDuration(1000);
-//                                recyclerView.getItemAnimator().setRemoveDuration(1000);
-//                                recyclerView.getItemAnimator().setMoveDuration(1000);
-//                                recyclerView.getItemAnimator().setChangeDuration(1000);
-
-                                recyclerView.setAdapter(recycler);
-                                emptyTag.setVisibility(View.GONE);
-                            } else {
-                                progressBar.setVisibility(View.GONE);
-                                recyclerView.setVisibility(INVISIBLE);
-                                emptyTag.setVisibility(VISIBLE);
-                                recyclerView.setVisibility(View.GONE);
-                                emptyTag.setText("Nothing found");
-                            }
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-        }
-
-        if(selectedPreference.equals("Food")){
-
-            databaseReference.child("menus").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull final DataSnapshot datasnapshot) {
-
-                    List <ProductDetailsModel> foods = new ArrayList<>();
-                    for(final DataSnapshot restaurants : datasnapshot.getChildren()){
-
-                        /**
-                         * Create new database reference for each restaurant and fetch user data
-                         */
-                        DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ restaurants.getKey());
-                        userData.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                final UserModel user = dataSnapshot.getValue(UserModel.class);
-//                            SafeToast.makeText(getContext(), "Name: " + user.getFirstname()
-//                                    + "\nliveStatus: " + user.getLiveStatus()
-//                                    + "\nlocationType: " + user.getLocationType(), Toast.LENGTH_SHORT).show();
-
-                                /**
-                                 * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
-                                 */
-
-                                try {
-                                    if (user.getLiveStatus() == true) {
-
-                                        /**
-                                         * Now check "locationType" so as to decide which location node to fetch, live or static
-                                         */
-                                        if (user.getLocationType().equals("default")) {
-                                            //if location type is default then fetch static location
-                                            DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey() + "/my_location");
-
-                                            defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    try {
-                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
-
-                                                        /**
-                                                         * Now lets compute distance of each restaurant with customer location
-                                                         */
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
-
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                        for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
-                                                            product.setKey(menu.getKey());
-                                                            product.setDistance(dist);
-                                                            product.accountType = myDetails.getAccount_type();
-
-                                                            //Don't show my menu items in the search
-                                                            if (!myPhone.equals(product.getOwner())) {
-                                                                if (product.getName().toLowerCase().contains(word.toLowerCase())) {
-                                                                    foods.add(product);
-                                                                } else if (word.toLowerCase().contains(product.getName().toLowerCase())) {
-                                                                    foods.add(product);
-                                                                }
-                                                                //search if word is equal to user name object
-                                                                else if (word.toLowerCase() == product.getName().toLowerCase()) {
-                                                                    foods.add(product);
-                                                                } else if (product.getName().toLowerCase().equals(word.toLowerCase())) {
-                                                                    foods.add(product);
-                                                                }
-                                                            }
-                                                        }
-
-                                                        if (!foods.isEmpty()) {
-                                                            //Collections.sort(foods, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            recyclerView.setVisibility(View.VISIBLE);
-                                                            progressBar.setVisibility(View.GONE);
-                                                            recyclerView.setVisibility(VISIBLE);
-                                                            ProductAdapter recycler = new ProductAdapter(SearchActivity.this, foods);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                            recyclerView.setLayoutManager(layoutmanager);
-                                                            //recyclerView.setItemAnimator(new SlideInLeftAnimator());
-
-                                                            recycler.notifyDataSetChanged();
-
-                                                            recyclerView.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.GONE);
-                                                        } else {
-                                                            progressBar.setVisibility(View.GONE);
-                                                            recyclerView.setVisibility(INVISIBLE);
-                                                            emptyTag.setVisibility(VISIBLE);
-                                                            recyclerView.setVisibility(View.GONE);
-                                                            emptyTag.setText("Nothing found");
-                                                        }
-                                                    } catch (Exception e){
-                                                        Log.e(TAG, "onDataChange: ", e);
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-                                        /**
-                                         * If location type is live then track restaurant live location instead of static location
-                                         */
-                                        else if (user.getLocationType().equals("live")) {
-                                            DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurants.getKey());
-
-                                            restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    try {
-                                                        LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
-
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                        for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
-                                                            product.setKey(menu.getKey());
-                                                            product.setDistance(dist);
-                                                            product.accountType = myDetails.getAccount_type();
-
-                                                            //Don't show my menu items in the search
-                                                            if(!myPhone.equals(product.getOwner())){
-                                                                if (product.getName().toLowerCase().contains(word.toLowerCase())) {
-                                                                    foods.add(product);
-                                                                }
-                                                                else if(word.toLowerCase().contains(product.getName().toLowerCase())){
-                                                                    foods.add(product);
-                                                                }
-                                                                //search if word is equal to user name object
-                                                                else if(word.toLowerCase() == product.getName().toLowerCase()){
-                                                                    foods.add(product);
-                                                                }
-                                                                else if(product.getName().toLowerCase().equals(word.toLowerCase())) {
-                                                                    foods.add(product);
-                                                                }
-                                                            }
-                                                        }
-
-                                                        if (!foods.isEmpty()) {
-                                                            //Collections.sort(foods, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            recyclerView.setVisibility(View.VISIBLE);
-                                                            progressBar.setVisibility(View.GONE);
-                                                            recyclerView.setVisibility(VISIBLE);
-                                                            ProductAdapter recycler = new ProductAdapter(SearchActivity.this, foods);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                            recyclerView.setLayoutManager(layoutmanager);
-                                                            //recyclerView.setItemAnimator(new SlideInLeftAnimator());
-
-                                                            recycler.notifyDataSetChanged();
-
-                                                            recyclerView.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.GONE);
-                                                        } else {
-                                                            progressBar.setVisibility(View.GONE);
-                                                            recyclerView.setVisibility(INVISIBLE);
-                                                            emptyTag.setVisibility(VISIBLE);
-                                                            recyclerView.setVisibility(View.GONE);
-                                                            emptyTag.setText("Nothing found");
-                                                        }
-                                                    } catch (Exception e){
-                                                        Log.e(TAG, "onDataChange: ", e);
-                                                    }
-
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-
-                                        /**
-                                         * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
-                                         * and "live" which tracks the restaurant's live location under "location/phone"
-                                         */
-                                        else {
-                                            SafeToast.makeText(SearchActivity.this, "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                } catch (Exception e){
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-        }
-
-        if(selectedPreference.equals("Vendors")){
-            databaseReference.child("menus").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull final DataSnapshot datasnapshot) {
-                    List <UserModel> restaurantsList = new ArrayList<>();
-                    for(final DataSnapshot restaurants : datasnapshot.getChildren()){
-                        Log.d("Restaurants", "found: "+restaurants.getKey());
-                        /**
-                         * Create new database reference for each restaurant and fetch user data
-                         */
-                        DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ restaurants.getKey());
-                        userData.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                final UserModel user = dataSnapshot.getValue(UserModel.class);
-                                user.setPhone(restaurants.getKey());
-                                Log.d("Restaurants", "name: "+user.getFirstname());
-
-                                /**
-                                 * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
-                                 */
-
-                                try {
-                                    if (user.getLiveStatus() == true) {
-
-                                        /**
-                                         * Now check "locationType" so as to decide which location node to fetch, live or static
-                                         */
-                                        if (user.getLocationType().equals("default")) {
-                                            //if location type is default then fetch static location
-                                            DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey() + "/my_location");
-
-                                            defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                    try {
-                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
-                                                        /**
-                                                         * Now lets compute distance of each restaurant with customer location
-                                                         */
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
-
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                        String restaurantName = user.getFirstname() + " " + user.getLastname();
-                                                        if (!myPhone.equals(user.getPhone())) {
-                                                            if (restaurantName.toLowerCase().contains(word.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (word.toLowerCase().contains(restaurantName.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
-                                                            //search if word is equal to user name object
-                                                            else if (word.toLowerCase() == restaurantName.toLowerCase()) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (restaurantName.toLowerCase().equals(word.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
-
-                                                            Log.d("Restaurants", "added: " + user.getFirstname());
-                                                        }
-
-                                                        if (!restaurantsList.isEmpty()) {
-                                                            progressBar.setVisibility(View.GONE);
-                                                            Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
-                                                            recyclerView.setVisibility(VISIBLE);
-                                                            /**
-                                                             * https://howtodoinjava.com/sort/collections-sort/
-                                                             * We want to sort from nearest to furthest location
-                                                             */
-                                                            //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            //Collections.reverse(list);
-                                                            RestaurantAdapter recycler = new RestaurantAdapter(SearchActivity.this, restaurantsList);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                            recyclerView.setLayoutManager(layoutmanager);
-                                                            //recyclerView.setItemAnimator(new SlideInLeftAnimator());
-                                                            recycler.notifyDataSetChanged();
-                                                            recyclerView.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.GONE);
-                                                        } else {
-                                                            progressBar.setVisibility(View.GONE);
-                                                            recyclerView.setVisibility(INVISIBLE);
-                                                            emptyTag.setVisibility(VISIBLE);
-                                                            recyclerView.setVisibility(View.GONE);
-                                                            emptyTag.setText("Nothing found");
-                                                        }
-                                                    } catch (Exception e){
-                                                        Log.e("SearchActivity", "onDataChange: ", e);
-                                                    }
-
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-                                        /**
-                                         * If location type is live then track restaurant live location instead of static location
-                                         */
-                                        else if (user.getLocationType().equals("live")) {
-                                            DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurants.getKey());
-
-                                            restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                    try {
-                                                        LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
-
-                                                        /**
-                                                         * Now lets compute distance of each restaurant with customer location
-                                                         */
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-
-                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
-
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                                        String restaurantName = user.getFirstname() + " " + user.getLastname();
-                                                        if (!myPhone.equals(user.getPhone())) {
-                                                            if (restaurantName.toLowerCase().contains(word.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (word.toLowerCase().contains(restaurantName.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
-                                                            //search if word is equal to user name object
-                                                            else if (word.toLowerCase() == restaurantName.toLowerCase()) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (restaurantName.toLowerCase().equals(word.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
-
-                                                            Log.d("Restaurants", "added: " + user.getFirstname());
-                                                        }
-
-                                                        if (!restaurantsList.isEmpty()) {
-                                                            progressBar.setVisibility(View.GONE);
-                                                            Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
-                                                            recyclerView.setVisibility(VISIBLE);
-                                                            /**
-                                                             * https://howtodoinjava.com/sort/collections-sort/
-                                                             * We want to sort from nearest to furthest location
-                                                             */
-                                                            //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            //Collections.reverse(list);
-                                                            RestaurantAdapter recycler = new RestaurantAdapter(SearchActivity.this, restaurantsList);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(SearchActivity.this);
-                                                            recyclerView.setLayoutManager(layoutmanager);
-                                                            recyclerView.setItemAnimator(new DefaultItemAnimator());
-                                                            recycler.notifyDataSetChanged();
-                                                            recyclerView.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.INVISIBLE);
-                                                        } else {
-                                                            progressBar.setVisibility(View.GONE);
-                                                            recyclerView.setVisibility(INVISIBLE);
-                                                            emptyTag.setVisibility(VISIBLE);
-                                                            recyclerView.setVisibility(View.GONE);
-                                                            emptyTag.setText("Nothing found");
-                                                        }
-                                                    } catch (Exception e){
-                                                        Log.e("SearchActivity", "onDataChange: ", e);
-                                                    }
-
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-
-                                        /**
-                                         * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
-                                         * and "live" which tracks the restaurant's live location under "location/phone"
-                                         */
-                                        else {
-                                            SafeToast.makeText(SearchActivity.this, "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                } catch (Exception e){
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
+    public String getSearchValue() {
+        return searchWord.getText().toString().trim();
     }
 
-    public static boolean isStringNullOrWhiteSpace(String value) {
-        if (value == null) {
-            return true;
-        }
+    private void setupViewPager(ViewPager viewPager, String searchString)
+    {
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        fragmentSearchUsers = new FragmentSearchUsers();
+        fragmentSearchFood = new FragmentSearchFood();
+        fragmentSearchVendors = new FragmentSearchVendors();
+        fragmentSearchPosts = new FragmentSearchPosts();
 
-        for (int i = 0; i < value.length(); i++) {
-            if (!Character.isWhitespace(value.charAt(i))) {
-                return false;
-            }
-        }
 
-        return true;
-    }
+        //Pass the search value
+        Bundle data = new Bundle();//bundle instance
+        data.putString("search", searchString);
+        fragmentSearchUsers.setArguments(data);//Set bundle data to fragment
+        fragmentSearchFood.setArguments(data);
+        fragmentSearchVendors.setArguments(data);
+        fragmentSearchPosts.setArguments(data);
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            myLocationRef.removeEventListener(locationListener);
-        } catch (Exception e){}
+        adapter.addFragment(fragmentSearchUsers,"Users");
+        adapter.addFragment(fragmentSearchFood,"Food");
+        adapter.addFragment(fragmentSearchVendors, "Vendors");
+        adapter.addFragment(fragmentSearchPosts, "Posts");
+        viewPager.setAdapter(adapter);
     }
 }
