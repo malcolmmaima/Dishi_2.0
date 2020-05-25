@@ -7,6 +7,7 @@ public class ReceiptModel {
     public String orderID;
     public String paymentMethod;
     public String restaurant;
+    public String customer;
     public Boolean seen;
 
     public String getInitiatedOn() {
@@ -47,6 +48,14 @@ public class ReceiptModel {
 
     public void setRestaurant(String restaurant) {
         this.restaurant = restaurant;
+    }
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(String customer) {
+        this.customer = customer;
     }
 
     public Boolean getSeen() {

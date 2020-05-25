@@ -48,7 +48,7 @@ public class ReceiptActivity extends AppCompatActivity {
 
     String TAG = "ReceiptActivity";
     DatabaseReference receiptItemsRef, receiptObjRef, myRef;
-    String key, myPhone, orderid, orderedOn, deliveredOn, restaurantName, restaurantPhone;
+    String key, myPhone, orderid, orderedOn, deliveredOn, restaurantName, restaurantPhone, customerPhone;
     FirebaseUser user;
     FirebaseAuth mAuth;
     private ArrayList<ProductDetailsModel> deliveredItems;
@@ -56,7 +56,7 @@ public class ReceiptActivity extends AppCompatActivity {
     private ReceiptItemAdapter mAdapter;
     ImageView exitReceipt, receiptOptions;
     MyTextView_Roboto_Regular totalTitle, orderID;
-    MyTextView_Roboto_Medium totalBill, dateOrdered, dateDelivered, vendorName, vendorPhone;
+    MyTextView_Roboto_Medium totalBill, dateOrdered, dateDelivered, vendorName, vendorPhone, nameTitle;
     int totalAmount;
     Double vatCharge;
 
@@ -202,16 +202,44 @@ public class ReceiptActivity extends AppCompatActivity {
         dateDelivered = findViewById(R.id.dateDelivered);
         vendorName = findViewById(R.id.restaurantName);
         vendorPhone = findViewById(R.id.restaurantPhone);
+        nameTitle = findViewById(R.id.nameTitle);
 
         orderedOn = getIntent().getStringExtra("orderOn");
         deliveredOn = getIntent().getStringExtra("deliveredOn");
         key = getIntent().getStringExtra("key");
 
+        customerPhone = getIntent().getStringExtra("customerPhone");
         restaurantPhone = getIntent().getStringExtra("restaurantPhone");
-        vendorPhone.setText(restaurantPhone);
 
         restaurantName = getIntent().getStringExtra("restaurantName");
         vendorName.setText(restaurantName);
+
+        DatabaseReference myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+        myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    UserModel myDetails = dataSnapshot.getValue(UserModel.class);
+                    if (myDetails.getAccount_type().equals("1")) {
+                        nameTitle.setText("Vendor");
+                        vendorPhone.setText(restaurantPhone);
+                    }
+
+                    if (myDetails.getAccount_type().equals("2")) {
+                        nameTitle.setText("Customer");
+                        vendorPhone.setText(customerPhone);
+                    }
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         receiptObjRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone+"/"+key);
@@ -253,9 +281,35 @@ public class ReceiptActivity extends AppCompatActivity {
                                     //set three option buttons
                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            String phone = restaurantPhone;
-                                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
-                                            startActivity(intent);
+                                            DatabaseReference myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                                            myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                    try {
+                                                        UserModel myDetails = dataSnapshot.getValue(UserModel.class);
+                                                        if (myDetails.getAccount_type().equals("1")) {
+                                                            String phone = restaurantPhone;
+                                                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                                            startActivity(intent);
+                                                        }
+
+                                                        if (myDetails.getAccount_type().equals("2")) {
+                                                            String phone = customerPhone;
+                                                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                                                            startActivity(intent);
+                                                        }
+                                                    } catch (Exception e){
+                                                        Log.e(TAG, "onDataChange: ", e);
+                                                    }
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
                                         }
                                     }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {

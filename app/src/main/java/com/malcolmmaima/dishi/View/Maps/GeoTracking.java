@@ -182,6 +182,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                     //set three option buttons
                                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
+                                            DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+restaurantPhone);
                                             DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
                                             ReceiptModel receipt = new ReceiptModel();
                                             String nodeKey = receiptsRef.push().getKey();
@@ -195,6 +196,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
                                                         if(prod.getConfirmed() == true){
                                                             receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
+                                                            vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
                                                         }
                                                     }
                                                 }
@@ -210,8 +212,10 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                             receipt.setOrderID(orderID);
                                             receipt.setPaymentMethod(paymentMethod);
                                             receipt.setRestaurant(restaurantPhone);
+                                            receipt.setCustomer(myPhone);
                                             receipt.setSeen(false);
 
+                                            vendorReceiptsRef.child(nodeKey).setValue(receipt);
                                             receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {

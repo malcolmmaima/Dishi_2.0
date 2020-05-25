@@ -46,6 +46,7 @@ import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MenuFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyReviewsFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyRidersFragment;
+import com.malcolmmaima.dishi.View.Fragments.ReceiptsFragment;
 import com.malcolmmaima.dishi.View.Fragments.RestaurantOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
 import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
@@ -625,9 +626,14 @@ public class RestaurantActivity extends AppCompatActivity
             fragmentClass[0] = MyReviewsFragment.class;
         }
 
-        else if (id == R.id.menu4) {
+        else if (id == R.id.menu3) {
             setTitle("My Riders");
             fragmentClass[0] = MyRidersFragment.class;
+        }
+
+        else if (id == R.id.menu4) {
+            setTitle("My Receipts");
+            fragmentClass[0] = ReceiptsFragment.class;
         }
 
         else if (id == R.id.nav_settings) {

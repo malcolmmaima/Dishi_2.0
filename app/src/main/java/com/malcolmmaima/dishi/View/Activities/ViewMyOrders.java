@@ -360,6 +360,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                     //set three option buttons
                                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
+                                            DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+phone);
                                             DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
                                             ReceiptModel receipt = new ReceiptModel();
                                             String nodeKey = receiptsRef.push().getKey();
@@ -372,6 +373,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                         ProductDetailsModel item = items.getValue(ProductDetailsModel.class);
                                                         if(item.getConfirmed() == true){
                                                             receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
+                                                            vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                         }
                                                     }
                                                 }
@@ -387,6 +389,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                             receipt.setOrderID(orderID);
                                             receipt.setPaymentMethod(paymentMethod);
                                             receipt.setRestaurant(phone);
+                                            receipt.setCustomer(myPhone);
                                             receipt.setSeen(false);
 
                                             //Post status update if i've set shareOrders in settings to ON
@@ -448,6 +451,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 }
                                             });
 
+                                            vendorReceiptsRef.child(nodeKey).setValue(receipt);
                                             receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
@@ -745,6 +749,7 @@ public class ViewMyOrders extends AppCompatActivity {
                         //set three option buttons
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+phone);
                                 DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
                                 ReceiptModel receipt = new ReceiptModel();
                                 String nodeKey = receiptsRef.push().getKey();
@@ -756,6 +761,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                         for(DataSnapshot items : dataSnapshot.getChildren()){
                                             ProductDetailsModel item = items.getValue(ProductDetailsModel.class);
                                             if(item.getConfirmed() == true){
+                                                vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                 receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                             }
                                         }
@@ -772,6 +778,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                 receipt.setOrderID(orderID);
                                 receipt.setPaymentMethod(paymentMethod);
                                 receipt.setRestaurant(phone);
+                                receipt.setCustomer(myPhone);
                                 receipt.setSeen(false);
 
                                 //Post status update if i've set shareOrders in settings to ON
@@ -833,6 +840,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                     }
                                 });
 
+                                vendorReceiptsRef.child(nodeKey).setValue(receipt);
                                 receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {

@@ -80,15 +80,49 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
-        DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+receipt.getRestaurant());
-        restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference myUserDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+        myUserDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    UserModel restaurant = dataSnapshot.getValue(UserModel.class);
-                    holder.restaurantName.setText(restaurant.getFirstname() + " " + restaurant.getLastname());
-                } catch (Exception e){
-                    Log.e(TAG, "onDataChange: ", e);
+                UserModel myDetails = dataSnapshot.getValue(UserModel.class);
+                if(myDetails.getAccount_type().equals("1")){
+                    DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+receipt.getRestaurant());
+                    restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try {
+                                UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+                                holder.restaurantName.setText(restaurant.getFirstname() + " " + restaurant.getLastname());
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+                if(myDetails.getAccount_type().equals("2")){
+                    DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+receipt.getCustomer());
+                    restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try {
+                                UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+                                holder.restaurantName.setText(restaurant.getFirstname() + " " + restaurant.getLastname());
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
 
@@ -97,6 +131,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
 
             }
         });
+
         setAnimation(holder.itemView, position);
 
         holder.orderID.setText("#"+receipt.getOrderID());
@@ -138,6 +173,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                     slideactivity.putExtra("key", receipt.key);
                     slideactivity.putExtra("restaurantName", holder.restaurantName.getText().toString());
                     slideactivity.putExtra("restaurantPhone", receipt.getRestaurant());
+                    slideactivity.putExtra("customerPhone", receipt.getCustomer());
                     slideactivity.putExtra("orderID", receipt.getOrderID());
                     slideactivity.putExtra("orderOn", receipt.getInitiatedOn());
                     slideactivity.putExtra("deliveredOn", receipt.getDeliveredOn());

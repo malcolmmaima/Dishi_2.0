@@ -14,9 +14,14 @@
             android:title="Reviews" />
 
         <item
-            android:id="@+id/menu4"
+            android:id="@+id/menu3"
             android:icon="@drawable/delivery_bike_64dp"
             android:title="Riders" />
+
+        <item
+            android:id="@+id/menu4"
+            android:icon="@drawable/ic_receipt_black_48dp"
+            android:title="Receipts" />
     </group>
 
     <item android:title="Account">
