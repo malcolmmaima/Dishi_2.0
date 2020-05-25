@@ -72,30 +72,23 @@ public class ForegroundService extends Service {
     String restaurantName, lastName;
     final int[] unreadCounter = {0};
     NotificationManager manager;
-
     Boolean customerNotifications = false;
     Boolean restaurantNotifications = false;
     Boolean riderNotifications = false;
-
     Boolean customerSocial = false;
     Boolean restaurantSocial = false;
     Boolean riderSocial = false;
-
     Boolean customerChat = false;
     Boolean restaurantChat = false;
     Boolean riderChat = false;
-
     //We use this two variables as our notification ID because they are unique and attached to a user phone number
     String lastFourDigits = "";     //substring containing last 4 characters
     String lastFiveDigits = "";     //substring containing last 5 characters
-
     ArrayList<String> restaurants = new ArrayList<>(); //I want to show the "item confirmed notification" only once
     // thus an arraylist that keeps trach of restaurant notifications. One notification for each confirmed order
     // item(s) since the listener that calls this function of type "orderConfirmed"
     //fires up everytime a single item's value is changed. might find a better way to do this in the future :-)
-
     NotificationChannel channel;
-
     private static FirebaseDatabase mDatabase;
 
     @Override

@@ -182,6 +182,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                     //set three option buttons
                                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
+                                            DatabaseReference riderReceiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+riderPhone);
                                             DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+restaurantPhone);
                                             DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
                                             ReceiptModel receipt = new ReceiptModel();
@@ -195,6 +196,10 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                                         //prod.setKey(items.getKey());
 
                                                         if(prod.getConfirmed() == true){
+
+                                                            if(riderPhone != null){
+                                                                riderReceiptRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
+                                                            }
                                                             receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
                                                             vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
                                                         }
@@ -215,6 +220,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                             receipt.setCustomer(myPhone);
                                             receipt.setSeen(false);
 
+                                            if(riderPhone != null){
+                                                riderReceiptRef.child(nodeKey).setValue(receipt);
+                                            }
                                             vendorReceiptsRef.child(nodeKey).setValue(receipt);
                                             receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -390,7 +398,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 try {
                     track();
                 } catch (Exception e){
-
+                    Log.e(TAG, "onDataChange: ", e);
                 }
             }
 
@@ -409,7 +417,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 try {
                     track();
                 } catch (Exception e){
-
+                    Log.e(TAG, "onDataChange: ", e);
                 }
             }
 
@@ -429,12 +437,16 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 for(DataSnapshot myCords : dataSnapshot.getChildren()){
-                    if(myCords.getKey().equals("latitude")){
-                        myLat = myCords.getValue(Double.class);
-                    }
+                    try {
+                        if (myCords.getKey().equals("latitude")) {
+                            myLat = myCords.getValue(Double.class);
+                        }
 
-                    if(myCords.getKey().equals("longitude")){
-                        myLong = myCords.getValue(Double.class);
+                        if (myCords.getKey().equals("longitude")) {
+                            myLong = myCords.getValue(Double.class);
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
                     }
                 }
 
@@ -442,7 +454,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 try {
                     track();
                 } catch (Exception e){
-
+                    Log.e(TAG, "onDataChange: ", e);
                 }
 
             }
@@ -487,8 +499,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                     public void onSuccess(Void aVoid) {
 
                     }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
+                }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 // Write failed
@@ -551,7 +562,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 loggedInUserLoc = new LatLng(myLat, myLong);
                 trackOrderLatLng = new LatLng(restaurantLat, restaurantLong); // default is restaurant coordinates
 
-            } catch(Exception e){ }
+            } catch(Exception e){
+                Log.e(TAG, "track: ", e);
+            }
 
             try {
 
@@ -726,6 +739,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
 
             } catch (Exception e){
+                Log.e(TAG, "track: ", e);
                 SafeToast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
                 confirmOrd.setEnabled(false);
                 callNduthi.setEnabled(false);
@@ -739,7 +753,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 loggedInUserLoc = new LatLng(myLat, myLong);
                 trackOrderLatLng = new LatLng(restaurantLat, restaurantLong); // default is restaurant coordinates
 
-            } catch(Exception e){ }
+            } catch(Exception e){
+                Log.e(TAG, "track: ", e);
+            }
 
             try {
 

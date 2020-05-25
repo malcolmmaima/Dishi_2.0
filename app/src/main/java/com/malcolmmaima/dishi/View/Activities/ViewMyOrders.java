@@ -360,6 +360,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                     //set three option buttons
                                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
+                                            DatabaseReference riderReceiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+riderPhone);
                                             DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+phone);
                                             DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
                                             ReceiptModel receipt = new ReceiptModel();
@@ -372,6 +373,9 @@ public class ViewMyOrders extends AppCompatActivity {
                                                     for(DataSnapshot items : dataSnapshot.getChildren()){
                                                         ProductDetailsModel item = items.getValue(ProductDetailsModel.class);
                                                         if(item.getConfirmed() == true){
+                                                            if(riderPhone != null){
+                                                                riderReceiptRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
+                                                            }
                                                             receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                             vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                         }
@@ -397,50 +401,54 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if(dataSnapshot.exists()){
-                                                        Boolean sharedOrders = dataSnapshot.getValue(Boolean.class);
+                                                        try {
+                                                            Boolean sharedOrders = dataSnapshot.getValue(Boolean.class);
 
-                                                        if(sharedOrders == true){
+                                                            if (sharedOrders == true) {
 
-                                                            DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
-                                                            userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                @Override
-                                                                public void onDataChange(@NonNull DataSnapshot userVendor) {
-                                                                    receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                            if(dataSnapshot.exists()){
-                                                                                UserModel vendor = userVendor.getValue(UserModel.class);
-                                                                                vendor.setPhone(phone);
+                                                                DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/" + phone);
+                                                                userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot userVendor) {
+                                                                        receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                if (dataSnapshot.exists()) {
+                                                                                    UserModel vendor = userVendor.getValue(UserModel.class);
+                                                                                    vendor.setPhone(phone);
 
-                                                                                GetCurrentDate currentDate = new GetCurrentDate();
-                                                                                String postDate = currentDate.getDate();
+                                                                                    GetCurrentDate currentDate = new GetCurrentDate();
+                                                                                    String postDate = currentDate.getDate();
 
-                                                                                String message = vendor.getFirstname()+" "+vendor.getLastname()+" successfully delivered my order :-) #DishiFoodie";
-                                                                                StatusUpdateModel statusUpdate = new StatusUpdateModel();
-                                                                                statusUpdate.setReceiptKey(nodeKey);
-                                                                                statusUpdate.setStatus(message);
-                                                                                statusUpdate.setAuthor(myPhone);
-                                                                                statusUpdate.setPostedTo(myPhone);
-                                                                                statusUpdate.setTimePosted(postDate);
-                                                                                statusUpdate.setImageShare(null);
-                                                                                String key = myPostUpdates.push().getKey();
-                                                                                myPostUpdates.child(key).setValue(statusUpdate);
+                                                                                    String message = vendor.getFirstname() + " " + vendor.getLastname() + " successfully delivered my order :-) #DishiFoodie";
+                                                                                    StatusUpdateModel statusUpdate = new StatusUpdateModel();
+                                                                                    statusUpdate.setReceiptKey(nodeKey);
+                                                                                    statusUpdate.setStatus(message);
+                                                                                    statusUpdate.setAuthor(myPhone);
+                                                                                    statusUpdate.setPostedTo(myPhone);
+                                                                                    statusUpdate.setTimePosted(postDate);
+                                                                                    statusUpdate.setImageShare(null);
+                                                                                    String key = myPostUpdates.push().getKey();
+                                                                                    myPostUpdates.child(key).setValue(statusUpdate);
+                                                                                }
                                                                             }
-                                                                        }
 
-                                                                        @Override
-                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                                        }
-                                                                    });
+                                                                            }
+                                                                        });
 
-                                                                }
+                                                                    }
 
-                                                                @Override
-                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                                }
-                                                            });
+                                                                    }
+                                                                });
+                                                            }
+                                                        } catch (Exception e){
+                                                            Log.e(TAG, "onDataChange: ", e);
                                                         }
                                                     }
                                                 }
@@ -451,6 +459,9 @@ public class ViewMyOrders extends AppCompatActivity {
                                                 }
                                             });
 
+                                            if(riderPhone != null){
+                                                riderReceiptRef.child(nodeKey).setValue(receipt);
+                                            }
                                             vendorReceiptsRef.child(nodeKey).setValue(receipt);
                                             receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -492,7 +503,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                                     });
 
                                                                 } catch (Exception e){
-
+                                                                    Log.e(TAG, "onDataChange: ", e);
                                                                 }
                                                             }
                                                         }
@@ -523,7 +534,7 @@ public class ViewMyOrders extends AppCompatActivity {
                             finish.show();
                         }
                     } catch (Exception e){
-
+                        Log.e(TAG, "onDataChange: ", e);
                     }
                     total[0] = 0;
 
@@ -542,7 +553,7 @@ public class ViewMyOrders extends AppCompatActivity {
                             }
 
                         } catch (Exception e){
-
+                            Log.e(TAG, "onDataChange: ", e);
                         }
                     }
                     subTotal.setText("Ksh "+total[0]);
@@ -749,6 +760,7 @@ public class ViewMyOrders extends AppCompatActivity {
                         //set three option buttons
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                DatabaseReference riderReceiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+riderPhone);
                                 DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+phone);
                                 DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
                                 ReceiptModel receipt = new ReceiptModel();
@@ -761,6 +773,10 @@ public class ViewMyOrders extends AppCompatActivity {
                                         for(DataSnapshot items : dataSnapshot.getChildren()){
                                             ProductDetailsModel item = items.getValue(ProductDetailsModel.class);
                                             if(item.getConfirmed() == true){
+
+                                                if(riderPhone != null){
+                                                    riderReceiptRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
+                                                }
                                                 vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                                 receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(item);
                                             }
@@ -786,50 +802,55 @@ public class ViewMyOrders extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if(dataSnapshot.exists()){
-                                            Boolean sharedOrders = dataSnapshot.getValue(Boolean.class);
 
-                                            if(sharedOrders == true){
+                                            try {
+                                                Boolean sharedOrders = dataSnapshot.getValue(Boolean.class);
 
-                                                DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+phone);
-                                                userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot userVendor) {
-                                                        receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if(dataSnapshot.exists()){
-                                                                    UserModel vendor = userVendor.getValue(UserModel.class);
-                                                                    vendor.setPhone(phone);
+                                                if (sharedOrders == true) {
 
-                                                                    GetCurrentDate currentDate = new GetCurrentDate();
-                                                                    String postDate = currentDate.getDate();
+                                                    DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/" + phone);
+                                                    userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot userVendor) {
+                                                            receiptsRef.child(nodeKey).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                    if (dataSnapshot.exists()) {
+                                                                        UserModel vendor = userVendor.getValue(UserModel.class);
+                                                                        vendor.setPhone(phone);
 
-                                                                    String message = vendor.getFirstname()+" "+vendor.getLastname()+" successfully delivered my order :-) #DishiFoodie";
-                                                                    StatusUpdateModel statusUpdate = new StatusUpdateModel();
-                                                                    statusUpdate.setReceiptKey(nodeKey);
-                                                                    statusUpdate.setStatus(message);
-                                                                    statusUpdate.setAuthor(myPhone);
-                                                                    statusUpdate.setPostedTo(myPhone);
-                                                                    statusUpdate.setTimePosted(postDate);
-                                                                    statusUpdate.setImageShare(null);
-                                                                    String key = myPostUpdates.push().getKey();
-                                                                    myPostUpdates.child(key).setValue(statusUpdate);
+                                                                        GetCurrentDate currentDate = new GetCurrentDate();
+                                                                        String postDate = currentDate.getDate();
+
+                                                                        String message = vendor.getFirstname() + " " + vendor.getLastname() + " successfully delivered my order :-) #DishiFoodie";
+                                                                        StatusUpdateModel statusUpdate = new StatusUpdateModel();
+                                                                        statusUpdate.setReceiptKey(nodeKey);
+                                                                        statusUpdate.setStatus(message);
+                                                                        statusUpdate.setAuthor(myPhone);
+                                                                        statusUpdate.setPostedTo(myPhone);
+                                                                        statusUpdate.setTimePosted(postDate);
+                                                                        statusUpdate.setImageShare(null);
+                                                                        String key = myPostUpdates.push().getKey();
+                                                                        myPostUpdates.child(key).setValue(statusUpdate);
+                                                                    }
                                                                 }
-                                                            }
 
-                                                            @Override
-                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                            }
-                                                        });
+                                                                }
+                                                            });
 
-                                                    }
+                                                        }
 
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                    }
-                                                });
+                                                        }
+                                                    });
+                                                }
+                                            } catch (Exception e){
+                                                Log.e(TAG, "onDataChange: ", e);
                                             }
                                         }
                                     }
@@ -840,6 +861,9 @@ public class ViewMyOrders extends AppCompatActivity {
                                     }
                                 });
 
+                                if(riderPhone != null){
+                                    riderReceiptRef.child(nodeKey).setValue(receipt);
+                                }
                                 vendorReceiptsRef.child(nodeKey).setValue(receipt);
                                 receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
