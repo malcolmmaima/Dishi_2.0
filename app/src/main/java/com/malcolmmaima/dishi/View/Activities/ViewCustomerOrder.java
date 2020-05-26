@@ -640,8 +640,11 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             try {
                                 riderUser = dataSnapshot.getValue(UserModel.class);
 
-                                myRiders.add(rider.getKey());
-                                ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
+                                if(!myRiders.contains(rider.getKey())){
+                                    myRiders.add(rider.getKey());
+                                    ridersName.add(riderUser.getFirstname() + " " + riderUser.getLastname());
+                                }
+
                             } catch (Exception e){
                                 Log.e(TAG, "onDataChange: ", e);
                             }
@@ -653,6 +656,10 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         }
                     });
                 }
+
+                //Add vendor as a rider as well just incase they want to remove existing riders and revert to themselves
+                myRiders.add(myPhone);
+                ridersName.add("Remove rider");
 
                 try {
                     Collections.reverse(myRiders);
@@ -667,7 +674,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
             }
         };
-        myRidersRef.addValueEventListener(myRidersListener);
+        myRidersRef.addListenerForSingleValueEvent(myRidersListener);
 
         /**
          * fetch current rider

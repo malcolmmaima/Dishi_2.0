@@ -110,9 +110,6 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
                             if(dataSnapshot.exists()){
                                 holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
                                 holder.followUnfollow.setText("ACCEPT");
-                            } else {
-                                holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                                holder.followUnfollow.setText("FOLLOW");
                             }
                         }
 
@@ -171,24 +168,24 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
             }
         });
 
-//        followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(!dataSnapshot.exists()){
-//                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-//                    holder.followUnfollow.setText("FOLLOW");
-//                }
-//                else {
-//                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-//                    holder.followUnfollow.setText("UNFOLLOW");
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+        followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                    holder.followUnfollow.setText("FOLLOW");
+                }
+                else {
+                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                    holder.followUnfollow.setText("UNFOLLOW");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         holder.followUnfollow.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -143,8 +143,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                 @Override
                 public void run() {
 
-                    mSwipeRefreshLayout.setRefreshing(true);
-                    onRefresh();
+                    fetchMessages();
                 }
             });
         }
@@ -394,7 +393,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
             }
         });
-        fetchMessages();
+        //fetchMessages();
     }
 
     @Override

@@ -67,6 +67,7 @@ public class TrackingService extends Service {
 //Make this notification ongoing so it can’t be dismissed by the user//
 
                 .setOngoing(true)
+                .setAutoCancel(true)
                 .setContentIntent(broadcastIntent)
                 .setSmallIcon(R.drawable.tracking_enabled);
 
@@ -96,13 +97,13 @@ public class TrackingService extends Service {
                 this, 0, new Intent(stop), PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-        Notification notification = notificationBuilder.setOngoing(true)
+        Notification notification = notificationBuilder
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.tracking_enabled_notif))
                 .setOngoing(true)
+                .setAutoCancel(true)
                 .setContentIntent(broadcastIntent)
                 .setSmallIcon(R.drawable.tracking_enabled)
-
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
