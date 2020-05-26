@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,11 +22,12 @@ import com.malcolmmaima.dishi.R;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class HelpActivity extends AppCompatActivity {
-
+    String TAG = "HelpActivity";
     String myPhone;
     DatabaseReference myRef;
     FirebaseAuth mAuth;
     FirebaseUser user;
+    String helpType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,11 @@ public class HelpActivity extends AppCompatActivity {
 
         setTitle("Help");
 
+        try {
+            helpType = getIntent().getStringExtra("type");
+        } catch (Exception e){
+            Log.e(TAG, "onCreate: ", e);
+        }
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
@@ -53,36 +60,45 @@ public class HelpActivity extends AppCompatActivity {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
-            myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()){
-                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
+            if(helpType != null){
+                if(helpType.equals("reset")){
+                    //
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                if(helpType.equals("normal")){
+                    myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
+                                        if(locked == true){
+                                            Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
-            });
+            }
         }
 
         //Back button on toolbar
@@ -98,35 +114,43 @@ public class HelpActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Boolean locked = dataSnapshot.getValue(Boolean.class);
-
-                            if(locked == true){
-                                Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                slideactivity.putExtra("pinType", "resume");
-                                startActivity(slideactivity);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
+        if(helpType != null){
+            if(helpType.equals("reset")){
+                //
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            if(helpType.equals("normal")){
+                myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
+                                    if(locked == true){
+                                        Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
-        });
+        }
     }
 }

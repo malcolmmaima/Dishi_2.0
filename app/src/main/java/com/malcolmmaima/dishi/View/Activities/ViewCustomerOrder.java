@@ -565,21 +565,24 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     }
 
                     //handle hashtags
-                    if(remarks.contains("#")){
-                        mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
-                                new HashTagHelper.OnHashTagClickListener() {
-                                    @Override
-                                    public void onHashTagClicked(String hashTag) {
-                                        String searchHashTag = "#"+hashTag;
-                                        Intent slideactivity = new Intent(ViewCustomerOrder.this, SearchActivity.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                        slideactivity.putExtra("searchString", searchHashTag);
-                                        startActivity(slideactivity);
-                                    }
-                                });
+                    if(remarks != null){
+                        if(remarks.contains("#")){
+                            mTextHashTagHelper = HashTagHelper.Creator.create(getResources().getColor(R.color.colorPrimary),
+                                    new HashTagHelper.OnHashTagClickListener() {
+                                        @Override
+                                        public void onHashTagClicked(String hashTag) {
+                                            String searchHashTag = "#"+hashTag;
+                                            Intent slideactivity = new Intent(ViewCustomerOrder.this, SearchActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                            slideactivity.putExtra("searchString", searchHashTag);
+                                            startActivity(slideactivity);
+                                        }
+                                    });
 
-                        mTextHashTagHelper.handle(customerRemarks);
+                            mTextHashTagHelper.handle(customerRemarks);
+                        }
                     }
+
                     for(DataSnapshot items : dataSnapshot.child("items").getChildren()){
 
                         try {

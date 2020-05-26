@@ -73,7 +73,7 @@ public class SecurityPin extends AppCompatActivity {
 
             logout = findViewById(R.id.logOut);
             resetPin = findViewById(R.id.resetPin);
-            resetPin.setVisibility(View.GONE); //TODO: implement reset pin mechanism later
+            resetPin.setVisibility(View.GONE);
 
             pin1 = findViewById(R.id.pin1);
             pin2 = findViewById(R.id.pin2);
@@ -125,6 +125,7 @@ public class SecurityPin extends AppCompatActivity {
             }
 
             if(pinType.equals("login")){
+                resetPin.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 accountType = getIntent().getStringExtra("accType");
                 logout.setVisibility(View.VISIBLE);
@@ -185,12 +186,14 @@ public class SecurityPin extends AppCompatActivity {
             }
 
             if(pinType.equals("resume")){
+                resetPin.setVisibility(View.VISIBLE);
                 logout.setVisibility(View.VISIBLE);
                 title1.setText("Your pin is required to");
                 title2.setText("login to your account");
             }
 
             if(pinType.equals("removePin")){
+                resetPin.setVisibility(View.VISIBLE);
                 logout.setVisibility(View.GONE);
                 title1.setText("Confirm your current");
                 title2.setText("PIN to remove");
@@ -269,7 +272,13 @@ public class SecurityPin extends AppCompatActivity {
             resetPin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //implement reset machanism later
+                    finish();
+                    Intent slideactivity = new Intent(SecurityPin.this, HelpActivity.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    slideactivity.putExtra("type", "reset");
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
                 }
             });
 

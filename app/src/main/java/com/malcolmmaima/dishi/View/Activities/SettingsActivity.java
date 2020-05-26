@@ -193,6 +193,7 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent slideactivity = new Intent(SettingsActivity.this, HelpActivity.class);
+                    slideactivity.putExtra("type", "normal");
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                     startActivity(slideactivity, bndlanimation);
