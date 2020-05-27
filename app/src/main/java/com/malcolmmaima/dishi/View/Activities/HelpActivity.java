@@ -72,7 +72,7 @@ public class HelpActivity extends AppCompatActivity {
 
             if(helpType != null){
                 if(helpType.equals("reset")){
-                    //
+                    resetPin.setEnabled(true);
                 }
 
                 if(helpType.equals("normal")){
