@@ -24,6 +24,7 @@
     </androidx.appcompat.widget.Toolbar>
     <fragment
         android:layout_below="@id/toolbar"
+        android:layout_above="@id/extraInf"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
@@ -52,5 +53,34 @@
 
         </RelativeLayout>
     </fragment>
+
+    <LinearLayout
+        android:id="@+id/extraInf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBackroundWhite"
+        android:paddingHorizontal="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:id="@+id/clearLocationBtn"
+            android:layout_width="100dp"
+            android:layout_margin="10dp"
+            android:layout_height="30dp"
+            android:background="@drawable/login_button"
+            android:fontFamily="sans-serif-medium"
+            android:text="clear"
+            android:elevation="8dp"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorBackroundWhite"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
 </RelativeLayout>

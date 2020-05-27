@@ -75,6 +75,9 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //Incase user has stopped tracking service
+        startService(new Intent(this, TrackingService.class));
+
         final String[] tempRiderPhoneHolder = new String[1];
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -376,8 +379,11 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         myRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                accType = dataSnapshot.getValue(String.class);
-                //SafeToast.makeText(GeoFireActivity.this, "accType: " + accType, Toast.LENGTH_SHORT).show();
+                try {
+                    accType = dataSnapshot.getValue(String.class);
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ",e);
+                }
             }
 
             @Override
@@ -550,9 +556,6 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         callNduthi.setEnabled(true);
 
         mMap = googleMap;
-
-        //Incase user has stopped tracking service
-        startService(new Intent(this, TrackingService.class));
     }
 
     private void track() {

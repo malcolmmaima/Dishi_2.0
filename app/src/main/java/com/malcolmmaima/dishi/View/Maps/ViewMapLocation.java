@@ -2,10 +2,14 @@ package com.malcolmmaima.dishi.View.Maps;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,8 +35,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
+import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.AboutActivity;
+import com.malcolmmaima.dishi.View.Activities.LocationSettings;
 import com.malcolmmaima.dishi.View.Activities.SecurityPin;
 
 import io.fabric.sdk.android.services.common.SafeToast;
@@ -50,6 +56,7 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
     LatLng mapLocation;
     ValueEventListener LocationListener;
     Marker myMarker;
+    AppCompatButton clearLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +64,8 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_view_map);
 
         zoomMap = findViewById(R.id.verticalSeekbar);
+        clearLocation = findViewById(R.id.clearLocationBtn);
+
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -181,6 +190,110 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
                     .findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
         }
+
+        clearLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog clearLoca = new AlertDialog.Builder(v.getContext())
+                        //set message, title, and icon
+                        .setMessage("Clear location data from our server?")
+                        //.setIcon(R.drawable.icon) will replace icon with name of existing icon from project
+                        //set three option buttons
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+                                            UserModel myDetails = dataSnapshot.getValue(UserModel.class);
+                                            if (myDetails.getAccount_type().equals("1")) {
+                                                DatabaseReference activeOrdersRef = FirebaseDatabase.getInstance().getReference("my_orders/" + myPhone);
+                                                activeOrdersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        if (dataSnapshot.exists()) {
+                                                            AlertDialog notAllowed = new AlertDialog.Builder(v.getContext())
+                                                                    .setMessage("Not allowed! You have an active order. Kindly complete order and try again.")
+                                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                        @Override
+                                                                        public void onClick(DialogInterface dialog, int which) {
+
+                                                                        }
+                                                                    }).create();
+                                                            notAllowed.show();
+                                                        } else {
+                                                            deletemyLocation();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+
+                                            if (myDetails.getAccount_type().equals("3")) {
+                                                DatabaseReference rideRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + myPhone);
+                                                rideRequests.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        if (dataSnapshot.exists()) {
+                                                            AlertDialog notAllowed = new AlertDialog.Builder(v.getContext())
+                                                                    .setMessage("Not allowed! You have ride requests.")
+                                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                        @Override
+                                                                        public void onClick(DialogInterface dialog, int which) {
+
+                                                                        }
+                                                                    }).create();
+                                                            notAllowed.show();
+                                                        } else {
+                                                            deletemyLocation();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                        } catch (Exception e){
+                                            SafeToast.makeText(ViewMapLocation.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                            Log.e(TAG, "onDataChange: ", e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //do nothing
+
+                            }
+                        })//setNegativeButton
+
+                        .create();
+                clearLoca.show();
+            }
+        });
+    }
+
+    private void deletemyLocation() {
+        DatabaseReference myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
+        myLocationRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                stopService(new Intent(ViewMapLocation.this, TrackingService.class));
+                finish();
+                SafeToast.makeText(ViewMapLocation.this, "Location data deleted!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 

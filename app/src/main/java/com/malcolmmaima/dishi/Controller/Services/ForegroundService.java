@@ -2026,6 +2026,8 @@ public class ForegroundService extends Service {
 
         stopService(new Intent(ForegroundService.this, TrackingService.class));
         restaurants.clear(); //Clear the tracker used in our send notification function
+
+        /** temporary commented out for now (testing)
         try {
             incomingMessages.removeEventListener(incomingMessagesListener);
             //myUserDetailsRef.removeEventListener(myUserDetailsListener); is currently a singleval listener
@@ -2038,6 +2040,8 @@ public class ForegroundService extends Service {
             databaseReference.removeEventListener(databaseListener);
             databaseReference.child("my_orders").child(myPhone).removeEventListener(myOrdersListener);
         } catch(Exception e){}
+
+        **/
     }
     @Nullable
     @Override
