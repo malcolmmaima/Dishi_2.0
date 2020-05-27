@@ -43,7 +43,7 @@ public class SearchActivity extends AppCompatActivity {
     FragmentSearchVendors fragmentSearchVendors;
     FragmentSearchPosts fragmentSearchPosts;
 
-    int currentFrag = 0;
+    int currentFrag;
     EditText searchWord;
     TabLayout tabLayout;
     DatabaseReference myLocationRef;
@@ -65,6 +65,7 @@ public class SearchActivity extends AppCompatActivity {
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
+            currentFrag = 0; //allows us to remain in the current fragment when we search
             //Hide keyboard on activity load
             this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 

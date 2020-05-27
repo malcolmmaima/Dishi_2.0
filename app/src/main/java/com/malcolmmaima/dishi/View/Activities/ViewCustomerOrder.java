@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -94,9 +95,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     String [] riderOptions = {"View","Message", "Call"};
     Timer timer;
     HashTagHelper mTextHashTagHelper;
-
+    Integer paid;
     final int[] total = {0};
-
+    Boolean paymentDialogShown;
     FirebaseAuth mAuth;
 
     @Override
@@ -108,6 +109,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
+            paymentDialogShown = false;
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
@@ -173,8 +175,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("pinType", "resume");
                                     startActivity(slideactivity);
-                                } else {
-                                    loadViewCustomer();
                                 }
                             }
 
@@ -183,8 +183,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                             }
                         });
-                    } else {
-                        loadViewCustomer();
                     }
                 }
 
@@ -193,6 +191,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                 }
             });
+
+            loadViewCustomer();
         }
     }
 
@@ -214,8 +214,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);
-                            } else {
-                                loadViewCustomer();
                             }
                         }
 
@@ -224,8 +222,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                         }
                     });
-                } else {
-                    loadViewCustomer();
                 }
             }
 
@@ -234,6 +230,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
             }
         });
+        loadViewCustomer();
     }
 
     private void loadViewCustomer() {
@@ -443,6 +440,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
                     String orderID = dataSnapshot.child("orderID").getValue(String.class);
                     String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                    paid = dataSnapshot.child("paid").getValue(Integer.class);
                     address = dataSnapshot.child("address").getValue(String.class);
                     payment.setText(paymentMethod);
                     myOrderID.setText("ORDER ID: #"+orderID);
@@ -610,11 +608,18 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         recyclerview.setItemAnimator( new DefaultItemAnimator());
                         recycler.notifyDataSetChanged();
                         recyclerview.setAdapter(recycler);
-
-
                     }
 
                     totalBill.setText("ksh " + totalAmount);
+
+                    try {
+                        //1 is default.. order has been sent 2. is awaiting payment confirmation 3. payment confirmed, order complete 4. order complete
+                        if (paid == 2) {
+                            paymentDialog(findViewById(android.R.id.content).getRootView());
+                        }
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
                 }
             }
 
@@ -984,6 +989,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                     customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
+                                            customerOrderItems.child("paid").setValue(4);
                                             Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
                                         }
                                     });
@@ -1014,11 +1020,22 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                     @Override
                                                     public void onClick(DialogInterface dialogInterface, int i) {
                                                         //Do nothing
+                                                        customerOrderItems.child("paid").setValue(1);
                                                     }
                                                 })
 
                                                 .create();
                                         cancelOrder.show();
+                                    }
+
+                                    else {
+                                        customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                customerOrderItems.child("paid").setValue(1);
+                                                Snackbar.make(v.getRootView(), "End once delivered to customer", Snackbar.LENGTH_LONG).show();
+                                            }
+                                        });
                                     }
                                 }
                             })
@@ -1124,6 +1141,45 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         });
         //topToolBar.setLogo(R.drawable.logo);
         //topToolBar.setLogoDescription(getResources().getString(R.string.logo_desc));
+    }
+
+    public void paymentDialog(View view) {
+        if(paymentDialogShown == false){
+            paymentDialogShown = true;
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogLayout = inflater.inflate(R.layout.alert_dialog_payment, null);
+            builder.setCancelable(false);
+            builder.setMessage("Has "+customerName+" paid for the order?");
+            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    customerOrderItems.child("paid").setValue(4).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar.make(view.getRootView(), "Waiting for confirmation from vendor", Snackbar.LENGTH_LONG).show();
+                            paymentDialogShown = false;
+                        }
+                    });
+                }
+            });
+            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    customerOrderItems.child("paid").setValue(1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar.make(view.getRootView(), "Sort payment with customer", Snackbar.LENGTH_LONG).show();
+                            paymentDialogShown = false;
+                        }
+                    });
+                }
+            });
+            builder.setView(dialogLayout);
+            builder.show();
+        }
+
     }
 
     @Override
@@ -1237,39 +1293,45 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(!dataSnapshot.exists()){
-                                                String [] riders = new String[ridersName.size()];
-                                                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                                                builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, final int which) {
-                                                        customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
+
+                                                try {
+                                                    String[] riders = new String[ridersName.size()];
+                                                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                                                    builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, final int which) {
+                                                            customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
 
 
-                                                                myRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        //Remove existing ride requests then set new request
-                                                                        for(DataSnapshot riders : dataSnapshot.getChildren()){
-                                                                            riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+riders.getKey());
-                                                                            riderRequests.child(myPhone).child(phone).removeValue();
+                                                                    myRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                            //Remove existing ride requests then set new request
+                                                                            for (DataSnapshot riders : dataSnapshot.getChildren()) {
+                                                                                riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + riders.getKey());
+                                                                                riderRequests.child(myPhone).child(phone).removeValue();
+                                                                            }
+
+                                                                            riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + myRiders.get(which));
+                                                                            riderRequests.child(myPhone).child(phone).setValue("assigned");
                                                                         }
 
-                                                                        riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
-                                                                        riderRequests.child(myPhone).child(phone).setValue("assigned");
-                                                                    }
+                                                                        @Override
+                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                                builder.create();
-                                                builder.show();
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                    builder.create();
+                                                    builder.show();
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                    Toast.makeText(ViewCustomerOrder.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                                }
 
                                             }
 
@@ -1284,50 +1346,55 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                                 //Load riders list
-                                                                String [] riders = new String[ridersName.size()];
-                                                                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
-                                                                builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
-                                                                    public void onClick(DialogInterface dialog, final int which) {
-                                                                        /**
-                                                                         * Logic here is to assign the rider number to the order, then send rider request to rider awaiting confirmation
-                                                                         */
-                                                                        customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                            @Override
-                                                                            public void onSuccess(Void aVoid) {
 
+                                                                try {
+                                                                    String[] riders = new String[ridersName.size()];
+                                                                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ViewCustomerOrder.this);
+                                                                    builder.setItems(ridersName.toArray(riders), new DialogInterface.OnClickListener() {
+                                                                        public void onClick(DialogInterface dialog, final int which) {
+                                                                            /**
+                                                                             * Logic here is to assign the rider number to the order, then send rider request to rider awaiting confirmation
+                                                                             */
+                                                                            customerOrderItems.child("rider").setValue(myRiders.get(which)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
 
-                                                                                myRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                    @Override
-                                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                        //Remove existing ride requests then set new request
-                                                                                        for(DataSnapshot riders : dataSnapshot.getChildren()){
+                                                                                    myRidersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                        @Override
+                                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                            //Remove existing ride requests then set new request
+                                                                                            for (DataSnapshot riders : dataSnapshot.getChildren()) {
+                                                                                                /**
+                                                                                                 * Delete any existing rider request for this particular order by looping through my riders,
+                                                                                                 * getting their primary key (phone) then deleting from 'my_rider_requests'
+                                                                                                 */
+                                                                                                riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + riders.getKey());
+                                                                                                riderRequests.child(myPhone).child(phone).removeValue();
+                                                                                            }
+
                                                                                             /**
-                                                                                             * Delete any existing rider request for this particular order by looping through my riders,
-                                                                                             * getting their primary key (phone) then deleting from 'my_rider_requests'
+                                                                                             * then send fresh rider order request, this is to avoid assigning a single order to
+                                                                                             * multiple riders. Preventing duplicates
                                                                                              */
-                                                                                            riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+riders.getKey());
-                                                                                            riderRequests.child(myPhone).child(phone).removeValue();
+                                                                                            riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + myRiders.get(which));
+                                                                                            riderRequests.child(myPhone).child(phone).setValue("assigned");
                                                                                         }
 
-                                                                                        /**
-                                                                                         * then send fresh rider order request, this is to avoid assigning a single order to
-                                                                                         * multiple riders. Preventing duplicates
-                                                                                         */
-                                                                                        riderRequests = FirebaseDatabase.getInstance().getReference("my_ride_requests/"+myRiders.get(which));
-                                                                                        riderRequests.child(myPhone).child(phone).setValue("assigned");
-                                                                                    }
+                                                                                        @Override
+                                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                                                    @Override
-                                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                });
-                                                                builder.create();
-                                                                builder.show();
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                    builder.create();
+                                                                    builder.show();
+                                                                } catch (Exception e){
+                                                                    Log.e(TAG, "onClick: ", e);
+                                                                    SafeToast.makeText(ViewCustomerOrder.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                                                }
                                                             }
                                                         })//setPositiveButton
 

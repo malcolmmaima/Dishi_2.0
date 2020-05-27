@@ -439,6 +439,7 @@ public class CheckOut extends AppCompatActivity {
                                         ordersRef.child(myPhone).child("items").child(cart.getKey()).setValue(product);
                                         ordersRef.child(myPhone).child("completed").setValue(false);
                                         ordersRef.child(myPhone).child("remarks").setValue(finalMyRemarks);
+                                        ordersRef.child(myPhone).child("paid").setValue(1);
 
                                         if(locationSet.equals("static")){
                                             staticLocationModel.setLatitude(lat);
