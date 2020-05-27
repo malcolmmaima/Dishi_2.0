@@ -80,7 +80,7 @@ public class HelpActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(dataSnapshot.exists()){
-                                resetPin.setEnabled(false);
+                                resetPin.setEnabled(true);
                                 myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -106,7 +106,7 @@ public class HelpActivity extends AppCompatActivity {
                             }
 
                             else {
-                                resetPin.setEnabled(true);
+                                resetPin.setEnabled(false);
                             }
                         }
 
@@ -174,7 +174,7 @@ public class HelpActivity extends AppCompatActivity {
         super.onResume();
         if(helpType != null){
             if(helpType.equals("reset")){
-                //
+                resetPin.setEnabled(true);
             }
 
             if(helpType.equals("normal")){
@@ -182,16 +182,21 @@ public class HelpActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()){
+                            resetPin.setEnabled(true);
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                    if(locked == true){
-                                        Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        slideactivity.putExtra("pinType", "resume");
-                                        startActivity(slideactivity);
+                                        if (locked == true) {
+                                            Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onDataChange: ", e);
                                     }
                                 }
 
@@ -200,6 +205,10 @@ public class HelpActivity extends AppCompatActivity {
 
                                 }
                             });
+                        }
+
+                        else {
+                            resetPin.setEnabled(false);
                         }
                     }
 
