@@ -428,6 +428,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                                                                     statusUpdate.setPostedTo(myPhone);
                                                                                     statusUpdate.setTimePosted(postDate);
                                                                                     statusUpdate.setImageShare(null);
+                                                                                    statusUpdate.setVendorPhone(vendor.getPhone());
                                                                                     String key = myPostUpdates.push().getKey();
                                                                                     myPostUpdates.child(key).setValue(statusUpdate);
                                                                                 }
