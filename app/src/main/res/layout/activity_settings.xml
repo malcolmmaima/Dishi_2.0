@@ -289,4 +289,15 @@
         </LinearLayout>
     </ScrollView>
 
+    <TextView
+        android:id="@+id/terms"
+        android:text="Terms and Conditions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="20dp"/>
+
 </RelativeLayout>

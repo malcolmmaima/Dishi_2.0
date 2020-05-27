@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackroundWhite"
-    tools:context=".View.Activities.PrivacyPolicy"
+    tools:context=".View.Activities.TermsConditions"
     android:id="@+id/parentlayout">
 
     <androidx.appcompat.widget.Toolbar

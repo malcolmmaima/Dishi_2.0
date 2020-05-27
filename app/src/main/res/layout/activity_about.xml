@@ -132,6 +132,17 @@
     </ScrollView>
 
     <TextView
+        android:id="@+id/terms"
+        android:text="Terms and Conditions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/colorPrimary"
+        android:layout_above="@id/version"
+        android:layout_marginBottom="0dp"/>
+
+    <TextView
         android:id="@+id/version"
         android:text="Version 1.0.0"
         android:layout_width="wrap_content"

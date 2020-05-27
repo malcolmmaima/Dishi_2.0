@@ -19,7 +19,8 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.Activities.ContactSupport"></activity>
+        <activity android:name=".View.Activities.TermsConditions"></activity>
+        <activity android:name=".View.Activities.ContactSupport" />
         <activity android:name=".View.Activities.DishiFaq" />
         <activity android:name=".View.Activities.PrivacyPolicy" />
         <activity android:name=".View.Activities.ResetPin" />

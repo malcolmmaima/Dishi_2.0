@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexzh.circleimageview.CircleImageView;
@@ -45,6 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
     ValueEventListener myRefListener;
     FirebaseAuth mAuth;
     FirebaseUser user;
+    TextView termsConditions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,6 +211,16 @@ public class SettingsActivity extends AppCompatActivity {
                     startActivity(slideactivity, bndlanimation);
                 }
             });
+
+            termsConditions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent slideactivity = new Intent(SettingsActivity.this, TermsConditions.class);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                    startActivity(slideactivity, bndlanimation);
+                }
+            });
         }
     }
 
@@ -251,11 +263,13 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+
     private void initWidgets() {
         personalDetails = findViewById(R.id.personalDetails);
         userName = findViewById(R.id.userName);
         phoneNumber = findViewById(R.id.phoneNumber);
         profilePic = findViewById(R.id.profilePic);
+        termsConditions = findViewById(R.id.terms);
 
         userName.setText("Loading...");
         phoneNumber.setText("Loading...");

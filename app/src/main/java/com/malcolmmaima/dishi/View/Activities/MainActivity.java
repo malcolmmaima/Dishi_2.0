@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String phonenumber;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     String myPhone, countrycode;
+    TextView termsConditions;
 
     ProgressDialog progressDialog ;
     private String TAG;
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         fabbutton = findViewById(R.id.sendverifybt);
         timertext = findViewById(R.id.timertv);
         verifiedimg = findViewById(R.id.verifiedsign);
+        termsConditions = findViewById(R.id.terms);
 
         countryCode = findViewById(R.id.countryCode);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -573,6 +575,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     snackbar.show();
                 }
+            }
+        });
+
+        termsConditions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(MainActivity.this, TermsConditions.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
             }
         });
 
