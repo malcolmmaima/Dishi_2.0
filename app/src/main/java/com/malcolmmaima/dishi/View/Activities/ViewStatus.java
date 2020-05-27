@@ -87,7 +87,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
     MyTextView_Roboto_Light timePosted;
     MyTextView_Roboto_Medium profileName;
     TextView  statusOptions;
-    ImageView profilePic, imageShare, likePost, comments, sharePost, commentsIcon;
+    ImageView profilePic, imageShare, likePost, comments, sharePost, commentsIcon, vendorPic;
     String myPhone, author;
     Button postStatus;
     EmojiconEditText statusPost;
@@ -205,6 +205,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
         postedToName = findViewById(R.id.postedToName);
         foodShare = findViewById(R.id.foodShare);
         foodShare.setVisibility(View.GONE);
+        vendorPic = findViewById(R.id.foodPic);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -503,6 +504,39 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                             if(viewPost.getReceiptKey() != null){
                                 foodShare.setVisibility(View.VISIBLE);
+
+                                //replace default rider image with vendor's profile image
+                                if(viewPost.getVendorPhone() != null){
+                                    DatabaseReference vendorDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+viewPost.getVendorPhone());
+                                    vendorDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if(dataSnapshot.exists()){
+                                                try {
+                                                    UserModel vendorDetails = dataSnapshot.getValue(UserModel.class);
+                                                    if (vendorDetails.getProfilePicSmall() != null) {
+                                                        Picasso.with(ViewStatus.this).load(vendorDetails.getProfilePicSmall()).fit().centerCrop()
+                                                                .placeholder(R.drawable.delivery_bike)
+                                                                .error(R.drawable.delivery_bike)
+                                                                .into(vendorPic);
+                                                    } else {
+                                                        Picasso.with(ViewStatus.this).load(vendorDetails.getProfilePic()).fit().centerCrop()
+                                                                .placeholder(R.drawable.delivery_bike)
+                                                                .error(R.drawable.delivery_bike)
+                                                                .into(vendorPic);
+                                                    }
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
                             }
 
                             foodShare.setOnClickListener(new View.OnClickListener() {

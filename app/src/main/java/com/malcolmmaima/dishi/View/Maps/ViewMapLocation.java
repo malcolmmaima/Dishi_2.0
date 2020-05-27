@@ -392,6 +392,8 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        stopService(new Intent(ViewMapLocation.this, TrackingService.class));
         try {
             myLocationRef.removeEventListener(LocationListener);
         } catch (Exception e){

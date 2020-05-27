@@ -1218,6 +1218,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopService(new Intent(GeoTracking.this, TrackingService.class));
 
         try {
             customerOrderRef.removeEventListener(customerOrderListener);

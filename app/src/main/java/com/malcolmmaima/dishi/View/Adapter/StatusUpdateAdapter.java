@@ -303,6 +303,39 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         if(statusUpdateModel.getReceiptKey() != null){
             holder.foodShare.setVisibility(View.VISIBLE);
+
+            //replace default rider image with vendor's profile image
+            if(statusUpdateModel.getVendorPhone() != null){
+                DatabaseReference vendorDetailsRef = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getVendorPhone());
+                vendorDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            try {
+                                UserModel vendorDetails = dataSnapshot.getValue(UserModel.class);
+                                if (vendorDetails.getProfilePicSmall() != null) {
+                                    Picasso.with(context).load(vendorDetails.getProfilePicSmall()).fit().centerCrop()
+                                            .placeholder(R.drawable.delivery_bike)
+                                            .error(R.drawable.delivery_bike)
+                                            .into(holder.vendorPic);
+                                } else {
+                                    Picasso.with(context).load(vendorDetails.getProfilePic()).fit().centerCrop()
+                                            .placeholder(R.drawable.delivery_bike)
+                                            .error(R.drawable.delivery_bike)
+                                            .into(holder.vendorPic);
+                                }
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
         }
 
         holder.foodShare.setOnClickListener(new View.OnClickListener() {
@@ -847,6 +880,53 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     }
 
     @Override
+    public void onViewAttachedToWindow(@NonNull MyHolder holder) {
+        super.onViewAttachedToWindow(holder);
+
+        StatusUpdateModel statusUpdateModel = listdata.get(holder.getAdapterPosition());
+        //fetch post User Details
+        DatabaseReference postUserDetails = FirebaseDatabase.getInstance().getReference("users/"+statusUpdateModel.getAuthor());
+        postUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    holder.likePost.setEnabled(false);
+                    holder.profilePic.setEnabled(false);
+                } else {
+                    try {
+                        UserModel getUser = dataSnapshot.getValue(UserModel.class);
+
+                        //Set profile pic
+
+                        if(getUser.getProfilePicSmall() != null){
+                            Picasso.with(context).load(getUser.getProfilePicSmall()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(holder.profilePic);
+                        }
+
+                        else {
+                            Picasso.with(context).load(getUser.getProfilePic()).fit().centerCrop()
+                                    .placeholder(R.drawable.default_profile)
+                                    .error(R.drawable.default_profile)
+                                    .into(holder.profilePic);
+                        }
+
+                        holder.profileName.setText(getUser.getFirstname() + " " + getUser.getLastname());
+                    } catch (Exception e){
+                        Log.d(TAG, "onDataChange: "+e.getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
     public int getItemCount() {
         return listdata.size();
     }
@@ -856,7 +936,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         MyTextView_Roboto_Medium profileName;
         MyTextView_Roboto_Light timePosted;
         TextView statusOptions;
-        ImageView profilePic, imageShare, likePost, comments, sharePost;
+        ImageView profilePic, imageShare, likePost, comments, sharePost, vendorPic;
         RelativeLayout foodShare;
         CardView cardView;
 
@@ -876,6 +956,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             timePosted = itemView.findViewById(R.id.timePosted);
             statusOptions = itemView.findViewById(R.id.statusOptions);
             foodShare = itemView.findViewById(R.id.foodShare);
+            vendorPic = itemView.findViewById(R.id.foodPic);
 
             //Long Press
             itemView.setOnLongClickListener(new View.OnLongClickListener() {

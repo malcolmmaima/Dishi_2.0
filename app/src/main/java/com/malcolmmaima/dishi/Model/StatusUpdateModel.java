@@ -73,6 +73,14 @@ public class StatusUpdateModel {
         this.receiptKey = receiptKey;
     }
 
+    public String getVendorPhone() {
+        return vendorPhone;
+    }
+
+    public void setVendorPhone(String vendorPhone) {
+        this.vendorPhone = vendorPhone;
+    }
+
     public String getImageShareSmall() {
         return imageShareSmall;
     }
