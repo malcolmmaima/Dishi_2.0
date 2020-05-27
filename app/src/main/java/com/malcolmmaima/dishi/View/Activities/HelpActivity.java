@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +30,7 @@ public class HelpActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser user;
     String helpType;
+    RelativeLayout resetPin, privacyPolicy, dishiFaq, contactSupport;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,11 @@ public class HelpActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         setTitle("Help");
+
+        resetPin = findViewById(R.id.resetPin);
+        privacyPolicy = findViewById(R.id.privacyPolicy);
+        dishiFaq = findViewById(R.id.dishiFaq);
+        contactSupport = findViewById(R.id.contactSupport);
 
         try {
             helpType = getIntent().getStringExtra("type");
@@ -106,6 +114,46 @@ public class HelpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish(); //Go back to previous activity
+            }
+        });
+
+        resetPin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(HelpActivity.this, ResetPin.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+            }
+        });
+
+        privacyPolicy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(HelpActivity.this, PrivacyPolicy.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+            }
+        });
+
+        dishiFaq.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(HelpActivity.this, DishiFaq.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
+            }
+        });
+
+        contactSupport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(HelpActivity.this, ContactSupport.class);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                startActivity(slideactivity, bndlanimation);
             }
         });
 
