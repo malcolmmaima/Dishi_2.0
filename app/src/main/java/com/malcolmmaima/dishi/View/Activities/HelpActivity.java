@@ -46,6 +46,7 @@ public class HelpActivity extends AppCompatActivity {
         setTitle("Help");
 
         resetPin = findViewById(R.id.resetPin);
+        resetPin.setEnabled(false);
         privacyPolicy = findViewById(R.id.privacyPolicy);
         dishiFaq = findViewById(R.id.dishiFaq);
         contactSupport = findViewById(R.id.contactSupport);
@@ -79,16 +80,21 @@ public class HelpActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(dataSnapshot.exists()){
+                                resetPin.setEnabled(false);
                                 myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                        try {
+                                            Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                        if(locked == true){
-                                            Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            slideactivity.putExtra("pinType", "resume");
-                                            startActivity(slideactivity);
+                                            if (locked == true) {
+                                                Intent slideactivity = new Intent(HelpActivity.this, SecurityPin.class)
+                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                slideactivity.putExtra("pinType", "resume");
+                                                startActivity(slideactivity);
+                                            }
+                                        } catch (Exception e){
+                                            Log.e(TAG, "onDataChange: ", e);
                                         }
                                     }
 
@@ -97,6 +103,10 @@ public class HelpActivity extends AppCompatActivity {
 
                                     }
                                 });
+                            }
+
+                            else {
+                                resetPin.setEnabled(true);
                             }
                         }
 

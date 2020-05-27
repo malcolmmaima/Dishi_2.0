@@ -258,46 +258,50 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                        if(userModel.getAccountPrivacy().equals("private")){
-                                            //send follow request
+                                        try {
+                                            if (userModel.getAccountPrivacy().equals("private")) {
+                                                //send follow request
 
-                                            followRequests.child(myPhone).setValue("followrequest").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    try {
-                                                        holder.followUnfollow.setText("REQUESTED");
-                                                        Snackbar.make(v.getRootView(), "Request sent", Snackbar.LENGTH_LONG).show();
-                                                    } catch (Exception er){
-                                                        Log.e(TAG, "onFailure: ", er);
+                                                followRequests.child(myPhone).setValue("followrequest").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        try {
+                                                            holder.followUnfollow.setText("REQUESTED");
+                                                            Snackbar.make(v.getRootView(), "Request sent", Snackbar.LENGTH_LONG).show();
+                                                        } catch (Exception er) {
+                                                            Log.e(TAG, "onFailure: ", er);
+                                                        }
+
+                                                        sendNotification("wants to follow you", "followrequest");
                                                     }
-
-                                                    sendNotification("wants to follow you", "followrequest");
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    try {
-                                                        holder.followUnfollow.setText("REQUESTED");
-                                                        Snackbar.make(v.getRootView(), "Something went wrong", Snackbar.LENGTH_LONG).show();
-                                                    } catch (Exception er){
-                                                        Log.e(TAG, "onFailure: ", er);
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        try {
+                                                            holder.followUnfollow.setText("REQUESTED");
+                                                            Snackbar.make(v.getRootView(), "Something went wrong", Snackbar.LENGTH_LONG).show();
+                                                        } catch (Exception er) {
+                                                            Log.e(TAG, "onFailure: ", er);
+                                                        }
                                                     }
-                                                }
-                                            });
+                                                });
 
-                                        }
+                                            }
 
-                                        if(userModel.getAccountPrivacy().equals("public")){
-                                            //automatically follow
-                                            profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    followingRef.setValue("follow");
-                                                    holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
-                                                    holder.followUnfollow.setText("UNFOLLOW");
-                                                    sendNotification("followed you", "followedwall");
-                                                }
-                                            });
+                                            if (userModel.getAccountPrivacy().equals("public")) {
+                                                //automatically follow
+                                                profileFollowers.child(myPhone).setValue("follow").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        followingRef.setValue("follow");
+                                                        holder.followUnfollow.getBackground().setColorFilter(context.getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.MULTIPLY);
+                                                        holder.followUnfollow.setText("UNFOLLOW");
+                                                        sendNotification("followed you", "followedwall");
+                                                    }
+                                                });
+                                            }
+                                        } catch (Exception e){
+                                            Log.e(TAG, "onDataChange: ", e);
                                         }
                                     }
 
