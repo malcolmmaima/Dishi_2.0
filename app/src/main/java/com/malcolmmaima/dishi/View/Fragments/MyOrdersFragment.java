@@ -52,7 +52,7 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     DatabaseReference dbRef, myOrders, userDetailsRef;
     FirebaseDatabase db;
     FirebaseUser user;
-    ValueEventListener userDetailsListener;
+    ValueEventListener myOrdersListener;
 
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
@@ -106,8 +106,21 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         });
 
+        myOrdersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                if(!dataSnapshot.exists()) {
+                    fetchOrders();
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        myOrders.addValueEventListener(myOrdersListener);
 
         return  v;
     }
@@ -229,5 +242,16 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         fetchOrders();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        try {
+            myOrders.removeEventListener(myOrdersListener);
+        } catch (Exception e){
+
+        }
     }
 }

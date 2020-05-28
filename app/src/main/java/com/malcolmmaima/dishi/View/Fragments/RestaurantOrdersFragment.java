@@ -120,9 +120,30 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                 mSwipeRefreshLayout.setRefreshing(true);
                 fetchOrders();
 
-
             }
         });
+
+        //Just a listener to keep track of orders. refresh if empty
+        inComingOrdersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+
+                /**
+                 * My orders node doesn't exist, meaning i dont have any order requests
+                 */
+                if(!dataSnapshot.exists()){
+                    fetchOrders();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        incomingOrders.addValueEventListener(inComingOrdersListener);
 
         liveTitle.setText("loading...");
         liveListener = new ValueEventListener() {
