@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -80,13 +81,17 @@ public class ReceiptActivity extends AppCompatActivity {
                         myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                try {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(ReceiptActivity.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
+                                    if (locked == true) {
+                                        Intent slideactivity = new Intent(ReceiptActivity.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
                                 }
                             }
 
@@ -128,13 +133,17 @@ public class ReceiptActivity extends AppCompatActivity {
                         myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                try {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(ReceiptActivity.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
+                                    if (locked == true) {
+                                        Intent slideactivity = new Intent(ReceiptActivity.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
                                 }
                             }
 
@@ -227,11 +236,50 @@ public class ReceiptActivity extends AppCompatActivity {
                     if (myDetails.getAccount_type().equals("1")) {
                         nameTitle.setText("Vendor");
                         vendorPhone.setText(restaurantPhone);
+
+                        vendorName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                try {
+                                    if (!myPhone.equals(restaurantPhone)) {
+                                        Intent slideactivity = new Intent(ReceiptActivity.this, ViewProfile.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                        slideactivity.putExtra("phone", restaurantPhone);
+                                        Bundle bndlanimation =
+                                                ActivityOptions.makeCustomAnimation(ReceiptActivity.this, R.anim.animation, R.anim.animation2).toBundle();
+                                        startActivity(slideactivity, bndlanimation);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onClick: ", e);
+                                }
+                            }
+                        });
                     }
 
                     if (myDetails.getAccount_type().equals("2") || myDetails.getAccount_type().equals("3")) {
                         nameTitle.setText("Customer");
                         vendorPhone.setText(customerPhone);
+
+
+                        vendorName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                try {
+                                    if (!myPhone.equals(customerPhone)) {
+                                        Intent slideactivity = new Intent(ReceiptActivity.this, ViewProfile.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                        slideactivity.putExtra("phone", customerPhone);
+                                        Bundle bndlanimation =
+                                                ActivityOptions.makeCustomAnimation(ReceiptActivity.this, R.anim.animation, R.anim.animation2).toBundle();
+                                        startActivity(slideactivity, bndlanimation);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onClick: ", e);
+                                }
+                            }
+                        });
                     }
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
@@ -254,26 +302,65 @@ public class ReceiptActivity extends AppCompatActivity {
                     finish();
                     SafeToast.makeText(ReceiptActivity.this, "Receipt does not exist!", Toast.LENGTH_LONG).show();
                 } else {
-                    //meaning null, from notification pending intent
-                    if(restaurantName.equals("vendorName")){
-                        DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+restaurantPhone);
-                        userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                try {
-                                    UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                                    vendorName.setText(userModel.getFirstname() + " " + userModel.getLastname());
-                                } catch (Exception e){
-                                    Log.e(TAG, "onDataChange: ", e);
+
+                    DatabaseReference myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+                    myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            try {
+                                UserModel myDetails = dataSnapshot.getValue(UserModel.class);
+                                if (myDetails.getAccount_type().equals("1")) {
+                                    DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+restaurantPhone);
+                                    userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            try {
+                                                UserModel userModel = dataSnapshot.getValue(UserModel.class);
+                                                vendorName.setText(userModel.getFirstname() + " " + userModel.getLastname());
+                                            } catch (Exception e){
+                                                Log.e(TAG, "onDataChange: ", e);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
+
+                                if (myDetails.getAccount_type().equals("2") || myDetails.getAccount_type().equals("3")) {
+                                    DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+customerPhone);
+                                    userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            try {
+                                                UserModel userModel = dataSnapshot.getValue(UserModel.class);
+                                                vendorName.setText(userModel.getFirstname() + " " + userModel.getLastname());
+                                            } catch (Exception e){
+                                                Log.e(TAG, "onDataChange: ", e);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
                             }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
 
-                            }
-                        });
-                    }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
 
                     vendorPhone.setOnClickListener(new View.OnClickListener() {
                         @Override
