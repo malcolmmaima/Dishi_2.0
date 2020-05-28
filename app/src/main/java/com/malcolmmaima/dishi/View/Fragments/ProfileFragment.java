@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,6 +39,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -54,6 +56,7 @@ import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.FollowersFollowing;
 import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.malcolmmaima.dishi.View.Activities.ViewReview;
 import com.malcolmmaima.dishi.View.Adapter.StatusUpdateAdapter;
 import com.squareup.picasso.Picasso;
@@ -79,12 +82,15 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     RecyclerView recyclerview;
     String myPhone;
 
+    Query posts;
+    LinearLayoutManager layoutmanager;
     DatabaseReference myRef, myPostUpdates, followersCounterRef, followingCounterref;
     ValueEventListener myListener, followersCounterListener, followingCounterListener;
-    ChildEventListener postUodatesChildListener;
+    ChildEventListener postUpdatesListener;
     FirebaseUser user;
 
     CircleImageView profilePhoto;
+    TextView loadMore;
     MyTextView_Roboto_Medium profileName;
     MyTextView_Roboto_Light profileBio;
     MyTextView_Roboto_Regular following, followers;
@@ -116,6 +122,10 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     // request code
     private final int PICK_IMAGE_REQUEST = 22;
 
+    private int mPosts = 5;
+    private int defaultPosts = 5;
+    StatusUpdateAdapter recycler;
+
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
@@ -144,6 +154,8 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         progressBar = v.findViewById(R.id.progressBar);
         recyclerview = v.findViewById(R.id.rview);
         recyclerview.setNestedScrollingEnabled(false);
+        loadMore = v.findViewById(R.id.loadMore);
+        loadMore.setVisibility(View.GONE);
 
         emoji = v.findViewById(R.id.emoji);
         myStatusUpdate = v.findViewById(R.id.myStatus);
@@ -154,6 +166,11 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         icon = v.findViewById(R.id.noPostsIcon);
         emptyTag = v.findViewById(R.id.empty_tag);
+
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
+        statusUpdates = new ArrayList<>();
+        recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -173,7 +190,15 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             public void run() {
 
                 mSwipeRefreshLayout.setRefreshing(true);
-                fetchPosts();
+                fetchPosts(defaultPosts);
+            }
+        });
+
+        loadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPosts = mPosts + 5;
+                fetchPosts(mPosts);
             }
         });
 
@@ -542,17 +567,15 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 myStatusUpdate.setText("");
                 myStatusUpdate.clearFocus();
-                statusUpdate.key = key;
-                statusUpdates.add(0,statusUpdate);
-
-                emptyTag.setVisibility(View.GONE);
-                icon.setVisibility(View.GONE);
-                recyclerview.setVisibility(View.VISIBLE);
-                StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
-                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
-                recyclerview.setLayoutManager(layoutmanager);
-                recycler.notifyItemInserted(0);
-                recyclerview.setAdapter(recycler);
+//                statusUpdate.key = key;
+//                statusUpdates.add(0,statusUpdate);
+//
+//                emptyTag.setVisibility(View.GONE);
+//                icon.setVisibility(View.GONE);
+//                recyclerview.setVisibility(View.VISIBLE);
+//                recyclerview.setLayoutManager(layoutmanager);
+//                recycler.notifyItemInserted(0);
+//                recyclerview.setAdapter(recycler);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -715,29 +738,36 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
-    private void fetchPosts() {
+    private void fetchPosts(int postCount) {
+        mSwipeRefreshLayout.setRefreshing(true);
         //Fetch the updates from status_updates node
-        myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
+        statusUpdates.clear();
+        posts = myPostUpdates.limitToLast(postCount);
+        postUpdatesListener = new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mSwipeRefreshLayout.setRefreshing(true);
-                statusUpdates = new ArrayList<>();
-                for(DataSnapshot updates : dataSnapshot.getChildren()){
-                    StatusUpdateModel statusUpdateModel = updates.getValue(StatusUpdateModel.class);
-                    statusUpdateModel.key = updates.getKey();
-                    statusUpdates.add(statusUpdateModel);
-                }
-
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 try {
+                    StatusUpdateModel statusUpdateModel = dataSnapshot.getValue(StatusUpdateModel.class);
+                    statusUpdateModel.key = dataSnapshot.getKey();
+                    if(!statusUpdates.contains(statusUpdateModel)){
+                        statusUpdates.add(statusUpdateModel);
+                        recyclerview.setHasFixedSize(true);
+                    }
+
                     mSwipeRefreshLayout.setRefreshing(false);
                     if (!statusUpdates.isEmpty()) {
+                        //Sort by most recent (based on timeStamp)
+                        //Collections.reverse(statusUpdates);
+                        try {
+                            Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+                        } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
                         emptyTag.setVisibility(View.GONE);
                         icon.setVisibility(View.GONE);
                         recyclerview.setVisibility(View.VISIBLE);
-                        Collections.reverse(statusUpdates);
                         recyclerview.setVisibility(View.VISIBLE);
                         StatusUpdateAdapter recycler = new StatusUpdateAdapter(getContext(), statusUpdates);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                         recyclerview.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
@@ -748,6 +778,30 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         icon.setVisibility(View.VISIBLE);
                         recyclerview.setVisibility(View.GONE);
                     }
+
+                    //show/hide loadmore...
+                    myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            loadMore.setVisibility(View.GONE);
+                            if(dataSnapshot.getChildrenCount() > statusUpdates.size()){
+                                loadMore.setVisibility(View.VISIBLE);
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                } catch (Exception e){
+                    Log.e(TAG, "onDataChange: ", e);
+                }
+
+                try {
+
                 }
 
                 catch (Exception e){
@@ -759,10 +813,26 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
 
             @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        posts.addChildEventListener(postUpdatesListener);
 
     }
 
@@ -777,6 +847,6 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
-        fetchPosts();
+        fetchPosts(defaultPosts);
     }
 }
