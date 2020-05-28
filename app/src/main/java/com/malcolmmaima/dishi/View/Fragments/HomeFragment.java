@@ -34,6 +34,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -65,6 +66,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     ProgressDialog progressDialog ;
     RecyclerView recyclerview;
     String myPhone;
+    int followingPostsCount;
 
     DatabaseReference followingRef, myPostUpdates, myBlockedUsersRef;
     FirebaseUser user;
@@ -132,6 +134,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+
+        followingPostsCount = 10;
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -257,10 +261,11 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void loadNewsFeed() {
+        Query myPosts = myPostUpdates.limitToLast(10); //dont show more than 10 of my posts on newsfeed
         statusUpdates = new ArrayList<>();
         mSwipeRefreshLayout.setRefreshing(true);
         //Add more posts to newsfeed as well
-        myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
+        myPosts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot updates : dataSnapshot.getChildren()){
@@ -315,11 +320,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mSwipeRefreshLayout.setRefreshing(true);
+
+                if(dataSnapshot.getChildrenCount() > 50){ //if i follow more than 50ppl then only show a max of 3 posts from each in newsfeed
+                    followingPostsCount = 3;
+                }
                 for(DataSnapshot following : dataSnapshot.getChildren()){
 
                     //for each 'following' user ... go to their posts node and fetch status updates
                     DatabaseReference newsFeedPosts = FirebaseDatabase.getInstance().getReference("posts/"+following.getKey());
-                    newsFeedPosts.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    Query otherPosts = newsFeedPosts.limitToLast(followingPostsCount); // don't show more than 10 of each users posts in newsfeed
+                    otherPosts.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             mSwipeRefreshLayout.setRefreshing(true);
@@ -332,14 +343,18 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(!dataSnapshot.exists()){
-                                                //Log.d(TAG, "not blocked: "+following.getKey());
-                                                statusUpdates.add(statusUpdateModel); //only add posts to newsfeed if i have not blocked the author of the post
+
+                                                //limit newsfeed items to 100
+                                                if(statusUpdates.size() < 100){
+                                                    statusUpdates.add(statusUpdateModel); //only add posts to newsfeed if i have not blocked the author of the post
+                                                }
                                             } else {
                                                 //Log.d(TAG, "blocked: "+following.getKey());
                                             }
 
                                             try {
                                                 mSwipeRefreshLayout.setRefreshing(false);
+
                                                 if (!statusUpdates.isEmpty()) {
 
                                                     //Sort by most recent (based on timeStamp)
