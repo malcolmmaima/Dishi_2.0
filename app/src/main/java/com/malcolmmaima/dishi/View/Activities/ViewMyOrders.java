@@ -397,6 +397,7 @@ public class ViewMyOrders extends AppCompatActivity {
                             paymentDialog(findViewById(android.R.id.content).getRootView());
                         }
 
+
                     } catch (Exception e){
                         Log.e(TAG, "onDataChange: ", e);
                     }
@@ -720,13 +721,18 @@ public class ViewMyOrders extends AppCompatActivity {
 
     public void paymentDialog(View view) {
         String message, action;
-        if (paid == 4){
-            action = "FINISH";
-            message = "Vendor confirmed, finish order";
-        }
-        else {
-            action = "YES";
-            message = "Have you paid for the order?";
+        message = "Have you paid for the order?";
+        action = "YES";
+        try {
+            if (paid == 4) {
+                action = "FINISH";
+                message = "Vendor confirmed, finish order";
+            } else {
+                action = "YES";
+                message = "Have you paid for the order?";
+            }
+        } catch (Exception e){
+            Log.e(TAG, "paymentDialog: ", e);
         }
         if(paymentDialogShown == false){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);

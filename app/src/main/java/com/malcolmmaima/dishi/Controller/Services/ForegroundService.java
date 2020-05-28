@@ -983,6 +983,7 @@ public class ForegroundService extends Service {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 try {
                                     Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
+                                    Integer paid = dataSnapshot.child("paid").getValue(Integer.class);
                                     /**
                                      * Now the challenge i'm facing with notifications is duplication of notifications
                                      * from a single trigger. To curb that i've decided to use the last 4 digits of the
@@ -995,7 +996,7 @@ public class ForegroundService extends Service {
                                     }
                                     int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
-                                    if (complete == true) {
+                                    if (complete == true && paid == 4) {
                                         //Lets get the restaurant's name that will be passed in the notification intent
                                         databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override

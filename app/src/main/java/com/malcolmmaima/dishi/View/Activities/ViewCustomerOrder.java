@@ -986,13 +986,14 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            customerOrderItems.child("paid").setValue(4);
-                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
-                                        }
-                                    });
+                                    customerOrderItems.child("paid").setValue(4);
+//                                    customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//
+//                                            Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
+//                                        }
+//                                    });
                                 }
                             })//setPositiveButton
 
