@@ -54,6 +54,7 @@ import com.volokh.danylo.hashtaghelper.HashTagHelper;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,6 +69,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
     long DURATION = 200;
     String TAG = "StatusAdapter";
     HashTagHelper mTextHashTagHelper;
+    int mode = 0;
 
     public StatusUpdateAdapter(Context context, List<StatusUpdateModel> listdata) {
         this.listdata = listdata;
@@ -967,6 +969,10 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                 }
             });
         }
+    }
+
+    public void setData(List<StatusUpdateModel> data){
+        this.listdata=data;
     }
 
     /**

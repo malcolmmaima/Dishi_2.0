@@ -1011,7 +1011,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         return listdata.size();
     }
 
-    class MyHolder extends RecyclerView.ViewHolder{
+    public class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium profileName;
         MyTextView_Roboto_Regular postedTo, userUpdate, likesTotal, commentsTotal;
         MyTextView_Roboto_Light timePosted;

@@ -33,11 +33,12 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingBottom="15dp">
 
                 <com.alexzh.circleimageview.CircleImageView
                     android:id="@+id/user_profile_photo"
@@ -313,9 +314,18 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_below="@id/statusActions"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/rview"
                     android:paddingBottom="40dp"
+                    />
+
+                <TextView
+                    android:id="@+id/loadMore"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="load more..."
                     />
 
             </RelativeLayout>
