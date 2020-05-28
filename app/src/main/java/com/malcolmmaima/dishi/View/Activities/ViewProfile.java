@@ -1107,51 +1107,90 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         mSwipeRefreshLayout.setRefreshing(true);
         //Fetch the updates from status_updates node
         statusUpdates.clear();
-        posts = myPostUpdates.limitToLast(postCount);
-        postUpdatesListener = new ChildEventListener() {
+
+        myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                try {
-                    StatusUpdateModel statusUpdateModel = dataSnapshot.getValue(StatusUpdateModel.class);
-                    statusUpdateModel.key = dataSnapshot.getKey();
-                    if(!statusUpdates.contains(statusUpdateModel)){
-                        statusUpdates.add(statusUpdateModel);
-                        recyclerview.setHasFixedSize(true);
-                    }
-
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
-                    if (!statusUpdates.isEmpty()) {
-                        //Sort by most recent (based on timeStamp)
-                        //Collections.reverse(statusUpdates);
-                        try {
-                            Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
-                        } catch (Exception e){
-                            Log.e(TAG, "onDataChange: ", e);
-                        }
-                        emptyTag.setVisibility(View.GONE);
-                        icon.setVisibility(View.GONE);
-                        recyclerview.setVisibility(View.VISIBLE);
-                        recyclerview.setVisibility(View.VISIBLE);
-                        StatusUpdateAdapter recycler = new StatusUpdateAdapter(ViewProfile.this, statusUpdates);
-                        recyclerview.setLayoutManager(layoutmanager);
+                    emptyTag.setText("NO POSTS");
+                    emptyTag.setVisibility(View.VISIBLE);
+                    icon.setVisibility(View.VISIBLE);
+                    recyclerview.setVisibility(View.GONE);
+                }
 
-                        recycler.notifyDataSetChanged();
-                        recyclerview.setAdapter(recycler);
-                    } else {
-                        emptyTag.setText("NO POSTS");
-                        emptyTag.setVisibility(View.VISIBLE);
-                        icon.setVisibility(View.VISIBLE);
-                        recyclerview.setVisibility(View.GONE);
-                    }
-
-                    //show/hide loadmore...
-                    myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
+                else {
+                    posts = myPostUpdates.limitToLast(postCount);
+                    postUpdatesListener = new ChildEventListener() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            loadMore.setVisibility(View.GONE);
-                            if(dataSnapshot.getChildrenCount() > statusUpdates.size()){
-                                loadMore.setVisibility(View.VISIBLE);
+                        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                            try {
+                                StatusUpdateModel statusUpdateModel = dataSnapshot.getValue(StatusUpdateModel.class);
+                                statusUpdateModel.key = dataSnapshot.getKey();
+                                if(!statusUpdates.contains(statusUpdateModel)){
+                                    statusUpdates.add(statusUpdateModel);
+                                    recyclerview.setHasFixedSize(true);
+                                }
+
+                                mSwipeRefreshLayout.setRefreshing(false);
+                                if (!statusUpdates.isEmpty()) {
+                                    //Sort by most recent (based on timeStamp)
+                                    //Collections.reverse(statusUpdates);
+                                    try {
+                                        Collections.sort(statusUpdates, (update1, update2) -> (update2.getTimePosted().compareTo(update1.getTimePosted())));
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onDataChange: ", e);
+                                    }
+                                    emptyTag.setVisibility(View.GONE);
+                                    icon.setVisibility(View.GONE);
+                                    recyclerview.setVisibility(View.VISIBLE);
+                                    recyclerview.setVisibility(View.VISIBLE);
+                                    StatusUpdateAdapter recycler = new StatusUpdateAdapter(ViewProfile.this, statusUpdates);
+                                    recyclerview.setLayoutManager(layoutmanager);
+
+                                    recycler.notifyDataSetChanged();
+                                    recyclerview.setAdapter(recycler);
+                                } else {
+                                    emptyTag.setText("NO POSTS");
+                                    emptyTag.setVisibility(View.VISIBLE);
+                                    icon.setVisibility(View.VISIBLE);
+                                    recyclerview.setVisibility(View.GONE);
+                                }
+
+                                //show/hide loadmore...
+                                myPostUpdates.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        loadMore.setVisibility(View.GONE);
+                                        if(dataSnapshot.getChildrenCount() > statusUpdates.size()){
+                                            loadMore.setVisibility(View.VISIBLE);
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
                             }
+                        }
+
+                        @Override
+                        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
                         }
 
@@ -1159,45 +1198,17 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
                         }
-                    });
-
-                } catch (Exception e){
-                    Log.e(TAG, "onDataChange: ", e);
+                    };
+                    posts.addChildEventListener(postUpdatesListener);
                 }
-
-                try {
-
-                }
-
-                catch (Exception e){
-                    emptyTag.setVisibility(View.VISIBLE);
-                    emptyTag.setText("ERROR");
-                    recyclerview.setVisibility(View.VISIBLE);
-
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        };
-        posts.addChildEventListener(postUpdatesListener);
+        });
+
 
     }
 
@@ -1409,29 +1420,17 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     public void onDestroy() {
         super.onDestroy();
 
-        try {
-            profileRef.removeEventListener(myListener);
-        } catch (Exception e){ }
+        try { profileRef.removeEventListener(myListener); } catch (Exception e){ }
 
-        try {
-            profileFollowers.removeEventListener(profileFollowersListener);
-        } catch (Exception e){ }
+        try { profileFollowers.removeEventListener(profileFollowersListener); } catch (Exception e){ }
 
-        try {
-            followersCounterRef.removeEventListener(followersCounterListener);
-        } catch (Exception e){ }
+        try { followersCounterRef.removeEventListener(followersCounterListener); } catch (Exception e){ }
 
-        try {
-            followingCounterref.removeEventListener(followingCounterListener);
-        } catch (Exception e){ }
+        try { followingCounterref.removeEventListener(followingCounterListener); } catch (Exception e){ }
 
-        try {
-            myBlockedUsers.removeEventListener(blockedUsersListener);
-        } catch (Exception e){ }
+        try { myBlockedUsers.removeEventListener(blockedUsersListener); } catch (Exception e){ }
 
-        try {
-            posts.removeEventListener(postUpdatesListener);
-        } catch (Exception e){
+        try { posts.removeEventListener(postUpdatesListener); } catch (Exception e){
 
         }
     }
