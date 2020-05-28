@@ -861,7 +861,44 @@ public class ForegroundService extends Service {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Integer paid = dataSnapshot.child("paid").getValue(Integer.class);
+                Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
 
+                if(paid == 2 && completed == false){
+                    String orderID = dataSnapshot.child("orderID").getValue(String.class);
+                    //Get user details
+                    DatabaseReference userDetails = FirebaseDatabase.getInstance().getReference("users/"+dataSnapshot.getKey());
+                    userDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try {
+                                UserModel customer = dataSnapshot.getValue(UserModel.class);
+
+                                //compose our notification and send
+                                String title = customer.getFirstname() + " " + customer.getLastname();
+                                String message;
+                                if(orderID != null){
+                                    message = "Confirm payment [#"+orderID+"]";
+                                } else {
+                                    message = "Confirm payment";
+                                }
+
+                                String customerPhone = dataSnapshot.getKey();
+                                if (customerPhone.length() > 4) {
+                                    lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
+                                }
+                                int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
+                                sendCustomerOrderNotification(notifId, "newOrderRequest", title, message, ViewCustomerOrder.class, customerPhone, title);
+
+                            } catch (Exception e){}
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
             @Override
