@@ -1116,7 +1116,6 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     statusUpdateModel.key = dataSnapshot.getKey();
                     if(!statusUpdates.contains(statusUpdateModel)){
                         statusUpdates.add(statusUpdateModel);
-                        recycler.setData(statusUpdates);
                         recyclerview.setHasFixedSize(true);
                     }
 

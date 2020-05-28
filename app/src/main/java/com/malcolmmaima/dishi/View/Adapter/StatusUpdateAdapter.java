@@ -971,10 +971,6 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
         }
     }
 
-    public void setData(List<StatusUpdateModel> data){
-        this.listdata=data;
-    }
-
     /**
      * @https://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
      */
