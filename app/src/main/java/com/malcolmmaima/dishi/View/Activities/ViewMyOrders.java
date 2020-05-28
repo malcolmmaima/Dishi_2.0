@@ -97,8 +97,6 @@ public class ViewMyOrders extends AppCompatActivity {
             finish();
             SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
-            paymentDialogShown = false;
-            receiptGenerated = false;
             try {
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -150,6 +148,9 @@ public class ViewMyOrders extends AppCompatActivity {
         deliveryCharge = 0.0;
         totalAmount = 0.0;
 
+        paymentDialogShown = false;
+        receiptGenerated = false;
+
         //Data passed from adapter
         phone = getIntent().getStringExtra("phone"); //From adapters
         restaurantName = getIntent().getStringExtra("name");
@@ -185,23 +186,6 @@ public class ViewMyOrders extends AppCompatActivity {
         myOrderID = findViewById(R.id.myOrderID);
         trackOrderTxt = findViewById(R.id.trackOrderTxt);
 
-        /**
-         * On loading this module check to see if it exists. this is a one time check
-         */
-        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         /**
          * Initialize cart items total and keep track of items
@@ -211,6 +195,7 @@ public class ViewMyOrders extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if(!dataSnapshot.exists()){
+                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
                     finish();
                 } else {
                     try {
@@ -407,6 +392,7 @@ public class ViewMyOrders extends AppCompatActivity {
                         //1 is default.. order has been sent 2. is awaiting payment confirmation 3. payment confirmed, order complete 4. order complete
                         if (paid == 4) {
                             if(receiptGenerated == false){
+                                receiptGenerated = true;
                                 DatabaseReference riderReceiptRef = FirebaseDatabase.getInstance().getReference("receipts/" + riderPhone);
                                 DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/" + phone);
                                 DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/" + myPhone);
@@ -514,7 +500,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                 receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        receiptGenerated = true;
+
                                         customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
