@@ -1,6 +1,7 @@
 package com.malcolmmaima.dishi.View.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
@@ -18,10 +19,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -37,15 +40,22 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class MyNotifications extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
+    String TAG = "MyNotifications";
     String myPhone;
     FirebaseUser user;
     DatabaseReference notificationsRef, myRef;
-    ValueEventListener notificationListener;
+    ChildEventListener notificationListener;
     RecyclerView recyclerView;
-    TextView emptyTag;
+    TextView emptyTag, loadMore;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
     FirebaseAuth mAuth;
+    List<NotificationModel> notifications;
+    Query notifs;
+    int defaultNotifCount;
+    int mPosts;
+    LinearLayoutManager layoutmanager;
+    NotificationAdapter recycler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +86,6 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("pinType", "resume");
                                     startActivity(slideactivity);
-                                } else {
-                                    loadActivity();
                                 }
                             }
 
@@ -86,8 +94,6 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
 
                             }
                         });
-                    } else {
-                        loadActivity();
                     }
                 }
 
@@ -96,6 +102,8 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
 
                 }
             });
+
+            loadActivity();
         }
     }
 
@@ -117,8 +125,6 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 slideactivity.putExtra("pinType", "resume");
                                 startActivity(slideactivity);
-                            } else {
-                                //loadActivity(); //redundant in this context
                             }
                         }
 
@@ -127,8 +133,6 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
 
                         }
                     });
-                } else {
-                    loadActivity();
                 }
             }
 
@@ -140,9 +144,19 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
     }
 
     private void loadActivity() {
+        notifications = new ArrayList<>();
+        defaultNotifCount = 10;
+        mPosts = 10;
+
         icon = findViewById(R.id.menuIcon);
         recyclerView = findViewById(R.id.rview);
         emptyTag = findViewById(R.id.empty_tag);
+        loadMore = findViewById(R.id.loadMore);
+        loadMore.setVisibility(View.GONE);
+
+        layoutmanager = new LinearLayoutManager(MyNotifications.this);
+        recycler = new NotificationAdapter(MyNotifications.this, notifications);
+        recyclerView.setLayoutManager(layoutmanager);
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
 
@@ -171,24 +185,30 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void run() {
 
-                mSwipeRefreshLayout.setRefreshing(true);
-
                 // Fetching data from server
-                fetchNotifications();
+                fetchNotifications(defaultNotifCount, false);
+            }
+        });
+
+        loadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPosts = mPosts + 5;
+                fetchNotifications(mPosts, true);
             }
         });
     }
 
-    private void fetchNotifications() {
-        notificationListener = new ValueEventListener() {
+    private void fetchNotifications(int notifCount, Boolean refresh) {
+        mSwipeRefreshLayout.setRefreshing(true);
+        notifications.clear();
+
+        notifs = notificationsRef.limitToLast(notifCount);
+        notificationListener = new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<NotificationModel> notifications = new ArrayList<>();
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
-
-                    NotificationAdapter recycler = new NotificationAdapter(MyNotifications.this, notifications);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyNotifications.this);
                     recyclerView.setLayoutManager(layoutmanager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());
                     recyclerView.setAdapter(recycler);
@@ -197,41 +217,80 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
                 }
 
                 else {
-                    for(DataSnapshot notif : dataSnapshot.getChildren()){
-                        NotificationModel notification = notif.getValue(NotificationModel.class);
+                    NotificationModel notification = dataSnapshot.getValue(NotificationModel.class);
+
+                    if(!notifications.contains(notification)){
                         notifications.add(notification);
+                        recyclerView.setHasFixedSize(true);
+                    }
 
-                        if (!notifications.isEmpty()) {
+                    if (!notifications.isEmpty()) {
 
-                            mSwipeRefreshLayout.setRefreshing(false);
-                            //Collections.reverse(notifications);
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        //Collections.reverse(notifications);
+                        try {
+                            Collections.sort(notifications, (not1, not2) -> (not2.timeStamp.compareTo(not1.timeStamp)));
+                        } catch (Exception e){}
+                        recyclerView.setLayoutManager(layoutmanager);
+                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+                        recycler.notifyDataSetChanged();
+                        recyclerView.setAdapter(recycler);
+                        emptyTag.setVisibility(View.INVISIBLE);
+                        icon.setVisibility(View.INVISIBLE);
+
+                        if(refresh == true){
                             try {
-                                Collections.sort(notifications, (not1, not2) -> (not2.timeStamp.compareTo(not1.timeStamp)));
-                            } catch (Exception e){}
-                            NotificationAdapter recycler = new NotificationAdapter(MyNotifications.this, notifications);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyNotifications.this);
-                            recyclerView.setLayoutManager(layoutmanager);
-                            recyclerView.setItemAnimator(new DefaultItemAnimator());
-                            recycler.notifyDataSetChanged();
-                            recyclerView.setAdapter(recycler);
-                            emptyTag.setVisibility(View.INVISIBLE);
-                            icon.setVisibility(View.INVISIBLE);
-                        } else {
-
-                            mSwipeRefreshLayout.setRefreshing(false);
-
-                            NotificationAdapter recycler = new NotificationAdapter(MyNotifications.this, notifications);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyNotifications.this);
-                            recyclerView.setLayoutManager(layoutmanager);
-                            recyclerView.setItemAnimator(new DefaultItemAnimator());
-                            recyclerView.setAdapter(recycler);
-                            emptyTag.setVisibility(View.VISIBLE);
-                            icon.setVisibility(View.VISIBLE);
-
+                                recyclerView.smoothScrollToPosition(notifCount);
+                            } catch (Exception e){
+                                Log.e(TAG, "onClick: ", e);
+                            }
                         }
+
+
+
+                    } else {
+
+                        mSwipeRefreshLayout.setRefreshing(false);
+
+                        recyclerView.setLayoutManager(layoutmanager);
+                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+                        recyclerView.setAdapter(recycler);
+                        emptyTag.setVisibility(View.VISIBLE);
+                        icon.setVisibility(View.VISIBLE);
+
                     }
                 }
 
+                //show/hide loadmore...
+                notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        loadMore.setVisibility(View.GONE);
+                        if(dataSnapshot.getChildrenCount() > notifications.size()){
+                            loadMore.setVisibility(View.VISIBLE);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
             }
 
@@ -240,7 +299,7 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
 
             }
         };
-        notificationsRef.addValueEventListener(notificationListener);
+        notifs.addChildEventListener(notificationListener);
     }
 
     @Override
@@ -268,7 +327,7 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
     protected void onDestroy() {
         super.onDestroy();
         try {
-            notificationsRef.removeEventListener(notificationListener);
+            notifs.removeEventListener(notificationListener);
         } catch (Exception e){
             Log.e("MyNotifications", "onDestroy: ", e);
         }
@@ -276,6 +335,6 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
 
     @Override
     public void onRefresh() {
-        fetchNotifications();
+        fetchNotifications(defaultNotifCount, false);
     }
 }

@@ -53,7 +53,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     String TAG = "NotificationAdapter";
     Context context;
     List<NotificationModel> listdata;
-    long DURATION = 200;
+    long DURATION = 250;
     UserModel userData;
     String myPhone;
     FirebaseUser user;
