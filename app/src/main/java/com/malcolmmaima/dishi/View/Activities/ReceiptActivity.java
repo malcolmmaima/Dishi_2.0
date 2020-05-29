@@ -378,6 +378,11 @@ public class ReceiptActivity extends AppCompatActivity {
                                     });
                                 }
                             } catch (Exception e){
+
+                                if(downloadRequest == true){
+                                    finish();
+                                    Toast.makeText(ReceiptActivity.this, "Something went wrong! try again", Toast.LENGTH_SHORT).show();
+                                }
                                 Log.e(TAG, "onDataChange: ", e);
                             }
 
