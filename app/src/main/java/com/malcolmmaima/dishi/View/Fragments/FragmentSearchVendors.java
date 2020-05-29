@@ -50,6 +50,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
     DatabaseReference myLocationRef, myUserDetails;
     ValueEventListener locationListener;
     UserModel myDetails;
+    int searchCap;
 
     public static FragmentSearchVendors newInstance() {
         FragmentSearchVendors fragment = new FragmentSearchVendors();
@@ -64,6 +65,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber();
+        searchCap = 100;
         //String searchString;
         //searchString = getArguments().getString("search");
 
@@ -185,23 +187,26 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
 
                                                         String restaurantName = user.getFirstname() + " " + user.getLastname();
                                                         if (!myPhone.equals(user.getPhone())) {
-                                                            if (restaurantName.toLowerCase().contains(searchValue.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (searchValue.toLowerCase().contains(restaurantName.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
-                                                            //search if word is equal to user name object
-                                                            else if (searchValue.toLowerCase() == restaurantName.toLowerCase()) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (restaurantName.toLowerCase().equals(searchValue.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
 
-                                                            Log.d("Restaurants", "added: " + user.getFirstname());
+                                                            if(restaurantsList.size() < searchCap){
+                                                                if (restaurantName.toLowerCase().contains(searchValue.toLowerCase())) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                } else if (searchValue.toLowerCase().contains(restaurantName.toLowerCase())) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                }
+                                                                //search if word is equal to user name object
+                                                                else if (searchValue.toLowerCase() == restaurantName.toLowerCase()) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                } else if (restaurantName.toLowerCase().equals(searchValue.toLowerCase())) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                }
+
+                                                                Log.d("Restaurants", "added: " + user.getFirstname());
+                                                            }
                                                         }
 
                                                         if (!restaurantsList.isEmpty()) {
@@ -265,23 +270,25 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
 
                                                         String restaurantName = user.getFirstname() + " " + user.getLastname();
                                                         if (!myPhone.equals(user.getPhone())) {
-                                                            if (restaurantName.toLowerCase().contains(searchValue.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (searchValue.toLowerCase().contains(restaurantName.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
-                                                            //search if word is equal to user name object
-                                                            else if (searchValue.toLowerCase() == restaurantName.toLowerCase()) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            } else if (restaurantName.toLowerCase().equals(searchValue.toLowerCase())) {
-                                                                user.setDistance(dist);
-                                                                restaurantsList.add(user);
-                                                            }
+                                                            if(restaurantsList.size() < searchCap){
+                                                                if (restaurantName.toLowerCase().contains(searchValue.toLowerCase())) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                } else if (searchValue.toLowerCase().contains(restaurantName.toLowerCase())) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                }
+                                                                //search if word is equal to user name object
+                                                                else if (searchValue.toLowerCase() == restaurantName.toLowerCase()) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                } else if (restaurantName.toLowerCase().equals(searchValue.toLowerCase())) {
+                                                                    user.setDistance(dist);
+                                                                    restaurantsList.add(user);
+                                                                }
 
-                                                            Log.d("Restaurants", "added: " + user.getFirstname());
+                                                                Log.d("Restaurants", "added: " + user.getFirstname());
+                                                            }
                                                         }
 
                                                         if (!restaurantsList.isEmpty()) {

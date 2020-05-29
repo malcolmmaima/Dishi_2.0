@@ -41,6 +41,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
     SwipeRefreshLayout mSwipeRefreshLayout;
     String searchValue, myPhone;
     FirebaseUser user;
+    int searchCap;
 
     public static FragmentSearchUsers newInstance() {
         FragmentSearchUsers fragment = new FragmentSearchUsers();
@@ -56,6 +57,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber();
+        searchCap = 100;
         //String searchString;
         //searchString = getArguments().getString("search");
 
@@ -117,7 +119,9 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
 
                             String name = userFound.getFirstname()+" "+userFound.getLastname();
                             if(name.toLowerCase().contains(s.toLowerCase()) && !myPhone.equals(userFound.getPhone())){
-                                usersFound.add(userFound);
+                                if(usersFound.size() < searchCap){
+                                    usersFound.add(userFound);
+                                }
                             }
 
                             if (!usersFound.isEmpty()) {

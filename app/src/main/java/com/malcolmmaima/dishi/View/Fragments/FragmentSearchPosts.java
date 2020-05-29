@@ -43,6 +43,7 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
     String searchValue, myPhone;
     FirebaseUser user;
     DatabaseReference followingRef, postsRef;
+    int searchCap;
 
     public static FragmentSearchPosts newInstance() {
         FragmentSearchPosts fragment = new FragmentSearchPosts();
@@ -57,6 +58,7 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber();
+        searchCap = 100;
 
         SearchActivity activity = (SearchActivity) getActivity();
         searchValue = activity.getSearchValue();
@@ -125,7 +127,9 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                                                         statusUpdateModel.key = updates.getKey();
                                                         statusUpdateModel.type = "searchPost";
                                                         if (statusUpdateModel.getStatus().toLowerCase().contains(searchValue.toLowerCase())) {
-                                                            statusUpdates.add(statusUpdateModel);
+                                                            if(statusUpdates.size() < searchCap){
+                                                                statusUpdates.add(statusUpdateModel);
+                                                            }
                                                         }
 
                                                         try {
@@ -185,7 +189,9 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                                             statusUpdateModel.type = "searchPost";
 
                                             if (statusUpdateModel.getStatus().toLowerCase().contains(searchValue.toLowerCase())) {
-                                                statusUpdates.add(statusUpdateModel);
+                                                if(statusUpdates.size() < searchCap){
+                                                    statusUpdates.add(statusUpdateModel);
+                                                }
                                             }
 
                                             try {
