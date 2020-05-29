@@ -185,7 +185,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
 
             }
         };
-
         myLocationRef.addValueEventListener(locationListener);
 
         /**
@@ -268,7 +267,10 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                     if (dist < location_filter) {
                                                         //Fetch menu items of restaurants that have passed distance parameter
                                                         user.setDistance(dist);
-                                                        list.add(user);
+
+                                                        if(list.size() < 120){ //put a cap of 120 items
+                                                            list.add(user);
+                                                        }
 
 //                                                    for (DataSnapshot menu : restaurants.getChildren()) {
 //                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
@@ -335,21 +337,20 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                     /**
                                                      * Now lets compute distance of each restaurant with customer location
                                                      */
+
                                                     CalculateDistance calculateDistance = new CalculateDistance();
                                                     Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                             liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
                                                     /**
                                                      * if distance meets parameters set then fetch menu
                                                      */
-
                                                     if (dist < location_filter) {
-                                                        //Fetch menu items of restaurants that have passed distance parameter
-
+                                                        //Fetch menu items of restaurants that have passed distance paramete
                                                         user.setDistance(dist);
-                                                        list.add(user);
+                                                        if(list.size() < 120){ //put a cap of 120 items
+                                                            list.add(user);
+                                                        }
                                                     }
 
                                                 } catch (Exception e){

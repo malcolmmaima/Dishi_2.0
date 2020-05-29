@@ -267,7 +267,10 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
                                                             product.accountType = "1"; //This fragment belongs to account type 1 (customer)
-                                                            list.add(product);
+
+                                                            if(list.size() < 120){ //put a cap of 100 items
+                                                                list.add(product);
+                                                            }
                                                         }
                                                     }
 
@@ -349,7 +352,9 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
                                                             product.accountType = "1"; //this fragment belongs to account type 1
-                                                            list.add(product);
+                                                            if(list.size() < 120){
+                                                                list.add(product);
+                                                            }
                                                         }
                                                     }
 
