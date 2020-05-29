@@ -8,6 +8,7 @@
     tools:context=".View.Activities.ReceiptActivity">
 
 <RelativeLayout
+    android:id="@+id/myReceipt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"

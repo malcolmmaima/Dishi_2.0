@@ -9,16 +9,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,6 +41,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.itextpdf.text.DocumentException;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
@@ -38,11 +50,18 @@ import com.malcolmmaima.dishi.Model.ReceiptModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.ReceiptItemAdapter;
+import com.malcolmmaima.dishi.View.Maps.GeoTracking;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
@@ -50,7 +69,9 @@ public class ReceiptActivity extends AppCompatActivity {
 
     String TAG = "ReceiptActivity";
     DatabaseReference receiptItemsRef, receiptObjRef, myRef;
-    String key, myPhone, orderid, orderedOn, deliveredOn, restaurantName, restaurantPhone, customerPhone;
+    String key, myPhone, orderid, orderedOn, deliveredOn,
+            restaurantName, restaurantPhone, customerPhone;
+    Boolean downloadRequest;
     FirebaseUser user;
     FirebaseAuth mAuth;
     private ArrayList<ProductDetailsModel> deliveredItems;
@@ -62,6 +83,10 @@ public class ReceiptActivity extends AppCompatActivity {
     int totalAmount;
     Double vatCharge;
     ProgressBar progressBar;
+    RelativeLayout myReceipt;
+    private Bitmap bitmap;
+    ProgressDialog progressDialog;
+    Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,6 +228,8 @@ public class ReceiptActivity extends AppCompatActivity {
     private void loadReceipt() {
         setContentView(R.layout.activity_receipt);
 
+        progressDialog = new ProgressDialog(ReceiptActivity.this);
+        myReceipt = findViewById(R.id.myReceipt);
         exitReceipt = findViewById(R.id.exitReceipt);
         recyclerView = findViewById(R.id.recyclerview);
         totalBill = findViewById(R.id.totalBill);
@@ -217,6 +244,7 @@ public class ReceiptActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
+        downloadRequest = getIntent().getBooleanExtra("downloadRequest", false);
         orderedOn = getIntent().getStringExtra("orderOn");
         deliveredOn = getIntent().getStringExtra("deliveredOn");
         key = getIntent().getStringExtra("key");
@@ -281,6 +309,7 @@ public class ReceiptActivity extends AppCompatActivity {
                             }
                         });
                     }
+
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
                 }
@@ -292,7 +321,6 @@ public class ReceiptActivity extends AppCompatActivity {
 
             }
         });
-
 
         receiptObjRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone+"/"+key);
         receiptObjRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -527,8 +555,10 @@ public class ReceiptActivity extends AppCompatActivity {
                                             //do something
                                             return (true);
                                         case R.id.download:
-                                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
-                                            //do something
+                                            exitReceipt.setVisibility(View.GONE);
+                                            receiptOptions.setVisibility(View.GONE);
+                                            bitmap = loadBitmapFromView(myReceipt, myReceipt.getWidth(), myReceipt.getHeight());
+                                            createPdf();
                                             return true;
                                         default:
                                             return false;
@@ -548,6 +578,47 @@ public class ReceiptActivity extends AppCompatActivity {
             }
         });
 
+        if(downloadRequest == true){
+            progressDialog.setMessage("Generating...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+
+                int second = 5;
+
+                @Override
+                public void run() {
+                    if (second == 0) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                timer.cancel();
+                                //now create
+                                exitReceipt.setVisibility(View.GONE);
+                                receiptOptions.setVisibility(View.GONE);
+                                bitmap = loadBitmapFromView(myReceipt, myReceipt.getWidth(), myReceipt.getHeight());
+
+                                createPdf();
+
+                            }
+                        });
+
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //seconds ticking
+                                progressDialog.setMessage("Generating("+(second--)+")...");
+                            }
+                        });
+                    }
+
+                }
+            }, 0, 1000);
+        }
+
         exitReceipt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -555,5 +626,102 @@ public class ReceiptActivity extends AppCompatActivity {
             }
         });
     }
+
+    //https://demonuts.com/android-generate-pdf-view/
+    private void createPdf(){
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        //  Display display = wm.getDefaultDisplay();
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        float hight = displaymetrics.heightPixels ;
+        float width = displaymetrics.widthPixels ;
+
+        int convertHighet = (int) hight, convertWidth = (int) width;
+
+//        Resources mResources = getResources();
+//        Bitmap bitmap = BitmapFactory.decodeResource(mResources, R.drawable.screenshot);
+
+        PdfDocument document = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(convertWidth, convertHighet, 1).create();
+        PdfDocument.Page page = document.startPage(pageInfo);
+
+        Canvas canvas = page.getCanvas();
+
+        Paint paint = new Paint();
+        canvas.drawPaint(paint);
+
+        bitmap = Bitmap.createScaledBitmap(bitmap, convertWidth, convertHighet, true);
+
+        paint.setColor(Color.BLUE);
+        canvas.drawBitmap(bitmap, 0, 0 , null);
+        document.finishPage(page);
+
+        // write the document content
+        String targetPdf = "/sdcard/Dishi_"+orderid+".pdf";
+        File filePath;
+        filePath = new File(targetPdf);
+        try {
+            document.writeTo(new FileOutputStream(filePath));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.myReceipt), "Something wrong", Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
+
+        // close the document
+        document.close();
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.myReceipt), "PDF is created", Snackbar.LENGTH_LONG);
+        snackbar.show();
+
+        try {
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        } catch (Exception e){
+            Log.e(TAG, "createPdf: ", e);
+        }
+
+        if(downloadRequest == true){
+            finish();
+        }
+
+        openGeneratedPDF();
+        exitReceipt.setVisibility(View.VISIBLE);
+        receiptOptions.setVisibility(View.VISIBLE);
+    }
+
+    private void openGeneratedPDF(){
+        File file = new File("/sdcard/Dishi_"+orderid+".pdf");
+        if (file.exists())
+        {
+            Toast.makeText(this, "Opening...", Toast.LENGTH_SHORT).show();
+            Intent intent=new Intent(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(file);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            try
+            {
+                startActivity(intent);
+            }
+            catch(ActivityNotFoundException e)
+            {
+                Toast.makeText(ReceiptActivity.this, "No Application available to view pdf", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public static Bitmap loadBitmapFromView(View v, int width, int height) {
+        Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        v.draw(c);
+
+        return b;
+    }
+
+
 }
 

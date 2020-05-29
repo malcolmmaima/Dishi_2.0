@@ -252,7 +252,23 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                                         //set three option buttons
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
-                                                Snackbar.make(view.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+                                                try {
+                                                    Intent slideactivity = new Intent(context, ReceiptActivity.class)
+                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                                    slideactivity.putExtra("key", receipt.key);
+                                                    slideactivity.putExtra("restaurantName", holder.restaurantName.getText().toString());
+                                                    slideactivity.putExtra("restaurantPhone", receipt.getRestaurant());
+                                                    slideactivity.putExtra("customerPhone", receipt.getCustomer());
+                                                    slideactivity.putExtra("orderID", receipt.getOrderID());
+                                                    slideactivity.putExtra("orderOn", receipt.getInitiatedOn());
+                                                    slideactivity.putExtra("deliveredOn", receipt.getDeliveredOn());
+                                                    slideactivity.putExtra("downloadRequest", true);
+                                                    Bundle bndlanimation =
+                                                            ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                                                    context.startActivity(slideactivity, bndlanimation);
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onClick: ", e);
+                                                }
                                             }
                                         })
                                         .setNegativeButton("NO", new DialogInterface.OnClickListener() {
