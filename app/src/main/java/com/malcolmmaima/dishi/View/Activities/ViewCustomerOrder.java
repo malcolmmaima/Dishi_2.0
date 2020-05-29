@@ -78,7 +78,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
             timeStamp, trackOrderTxt;
     FloatingActionButton acceptOrd;
     ImageView riderIcon;
-    Double deliveryCharge, totalAmount;
+    Integer deliveryCharge;
+    Double totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
     CardView DeliveryAddress, OrderStatus;
@@ -237,7 +238,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         setContentView(R.layout.activity_view_customer_order);
 
         //Initialize variables
-        deliveryCharge = 0.0;
+        deliveryCharge = 0;
         totalAmount = 0.0;
 
         //Data passed from adapter
@@ -437,6 +438,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                     list = new ArrayList<>();
 
+                    deliveryCharge = dataSnapshot.child("deliveryCharge").getValue(Integer.class);
                     String remarks = dataSnapshot.child("remarks").getValue(String.class);
                     String orderID = dataSnapshot.child("orderID").getValue(String.class);
                     String paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
@@ -444,6 +446,10 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     address = dataSnapshot.child("address").getValue(String.class);
                     payment.setText(paymentMethod);
                     myOrderID.setText("ORDER ID: #"+orderID);
+                    deliveryChargeAmount.setText("Ksh "+deliveryCharge);
+                    totalAmount = Double.valueOf(total[0] + deliveryCharge);
+                    subTotal.setText("Ksh " + total[0]);
+                    totalBill.setText("Ksh " + totalAmount);
                     initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
 
                     try {
@@ -592,7 +598,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                             if(prod.getConfirmed() == true){
                                 int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
                                 total[0] = total[0] + adapterTotal;
-                                totalAmount = total[0] + deliveryCharge;
+                                totalAmount = Double.valueOf(total[0] + deliveryCharge);
                             }
                         } catch (Exception e){
 
@@ -610,7 +616,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         recyclerview.setAdapter(recycler);
                     }
 
-                    totalBill.setText("ksh " + totalAmount);
+                    totalBill.setText("Ksh " + totalAmount);
 
                     try {
                         //1 is default.. order has been sent 2. is awaiting payment confirmation 3. payment confirmed, order complete 4. order complete
@@ -1199,9 +1205,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
          */
         if(isChecked){
             total[0] = total[0] + adapterTotal;
-            totalAmount = total[0] + deliveryCharge;
+            totalAmount = Double.valueOf(total[0] + deliveryCharge);
             subTotal.setText("Ksh " + total[0]);
-            totalBill.setText("ksh " + totalAmount);
+            totalBill.setText("Ksh " + totalAmount);
 
             if(confirmOrder.getTag().toString().equals("end")){
                 confirmOrder.setTag("confirm");
@@ -1212,9 +1218,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         else {
             total[0] = total[0] - adapterTotal;
             if(total[0] < 0) { total[0] = 0;}
-            totalAmount = total[0] + deliveryCharge;
+            totalAmount = Double.valueOf(total[0] + deliveryCharge);
             subTotal.setText("Ksh " + total[0]);
-            totalBill.setText("ksh " + totalAmount);
+            totalBill.setText("Ksh " + totalAmount);
         }
     }
 

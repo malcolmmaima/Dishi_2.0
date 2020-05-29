@@ -74,7 +74,8 @@ public class ViewMyOrders extends AppCompatActivity {
     MyTextView_Roboto_Medium myOrderID, totalBill;
     MyTextView_Roboto_Regular subTotal, deliveryChargeAmount, payment, myRemarks, riderName, timeStamp, trackOrderTxt;
     ImageView riderIcon;
-    Double deliveryCharge, totalAmount;
+    Integer deliveryCharge;
+    Double totalAmount;
     RecyclerView recyclerview;
     AppCompatButton confirmOrder, declineOrder;
     CardView DeliveryAddress;
@@ -145,7 +146,7 @@ public class ViewMyOrders extends AppCompatActivity {
         setContentView(R.layout.activity_view_my_orders);
 
         //Initialize variables
-        deliveryCharge = 0.0;
+        deliveryCharge = 0;
         totalAmount = 0.0;
 
         paymentDialogShown = false;
@@ -201,6 +202,7 @@ public class ViewMyOrders extends AppCompatActivity {
                     try {
 
                         Boolean completed = dataSnapshot.child("completed").getValue(Boolean.class);
+                        deliveryCharge = dataSnapshot.child("deliveryCharge").getValue(Integer.class);
                         String remarks = dataSnapshot.child("remarks").getValue(String.class);
                         paid = dataSnapshot.child("paid").getValue(Integer.class);
                         orderID = dataSnapshot.child("orderID").getValue(String.class);
@@ -208,6 +210,10 @@ public class ViewMyOrders extends AppCompatActivity {
                         address = dataSnapshot.child("address").getValue(String.class);
                         myOrderID.setText("ORDER ID: #"+orderID);
                         payment.setText(paymentMethod);
+                        deliveryChargeAmount.setText("Ksh "+deliveryCharge);
+                        totalAmount = Double.valueOf(total[0] + deliveryCharge);
+                        subTotal.setText("Ksh " + total[0]);
+                        totalBill.setText("Ksh " + totalAmount);
 
                         if(address.equals("pick")){
                             trackOrderTxt.setText("Locate Vendor");
@@ -355,7 +361,7 @@ public class ViewMyOrders extends AppCompatActivity {
                             if(prod.getConfirmed() == true){
                                 int adapterTotal = prod.getQuantity() * Integer.parseInt(prod.getPrice());
                                 total[0] = total[0] + adapterTotal;
-                                totalAmount = total[0] + deliveryCharge;
+                                totalAmount = Double.valueOf(total[0] + deliveryCharge);
                             }
 
                         } catch (Exception e){

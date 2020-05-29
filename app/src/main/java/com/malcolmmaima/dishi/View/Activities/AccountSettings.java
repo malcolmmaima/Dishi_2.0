@@ -246,7 +246,7 @@ public class AccountSettings extends AppCompatActivity {
                 }
 
                 try {
-                    deliveryChargeAmount.setText("Ksh "+myUserDetails.getDelivery_charge()+"/Km");
+                    deliveryChargeAmount.setText("Ksh "+myUserDetails.getDelivery_charge());
                 } catch (Exception error){
                     Log.e(TAG, "onDataChange: ", error);
                 }

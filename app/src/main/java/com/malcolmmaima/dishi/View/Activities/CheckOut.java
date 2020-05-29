@@ -77,6 +77,8 @@ public class CheckOut extends AppCompatActivity {
     ArrayList<ProductDetailsModel> myCartItems;
     private RecyclerView recyclerView;
     private ReceiptItemAdapter mAdapter;
+    ArrayList<String> vendors;
+    ArrayList<UserModel> vendorObj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +128,8 @@ public class CheckOut extends AppCompatActivity {
         lng = 0.0;
         placeName = "";
         locationSet = "";
+        vendors = new ArrayList<String>();
+        vendorObj = new ArrayList<UserModel>();
         progressDialog = new ProgressDialog(CheckOut.this);
 
         //Hide keyboard on activity load
@@ -156,12 +160,13 @@ public class CheckOut extends AppCompatActivity {
         myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                vendors.clear();
                 myCartItems = new ArrayList<>();
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                     try {
                         ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
                         myCartItems.add(product);
-
+                        addVendors(product.getOwner());
                     } catch (Exception e){
                         Log.e(TAG, "onDataChange: ", e);
                     }
@@ -173,6 +178,39 @@ public class CheckOut extends AppCompatActivity {
                 recyclerView.setItemAnimator(new DefaultItemAnimator());
                 recyclerView.setAdapter(mAdapter);
 
+            }
+
+            private void addVendors(String vendor) {
+                if(!vendors.contains(vendor)){
+                    vendors.add(vendor);
+
+                    //get vendor details incl delivery charge val
+                    DatabaseReference vendorUserDetails = FirebaseDatabase.getInstance().getReference("users/"+vendor);
+                    vendorUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try {
+                                UserModel vendorUser = dataSnapshot.getValue(UserModel.class);
+                                vendorUser.setPhone(vendor);
+
+                                vendorObj.add(vendorUser);
+                                deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                deliveryChargeAmount.setText("Ksh " + deliveryAmount);
+
+                                totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
+                                totalBill.setText("Ksh " + totalBillAmount);
+
+                            } catch (Exception e){
+                                Log.e(TAG, "onDataChange: ", e);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
             @Override
@@ -263,6 +301,7 @@ public class CheckOut extends AppCompatActivity {
             }
         });
     }
+
 
     private void sendOrder() {
 
@@ -432,6 +471,25 @@ public class CheckOut extends AppCompatActivity {
                                         int orderID_2 = new Random().nextInt(1000);
                                         String orderID = orderID_1.toUpperCase()+""+orderID_2;
 
+                                        //post delivery charge with order as well
+                                        DatabaseReference vendorDetails = FirebaseDatabase.getInstance().getReference("users/"+product.getOwner());
+                                        vendorDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                try {
+                                                    UserModel vendorDet = dataSnapshot.getValue(UserModel.class);
+                                                    ordersRef.child(myPhone).child("deliveryCharge").setValue(vendorDet.getDelivery_charge());
+                                                } catch (Exception e){
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
                                         ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
                                         ordersRef.child(myPhone).child("paymentMethod").setValue(selectedPaymentMethod);
                                         ordersRef.child(myPhone).child("address").setValue(locationSet);
@@ -440,6 +498,7 @@ public class CheckOut extends AppCompatActivity {
                                         ordersRef.child(myPhone).child("completed").setValue(false);
                                         ordersRef.child(myPhone).child("remarks").setValue(finalMyRemarks);
                                         ordersRef.child(myPhone).child("paid").setValue(1);
+
 
                                         if(locationSet.equals("static")){
                                             staticLocationModel.setLatitude(lat);
@@ -561,6 +620,25 @@ public class CheckOut extends AppCompatActivity {
                                 //Generate random integer
                                 int orderID_2 = new Random().nextInt(1000);
                                 String orderID = orderID_1.toUpperCase()+""+orderID_2;
+
+                                //post delivery charge with order as well
+                                DatabaseReference vendorDetails = FirebaseDatabase.getInstance().getReference("users/"+product.getOwner());
+                                vendorDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+                                            UserModel vendorDet = dataSnapshot.getValue(UserModel.class);
+                                            ordersRef.child(myPhone).child("deliveryCharge").setValue(vendorDet.getDelivery_charge());
+                                        } catch (Exception e){
+                                            Log.e(TAG, "onDataChange: ", e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
 
                                 ordersRef.child(myPhone).child("initiatedOn").setValue(orderDate);
                                 ordersRef.child(myPhone).child("paymentMethod").setValue(selectedPaymentMethod);

@@ -173,4 +173,5 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="title_activity_maps">Map</string>
     <string name="contact_support">Having trouble with the app? We\'re here to help. Be sure to shoot us an email and we will get back to you as soon as possible.</string>
+    <string name="delivery_charge_desc">Please not this is a flat rate delivery fee you charge to your customers. We do not calculate this value whatsoever. We have given you the autonomy to set your own rates. Please note that customers are more likely to order from you if your rates are affordable (^_^)</string>
 </resources>
