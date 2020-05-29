@@ -41,7 +41,6 @@ import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Fragments.FragmentStats;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MenuFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyReviewsFragment;
@@ -49,7 +48,6 @@ import com.malcolmmaima.dishi.View.Fragments.MyRidersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ReceiptsFragment;
 import com.malcolmmaima.dishi.View.Fragments.RestaurantOrdersFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
-import com.malcolmmaima.dishi.View.Fragments.ReviewsFragment;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.Nullable;
@@ -77,16 +75,15 @@ import android.widget.Toast;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
-public class RestaurantActivity extends AppCompatActivity
+public class VendorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    FloatingActionButton addMenu;
     Menu myMenu;
     String myPhone, imageURL, imageURLBig;
     private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
     private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener, lastQueryListener;
     private FirebaseAuth mAuth;
-    private String TAG = "RestaurantActivity";
+    private String TAG = "VendorActivity";
     private Query lastQuery;
     private static final int PERMISSIONS_REQUEST = 100;
 
@@ -154,7 +151,7 @@ public class RestaurantActivity extends AppCompatActivity
                                         Boolean locked = dataSnapshot.getValue(Boolean.class);
 
                                         if (locked == true) {
-                                            Intent slideactivity = new Intent(RestaurantActivity.this, SecurityPin.class)
+                                            Intent slideactivity = new Intent(VendorActivity.this, SecurityPin.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                             slideactivity.putExtra("pinType", "resume");
                                             startActivity(slideactivity);
@@ -192,8 +189,6 @@ public class RestaurantActivity extends AppCompatActivity
 
         imageURL = "";
 
-        addMenu = findViewById(R.id.button_add_menu);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("");
@@ -201,29 +196,6 @@ public class RestaurantActivity extends AppCompatActivity
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        /**
-         * Load add menu activity
-         */
-
-        addMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent slideactivity = new Intent(RestaurantActivity.this, AddMenu.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                Bundle bndlanimation =
-                        null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    bndlanimation = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    try {
-                        startActivity(slideactivity, bndlanimation);
-                    } catch (Exception e){
-
-                    }
-                }
-            }
-        });
 
         /**
          * Manually displaying the first fragment - one time only
@@ -268,7 +240,7 @@ public class RestaurantActivity extends AppCompatActivity
                     UserModel user = dataSnapshot.getValue(UserModel.class);
 
                     if(!user.getAccount_type().equals("2")){
-                        SafeToast.makeText(RestaurantActivity.this, "Not allowed!", Toast.LENGTH_LONG).show();
+                        SafeToast.makeText(VendorActivity.this, "Not allowed!", Toast.LENGTH_LONG).show();
                         finish();
                     }
 
@@ -279,14 +251,14 @@ public class RestaurantActivity extends AppCompatActivity
                     navUsername.setText(user.getFirstname() + " " + user.getLastname());
 
                     if(user.getProfilePicSmall() != null){
-                        Picasso.with(RestaurantActivity.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                        Picasso.with(VendorActivity.this).load(user.getProfilePicSmall()).fit().centerCrop()
                                 .placeholder(R.drawable.default_profile)
                                 .error(R.drawable.default_profile)
                                 .into(profilePic);
                     }
 
                     else {
-                        Picasso.with(RestaurantActivity.this).load(user.getProfilePic()).fit().centerCrop()
+                        Picasso.with(VendorActivity.this).load(user.getProfilePic()).fit().centerCrop()
                                 .placeholder(R.drawable.default_profile)
                                 .error(R.drawable.default_profile)
                                 .into(profilePic);
@@ -332,7 +304,7 @@ public class RestaurantActivity extends AppCompatActivity
             public void onClick(View view) {
                 //Make sure image url is not empty
                 if(imageURLBig != null){
-                    Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
+                    Intent slideactivity = new Intent(VendorActivity.this, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     slideactivity.putExtra("imageURL", imageURLBig);
@@ -340,7 +312,7 @@ public class RestaurantActivity extends AppCompatActivity
                 }
 
                 else if(imageURL != null){
-                    Intent slideactivity = new Intent(RestaurantActivity.this, ViewImage.class)
+                    Intent slideactivity = new Intent(VendorActivity.this, ViewImage.class)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     slideactivity.putExtra("imageURL", imageURL);
@@ -357,7 +329,7 @@ public class RestaurantActivity extends AppCompatActivity
         notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent slideactivity = new Intent(RestaurantActivity.this, MyNotifications.class)
+                Intent slideactivity = new Intent(VendorActivity.this, MyNotifications.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(slideactivity);
 
@@ -406,7 +378,7 @@ public class RestaurantActivity extends AppCompatActivity
                             try {
                                 // Show the dialog by calling startResolutionForResult(),
                                 // and check the result in onActivityResult().
-                                status.startResolutionForResult(RestaurantActivity.this, 1000);
+                                status.startResolutionForResult(VendorActivity.this, 1000);
                             } catch (IntentSender.SendIntentException e) {
                                 // Ignore the error.
                             }
@@ -448,7 +420,7 @@ public class RestaurantActivity extends AppCompatActivity
 
             AppLifecycleObserver appLifecycleObserver = new AppLifecycleObserver();
             ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
-            TAG = "RestaurantActivity";
+            TAG = "VendorActivity";
 
             try {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -468,7 +440,7 @@ public class RestaurantActivity extends AppCompatActivity
                                     Boolean locked = dataSnapshot.getValue(Boolean.class);
 
                                     if(locked == true){
-                                        Intent slideactivity = new Intent(RestaurantActivity.this, SecurityPin.class)
+                                        Intent slideactivity = new Intent(VendorActivity.this, SecurityPin.class)
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         slideactivity.putExtra("pinType", "resume");
                                         startActivity(slideactivity);
@@ -550,7 +522,7 @@ public class RestaurantActivity extends AppCompatActivity
         myMessagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                item.setIcon(ContextCompat.getDrawable(RestaurantActivity.this, R.drawable.inbox_default_64dp));
+                item.setIcon(ContextCompat.getDrawable(VendorActivity.this, R.drawable.inbox_default_64dp));
                 if(!dataSnapshot.hasChildren()){
                     //default icon
                 } else {
@@ -576,7 +548,7 @@ public class RestaurantActivity extends AppCompatActivity
                                                 MessageModel chatMessage = message.getValue(MessageModel.class);
                                                 if(!chatMessage.getSender().equals(myPhone) && chatMessage.getRead() == false){
                                                     //chane message icon top right to active one
-                                                    item.setIcon(ContextCompat.getDrawable(RestaurantActivity.this, R.drawable.inbox_active_64dp));
+                                                    item.setIcon(ContextCompat.getDrawable(VendorActivity.this, R.drawable.inbox_active_64dp));
                                                 }
                                             } catch (Exception e){
                                                 Log.e(TAG, "Error: ", e);
@@ -638,7 +610,7 @@ public class RestaurantActivity extends AppCompatActivity
 
         else if (id == R.id.nav_settings) {
 
-            Intent slideactivity = new Intent(RestaurantActivity.this, SettingsActivity.class)
+            Intent slideactivity = new Intent(VendorActivity.this, SettingsActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             Bundle bndlanimation =
                     ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
@@ -647,7 +619,7 @@ public class RestaurantActivity extends AppCompatActivity
         }
 
         else if (id == R.id.logOut) {
-            final AlertDialog logout = new AlertDialog.Builder(RestaurantActivity.this)
+            final AlertDialog logout = new AlertDialog.Builder(VendorActivity.this)
                     .setMessage("Logout?")
                     //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
                     .setCancelable(false)
@@ -657,10 +629,10 @@ public class RestaurantActivity extends AppCompatActivity
                             myRef.child("appLocked").setValue(true);
                             //Log out
                             //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
-                            stopService(new Intent(RestaurantActivity.this, ForegroundService.class));
-                            stopService(new Intent(RestaurantActivity.this, TrackingService.class));
+                            stopService(new Intent(VendorActivity.this, ForegroundService.class));
+                            stopService(new Intent(VendorActivity.this, TrackingService.class));
                             FirebaseAuth.getInstance().signOut();
-                            startActivity(new Intent(RestaurantActivity.this,SplashActivity.class)
+                            startActivity(new Intent(VendorActivity.this,SplashActivity.class)
                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                             finish();
                         }
@@ -709,13 +681,13 @@ public class RestaurantActivity extends AppCompatActivity
 
         switch(item.getItemId()) {
             case R.id.search:
-                Intent searchActivity = new Intent(RestaurantActivity.this, SearchActivity.class)
+                Intent searchActivity = new Intent(VendorActivity.this, SearchActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(searchActivity, bndlanimation);
                 return(true);
 
             case R.id.sendDM:
-                Intent slideactivity = new Intent(RestaurantActivity.this, Inbox.class)
+                Intent slideactivity = new Intent(VendorActivity.this, Inbox.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(slideactivity, bndlanimation);
                 return(true);

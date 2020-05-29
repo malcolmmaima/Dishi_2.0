@@ -5,33 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".View.Activities.RestaurantActivity"
+    tools:context=".View.Activities.VendorActivity"
     tools:showIn="@layout/restaurant_app_bar_drawer">
-
-
-    <!-- Floating action bar -->
-    <LinearLayout
-
-        android:id="@+id/ly_bar_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
-        app:layout_constraintRight_toRightOf="parent"
-        android:gravity="end|bottom"
-        android:orientation="horizontal">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_add_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@drawable/ic_add_white_36dp"
-            app:borderWidth="0dp"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp" />
-    </LinearLayout>
-
 
     <!-- Our Bottom navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -151,7 +151,7 @@ public class SecurityPin extends AppCompatActivity {
                                                 startActivity(slideactivity, bndlanimation);
                                             }
                                             if (accountType.equals("2")) {
-                                                Intent slideactivity = new Intent(SecurityPin.this, RestaurantActivity.class)
+                                                Intent slideactivity = new Intent(SecurityPin.this, VendorActivity.class)
                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                 Bundle bndlanimation =
                                                         ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
@@ -388,7 +388,7 @@ public class SecurityPin extends AppCompatActivity {
                                     startActivity(slideactivity, bndlanimation);
                                 }
                                 if(accountType.equals("2")){
-                                    Intent slideactivity = new Intent(SecurityPin.this, RestaurantActivity.class)
+                                    Intent slideactivity = new Intent(SecurityPin.this, VendorActivity.class)
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     Bundle bndlanimation =
                                             ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();

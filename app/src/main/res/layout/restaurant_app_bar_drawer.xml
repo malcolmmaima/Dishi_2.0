@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".View.Activities.RestaurantActivity">
+    tools:context=".View.Activities.VendorActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -28,7 +28,6 @@
         android:background="@color/colorBackroundWhite"
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginBottom="@dimen/actionBarSize">
-
 
     </FrameLayout>
 

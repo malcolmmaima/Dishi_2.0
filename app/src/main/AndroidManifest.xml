@@ -112,7 +112,7 @@
             android:name=".View.Activities.RiderActivity"
             android:label="@string/title_activity_rider" />
         <activity
-            android:name=".View.Activities.RestaurantActivity"
+            android:name=".View.Activities.VendorActivity"
             android:label="@string/title_activity_restaurant" />
         <activity
             android:name=".View.Activities.CustomerActivity"

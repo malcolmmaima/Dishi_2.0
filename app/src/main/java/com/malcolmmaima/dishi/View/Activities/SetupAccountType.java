@@ -188,7 +188,7 @@ public class SetupAccountType extends AppCompatActivity {
                                             String date = getDate();
                                             myRef.child(myPhone).child("signupDate").setValue(date);
                                             //Load account
-                                            Intent slideactivity = new Intent(SetupAccountType.this, RestaurantActivity.class)
+                                            Intent slideactivity = new Intent(SetupAccountType.this, VendorActivity.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             Bundle bndlanimation =
                                                     null;

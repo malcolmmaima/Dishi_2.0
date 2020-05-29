@@ -7,11 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -437,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                                                 else {
                                                                                     //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                                                    Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
+                                                                                    Intent slideactivity = new Intent(MainActivity.this, VendorActivity.class)
                                                                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                     Bundle bndlanimation =
                                                                                             ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
@@ -805,7 +803,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                         else {
                                                                                             try {
                                                                                                 //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                                                                Intent slideactivity = new Intent(MainActivity.this, RestaurantActivity.class)
+                                                                                                Intent slideactivity = new Intent(MainActivity.this, VendorActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
                                                                                                         ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();

@@ -307,7 +307,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                 else {
                                                                                     try {
                                                                                         //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
-                                                                                        Intent slideactivity = new Intent(SplashActivity.this, RestaurantActivity.class)
+                                                                                        Intent slideactivity = new Intent(SplashActivity.this, VendorActivity.class)
                                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                         Bundle bndlanimation =
                                                                                                 ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();

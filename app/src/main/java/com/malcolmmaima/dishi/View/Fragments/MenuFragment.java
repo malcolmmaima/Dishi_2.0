@@ -1,5 +1,8 @@
 package com.malcolmmaima.dishi.View.Fragments;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.AddMenu;
+import com.malcolmmaima.dishi.View.Activities.VendorActivity;
 import com.malcolmmaima.dishi.View.Adapter.MenuAdapter;
 
 import java.util.ArrayList;
@@ -41,7 +47,7 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     DatabaseReference dbRef, menusRef;
     FirebaseDatabase db;
     FirebaseUser user;
-
+    FloatingActionButton addMenu;
 
     public static MenuFragment newInstance() {
         MenuFragment fragment = new MenuFragment();
@@ -69,6 +75,7 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        addMenu = v.findViewById(R.id.button_add_menu);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -92,6 +99,26 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 // Fetching data from server
                 fetchMenu();
 
+            }
+        });
+
+        addMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent slideactivity = new Intent(getContext(), AddMenu.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bndlanimation =
+                        null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    bndlanimation = ActivityOptions.makeCustomAnimation(getContext(), R.anim.animation, R.anim.animation2).toBundle();
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    try {
+                        startActivity(slideactivity, bndlanimation);
+                    } catch (Exception e){
+
+                    }
+                }
             }
         });
 
