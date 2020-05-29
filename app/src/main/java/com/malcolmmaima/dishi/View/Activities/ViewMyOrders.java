@@ -791,6 +791,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                     receipt.setPaymentMethod(paymentMethod);
                                     receipt.setRestaurant(phone);
                                     receipt.setCustomer(myPhone);
+                                    receipt.setDeliveryCharge(deliveryCharge);
                                     receipt.setSeen(false);
 
                                     //Post status update if i've set shareOrders in settings to ON

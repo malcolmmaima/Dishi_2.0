@@ -175,6 +175,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                     slideactivity.putExtra("restaurantPhone", receipt.getRestaurant());
                     slideactivity.putExtra("customerPhone", receipt.getCustomer());
                     slideactivity.putExtra("orderID", receipt.getOrderID());
+                    slideactivity.putExtra("deliveryCharge", receipt.getDeliveryCharge());
                     slideactivity.putExtra("orderOn", receipt.getInitiatedOn());
                     slideactivity.putExtra("deliveredOn", receipt.getDeliveredOn());
                     Bundle bndlanimation =
@@ -262,6 +263,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                                                     slideactivity.putExtra("orderID", receipt.getOrderID());
                                                     slideactivity.putExtra("orderOn", receipt.getInitiatedOn());
                                                     slideactivity.putExtra("deliveredOn", receipt.getDeliveredOn());
+                                                    slideactivity.putExtra("deliveryCharge", receipt.getDeliveryCharge());
                                                     slideactivity.putExtra("downloadRequest", true);
                                                     Bundle bndlanimation =
                                                             ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();

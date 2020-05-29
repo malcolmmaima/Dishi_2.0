@@ -9,6 +9,7 @@ public class ReceiptModel {
     public String restaurant;
     public String customer;
     public Boolean seen;
+    public Integer deliveryCharge;
 
     public String getInitiatedOn() {
         return initiatedOn;
@@ -64,5 +65,13 @@ public class ReceiptModel {
 
     public void setSeen(Boolean seen) {
         this.seen = seen;
+    }
+
+    public Integer getDeliveryCharge() {
+        return deliveryCharge;
+    }
+
+    public void setDeliveryCharge(Integer deliveryCharge) {
+        this.deliveryCharge = deliveryCharge;
     }
 }

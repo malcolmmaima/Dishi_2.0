@@ -77,10 +77,10 @@ public class ReceiptActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ReceiptItemAdapter mAdapter;
     ImageView exitReceipt, receiptOptions;
-    MyTextView_Roboto_Regular totalTitle, orderID;
+    MyTextView_Roboto_Regular totalTitle, orderID, deliveryChargeAmount, subTotal;
     MyTextView_Roboto_Medium totalBill, dateOrdered, dateDelivered, vendorName, vendorPhone, nameTitle;
     int totalAmount;
-    Double vatCharge;
+    Integer deliveryCharge;
     ProgressBar progressBar;
     RelativeLayout myReceipt;
     private Bitmap bitmap;
@@ -242,8 +242,11 @@ public class ReceiptActivity extends AppCompatActivity {
         nameTitle = findViewById(R.id.nameTitle);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
+        deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
+        subTotal = findViewById(R.id.subTotal);
 
         downloadRequest = getIntent().getBooleanExtra("downloadRequest", false);
+        deliveryCharge = getIntent().getIntExtra("deliveryCharge", 0);
         orderedOn = getIntent().getStringExtra("orderOn");
         deliveredOn = getIntent().getStringExtra("deliveredOn");
         key = getIntent().getStringExtra("key");
@@ -253,6 +256,11 @@ public class ReceiptActivity extends AppCompatActivity {
 
         restaurantName = getIntent().getStringExtra("restaurantName");
         vendorName.setText(restaurantName);
+
+        orderid = getIntent().getStringExtra("orderID");
+        orderID.setText("Order ID: #"+orderid);
+
+        deliveryChargeAmount.setText("Ksh "+deliveryCharge);
 
         DatabaseReference myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
         myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -446,8 +454,6 @@ public class ReceiptActivity extends AppCompatActivity {
                         }
                     });
 
-                    orderid = getIntent().getStringExtra("orderID");
-                    orderID.setText("Order ID: #"+orderid);
 
                     String dtEnd = deliveredOn;
                     String dtStart = orderedOn;
@@ -476,15 +482,18 @@ public class ReceiptActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             deliveredItems = new ArrayList<>();
                             totalAmount = 0;
+                            int subT = 0;
                             for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                                 try {
                                     progressBar.setVisibility(View.GONE);
                                     ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
                                     deliveredItems.add(product);
 
+                                    subT = totalAmount + (Integer.parseInt(product.getPrice())*product.getQuantity());
+                                    subTotal.setText("Ksh "+subT);
                                     totalAmount = totalAmount + (Integer.parseInt(product.getPrice())*product.getQuantity());
-                                    totalBill.setText("Ksh " + totalAmount);
-                                    totalTitle.setText("" + totalAmount);
+                                    totalBill.setText("Ksh " + (totalAmount+deliveryCharge));
+                                    totalTitle.setText("" + (totalAmount+deliveryCharge));
                                 } catch (Exception e){
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(ReceiptActivity.this, "Something went wrong!", Toast.LENGTH_LONG).show();
