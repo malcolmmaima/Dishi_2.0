@@ -617,6 +617,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetailsModel.setOwner(myPhone);
                 productDetailsModel.setStorageLocation(imageLocation);
                 productDetailsModel.setUploadDate(getDate());
+                productDetailsModel.setOutOfStock(false);
 
                 Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 

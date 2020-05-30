@@ -144,7 +144,7 @@
                             android:id="@+id/restaurantTag"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginRight="5dp"
                             android:scaleType="centerCrop"
                             android:background="@drawable/online_store"
@@ -153,7 +153,7 @@
                             android:id="@+id/restaurantName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center_vertical"
                             android:text="loading..."
                             android:layout_marginLeft="0dp"
                             android:layout_marginRight="5dp"/>
@@ -162,6 +162,7 @@
                             android:id="@+id/favourite"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
+                            android:layout_gravity="center_vertical"
                             android:padding="5dp"
                             android:src="@drawable/ic_like" />
 
@@ -173,6 +174,22 @@
                             android:id="@+id/favouritesTotal"
                             />
 
+                        <CheckBox
+                            android:id="@+id/checkBox"
+                            android:layout_gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"/>
+
+                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                            android:id="@+id/outOfStock"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="-10dp"
+                            android:text="out of stock"
+                            android:gravity="center_vertical"
+                            android:layout_marginRight="5dp"/>
                     </LinearLayout>
 
                     <LinearLayout

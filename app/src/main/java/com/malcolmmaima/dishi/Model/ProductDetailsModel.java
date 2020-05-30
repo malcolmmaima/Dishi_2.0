@@ -10,6 +10,7 @@ public class ProductDetailsModel {
     public String imageUrlMedium;
     public String imageUrlBig;
     public  String storageLocation;
+    public Boolean outOfStock;
     public String key; //When deleting menu items from firebase, this key value will help delete individual items from the menu node
     public String owner;
     public int quantity;
@@ -100,6 +101,14 @@ public class ProductDetailsModel {
 
     public void setStorageLocation(String storageLocation) {
         this.storageLocation = storageLocation;
+    }
+
+    public Boolean getOutOfStock() {
+        return outOfStock;
+    }
+
+    public void setOutOfStock(Boolean outOfStock) {
+        this.outOfStock = outOfStock;
     }
 
     public String getKey() {

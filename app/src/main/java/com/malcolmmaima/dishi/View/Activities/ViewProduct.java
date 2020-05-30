@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,11 +55,13 @@ public class ViewProduct extends AppCompatActivity {
     Double distance;
     ImageView addToFavourites;
     MyTextView_Roboto_Medium productName, productPrice, itemCount, subTotal;
-    MyTextView_Roboto_Regular distanceAway, restaurantName, productDescription, favouritesTotal;
+    MyTextView_Roboto_Regular distanceAway, restaurantName, productDescription, favouritesTotal, outOfStockTxt;
     CircleImageView foodPic;
     FloatingActionButton add, minus;
+    CheckBox checkBox;
     HashTagHelper mTextHashTagHelper;
     int count;
+    Boolean outOfStock;
     Menu myMenu;
     DatabaseReference myCart, favouritesTotalRef, myFoodFavourites, menuExistRef, existingCartRef, myRef;
     ValueEventListener cartListener, favouritesTotalListener, myFoodFavouritesListener, existsListener;
@@ -93,13 +96,17 @@ public class ViewProduct extends AppCompatActivity {
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                    if(locked == true){
-                                        Intent slideactivity = new Intent(ViewProduct.this, SecurityPin.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        slideactivity.putExtra("pinType", "resume");
-                                        startActivity(slideactivity);
+                                        if (locked == true) {
+                                            Intent slideactivity = new Intent(ViewProduct.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    } catch (Exception e){
+
                                     }
                                 }
 
@@ -143,6 +150,11 @@ public class ViewProduct extends AppCompatActivity {
             fab = findViewById(R.id.fab);
             addToFavourites = findViewById(R.id.favourite);
             favouritesTotal = findViewById(R.id.favouritesTotal);
+            checkBox = findViewById(R.id.checkBox);
+            checkBox.setVisibility(View.GONE);
+            checkBox.setEnabled(false);
+            outOfStockTxt = findViewById(R.id.outOfStock);
+            outOfStockTxt.setVisibility(View.GONE);
 
             /**
              * Receive values from product adapter via intent
@@ -156,6 +168,7 @@ public class ViewProduct extends AppCompatActivity {
             distance = getIntent().getDoubleExtra("distance", 0.0);
             restaurantName_ = getIntent().getStringExtra("restaurantName");
             accType = getIntent().getStringExtra("accType");
+            outOfStock = getIntent().getBooleanExtra("outOfStock", false);
 
 
             favouritesTotalRef = FirebaseDatabase.getInstance().getReference("menus/"+restaurant+"/"+key+"/likes");
@@ -427,6 +440,18 @@ public class ViewProduct extends AppCompatActivity {
                 fab.setEnabled(false);
                 addToFavourites.setEnabled(false);
 
+                add.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
+                minus.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
+                fab.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
+            }
+
+            if(outOfStock == true){
+                checkBox.setVisibility(View.VISIBLE);
+                checkBox.setChecked(true);
+                outOfStockTxt.setVisibility(View.VISIBLE);
+                add.setEnabled(false);
+                minus.setEnabled(false);
+                fab.setEnabled(false);
                 add.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
                 minus.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));
                 fab.setSupportBackgroundTintList(ContextCompat.getColorStateList(this, R.color.grey));

@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,6 +45,7 @@ import java.util.List;
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     String TAG = "MenuAdapter";
+    String myPhone;
     Context context;
     List<ProductDetailsModel> listdata;
     long DURATION = 200;
@@ -66,6 +69,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
         final ProductDetailsModel productDetailsModel = listdata.get(position);
 
         setAnimation(holder.itemView, position);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        myPhone = user.getPhoneNumber(); //Current logged in user phone number
+        DatabaseReference menuItemRef = FirebaseDatabase.getInstance().getReference("menus/"+myPhone+"/"+productDetailsModel.getKey());
 
         /**
          * Set widget values
@@ -102,6 +109,53 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
             mTextHashTagHelper.handle(holder.foodDescription);
         }
+
+        try {
+            holder.checkBox.setChecked(productDetailsModel.getOutOfStock());
+        } catch (Exception e){
+            holder.checkBox.setChecked(false);
+            Log.e(TAG, "onBindViewHolder: ", e);
+        }
+
+        holder.checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String message;
+                if(holder.checkBox.isChecked()){
+                    message = productDetailsModel.getName()+" out of stock?";
+                } else {
+                    message = productDetailsModel.getName()+" in stock?";
+                }
+
+                AlertDialog stockDialog = new AlertDialog.Builder(context)
+                        .setMessage(message)
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                menuItemRef.child("outOfStock").setValue(holder.checkBox.isChecked()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        holder.checkBox.setChecked(holder.checkBox.isChecked());
+                                        Snackbar.make(v.getRootView(), "Saved", Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                menuItemRef.child("outOfStock").setValue(!holder.checkBox.isChecked()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        holder.checkBox.setChecked(!holder.checkBox.isChecked());
+                                        Snackbar.make(v.getRootView(), "Saved", Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }).create();
+                stockDialog.show();
+            }
+        });
 
         /**
          * Click listener on our card
@@ -194,9 +248,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
 
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium foodPrice , foodName;
-        MyTextView_Roboto_Regular foodDescription;
+        MyTextView_Roboto_Regular foodDescription, outOfStock;
         ImageView foodPic;
         CardView cardView;
+        CheckBox checkBox;
 
         public MyHolder(View itemView) {
             super(itemView);
@@ -205,6 +260,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
             foodDescription = itemView.findViewById(R.id.foodDescription);
             foodPic = itemView.findViewById(R.id.foodPic);
             cardView = itemView.findViewById(R.id.card_view);
+            checkBox = itemView.findViewById(R.id.checkBox);
+            outOfStock = itemView.findViewById(R.id.outOfStock);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number

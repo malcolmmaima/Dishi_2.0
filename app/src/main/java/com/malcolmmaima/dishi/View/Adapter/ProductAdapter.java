@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -113,6 +114,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         /**
          * Set widget values
          **/
+
+        holder.checkBox.setEnabled(false);
+        holder.checkBox.setVisibility(View.GONE);
+        holder.outOfStock.setVisibility(View.GONE);
+
 
         //get vendor user data
         DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ productDetailsModel.getOwner());
@@ -225,6 +231,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             }
         });
 
+        try {
+            if(productDetailsModel.getOutOfStock() == true){
+                holder.checkBox.setVisibility(View.VISIBLE);
+                holder.checkBox.setChecked(true);
+                holder.outOfStock.setVisibility(View.VISIBLE);
+                holder.addToCart.setVisibility(View.GONE);
+            } else {
+                holder.addToCart.setVisibility(View.VISIBLE);
+                holder.checkBox.setVisibility(View.GONE);
+                holder.outOfStock.setVisibility(View.GONE);
+            }
+        } catch (Exception e){
+
+        }
         try {
             if (productDetailsModel.getDescription().length() > 89) {
                 holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
@@ -442,6 +462,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                     slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
                     slideactivity.putExtra("distance", productDetailsModel.getDistance());
                     slideactivity.putExtra("accType", productDetailsModel.accountType);
+                    slideactivity.putExtra("outOfStock", productDetailsModel.getOutOfStock());
 
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
@@ -712,11 +733,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
 
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium foodName, foodPrice;
-        MyTextView_Roboto_Regular foodDescription, restaurantName, distanceAway;
+        MyTextView_Roboto_Regular foodDescription, restaurantName, distanceAway, outOfStock;
         TextView  productOptions;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;
+        CheckBox checkBox;
 
         public MyHolder(View itemView) {
             super(itemView);
@@ -729,6 +751,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
             distanceAway = itemView.findViewById(R.id.distanceAway);
             addToCart = itemView.findViewById(R.id.addToCart);
             productOptions = itemView.findViewById(R.id.productOptions);
+            checkBox = itemView.findViewById(R.id.checkBox);
+            outOfStock = itemView.findViewById(R.id.outOfStock);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number

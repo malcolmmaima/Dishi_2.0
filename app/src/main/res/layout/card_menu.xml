@@ -81,5 +81,25 @@
             android:layout_toEndOf="@id/foodPic"
             android:textColor="#666"/>
 
+        <CheckBox
+            android:layout_below="@id/foodDescription"
+            android:layout_toRightOf="@id/foodPic"
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"/>
+
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            android:id="@+id/outOfStock"
+            android:layout_below="@id/foodDescription"
+            android:layout_toRightOf="@id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="-10dp"
+            android:text="out of stock"
+            android:gravity="center_vertical"
+            android:layout_marginRight="5dp"/>
+
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
