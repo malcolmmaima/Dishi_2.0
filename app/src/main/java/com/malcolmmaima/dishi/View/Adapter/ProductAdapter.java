@@ -430,21 +430,25 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent slideactivity = new Intent(context, ViewProduct.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                slideactivity.putExtra("key", productDetailsModel.getKey());
-                slideactivity.putExtra("restaurant", productDetailsModel.getOwner());
-                slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
-                slideactivity.putExtra("product", productDetailsModel.getName());
-                slideactivity.putExtra("description", productDetailsModel.getDescription());
-                slideactivity.putExtra("price", productDetailsModel.getPrice());
-                slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
-                slideactivity.putExtra("distance", productDetailsModel.getDistance());
-                slideactivity.putExtra("accType", productDetailsModel.accountType);
+                try {
+                    Intent slideactivity = new Intent(context, ViewProduct.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("key", productDetailsModel.getKey());
+                    slideactivity.putExtra("restaurant", productDetailsModel.getOwner());
+                    slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
+                    slideactivity.putExtra("product", productDetailsModel.getName());
+                    slideactivity.putExtra("description", productDetailsModel.getDescription());
+                    slideactivity.putExtra("price", productDetailsModel.getPrice());
+                    slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
+                    slideactivity.putExtra("distance", productDetailsModel.getDistance());
+                    slideactivity.putExtra("accType", productDetailsModel.accountType);
 
-                Bundle bndlanimation =
-                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
-                context.startActivity(slideactivity, bndlanimation);
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                }
             }
         });
 

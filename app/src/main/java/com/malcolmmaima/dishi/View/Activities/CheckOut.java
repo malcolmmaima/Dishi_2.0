@@ -196,6 +196,7 @@ public class CheckOut extends AppCompatActivity {
 
                                 vendorObj.add(vendorUser);
 
+                                //Count the number of items from each individual vendor, if above waiver limit then add delivery fee
                                 myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

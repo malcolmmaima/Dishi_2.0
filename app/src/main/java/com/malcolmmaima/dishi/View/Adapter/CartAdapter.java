@@ -2,8 +2,10 @@ package com.malcolmmaima.dishi.View.Adapter;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +35,7 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Activities.SearchActivity;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
+import com.malcolmmaima.dishi.View.Activities.ViewProduct;
 import com.malcolmmaima.dishi.View.Activities.ViewProfile;
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.hashtaghelper.HashTagHelper;
@@ -133,7 +136,25 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    Intent slideactivity = new Intent(context, ViewProduct.class)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    slideactivity.putExtra("key", productDetailsModel.getOriginalKey());
+                    slideactivity.putExtra("restaurant", productDetailsModel.getOwner());
+                    slideactivity.putExtra("restaurantName", holder.restaurantName.getText());
+                    slideactivity.putExtra("product", productDetailsModel.getName());
+                    slideactivity.putExtra("description", productDetailsModel.getDescription());
+                    slideactivity.putExtra("price", productDetailsModel.getPrice());
+                    slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
+                    slideactivity.putExtra("distance", productDetailsModel.getDistance());
+                    slideactivity.putExtra("accType", "1"); // this cart adapter is ony accessible to customers when they view their cart
 
+                    Bundle bndlanimation =
+                            ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
+                    context.startActivity(slideactivity, bndlanimation);
+                } catch (Exception e){
+                    Log.e(TAG, "onClick: ", e);
+                }
             }
         });
 
