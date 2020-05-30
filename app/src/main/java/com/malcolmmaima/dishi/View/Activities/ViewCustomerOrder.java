@@ -447,7 +447,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     payment.setText(paymentMethod);
                     myOrderID.setText("ORDER ID: #"+orderID);
                     deliveryChargeAmount.setText("Ksh "+deliveryCharge);
-                    totalAmount = Double.valueOf(total[0] + deliveryCharge);
+                    try { totalAmount = Double.valueOf(total[0] + deliveryCharge); } catch (Exception e){}
                     subTotal.setText("Ksh " + total[0]);
                     totalBill.setText("Ksh " + totalAmount);
                     initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
@@ -994,13 +994,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     customerOrderItems.child("paid").setValue(4);
                                     Snackbar.make(v.getRootView(), "Awaiting customer confirmation", Snackbar.LENGTH_LONG).show();
-//                                    customerOrderItems.child("completed").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                        @Override
-//                                        public void onSuccess(Void aVoid) {
-//
-//
-//                                        }
-//                                    });
+
                                 }
                             })//setPositiveButton
 

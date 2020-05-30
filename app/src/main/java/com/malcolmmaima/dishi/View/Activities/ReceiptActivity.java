@@ -21,6 +21,7 @@ import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -494,6 +495,7 @@ public class ReceiptActivity extends AppCompatActivity {
                                     totalAmount = totalAmount + (Integer.parseInt(product.getPrice())*product.getQuantity());
                                     totalBill.setText("Ksh " + (totalAmount+deliveryCharge));
                                     totalTitle.setText("" + (totalAmount+deliveryCharge));
+                                    deliveryChargeAmount.setText("Ksh "+deliveryCharge);
                                 } catch (Exception e){
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(ReceiptActivity.this, "Something went wrong!", Toast.LENGTH_LONG).show();
@@ -670,7 +672,7 @@ public class ReceiptActivity extends AppCompatActivity {
         document.finishPage(page);
 
         // write the document content
-        String targetPdf = "/sdcard/Dishi/Dishi_"+orderid+".pdf";
+        String targetPdf = Environment.getExternalStorageDirectory().getPath()+"/Download/Dishi_"+orderid+".pdf";
         File filePath;
         filePath = new File(targetPdf);
         try {
@@ -707,6 +709,8 @@ public class ReceiptActivity extends AppCompatActivity {
             } catch (Exception err){}
             Log.e(TAG, "createPdf: ", e);
             e.printStackTrace();
+            exitReceipt.setVisibility(View.VISIBLE);
+            receiptOptions.setVisibility(View.VISIBLE);
             Snackbar snackbar = Snackbar
                     .make(findViewById(R.id.myReceipt), "Something went wrong", Snackbar.LENGTH_LONG);
             snackbar.show();
@@ -715,7 +719,7 @@ public class ReceiptActivity extends AppCompatActivity {
     }
 
     private void openGeneratedPDF(){
-        File file = new File("/sdcard/Dishi/Dishi_"+orderid+".pdf");
+        File file = new File(Environment.getExternalStorageDirectory().getPath()+"/Download/Dishi_"+orderid+".pdf");
         if (file.exists())
         {
             Toast.makeText(this, "Opening...", Toast.LENGTH_SHORT).show();

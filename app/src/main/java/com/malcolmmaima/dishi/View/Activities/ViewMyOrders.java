@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -88,6 +89,7 @@ public class ViewMyOrders extends AppCompatActivity {
     String tempRiderPhoneHolder;
     Integer paid;
     Boolean paymentDialogShown, receiptGenerated;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +147,7 @@ public class ViewMyOrders extends AppCompatActivity {
     private void loadMyOrders() {
         setContentView(R.layout.activity_view_my_orders);
 
+        progressDialog = new ProgressDialog(ViewMyOrders.this);
         //Initialize variables
         deliveryCharge = 0;
         totalAmount = 0.0;
@@ -196,7 +199,12 @@ public class ViewMyOrders extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if(!dataSnapshot.exists()){
-                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_LONG).show();
+                    try {
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                    } catch (Exception e){}
+                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
                     try {
@@ -749,6 +757,12 @@ public class ViewMyOrders extends AppCompatActivity {
             builder.setPositiveButton(action, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+
+                    if(paid == 4){
+                        progressDialog.setMessage("Finalizing...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    }
                     paymentDialogShown = false;
                     customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

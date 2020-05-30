@@ -2045,6 +2045,7 @@ public class ForegroundService extends Service {
         intent.putExtra("orderID", newReceipt.getOrderID());
         intent.putExtra("restaurantPhone", newReceipt.getRestaurant());
         intent.putExtra("customerPhone", newReceipt.getCustomer());
+        intent.putExtra("deliveryCharge", newReceipt.getDeliveryCharge());
         intent.putExtra("key", newReceipt.key);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
