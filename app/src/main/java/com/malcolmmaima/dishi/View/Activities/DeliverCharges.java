@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -25,10 +27,10 @@ import io.fabric.sdk.android.services.common.SafeToast;
 
 public class DeliverCharges extends AppCompatActivity {
 
-    EditText pricePerKm;
+    EditText pricePerKm, deliveryWaiver;
     AppCompatButton saveDetails;
     String myPhone;
-    int price;
+    int price, deliveryWaiverFee;
     DatabaseReference myRef;
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -47,6 +49,10 @@ public class DeliverCharges extends AppCompatActivity {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
+            pricePerKm = findViewById(R.id.pricePerKm);
+            deliveryWaiver = findViewById(R.id.deliveryWaiver);
+            saveDetails = findViewById(R.id.saveDetails);
+
             //Set fb database reference
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
             myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -56,13 +62,17 @@ public class DeliverCharges extends AppCompatActivity {
                         myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                try {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(DeliverCharges.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
+                                    if (locked == true) {
+                                        Intent slideactivity = new Intent(DeliverCharges.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                } catch (Exception e){
+
                                 }
                             }
 
@@ -98,27 +108,67 @@ public class DeliverCharges extends AppCompatActivity {
 
                 }
             });
+            myRef.child("deliveryChargeLimit").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()){
+                        myRef.child("deliveryChargeLimit").setValue(0);
+                        deliveryWaiver.setText("0");
+                    }
 
-            pricePerKm = findViewById(R.id.pricePerKm);
-            saveDetails = findViewById(R.id.saveDetails);
+                    else {
+                        deliveryWaiverFee = dataSnapshot.getValue(Integer.class);
+                        deliveryWaiver.setText(""+deliveryWaiverFee);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
             saveDetails.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Snackbar snackbar = Snackbar
+                            .make(findViewById(R.id.parentlayout), "Saving...", Snackbar.LENGTH_LONG);
+                    snackbar.show();
 
                     price = Integer.parseInt(pricePerKm.getText().toString());
-                    if(!pricePerKm.getText().equals("")){
+                    deliveryWaiverFee = Integer.parseInt(deliveryWaiver.getText().toString());
+
+                    if(!pricePerKm.getText().equals("") && !deliveryWaiver.getText().equals("")){
                         myRef.child("delivery_charge").setValue(price).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                SafeToast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
-                                finish();
+                                myRef.child("deliveryChargeLimit").setValue(deliveryWaiverFee).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        SafeToast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
+                                        finish();
+                                    }
+                                });
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Snackbar snackbar = Snackbar
+                                        .make(findViewById(R.id.parentlayout), "Failed, try again", Snackbar.LENGTH_LONG);
+                                snackbar.show();
                             }
                         });
                     }
 
                     else {
-                        pricePerKm.setError("Can't be Empty");
+                        if(pricePerKm.getText().equals("")){
+                            pricePerKm.setError("Can't be Empty");
+                        }
+
+                        if(deliveryWaiver.getText().equals("")){
+                            deliveryWaiver.setError("Can't be Empty");
+                        }
                     }
                 }
             });
