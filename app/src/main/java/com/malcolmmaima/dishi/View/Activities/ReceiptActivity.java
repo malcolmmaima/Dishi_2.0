@@ -670,44 +670,52 @@ public class ReceiptActivity extends AppCompatActivity {
         document.finishPage(page);
 
         // write the document content
-        String targetPdf = "/sdcard/Dishi_"+orderid+".pdf";
+        String targetPdf = "/sdcard/Dishi/Dishi_"+orderid+".pdf";
         File filePath;
         filePath = new File(targetPdf);
         try {
             document.writeTo(new FileOutputStream(filePath));
 
+            // close the document
+            document.close();
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.myReceipt), "PDF is created", Snackbar.LENGTH_LONG);
+            snackbar.show();
+
+            try {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            } catch (Exception e){
+                Log.e(TAG, "createPdf: ", e);
+            }
+
+            if(downloadRequest == true){
+                finish();
+            }
+
+            openGeneratedPDF();
+            exitReceipt.setVisibility(View.VISIBLE);
+            receiptOptions.setVisibility(View.VISIBLE);
+
         } catch (IOException e) {
+
+            try {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            } catch (Exception err){}
+            Log.e(TAG, "createPdf: ", e);
             e.printStackTrace();
             Snackbar snackbar = Snackbar
-                    .make(findViewById(R.id.myReceipt), "Something wrong", Snackbar.LENGTH_LONG);
+                    .make(findViewById(R.id.myReceipt), "Something went wrong", Snackbar.LENGTH_LONG);
             snackbar.show();
         }
 
-        // close the document
-        document.close();
-        Snackbar snackbar = Snackbar
-                .make(findViewById(R.id.myReceipt), "PDF is created", Snackbar.LENGTH_LONG);
-        snackbar.show();
-
-        try {
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-        } catch (Exception e){
-            Log.e(TAG, "createPdf: ", e);
-        }
-
-        if(downloadRequest == true){
-            finish();
-        }
-
-        openGeneratedPDF();
-        exitReceipt.setVisibility(View.VISIBLE);
-        receiptOptions.setVisibility(View.VISIBLE);
     }
 
     private void openGeneratedPDF(){
-        File file = new File("/sdcard/Dishi_"+orderid+".pdf");
+        File file = new File("/sdcard/Dishi/Dishi_"+orderid+".pdf");
         if (file.exists())
         {
             Toast.makeText(this, "Opening...", Toast.LENGTH_SHORT).show();
