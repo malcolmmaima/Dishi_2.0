@@ -175,6 +175,8 @@ public class SetupAccountType extends AppCompatActivity {
 
                                     }
                                     //Set account type in database under logged in user's node
+                                    myRef.child(myPhone).child("delivery_charge").setValue(0);
+                                    myRef.child(myPhone).child("deliveryChargeLimit").setValue(0);
                                     myRef.child(myPhone).child("account_type").setValue(accountType).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

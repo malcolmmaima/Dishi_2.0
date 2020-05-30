@@ -166,6 +166,7 @@ public class CheckOut extends AppCompatActivity {
                     try {
                         ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
                         myCartItems.add(product);
+
                         addVendors(product.getOwner());
                     } catch (Exception e){
                         Log.e(TAG, "onDataChange: ", e);
@@ -194,11 +195,39 @@ public class CheckOut extends AppCompatActivity {
                                 vendorUser.setPhone(vendor);
 
                                 vendorObj.add(vendorUser);
-                                deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
-                                deliveryChargeAmount.setText("Ksh " + deliveryAmount);
 
-                                totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
-                                totalBill.setText("Ksh " + totalBillAmount);
+                                myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        int prodCount = 0;
+                                        for(DataSnapshot items : dataSnapshot.getChildren()){
+                                            try {
+                                                ProductDetailsModel product = items.getValue(ProductDetailsModel.class);
+
+                                                if(product.getOwner().equals(vendor)){
+                                                    prodCount = prodCount + product.getQuantity();
+
+                                                    if(prodCount > vendorUser.getDeliveryChargeLimit()){
+                                                        deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                                        deliveryChargeAmount.setText("Ksh " + deliveryAmount);
+                                                    }
+
+                                                    totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
+                                                    totalBill.setText("Ksh " + totalBillAmount);
+                                                    Log.d(TAG, vendorUser.getFirstname()+ " items: "+(prodCount));
+                                                }
+                                            } catch (Exception e){
+                                                Log.e(TAG, "onDataChange: ", e);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
 
                             } catch (Exception e){
                                 Log.e(TAG, "onDataChange: ", e);

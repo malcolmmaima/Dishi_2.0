@@ -5,6 +5,7 @@ public class UserModel {
     String account_type;
     String bio;
     int delivery_charge;
+    int deliveryChargeLimit;
     Double distance; //useful in our FragmentRestaurants fragment
     String email;
     String firstname;
@@ -88,6 +89,14 @@ public class UserModel {
 
     public void setDelivery_charge(int delivery_charge) {
         this.delivery_charge = delivery_charge;
+    }
+
+    public int getDeliveryChargeLimit() {
+        return deliveryChargeLimit;
+    }
+
+    public void setDeliveryChargeLimit(int deliveryChargeLimit) {
+        this.deliveryChargeLimit = deliveryChargeLimit;
     }
 
     public String getEmail() {
