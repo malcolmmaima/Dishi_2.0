@@ -308,8 +308,9 @@ public class CheckOut extends AppCompatActivity {
                                                                     deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
                                                                     deliveryChargeAmount.setText("Ksh " + Double.valueOf(df.format(deliveryAmount)));
                                                                     deliveryFeeBreakdown.add(vendorUser.getFirstname()+" "+vendorUser.getLastname()+" (Ksh " + vendorUser.getDelivery_charge()+")");
-                                                                    //Log.d(TAG, vendorUser.getFirstname()+" => " + vendorUser.getDelivery_charge());
+                                                                    //Log.d(TAG, vendorUser.getFirstname()+"("+prodCount+") => " + vendorUser.getDelivery_charge()+" (waive="+vendorUser.getDeliveryChargeLimit()+")");
                                                                     vendors.add(vendor);
+                                                                    prodCount = 0;
                                                                 }
 
                                                                 totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
@@ -465,7 +466,7 @@ public class CheckOut extends AppCompatActivity {
             if(deliveryFeeBreakdown.size() > 1){
                 String[] vendors = new String[deliveryFeeBreakdown.size()];
                 AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
-                builder.setTitle("Delivery fee breakdown");
+                builder.setTitle("Delivery Charge Breakdown");
                 builder.setItems(deliveryFeeBreakdown.toArray(vendors), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -530,7 +531,7 @@ public class CheckOut extends AppCompatActivity {
                              */
                             if(dataSnapshot.exists()){
 
-                                Log.d(TAG, "Order exists: " + dataSnapshot.getKey());
+                                //Log.d(TAG, "Order exists: " + dataSnapshot.getKey());
                                 //Get today's date
                                 GetCurrentDate currentDate = new GetCurrentDate();
                                 String currDate = currentDate.getDate();
@@ -586,7 +587,7 @@ public class CheckOut extends AppCompatActivity {
                                     //Now compute timeAgo duration
                                     TimeAgo timeAgo = new TimeAgo();
 
-                                    Log.d(TAG, "initiated: "+ timeAgo.toRelative(dateStart, dateEnd, 1));
+                                    //Log.d(TAG, "initiated: "+ timeAgo.toRelative(dateStart, dateEnd, 1));
 
                                     long timestamp1 = dateStart.getTime();
                                     long timestamp2 = dateEnd.getTime();
@@ -690,7 +691,7 @@ public class CheckOut extends AppCompatActivity {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                             for(DataSnapshot items : dataSnapshot.getChildren()){
-                                                                Log.d(TAG, "Remove cart item: " + items.getKey());
+                                                                //Log.d(TAG, "Remove cart item: " + items.getKey());
                                                                 myCartRef.child(items.getKey()).removeValue();
                                                                 try {
                                                                     progressDialog.dismiss();
@@ -716,7 +717,7 @@ public class CheckOut extends AppCompatActivity {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     for(DataSnapshot items : dataSnapshot.getChildren()){
-                                                        Log.d(TAG, "Remove cart item: " + items.getKey());
+                                                        //Log.d(TAG, "Remove cart item: " + items.getKey());
                                                         myCartRef.child(items.getKey()).removeValue();
                                                         try {
                                                             progressDialog.dismiss();
@@ -788,7 +789,7 @@ public class CheckOut extends AppCompatActivity {
                                     Log.d(TAG, "timeStamp: "+ e.getMessage());
                                 }
                             } else {
-                                Log.d(TAG, "Order "+dataSnapshot.getKey()+" at "+product.getOwner()+" doesn't exist, add new");
+                                //Log.d(TAG, "Order "+dataSnapshot.getKey()+" at "+product.getOwner()+" doesn't exist, add new");
                                 //No active order with said restaurant
                                 //Generate a random String
                                 GenerateRandomString randomString = new GenerateRandomString();
@@ -839,7 +840,7 @@ public class CheckOut extends AppCompatActivity {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     for(DataSnapshot items : dataSnapshot.getChildren()){
-                                                        Log.d(TAG, "Remove cart item "+items.getKey());
+                                                        //Log.d(TAG, "Remove cart item "+items.getKey());
                                                         myCartRef.child(items.getKey()).removeValue();
                                                         Log.d(TAG, "Order complete");
                                                         try {

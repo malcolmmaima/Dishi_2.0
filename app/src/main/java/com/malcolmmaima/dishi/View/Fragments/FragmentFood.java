@@ -66,6 +66,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     SwipeRefreshLayout mSwipeRefreshLayout;
     LiveLocationModel liveLocationModel;
     SeekBar seekBar;
+    Boolean gpsDialogShown;
 
     DatabaseReference dbRef, menusRef, myLocationRef;
     FirebaseDatabase db;
@@ -97,6 +98,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                              Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_food, container, false);
 
+        gpsDialogShown = false;
         location_filter = 0; // initialize distance filter
 
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -449,55 +451,58 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void checkGPS() {
-        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
-            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build();
-            googleApiClient.connect();
+        if(gpsDialogShown == false){
+            LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+            if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+                GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this).build();
+                googleApiClient.connect();
 
-            LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(5 * 1000);
-            locationRequest.setFastestInterval(2 * 1000);
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(locationRequest);
+                LocationRequest locationRequest = LocationRequest.create();
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                locationRequest.setInterval(5 * 1000);
+                locationRequest.setFastestInterval(2 * 1000);
+                LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                        .addLocationRequest(locationRequest);
 
-            //**************************
-            builder.setAlwaysShow(true); //this is the key ingredient
-            //**************************
+                //**************************
+                builder.setAlwaysShow(true); //this is the key ingredient
+                //**************************
 
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                @Override
-                public void onResult(@NonNull LocationSettingsResult result) {
-                    final Status status = result.getStatus();
-                    //                final LocationSettingsStates state = result.getLocationSettingsStates();
+                PendingResult<LocationSettingsResult> result =
+                        LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+                result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                    @Override
+                    public void onResult(@NonNull LocationSettingsResult result) {
+                        final Status status = result.getStatus();
+                        //                final LocationSettingsStates state = result.getLocationSettingsStates();
 
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
+                        switch (status.getStatusCode()) {
+                            case LocationSettingsStatusCodes.SUCCESS:
 
 
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the user
-                            // a dialog.
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(getActivity(), 1000);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            break;
+                                break;
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                // Location settings are not satisfied. But could be fixed by showing the user
+                                // a dialog.
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(),
+                                    // and check the result in onActivityResult().
+                                    status.startResolutionForResult(getActivity(), 1000);
+                                } catch (IntentSender.SendIntentException e) {
+                                    // Ignore the error.
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                break;
+                        }
                     }
-                }
-            });
+                });
+                gpsDialogShown = true;
+            }
         }
     }
 

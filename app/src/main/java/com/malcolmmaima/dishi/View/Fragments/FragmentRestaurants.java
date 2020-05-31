@@ -223,7 +223,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     }
 
     private void fetchRestaurants() {
-        checkGPS();
         //Fetch restaurants
         menusRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -440,58 +439,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
         });
     }
 
-    private void checkGPS() {
-        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
-            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build();
-            googleApiClient.connect();
-
-            LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(5 * 1000);
-            locationRequest.setFastestInterval(2 * 1000);
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(locationRequest);
-
-            //**************************
-            builder.setAlwaysShow(true); //this is the key ingredient
-            //**************************
-
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                @Override
-                public void onResult(@NonNull LocationSettingsResult result) {
-                    final Status status = result.getStatus();
-                    //                final LocationSettingsStates state = result.getLocationSettingsStates();
-
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
-
-
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the user
-                            // a dialog.
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(getActivity(), 1000);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            break;
-                    }
-                }
-            });
-        }
-    }
 
     @Override
     public void onRefresh() {
