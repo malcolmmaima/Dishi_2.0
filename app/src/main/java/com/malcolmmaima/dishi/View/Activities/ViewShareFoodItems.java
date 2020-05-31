@@ -38,7 +38,7 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "ViewShareFoodItems";
     FirebaseAuth mAuth;
-    String myPhone, receiptKey, accountType, authorPhone;
+    String myPhone, receiptKey, accountType, authorPhone, vendorPhone;
     DatabaseReference myRef, receiptRef, myLocationRef;
     List<ProductDetailsModel> list;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -83,6 +83,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
         } else {
             receiptKey = getIntent().getStringExtra("receiptKey");
             authorPhone = getIntent().getStringExtra("author");
+            vendorPhone = getIntent().getStringExtra("vendorPhone");
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -163,26 +164,49 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
                         product.setDistance(0.0);
                         product.accountType = accountType;
 
-                        list.add(product);
+                        DatabaseReference vendorMenuItemRef = FirebaseDatabase.getInstance().getReference("menus/"+vendorPhone+"/"+product.getOriginalKey());
+                        vendorMenuItemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    try {
+                                        ProductDetailsModel vendorMenuItem = dataSnapshot.getValue(ProductDetailsModel.class);
+                                        product.setOutOfStock(vendorMenuItem.getOutOfStock());
+                                    } catch (Exception e){
 
-                        if (!list.isEmpty()) {
-                            /**
-                             * https://howtodoinjava.com/sort/collections-sort/
-                             * We want to sort from nearest to furthest location
-                             */
-                            Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                            mSwipeRefreshLayout.setRefreshing(false);
-                            //Collections.reverse(list);
-                            ProductAdapter recycler = new ProductAdapter(ViewShareFoodItems.this, list);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewShareFoodItems.this);
-                            recyclerview.setLayoutManager(layoutmanager);
-                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                            recycler.notifyDataSetChanged();
-                            recyclerview.setAdapter(recycler);
-                        } else {
-                            //finish();
-                            SafeToast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
-                        }
+                                    }
+                                } else {
+                                    product.setOutOfStock(false);
+                                }
+
+                                list.add(product);
+
+                                if (!list.isEmpty()) {
+                                    /**
+                                     * https://howtodoinjava.com/sort/collections-sort/
+                                     * We want to sort from nearest to furthest location
+                                     */
+                                    Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                    //Collections.reverse(list);
+                                    ProductAdapter recycler = new ProductAdapter(ViewShareFoodItems.this, list);
+                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewShareFoodItems.this);
+                                    recyclerview.setLayoutManager(layoutmanager);
+                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                    recycler.notifyDataSetChanged();
+                                    recyclerview.setAdapter(recycler);
+                                } else {
+                                    finish();
+                                    SafeToast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
 
                 }

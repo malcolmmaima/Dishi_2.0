@@ -347,6 +347,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("receiptKey", statusUpdateModel.getReceiptKey());
                 slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                slideactivity.putExtra("vendorPhone", statusUpdateModel.getVendorPhone());
                 context.startActivity(slideactivity);
             }
         });

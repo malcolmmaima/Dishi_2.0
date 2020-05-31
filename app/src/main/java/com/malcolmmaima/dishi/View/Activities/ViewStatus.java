@@ -546,6 +546,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     slideactivity.putExtra("receiptKey", viewPost.getReceiptKey());
                                     slideactivity.putExtra("author", viewPost.getAuthor());
+                                    slideactivity.putExtra("vendorPhone", viewPost.getVendorPhone());
                                     startActivity(slideactivity);
                                 }
                             });

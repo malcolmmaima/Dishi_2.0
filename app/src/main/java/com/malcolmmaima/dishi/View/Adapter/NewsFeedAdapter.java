@@ -934,6 +934,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 slideactivity.putExtra("receiptKey", statusUpdateModel.getReceiptKey());
                 slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                slideactivity.putExtra("vendorPhone", statusUpdateModel.getVendorPhone());
                 context.startActivity(slideactivity);
             }
         });
