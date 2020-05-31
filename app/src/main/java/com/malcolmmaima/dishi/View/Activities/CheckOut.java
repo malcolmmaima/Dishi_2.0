@@ -85,7 +85,7 @@ public class CheckOut extends AppCompatActivity {
     private ReceiptItemAdapter mAdapter;
     ArrayList<String> vendors;
     ArrayList<UserModel> vendorObj;
-    Boolean stopDialogShown;
+    Boolean stopDialogShown, pauseOrder;
     int prodCount;
     ProgressBar progressBar;
 
@@ -145,6 +145,7 @@ public class CheckOut extends AppCompatActivity {
         vendorObj = new ArrayList<UserModel>();
         progressDialog = new ProgressDialog(CheckOut.this);
         stopDialogShown = false;
+        pauseOrder = false;
 
         //Hide keyboard on activity load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -601,6 +602,7 @@ public class CheckOut extends AppCompatActivity {
                                                 try {
                                                     UserModel restaurant_ = dataSnapshot.getValue(UserModel.class);
 
+                                                    pauseOrder = true;
                                                     final AlertDialog alertUser = new AlertDialog.Builder(CheckOut.this)
                                                             //set message, title, and icon
                                                             .setCancelable(false)
@@ -616,10 +618,7 @@ public class CheckOut extends AppCompatActivity {
                                                                     }catch(Exception er){
 
                                                                     }
-//                                                        finish();
-//                                                        Intent backToCart = new Intent(CheckOut.this, MyCart.class)
-//                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                                        startActivity(backToCart);
+                                                                    finish();
                                                                 }
                                                             }).create();
                                                     alertUser.show();
@@ -698,7 +697,11 @@ public class CheckOut extends AppCompatActivity {
                                                                 } catch (Exception er){
 
                                                                 }
-                                                                finish();
+
+                                                                //Allow the customer to read the pop up message above about their existing order
+                                                                if(pauseOrder == false){
+                                                                    finish();
+                                                                }
                                                                 SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
 
                                                             }
@@ -724,7 +727,9 @@ public class CheckOut extends AppCompatActivity {
                                                         } catch (Exception e){
 
                                                         }
-                                                        finish();
+                                                        if(pauseOrder == false){
+                                                            finish();
+                                                        }
                                                         SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                     }
                                                 }
@@ -757,7 +762,9 @@ public class CheckOut extends AppCompatActivity {
                                                             } catch (Exception e){
 
                                                             }
-                                                            finish();
+                                                            if(pauseOrder == false){
+                                                                finish();
+                                                            }
                                                             SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                         }
                                                     }
@@ -848,7 +855,9 @@ public class CheckOut extends AppCompatActivity {
                                                         } catch (Exception er){
 
                                                         }
-                                                        finish();
+                                                        if(pauseOrder == false){
+                                                            finish();
+                                                        }
                                                         SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                     }
                                                 }
@@ -883,7 +892,9 @@ public class CheckOut extends AppCompatActivity {
                                                     } catch (Exception er){
 
                                                     }
-                                                    finish();
+                                                    if(pauseOrder == false){
+                                                        finish();
+                                                    }
                                                     SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                 }
                                             }
