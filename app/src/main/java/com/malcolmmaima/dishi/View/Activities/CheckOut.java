@@ -42,6 +42,7 @@ import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 import com.malcolmmaima.dishi.View.Adapter.ReceiptItemAdapter;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
@@ -49,6 +50,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -79,6 +81,8 @@ public class CheckOut extends AppCompatActivity {
     private ReceiptItemAdapter mAdapter;
     ArrayList<String> vendors;
     ArrayList<UserModel> vendorObj;
+    Boolean stopDialogShown;
+    int prodCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +100,17 @@ public class CheckOut extends AppCompatActivity {
                     myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+                            try {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                            if(locked == true){
-                                Intent slideactivity = new Intent(CheckOut.this, SecurityPin.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                slideactivity.putExtra("pinType", "resume");
-                                startActivity(slideactivity);
+                                if (locked == true) {
+                                    Intent slideactivity = new Intent(CheckOut.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            } catch (Exception e){
+
                             }
                         }
 
@@ -131,6 +139,7 @@ public class CheckOut extends AppCompatActivity {
         vendors = new ArrayList<String>();
         vendorObj = new ArrayList<UserModel>();
         progressDialog = new ProgressDialog(CheckOut.this);
+        stopDialogShown = false;
 
         //Hide keyboard on activity load
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -155,6 +164,8 @@ public class CheckOut extends AppCompatActivity {
         totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
         totalBill.setText("Ksh " + totalBillAmount);
 
+        orderBtn.setVisibility(View.GONE);
+
         setTitle("Checkout");
 
         myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -165,7 +176,64 @@ public class CheckOut extends AppCompatActivity {
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                     try {
                         ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
-                        myCartItems.add(product);
+
+                        DatabaseReference vendorMenuItemRef = FirebaseDatabase.getInstance().getReference("menus/"+product.getOwner()+"/"+product.getOriginalKey());
+                        vendorMenuItemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    try {
+                                        ProductDetailsModel vendorMenuItem = dataSnapshot.getValue(ProductDetailsModel.class);
+                                        product.setOutOfStock(vendorMenuItem.getOutOfStock());
+                                    } catch (Exception e){
+                                        product.setOutOfStock(false);
+                                    }
+                                } else {
+                                    product.setOutOfStock(false);
+                                }
+
+                                //allow checkout of items in stock only
+                                if(product.getOutOfStock() == false){
+                                    myCartItems.add(product);
+                                }
+
+                                if(!myCartItems.isEmpty()){
+                                    orderBtn.setVisibility(View.VISIBLE);
+                                    mAdapter = new ReceiptItemAdapter(CheckOut.this,myCartItems);
+                                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(CheckOut.this);
+                                    recyclerView.setLayoutManager(mLayoutManager);
+                                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+                                    recyclerView.setAdapter(mAdapter);
+                                }
+
+                                else {
+                                    orderBtn.setVisibility(View.GONE);
+                                    if(stopDialogShown == false){
+                                        android.app.AlertDialog notAllowed = new android.app.AlertDialog.Builder(CheckOut.this)
+                                                .setTitle("Sorry :-(")
+                                                .setMessage("You can't checkout items that are out of stock!")
+                                                .setCancelable(false)
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        finish();
+                                                        Intent slideactivity = new Intent(CheckOut.this, MyCart.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                                        startActivity(slideactivity);
+                                                    }
+                                                }).create();
+                                        notAllowed.show();
+                                        stopDialogShown = true;
+                                    }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
 
                         addVendors(product.getOwner());
                     } catch (Exception e){
@@ -173,11 +241,7 @@ public class CheckOut extends AppCompatActivity {
                     }
                 }
 
-                mAdapter = new ReceiptItemAdapter(CheckOut.this,myCartItems);
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(CheckOut.this);
-                recyclerView.setLayoutManager(mLayoutManager);
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                recyclerView.setAdapter(mAdapter);
+
 
             }
 
@@ -200,23 +264,49 @@ public class CheckOut extends AppCompatActivity {
                                 myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        int prodCount = 0;
+                                        prodCount = 0;
                                         for(DataSnapshot items : dataSnapshot.getChildren()){
                                             try {
                                                 ProductDetailsModel product = items.getValue(ProductDetailsModel.class);
 
-                                                if(product.getOwner().equals(vendor)){
-                                                    prodCount = prodCount + product.getQuantity();
+                                                DatabaseReference vendorMenuItemRef = FirebaseDatabase.getInstance().getReference("menus/"+product.getOwner()+"/"+product.getOriginalKey());
+                                                vendorMenuItemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        try {
+                                                            if (dataSnapshot.exists()) {
+                                                                ProductDetailsModel vendorMenuItem = dataSnapshot.getValue(ProductDetailsModel.class);
+                                                                product.setOutOfStock(vendorMenuItem.getOutOfStock());
+                                                            } else {
+                                                                product.setOutOfStock(false);
+                                                            }
+                                                        } catch (Exception e){
+                                                            Log.e(TAG, "onDataChange: ", e);
+                                                            product.setOutOfStock(false);
+                                                        }
 
-                                                    if(prodCount > vendorUser.getDeliveryChargeLimit()){
-                                                        deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
-                                                        deliveryChargeAmount.setText("Ksh " + deliveryAmount);
+                                                        //increment product count only if it's in stock.
+                                                        //product count helps us determine the delivery charge
+                                                        if(product.getOwner().equals(vendor) && product.getOutOfStock() == false){
+                                                            prodCount = prodCount + product.getQuantity();
+
+                                                            if(prodCount > vendorUser.getDeliveryChargeLimit()){
+                                                                deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                                                deliveryChargeAmount.setText("Ksh " + deliveryAmount);
+                                                            }
+
+                                                            totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
+                                                            totalBill.setText("Ksh " + totalBillAmount);
+                                                            Log.d(TAG, vendorUser.getFirstname()+ " items: "+(prodCount));
+                                                        }
                                                     }
 
-                                                    totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
-                                                    totalBill.setText("Ksh " + totalBillAmount);
-                                                    Log.d(TAG, vendorUser.getFirstname()+ " items: "+(prodCount));
-                                                }
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
                                             } catch (Exception e){
                                                 Log.e(TAG, "onDataChange: ", e);
                                             }

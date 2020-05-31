@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -77,6 +78,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
          * Set widget values
          **/
 
+        holder.checkBox.setEnabled(false);
+        holder.checkBox.setVisibility(View.GONE);
+        holder.outOfStock.setVisibility(View.GONE);
+
         int price = productDetailsModel.getQuantity() * Integer.parseInt(productDetailsModel.getPrice());
         holder.foodPrice.setText("Ksh "+price);
         holder.foodName.setText(productDetailsModel.getName());
@@ -101,10 +106,46 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             }
         });
 
-        if(productDetailsModel.getDescription().length() > 89) {
-            holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
-        } else {
-            holder.foodDescription.setText(productDetailsModel.getDescription());
+
+        //Check item status from vendor on whether item is out of stock or nah
+        DatabaseReference menuItemRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetailsModel.getOwner()+"/"+productDetailsModel.getOriginalKey());
+        menuItemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    ProductDetailsModel menuProduct = dataSnapshot.getValue(ProductDetailsModel.class);
+                    try {
+                        if(menuProduct.getOutOfStock() == true){
+                            productDetailsModel.setOutOfStock(true);
+                            holder.checkBox.setVisibility(View.VISIBLE);
+                            holder.checkBox.setChecked(true);
+                            holder.outOfStock.setVisibility(View.VISIBLE);
+                        } else {
+                            productDetailsModel.setOutOfStock(false);
+                            holder.checkBox.setVisibility(View.GONE);
+                            holder.outOfStock.setVisibility(View.GONE);
+                        }
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+        try {
+            if (productDetailsModel.getDescription().length() > 89) {
+                holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
+            } else {
+                holder.foodDescription.setText(productDetailsModel.getDescription());
+            }
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ", e);
         }
 
         try {
@@ -148,6 +189,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
                     slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
                     slideactivity.putExtra("distance", productDetailsModel.getDistance());
                     slideactivity.putExtra("accType", "1"); // this cart adapter is ony accessible to customers when they view their cart
+                    slideactivity.putExtra("outOfStock", productDetailsModel.getOutOfStock());
 
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation, R.anim.animation2).toBundle();
@@ -243,10 +285,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
 
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium foodName, foodPrice;
-        MyTextView_Roboto_Regular foodDescription, restaurantName,quantity;
+        MyTextView_Roboto_Regular foodDescription, restaurantName,quantity, outOfStock;
         ImageView foodPic;
         CardView cardView;
         ImageButton removeCart;
+        CheckBox checkBox;
 
         public MyHolder(View itemView) {
             super(itemView);
@@ -258,6 +301,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             restaurantName = itemView.findViewById(R.id.restaurantName);
             quantity = itemView.findViewById(R.id.quantity);
             removeCart = itemView.findViewById(R.id.removeCart);
+            checkBox = itemView.findViewById(R.id.checkBox);
+            outOfStock = itemView.findViewById(R.id.outOfStock);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
