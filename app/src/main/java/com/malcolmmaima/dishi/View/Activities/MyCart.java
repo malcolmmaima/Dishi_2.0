@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -37,11 +39,14 @@ import com.malcolmmaima.dishi.View.Adapter.CartAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class MyCart extends AppCompatActivity {
 
+    String TAG = "MyCartActivity";
     List<ProductDetailsModel> list;
     RecyclerView recyclerview;
     String myPhone, restaurantName;
@@ -49,7 +54,7 @@ public class MyCart extends AppCompatActivity {
     AppCompatImageView icon;
     LiveLocationModel liveLocationModel;
     Button checkoutBtn;
-    Boolean multipleRestaurants;
+    Boolean multipleRestaurants, dialogShow;
     DatabaseReference myCartRef, myLocationRef, myRef;
     FirebaseDatabase db;
     ValueEventListener locationListener, cartListener, totalItemsListener;
@@ -118,7 +123,7 @@ public class MyCart extends AppCompatActivity {
              */
             restaurantName = "";
             multipleRestaurants = false;
-
+            dialogShow = false;
 
             /**
              * Initialize firebase database
@@ -222,16 +227,13 @@ public class MyCart extends AppCompatActivity {
 
                                     //Compare other providers in the list with the first index
                                     if(!restaurantName.equals(list.get(i).getOwner())){
-                                        //SafeToast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, restaurantName + " != " + list.get(i).getOwner());
                                         multipleRestaurants = true;
+                                        /**
+                                         * Prompt user they are about to order from multiple providers, this means an increase in delivery charges
+                                         */
 
-                                        //Perform action only once (if loop is complete)
-                                        if(i == list.size()-1){
-
-                                            /**
-                                             * Prompt user they are about to order from multiple providers, this means an increase in delivery charges
-                                             */
-
+                                        if(dialogShow == false){
                                             AlertDialog multiple = new AlertDialog.Builder(MyCart.this)
                                                     .setMessage("You are about to order from more than one vendor")
                                                     //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
@@ -239,6 +241,7 @@ public class MyCart extends AppCompatActivity {
                                                     //set three option buttons
                                                     .setPositiveButton("PROCEED", new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
+                                                            dialogShow = false;
                                                             //Snackbar.make(v.getRootView(), "Checkout module", Snackbar.LENGTH_LONG).show();
 
                                                             //Slide to new activity
@@ -265,22 +268,19 @@ public class MyCart extends AppCompatActivity {
                                                     .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialogInterface, int i) {
-
+                                                            dialogShow = false;
                                                         }
                                                     })
 
                                                     .create();
                                             multiple.show();
+                                            dialogShow = true;
                                         }
                                     }
 
-                                    else {
-                                        multipleRestaurants = false;
-
-                                        //Perform action only once (if loop is complete)
-                                        if(i == list.size()-1){
-                                            //Snackbar.make(v.getRootView(), "Checkout module", Snackbar.LENGTH_LONG).show();
-
+                                    if(i == list.size()-1){
+                                        if(multipleRestaurants == false){
+                                            Log.d(TAG, i + " == " + (list.size()-1));
                                             //Slide to new activity
                                             Intent slideactivity = new Intent(MyCart.this, CheckOut.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -300,7 +300,9 @@ public class MyCart extends AppCompatActivity {
 
                                             finish();//clear this activity from stack
                                         }
+
                                     }
+
                                 }
 
 
@@ -308,7 +310,6 @@ public class MyCart extends AppCompatActivity {
 
                             //list is empty
                             else {
-
                                 checkoutBtn.setVisibility(View.GONE);
                             }
 

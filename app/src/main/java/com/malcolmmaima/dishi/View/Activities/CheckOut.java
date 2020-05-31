@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -83,6 +84,7 @@ public class CheckOut extends AppCompatActivity {
     ArrayList<UserModel> vendorObj;
     Boolean stopDialogShown;
     int prodCount;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,19 +187,30 @@ public class CheckOut extends AppCompatActivity {
                                     try {
                                         ProductDetailsModel vendorMenuItem = dataSnapshot.getValue(ProductDetailsModel.class);
                                         product.setOutOfStock(vendorMenuItem.getOutOfStock());
+
+                                        if(product.getOutOfStock() == false){
+                                            myCartItems.add(product);
+                                        }
                                     } catch (Exception e){
                                         product.setOutOfStock(false);
+                                        myCartItems.add(product);
                                     }
                                 } else {
                                     product.setOutOfStock(false);
-                                }
-
-                                //allow checkout of items in stock only
-                                if(product.getOutOfStock() == false){
                                     myCartItems.add(product);
                                 }
 
+                                try {
+                                    //allow checkout of items in stock only
+                                    if (product.getOutOfStock() == false) {
+                                        //myCartItems.add(product);
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
+
                                 if(!myCartItems.isEmpty()){
+                                    progressBar.setVisibility(View.GONE);
                                     orderBtn.setVisibility(View.VISIBLE);
                                     mAdapter = new ReceiptItemAdapter(CheckOut.this,myCartItems);
                                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(CheckOut.this);
@@ -207,6 +220,7 @@ public class CheckOut extends AppCompatActivity {
                                 }
 
                                 else {
+                                    progressBar.setVisibility(View.GONE);
                                     orderBtn.setVisibility(View.GONE);
                                     if(stopDialogShown == false){
                                         android.app.AlertDialog notAllowed = new android.app.AlertDialog.Builder(CheckOut.this)
@@ -235,19 +249,18 @@ public class CheckOut extends AppCompatActivity {
                             }
                         });
 
+                        //filter the vendors and get their delivery charges then add
                         addVendors(product.getOwner());
                     } catch (Exception e){
                         Log.e(TAG, "onDataChange: ", e);
                     }
                 }
 
-
-
             }
 
             private void addVendors(String vendor) {
+
                 if(!vendors.contains(vendor)){
-                    vendors.add(vendor);
 
                     //get vendor details incl delivery charge val
                     DatabaseReference vendorUserDetails = FirebaseDatabase.getInstance().getReference("users/"+vendor);
@@ -280,25 +293,26 @@ public class CheckOut extends AppCompatActivity {
                                                             } else {
                                                                 product.setOutOfStock(false);
                                                             }
+
+                                                            //increment product count only if it's in stock.
+                                                            //product count helps us determine the delivery charge
+                                                            if (product.getOwner().equals(vendor) && product.getOutOfStock() == false) {
+                                                                prodCount = prodCount + product.getQuantity();
+
+                                                                if (prodCount > vendorUser.getDeliveryChargeLimit() && !vendors.contains(product.getOwner())) {
+                                                                    deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                                                    deliveryChargeAmount.setText("Ksh " + deliveryAmount);
+                                                                    Log.d(TAG, vendorUser.getFirstname()+" => " + vendorUser.getDelivery_charge());
+                                                                    vendors.add(vendor);
+                                                                }
+
+                                                                totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
+                                                                totalBill.setText("Ksh " + totalBillAmount);
+                                                            }
                                                         } catch (Exception e){
                                                             Log.e(TAG, "onDataChange: ", e);
-                                                            product.setOutOfStock(false);
                                                         }
 
-                                                        //increment product count only if it's in stock.
-                                                        //product count helps us determine the delivery charge
-                                                        if(product.getOwner().equals(vendor) && product.getOutOfStock() == false){
-                                                            prodCount = prodCount + product.getQuantity();
-
-                                                            if(prodCount > vendorUser.getDeliveryChargeLimit()){
-                                                                deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
-                                                                deliveryChargeAmount.setText("Ksh " + deliveryAmount);
-                                                            }
-
-                                                            totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
-                                                            totalBill.setText("Ksh " + totalBillAmount);
-                                                            Log.d(TAG, vendorUser.getFirstname()+ " items: "+(prodCount));
-                                                        }
                                                     }
 
                                                     @Override
@@ -956,6 +970,8 @@ public class CheckOut extends AppCompatActivity {
         paymentStatus = findViewById(R.id.paymentStatus);
         deliveryLocationStatus = findViewById(R.id.deliveryLocationStatus);
         recyclerView = findViewById(R.id.recyclerview);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     public String[] Split(String timeStamp){
