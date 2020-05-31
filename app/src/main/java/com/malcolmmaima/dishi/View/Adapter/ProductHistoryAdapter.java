@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -113,6 +114,42 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             }
         });
 
+        holder.checkBox.setEnabled(false);
+        holder.checkBox.setVisibility(View.GONE);
+        holder.outOfStock.setVisibility(View.GONE);
+
+        //Check item status from vendor on whether item is out of stock or nah
+        DatabaseReference menuItemRef = FirebaseDatabase.getInstance().getReference("menus/"+productDetailsModel.getOwner()+"/"+productDetailsModel.getOriginalKey());
+        menuItemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    ProductDetailsModel menuProduct = dataSnapshot.getValue(ProductDetailsModel.class);
+                    try {
+                        if(menuProduct.getOutOfStock() == true){
+                            productDetailsModel.setOutOfStock(true);
+                            holder.checkBox.setVisibility(View.VISIBLE);
+                            holder.checkBox.setChecked(true);
+                            holder.outOfStock.setVisibility(View.VISIBLE);
+                            holder.addToCart.setVisibility(View.GONE);
+                        } else {
+                            productDetailsModel.setOutOfStock(false);
+                            holder.addToCart.setVisibility(View.VISIBLE);
+                            holder.checkBox.setVisibility(View.GONE);
+                            holder.outOfStock.setVisibility(View.GONE);
+                        }
+                    } catch (Exception e){
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         try {
             if (productDetailsModel.getDescription().length() > 89) {
                 holder.foodDescription.setText(productDetailsModel.getDescription().substring(0, 80) + "...");
@@ -165,6 +202,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                 slideactivity.putExtra("imageUrl", productDetailsModel.getImageURL());
                 slideactivity.putExtra("distance", productDetailsModel.getDistance());
                 slideactivity.putExtra("accType", productDetailsModel.accountType);
+                slideactivity.putExtra("outOfStock", productDetailsModel.getOutOfStock());
 
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
@@ -487,10 +525,12 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
 
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium foodName, foodPrice;
-        MyTextView_Roboto_Regular foodDescription, restaurantName, distanceAway, itemQuantity, confirmOrd, orderedOn;
+        MyTextView_Roboto_Regular foodDescription, restaurantName,
+                distanceAway, itemQuantity, confirmOrd, orderedOn, outOfStock;
         ImageView foodPic;
         CardView cardView;
         ImageButton addToCart;
+        CheckBox checkBox;
 
         public MyHolder(View itemView) {
             super(itemView);
@@ -505,6 +545,8 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
             orderedOn = itemView.findViewById(R.id.orderedOn);
             itemQuantity = itemView.findViewById(R.id.itemQuantity);
             confirmOrd = itemView.findViewById(R.id.confirmOrd);
+            checkBox = itemView.findViewById(R.id.checkBox);
+            outOfStock = itemView.findViewById(R.id.outOfStock);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             final String myPhone = user.getPhoneNumber(); //Current logged in user phone number
