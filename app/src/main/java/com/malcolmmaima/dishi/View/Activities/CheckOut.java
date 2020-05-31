@@ -462,16 +462,18 @@ public class CheckOut extends AppCompatActivity {
 
     private void deliveryCharges() {
         try {
-            String[] vendors = new String[deliveryFeeBreakdown.size()];
-            AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
-            builder.setTitle("Delivery fee breakdown");
-            builder.setItems(deliveryFeeBreakdown.toArray(vendors), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+            if(deliveryFeeBreakdown.size() > 1){
+                String[] vendors = new String[deliveryFeeBreakdown.size()];
+                AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
+                builder.setTitle("Delivery fee breakdown");
+                builder.setItems(deliveryFeeBreakdown.toArray(vendors), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
 
-                }
-            });
-            builder.create();
-            builder.show();
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
         } catch (Exception e){
             Log.e(TAG, "deliveryCharges: ",e );
         }
