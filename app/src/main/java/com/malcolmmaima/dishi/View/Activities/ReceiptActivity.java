@@ -570,10 +570,47 @@ public class ReceiptActivity extends AppCompatActivity {
                                             //do something
                                             return (true);
                                         case R.id.download:
-                                            exitReceipt.setVisibility(View.GONE);
-                                            receiptOptions.setVisibility(View.GONE);
-                                            bitmap = loadBitmapFromView(myReceipt, myReceipt.getWidth(), myReceipt.getHeight());
-                                            createPdf();
+                                            //5 second delay to run a few checks
+                                            progressDialog.setMessage("Generating...");
+                                            progressDialog.setCancelable(false);
+                                            progressDialog.show();
+
+                                            timer = new Timer();
+                                            timer.schedule(new TimerTask() {
+
+                                                int second = 5;
+
+                                                @Override
+                                                public void run() {
+                                                    if (second == 0) {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                timer.cancel();
+                                                                if(progressDialog.isShowing()){
+                                                                    progressDialog.dismiss();
+                                                                }
+
+                                                                exitReceipt.setVisibility(View.GONE);
+                                                                receiptOptions.setVisibility(View.GONE);
+                                                                bitmap = loadBitmapFromView(myReceipt, myReceipt.getWidth(), myReceipt.getHeight());
+                                                                createPdf();
+
+                                                            }
+                                                        });
+
+                                                    } else {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                //seconds ticking
+                                                                progressDialog.setMessage("Generating("+(second--)+")...");
+                                                            }
+                                                        });
+                                                    }
+
+                                                }
+                                            }, 0, 1000);
                                             return true;
                                         default:
                                             return false;

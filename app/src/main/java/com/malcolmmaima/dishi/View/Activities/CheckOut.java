@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -67,7 +69,7 @@ public class CheckOut extends AppCompatActivity {
     CardView PaymentMethod, DeliveryAddress;
     EditText remarks;
     MyTextView_Roboto_Medium totalBill;
-    MyTextView_Roboto_Regular SubTotal, deliveryChargeAmount, VATamount;
+    MyTextView_Roboto_Regular SubTotal, deliveryChargeAmount, VATamount, DeliveryCharge;
     Double deliveryAmount, totalBillAmount,VAT;
     String [] paymentMethods = {"M-Pesa","Cash on Delivery"};
     String [] deliveryAddress = {"Live Location","Select Location", "Pick My Order"};
@@ -78,6 +80,7 @@ public class CheckOut extends AppCompatActivity {
     DatabaseReference myRef, myCartRef;
     ProgressDialog progressDialog;
     ArrayList<ProductDetailsModel> myCartItems;
+    List<String> deliveryFeeBreakdown;
     private RecyclerView recyclerView;
     private ReceiptItemAdapter mAdapter;
     ArrayList<String> vendors;
@@ -151,14 +154,15 @@ public class CheckOut extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        DecimalFormat df = new DecimalFormat("#"); //#.##
+
         //Initialize some values
         int subTotalAmount = getIntent().getIntExtra("subTotal", 0);
 
         totalBillAmount = Double.valueOf(subTotalAmount);
-        SubTotal.setText("Ksh " + subTotalAmount);
+        SubTotal.setText("Ksh " + Double.valueOf(df.format(subTotalAmount)));
         deliveryChargeAmount.setText("Ksh " + deliveryAmount);
 
-        DecimalFormat df = new DecimalFormat("#"); //#.##
         VAT = 0.16 * totalBillAmount; //16% VAT : Kenya
         VAT = Double.valueOf(df.format(VAT));
         VATamount.setText("Ksh " + VAT);
@@ -175,6 +179,7 @@ public class CheckOut extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 vendors.clear();
                 myCartItems = new ArrayList<>();
+                deliveryFeeBreakdown = new ArrayList<String>();
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                     try {
                         ProductDetailsModel product = dataSnapshot1.getValue(ProductDetailsModel.class);
@@ -301,13 +306,15 @@ public class CheckOut extends AppCompatActivity {
 
                                                                 if (prodCount > vendorUser.getDeliveryChargeLimit() && !vendors.contains(product.getOwner())) {
                                                                     deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
-                                                                    deliveryChargeAmount.setText("Ksh " + deliveryAmount);
-                                                                    Log.d(TAG, vendorUser.getFirstname()+" => " + vendorUser.getDelivery_charge());
+                                                                    deliveryChargeAmount.setText("Ksh " + Double.valueOf(df.format(deliveryAmount)));
+                                                                    deliveryFeeBreakdown.add(vendorUser.getFirstname()+" "+vendorUser.getLastname()+" (Ksh " + vendorUser.getDelivery_charge()+")");
+                                                                    //Log.d(TAG, vendorUser.getFirstname()+" => " + vendorUser.getDelivery_charge());
                                                                     vendors.add(vendor);
                                                                 }
 
                                                                 totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
-                                                                totalBill.setText("Ksh " + totalBillAmount);
+                                                                totalBill.setText("Ksh " + Double.valueOf(df.format(totalBillAmount)));
+
                                                             }
                                                         } catch (Exception e){
                                                             Log.e(TAG, "onDataChange: ", e);
@@ -416,6 +423,23 @@ public class CheckOut extends AppCompatActivity {
         });
 
         /**
+         * Delivery charge breakdown
+         */
+        DeliveryCharge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deliveryCharges();
+            }
+        });
+
+        deliveryChargeAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deliveryCharges();
+            }
+        });
+
+        /**
          * Complete order
          */
         orderBtn.setOnClickListener(new View.OnClickListener() {
@@ -434,6 +458,23 @@ public class CheckOut extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void deliveryCharges() {
+        try {
+            String[] vendors = new String[deliveryFeeBreakdown.size()];
+            AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
+            builder.setTitle("Delivery fee breakdown");
+            builder.setItems(deliveryFeeBreakdown.toArray(vendors), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.create();
+            builder.show();
+        } catch (Exception e){
+            Log.e(TAG, "deliveryCharges: ",e );
+        }
     }
 
 
@@ -964,6 +1005,7 @@ public class CheckOut extends AppCompatActivity {
 
         SubTotal = findViewById(R.id.subTotal);
         deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
+        DeliveryCharge = findViewById(R.id.DeliveryCharge);
         VATamount = findViewById(R.id.VATamount);
         totalBill = findViewById(R.id.totalBill);
 
