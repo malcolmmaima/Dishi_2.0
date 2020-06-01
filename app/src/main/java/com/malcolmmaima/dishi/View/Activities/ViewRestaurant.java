@@ -641,6 +641,8 @@ public class ViewRestaurant extends AppCompatActivity {
             providerFavs.removeEventListener(providerFavsListener);
             myLocationRef.removeEventListener(mylocationListener);
             restaurantLocationRef.removeEventListener(restaurantLocationListener);
+            myCartRef.removeEventListener(cartListener);
+
         } catch (Exception e){
 
         }

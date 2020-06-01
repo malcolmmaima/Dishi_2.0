@@ -1191,6 +1191,8 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
             reviewsRef.removeEventListener(likesListener);
             reviewsRef.removeEventListener(commentsListener);
             reviewsRef.child(key).removeEventListener(reviewsRefListener);
+            reviewsRef.child(key).child("comments").removeEventListener(commentsListener);
+            reviewsRef.child(key).child("likes").removeEventListener(commentsListener);
         } catch (Exception e){
 
         }

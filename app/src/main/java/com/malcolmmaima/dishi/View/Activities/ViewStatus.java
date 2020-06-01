@@ -1433,14 +1433,12 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
             layoutmanager = null;
         }
 
-        try {
-            authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);
-            postRef.removeEventListener(likesListener);
-            postRef.removeEventListener(commentsListener);
-            postRef.child(key).removeEventListener(postRefListener);
-        } catch (Exception e){
-
-        }
+        try { authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener); } catch (Exception e){ }
+        try { postRef.removeEventListener(likesListener); } catch (Exception e){ }
+        try { postRef.removeEventListener(commentsListener); } catch (Exception e){ }
+        try { postRef.child(key).removeEventListener(postRefListener); } catch (Exception e){ }
+        try { postRef.child(key).child("comments").removeEventListener(commentsListener); } catch (Exception e){ }
+        try { postRef.child(key).child("likes").removeEventListener(likesListener); } catch (Exception e){ }
     }
 
     @Override

@@ -280,5 +280,11 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
             }
         });
 
+        try {
+            myRef.child("account_type").removeEventListener(accountTypeListener);
+        } catch (Exception e){
+
+        }
+
     }
 }
