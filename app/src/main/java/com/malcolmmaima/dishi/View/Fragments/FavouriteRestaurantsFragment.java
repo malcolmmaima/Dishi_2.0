@@ -53,6 +53,7 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
     AppCompatImageView icon;
     View v;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayoutManager layoutmanager;
 
     public static FavouriteRestaurantsFragment newInstance() {
         FavouriteRestaurantsFragment fragment = new FavouriteRestaurantsFragment();
@@ -74,6 +75,9 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -151,7 +155,6 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                     mSwipeRefreshLayout.setRefreshing(false);
 
                     RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -220,7 +223,6 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                                 //Collections.reverse(list);
                                                                 RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                 recyclerview.setLayoutManager(layoutmanager);
                                                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                                 recycler.notifyDataSetChanged();
@@ -232,7 +234,6 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                                                 mSwipeRefreshLayout.setRefreshing(false);
 
                                                                 RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                 recyclerview.setLayoutManager(layoutmanager);
                                                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                                 recyclerview.setAdapter(recycler);
@@ -287,7 +288,6 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                                             mSwipeRefreshLayout.setRefreshing(false);
                                                             //Collections.reverse(list);
                                                             RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recycler.notifyDataSetChanged();
@@ -299,7 +299,6 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                                                             mSwipeRefreshLayout.setRefreshing(false);
 
                                                             RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recyclerview.setAdapter(recycler);
@@ -368,6 +367,7 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
 

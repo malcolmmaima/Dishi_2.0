@@ -848,7 +848,18 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
             try { myRef.removeEventListener(myListener); } catch (Exception e){}
             try { followersCounterRef.removeEventListener(followersCounterListener); } catch (Exception e){}
             try { followingCounterref.removeEventListener(followingCounterListener); } catch (Exception e){}

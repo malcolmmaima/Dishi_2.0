@@ -45,6 +45,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
     RecyclerView recyclerview;
     LiveLocationModel liveLocationModel;
     ValueEventListener locationListener, accountTypeListener;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,10 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
             }
         });
         recyclerview = findViewById(R.id.rview);
+
+        layoutmanager = new LinearLayoutManager(ViewShareFoodItems.this);
+        recyclerview.setLayoutManager(layoutmanager);
+
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -190,7 +195,6 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
                                     mSwipeRefreshLayout.setRefreshing(false);
                                     //Collections.reverse(list);
                                     ProductAdapter recycler = new ProductAdapter(ViewShareFoodItems.this, list);
-                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewShareFoodItems.this);
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                     recycler.notifyDataSetChanged();
@@ -263,11 +267,18 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
     protected void onDestroy() {
         super.onDestroy();
 
-        try {
-            myLocationRef.removeEventListener(locationListener);
-            myRef.child("account_type").removeEventListener(accountTypeListener);
-        } catch (Exception e){
-            Log.e(TAG, "onDestroy: ", e);
-        }
+        recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                // no-op
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                recyclerview.setAdapter(null);
+                layoutmanager = null;
+            }
+        });
+
     }
 }

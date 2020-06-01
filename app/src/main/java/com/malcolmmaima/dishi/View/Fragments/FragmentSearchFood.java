@@ -54,6 +54,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
     DatabaseReference myLocationRef, myUserDetails;
     int searchCap;
     View view;
+    LinearLayoutManager layoutmanager;
 
     public static FragmentSearchFood newInstance() {
         FragmentSearchFood fragment = new FragmentSearchFood();
@@ -110,6 +111,8 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
 
         recyclerview = view.findViewById(R.id.rview);
         emptyTag = view.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -221,7 +224,6 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                             recyclerview.setVisibility(View.VISIBLE);
 
                                                             ProductAdapter recycler = new ProductAdapter(getContext(), foods);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             //recyclerView.setItemAnimator(new SlideInLeftAnimator());
 
@@ -301,7 +303,6 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                             recyclerview.setVisibility(View.VISIBLE);
                                                             recyclerview.setVisibility(VISIBLE);
                                                             ProductAdapter recycler = new ProductAdapter(getContext(), foods);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             //recyclerView.setItemAnimator(new SlideInLeftAnimator());
 
@@ -394,8 +395,10 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
+
             try {
                 myLocationRef.removeEventListener(locationListener);
             } catch (Exception e){

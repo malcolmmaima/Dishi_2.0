@@ -53,6 +53,7 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
     FirebaseUser user;
     ValueEventListener locationListener;
     View v;
+    LinearLayoutManager layoutmanager;
 
     public static FavouriteFoodsFragment newInstance() {
         FavouriteFoodsFragment fragment = new FavouriteFoodsFragment();
@@ -86,6 +87,8 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -145,7 +148,6 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                     mSwipeRefreshLayout.setRefreshing(false);
 
                     ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -220,7 +222,6 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                                         mSwipeRefreshLayout.setRefreshing(false);
                                                                         //Collections.reverse(list);
                                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                         recyclerview.setLayoutManager(layoutmanager);
                                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                                         recycler.notifyDataSetChanged();
@@ -232,7 +233,6 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                                         mSwipeRefreshLayout.setRefreshing(false);
 
                                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                         recyclerview.setLayoutManager(layoutmanager);
                                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                                         recyclerview.setAdapter(recycler);
@@ -310,7 +310,6 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                                         mSwipeRefreshLayout.setRefreshing(false);
                                                                         //Collections.reverse(list);
                                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                         recyclerview.setLayoutManager(layoutmanager);
                                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                                         recycler.notifyDataSetChanged();
@@ -322,7 +321,6 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                                         mSwipeRefreshLayout.setRefreshing(false);
 
                                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                         recyclerview.setLayoutManager(layoutmanager);
                                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                                         recyclerview.setAdapter(recycler);
@@ -398,6 +396,7 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
 

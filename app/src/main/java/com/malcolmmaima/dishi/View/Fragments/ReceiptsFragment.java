@@ -44,6 +44,7 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayoutManager layoutmanager;
 
     DatabaseReference dbRef, receiptsRef;
     FirebaseDatabase db;
@@ -94,6 +95,8 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -150,7 +153,6 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
                     mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     ReceiptAdapter recycler = new ReceiptAdapter(getContext(),list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recycler.notifyDataSetChanged();
@@ -164,7 +166,6 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
                     mSwipeRefreshLayout.setRefreshing(false);
 
                     ReceiptAdapter recycler = new ReceiptAdapter(getContext(),list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -189,8 +190,18 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
         super.onDestroyView();
         if(v != null){
             v = null;
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
 
-            recyclerview.setAdapter(null);
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 }

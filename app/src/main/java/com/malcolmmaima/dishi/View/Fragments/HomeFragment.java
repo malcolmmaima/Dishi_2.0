@@ -83,6 +83,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     View rootView;
     EmojIconActions emojIcon;
     View v;
+    LinearLayoutManager layoutmanager;
 
     // Uri indicates, where the image will be picked from
     private Uri filePath;
@@ -131,6 +132,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         postBtn.setVisibility(View.GONE);
         imageUpload.setVisibility(View.GONE);
         emoji.setVisibility(View.GONE);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // get the Firebase  storage reference
         storage = FirebaseStorage.getInstance();
@@ -296,7 +299,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         recyclerview.setVisibility(View.VISIBLE);
                         recyclerview.setVisibility(View.VISIBLE);
                         NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                         recyclerview.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
@@ -371,7 +373,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                                     recyclerview.setVisibility(View.VISIBLE);
                                                     recyclerview.setVisibility(View.VISIBLE);
                                                     NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
 
                                                     recycler.notifyDataSetChanged();
@@ -417,7 +418,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //                                    recyclerview.setVisibility(View.VISIBLE);
 //                                    recyclerview.setVisibility(View.VISIBLE);
 //                                    NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-//                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
 //                                    recyclerview.setLayoutManager(layoutmanager);
 //
 //                                    recycler.notifyDataSetChanged();
@@ -486,7 +486,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 emptyTag.setVisibility(View.GONE);
                 recyclerview.setVisibility(View.VISIBLE);
                 NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                 recyclerview.setLayoutManager(layoutmanager);
                 recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
@@ -665,8 +664,20 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         super.onDestroyView();
         if(v != null){
             v = null;
+            rootView = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 }

@@ -90,6 +90,7 @@ public class ViewMyOrders extends AppCompatActivity {
     Integer paid;
     Boolean paymentDialogShown, receiptGenerated;
     ProgressDialog progressDialog;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,6 +190,9 @@ public class ViewMyOrders extends AppCompatActivity {
         timeStamp = findViewById(R.id.timeStamp);
         myOrderID = findViewById(R.id.myOrderID);
         trackOrderTxt = findViewById(R.id.trackOrderTxt);
+
+        layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
+        recyclerview.setLayoutManager(layoutmanager);
 
 
         /**
@@ -390,7 +394,6 @@ public class ViewMyOrders extends AppCompatActivity {
                     if(!list.isEmpty()){
                         Collections.reverse(list);
                         ViewOrderItemsAdapter recycler = new ViewOrderItemsAdapter(ViewMyOrders.this, list);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewMyOrders.this);
                         recyclerview.setLayoutManager(layoutmanager);
                         recyclerview.setItemAnimator( new DefaultItemAnimator());
                         recycler.notifyDataSetChanged();
@@ -1039,6 +1042,10 @@ public class ViewMyOrders extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        recyclerview.setAdapter(null);
+        layoutmanager = null;
+
         try {
             customerOrderItems.removeEventListener(customerOrderItemsListener);
         } catch (Exception e){

@@ -635,6 +635,8 @@ public class ViewRestaurant extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        viewPager.setAdapter(null);
+
         try {
             providerFavs.removeEventListener(providerFavsListener);
             myLocationRef.removeEventListener(mylocationListener);

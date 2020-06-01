@@ -47,7 +47,7 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
     FirebaseDatabase db;
     FirebaseUser user;
     View v;
-
+    LinearLayoutManager layoutmanager;
 
     public static MyRestaurantsFragment newInstance() {
         MyRestaurantsFragment fragment = new MyRestaurantsFragment();
@@ -76,6 +76,8 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -122,7 +124,6 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     RestaurantRiderRequestAdapter recycler = new RestaurantRiderRequestAdapter(getContext(), riderRequests);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -153,7 +154,6 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
                             if (!riderRequests.isEmpty()) {
                                 //Collections.reverse(orders);
                                 RestaurantRiderRequestAdapter recycler = new RestaurantRiderRequestAdapter(getContext(), riderRequests);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recycler.notifyDataSetChanged();
@@ -163,7 +163,6 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
                             } else {
 //                                        progressDialog.dismiss();
                                 RestaurantRiderRequestAdapter recycler = new RestaurantRiderRequestAdapter(getContext(), riderRequests);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recyclerview.setAdapter(recycler);
@@ -199,7 +198,18 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 }

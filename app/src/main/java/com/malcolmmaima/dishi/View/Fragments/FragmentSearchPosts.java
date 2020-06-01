@@ -45,6 +45,7 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
     DatabaseReference followingRef, postsRef;
     int searchCap;
     View view;
+    LinearLayoutManager layoutmanager;
 
     public static FragmentSearchPosts newInstance() {
         FragmentSearchPosts fragment = new FragmentSearchPosts();
@@ -66,6 +67,8 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
 
         recyclerview = view.findViewById(R.id.rview);
         emptyTag = view.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -149,7 +152,6 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                                                                 recyclerview.setVisibility(View.VISIBLE);
                                                                 recyclerview.setVisibility(View.VISIBLE);
                                                                 NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-                                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                                 recyclerview.setLayoutManager(layoutmanager);
 
                                                                 recycler.notifyDataSetChanged();
@@ -210,7 +212,6 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                                                     emptyTag.setVisibility(View.GONE);
                                                     recyclerview.setVisibility(View.VISIBLE);
                                                     NewsFeedAdapter recycler = new NewsFeedAdapter(getContext(), statusUpdates);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
 
                                                     recycler.notifyDataSetChanged();
@@ -286,6 +287,7 @@ public class FragmentSearchPosts extends Fragment implements SwipeRefreshLayout.
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
         }

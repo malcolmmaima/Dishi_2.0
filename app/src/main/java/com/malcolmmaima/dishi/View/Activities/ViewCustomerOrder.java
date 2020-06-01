@@ -100,6 +100,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     final int[] total = {0};
     Boolean paymentDialogShown;
     FirebaseAuth mAuth;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,6 +278,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         restaurantName.setText(restaurantname);
         myOrderID = findViewById(R.id.myOrderID);
         trackOrderTxt = findViewById(R.id.trackOrderTxt);
+
+        layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
+        recyclerview.setLayoutManager(layoutmanager);
 
         /**
          * Load image url onto imageview
@@ -609,7 +613,6 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                     if(!list.isEmpty()){
                         Collections.reverse(list);
                         ViewOrderAdapter recycler = new ViewOrderAdapter(ViewCustomerOrder.this, list, ViewCustomerOrder.this);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewCustomerOrder.this);
                         recyclerview.setLayoutManager(layoutmanager);
                         recyclerview.setItemAnimator( new DefaultItemAnimator());
                         recycler.notifyDataSetChanged();
@@ -1475,6 +1478,9 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        recyclerview.setAdapter(null);
+        layoutmanager = null;
 
         try {
             customerOrderItems.removeEventListener(customerOrderItemsListener);

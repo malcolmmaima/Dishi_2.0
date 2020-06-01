@@ -115,6 +115,8 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     private final int PICK_IMAGE_REQUEST = 22;
     FirebaseAuth mAuth;
 
+    LinearLayoutManager layoutmanager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -200,6 +202,9 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
         emoji.setVisibility(View.GONE);
         imageShare = findViewById(R.id.imageShare);
         reviewOptions = findViewById(R.id.reviewOptions);
+
+        layoutmanager = new LinearLayoutManager(ViewReview.this);
+        recyclerView.setLayoutManager(layoutmanager);
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -924,7 +929,6 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                         //Collections.reverse(list);
                         recyclerView.setVisibility(View.VISIBLE);
                         ReviewReplyAdapter recycler = new ReviewReplyAdapter(ViewReview.this, list);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewReview.this);
                         recyclerView.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
@@ -1135,7 +1139,6 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyTag.setVisibility(View.GONE);
                 ReviewReplyAdapter recycler = new ReviewReplyAdapter(ViewReview.this, list);
-                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(ViewReview.this);
                 recyclerView.setLayoutManager(layoutmanager);
                 recycler.notifyDataSetChanged();
                 recyclerView.setAdapter(recycler);
@@ -1165,6 +1168,23 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if(rootView != null){
+            rootView = null;
+
+            recyclerView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerView.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
+        }
 
         try {
             authorUserDetailsRef.removeEventListener(authorUserDetailsRefListener);

@@ -44,6 +44,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
     FirebaseDatabase db;
     FirebaseUser user;
 
+    LinearLayoutManager layoutmanager;
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -72,6 +73,8 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
         icon = v.findViewById(R.id.riderIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -130,7 +133,6 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
                     mSwipeRefreshLayout.setRefreshing(false);
                     riders = new ArrayList<>();
                     MyRidersAdapter recycler = new MyRidersAdapter(getContext(), riders);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -154,7 +156,6 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 if (!riders.isEmpty()) {
                                     //Collections.reverse(orders);
                                     MyRidersAdapter recycler = new MyRidersAdapter(getContext(), riders);
-                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                     recycler.notifyDataSetChanged();
@@ -164,7 +165,6 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 } else {
 //                                        progressDialog.dismiss();
                                     MyRidersAdapter recycler = new MyRidersAdapter(getContext(), riders);
-                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                     recyclerview.setAdapter(recycler);
@@ -202,7 +202,18 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 }

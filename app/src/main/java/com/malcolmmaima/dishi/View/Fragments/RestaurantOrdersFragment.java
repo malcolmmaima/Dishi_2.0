@@ -59,6 +59,7 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayoutManager layoutmanager;
     View v;
 
     public static RestaurantOrdersFragment newInstance() {
@@ -100,6 +101,8 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -280,7 +283,6 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -328,7 +330,6 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                                     if (!orders.isEmpty()) {
                                         //Collections.reverse(orders);
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
-                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                         recyclerview.setLayoutManager(layoutmanager);
                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                         recycler.notifyDataSetChanged();
@@ -338,7 +339,6 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                                     } else {
 //                                        progressDialog.dismiss();
                                         OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
-                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                         recyclerview.setLayoutManager(layoutmanager);
                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                         recyclerview.setAdapter(recycler);
@@ -395,7 +395,18 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
             try {
                 dbRef.removeEventListener(liveListener);
                 incomingOrders.removeEventListener(inComingOrdersListener);

@@ -51,6 +51,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
     UserModel userModel;
     LiveLocationModel myLocation, restaurantLocation;
     View v;
+    LinearLayoutManager layoutmanager;
 
     public static ViewRestaurantMenuFragment newInstance() {
         ViewRestaurantMenuFragment fragment = new ViewRestaurantMenuFragment();
@@ -125,6 +126,8 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         recyclerview = v.findViewById(R.id.rview);
         //recyclerview.setNestedScrollingEnabled(false);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         //Get my user details
         myRefListener = new ValueEventListener() {
@@ -208,7 +211,6 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
                     mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     ProductAdapter recycler = new ProductAdapter(getContext(),list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recycler.notifyDataSetChanged();
@@ -220,9 +222,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
                 else {
 
                     mSwipeRefreshLayout.setRefreshing(false);
-
                     ProductAdapter recycler = new ProductAdapter(getContext(),list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -248,7 +248,19 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
+
             myRef.removeEventListener(myRefListener);
             myLocationRef.removeEventListener(mylocationListener);
             restaurantLocationRef.removeEventListener(restaurantLocationListener);

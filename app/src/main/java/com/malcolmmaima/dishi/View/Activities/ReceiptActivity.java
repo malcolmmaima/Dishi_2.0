@@ -90,6 +90,7 @@ public class ReceiptActivity extends AppCompatActivity {
     private Bitmap bitmap;
     ProgressDialog progressDialog;
     Timer timer;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -258,6 +259,9 @@ public class ReceiptActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         deliveryChargeAmount = findViewById(R.id.deliveryChargeAmount);
         subTotal = findViewById(R.id.subTotal);
+
+        layoutmanager = new LinearLayoutManager(ReceiptActivity.this);
+        recyclerView.setLayoutManager(layoutmanager);
 
         downloadRequest = getIntent().getBooleanExtra("downloadRequest", false);
         deliveryCharge = getIntent().getIntExtra("deliveryCharge", 0);
@@ -517,8 +521,7 @@ public class ReceiptActivity extends AppCompatActivity {
                             }
 
                             mAdapter = new ReceiptItemAdapter(ReceiptActivity.this,deliveredItems);
-                            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(ReceiptActivity.this);
-                            recyclerView.setLayoutManager(mLayoutManager);
+                            recyclerView.setLayoutManager(layoutmanager);
                             recyclerView.setItemAnimator(new DefaultItemAnimator());
                             recyclerView.setAdapter(mAdapter);
 
@@ -797,5 +800,11 @@ public class ReceiptActivity extends AppCompatActivity {
         return b;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        recyclerView.setAdapter(null);
+        layoutmanager = null;
+    }
 }

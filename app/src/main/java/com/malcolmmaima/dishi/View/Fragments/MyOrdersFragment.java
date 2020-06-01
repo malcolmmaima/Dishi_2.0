@@ -53,7 +53,7 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener myOrdersListener;
-
+    LinearLayoutManager layoutmanager;
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -85,6 +85,8 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
         emptyTag.setVisibility(View.GONE);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -140,7 +142,6 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                     mSwipeRefreshLayout.setRefreshing(false);
                     orders = new ArrayList<>();
                     MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -188,7 +189,6 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                                 mSwipeRefreshLayout.setRefreshing(false);
                                                 Collections.reverse(orders);
                                                 MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                 recyclerview.setLayoutManager(layoutmanager);
                                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                 recycler.notifyDataSetChanged();
@@ -200,7 +200,6 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
                                                 mSwipeRefreshLayout.setRefreshing(false);
 //                                        progressDialog.dismiss();
                                                 MyOrdersAdapter recycler = new MyOrdersAdapter(getContext(), orders);
-                                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                 recyclerview.setLayoutManager(layoutmanager);
                                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                 recyclerview.setAdapter(recycler);
@@ -251,7 +250,18 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
             try { myOrders.removeEventListener(myOrdersListener); } catch (Exception e){ }
         }
     }

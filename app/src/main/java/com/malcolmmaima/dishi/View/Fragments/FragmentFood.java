@@ -73,6 +73,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     FirebaseUser user;
     ValueEventListener locationListener;
     View v;
+    LinearLayoutManager layoutmanager;
 
     int location_filter;
 
@@ -109,6 +110,9 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
         emptyTag = v.findViewById(R.id.empty_tag);
         seekBar = v.findViewById(R.id.seekBar);
         distanceShow = v.findViewById(R.id.distanceShow);
+
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         //Fetch location filter value from database
         dbRef.child("location-filter").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -298,7 +302,6 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                         mSwipeRefreshLayout.setRefreshing(false);
                                                         //Collections.reverse(list);
                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                         recycler.notifyDataSetChanged();
@@ -310,7 +313,6 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                         mSwipeRefreshLayout.setRefreshing(false);
 
                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                         recyclerview.setAdapter(recycler);
@@ -382,7 +384,6 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                         mSwipeRefreshLayout.setRefreshing(false);
                                                         //Collections.reverse(list);
                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                         recycler.notifyDataSetChanged();
@@ -394,7 +395,6 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                         mSwipeRefreshLayout.setRefreshing(false);
 
                                                         ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                         recyclerview.setAdapter(recycler);
@@ -528,6 +528,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
 

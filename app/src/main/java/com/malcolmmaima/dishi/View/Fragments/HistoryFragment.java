@@ -61,6 +61,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
     FirebaseUser user;
     ValueEventListener locationListener;
     View v;
+    LinearLayoutManager layoutmanager;
 
     public static HistoryFragment newInstance() {
         HistoryFragment fragment = new HistoryFragment();
@@ -91,6 +92,9 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
         emptyTag = v.findViewById(R.id.empty_tag);
         clearAll = v.findViewById(R.id.clearAll);
         clearAll.setVisibility(View.GONE);
+
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         final FloatingActionButton fab = v.findViewById(R.id.fab);
         myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
@@ -220,7 +224,6 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     clearAll.setVisibility(View.GONE);
                     mSwipeRefreshLayout.setRefreshing(false);
                     ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -295,7 +298,6 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             } catch (Exception e) {
                                                             }
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recycler.notifyDataSetChanged();
@@ -308,7 +310,6 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             mSwipeRefreshLayout.setRefreshing(false);
 
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recyclerview.setAdapter(recycler);
@@ -371,7 +372,6 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             } catch (Exception e) {
                                                             }
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recycler.notifyDataSetChanged();
@@ -383,7 +383,6 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             mSwipeRefreshLayout.setRefreshing(false);
 
                                                             ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recyclerview.setAdapter(recycler);
@@ -449,8 +448,18 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if(v != null){
             v = null;
 
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
 
-            recyclerview.setAdapter(null);
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
 
             try { myLocationRef.removeEventListener(locationListener); }catch (Exception e){}
             try { myLocationRef.removeEventListener(locationListener); }catch (Exception e){}

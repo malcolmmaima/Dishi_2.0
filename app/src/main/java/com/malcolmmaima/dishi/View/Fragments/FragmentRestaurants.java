@@ -70,6 +70,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     FirebaseUser user;
     SeekBar seekBar;
     AppCompatImageView icon;
+    LinearLayoutManager layoutmanager;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
     int location_filter;
@@ -100,6 +101,8 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -305,7 +308,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                         mSwipeRefreshLayout.setRefreshing(false);
                                                         //Collections.reverse(list);
                                                         RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                         recycler.notifyDataSetChanged();
@@ -317,7 +319,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                         mSwipeRefreshLayout.setRefreshing(false);
 
                                                         RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                         recyclerview.setLayoutManager(layoutmanager);
                                                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                         recyclerview.setAdapter(recycler);
@@ -380,7 +381,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                     mSwipeRefreshLayout.setRefreshing(false);
                                                     //Collections.reverse(list);
                                                     RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
                                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                     recycler.notifyDataSetChanged();
@@ -392,7 +392,6 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                     mSwipeRefreshLayout.setRefreshing(false);
 
                                                     RestaurantAdapter recycler = new RestaurantAdapter(getContext(), list);
-                                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                     recyclerview.setLayoutManager(layoutmanager);
                                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                     recyclerview.setAdapter(recycler);
@@ -461,6 +460,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
 

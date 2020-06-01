@@ -400,6 +400,8 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
     protected void onDestroy() {
         super.onDestroy();
 
+        adapter = null;
+        chatList.setAdapter(null);
         try {
             myMessagesRef.removeEventListener(myMessagesChildListener);
         } catch (Exception e){

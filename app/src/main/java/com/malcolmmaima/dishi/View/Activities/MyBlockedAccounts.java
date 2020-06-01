@@ -41,6 +41,7 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
     MyTextView_Roboto_Medium emptyTag;
     SwipeRefreshLayout mSwipeRefreshLayout;
     RecyclerView recyclerview;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,9 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
         emptyTag = findViewById(R.id.empty_tag);
         emptyTag.setVisibility(View.GONE);
         recyclerview = findViewById(R.id.rview);
+
+        layoutmanager = new LinearLayoutManager(MyBlockedAccounts.this);
+        recyclerview.setLayoutManager(layoutmanager);
 
         icon = findViewById(R.id.blockedIcon);
         icon.setVisibility(View.GONE);
@@ -143,7 +147,6 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     BlockedUserAdapter recycler = new BlockedUserAdapter(MyBlockedAccounts.this, blockedUsers);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyBlockedAccounts.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -166,7 +169,6 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
                                     mSwipeRefreshLayout.setRefreshing(false);
                                     //Collections.reverse(orders);
                                     BlockedUserAdapter recycler = new BlockedUserAdapter(MyBlockedAccounts.this, blockedUsers);
-                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyBlockedAccounts.this);
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                     recycler.notifyDataSetChanged();
@@ -176,7 +178,6 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
                                 } else {
                                     mSwipeRefreshLayout.setRefreshing(false);
                                     BlockedUserAdapter recycler = new BlockedUserAdapter(MyBlockedAccounts.this, blockedUsers);
-                                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyBlockedAccounts.this);
                                     recyclerview.setLayoutManager(layoutmanager);
                                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                                     recyclerview.setAdapter(recycler);
@@ -239,5 +240,23 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
     @Override
     public void onRefresh() {
         fetchBlocked();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                // no-op
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                recyclerview.setAdapter(null);
+                layoutmanager = null;
+            }
+        });
     }
 }

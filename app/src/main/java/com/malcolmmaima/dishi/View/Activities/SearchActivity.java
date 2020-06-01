@@ -346,4 +346,12 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        adapter = null;
+        viewPager.setAdapter(null);
+    }
 }

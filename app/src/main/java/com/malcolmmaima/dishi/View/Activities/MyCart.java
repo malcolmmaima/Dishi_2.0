@@ -61,6 +61,7 @@ public class MyCart extends AppCompatActivity {
     FirebaseUser user;
     int itemCount;
     FirebaseAuth mAuth;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +114,9 @@ public class MyCart extends AppCompatActivity {
             totalPrice = findViewById(R.id.total);
             totalItems = findViewById(R.id.totalItems);
             checkoutBtn = findViewById(R.id.checkOut);
+
+            layoutmanager = new LinearLayoutManager(MyCart.this);
+            recyclerview.setLayoutManager(layoutmanager);
 
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -348,7 +352,6 @@ public class MyCart extends AppCompatActivity {
                     //mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     CartAdapter recycler = new CartAdapter(MyCart.this,list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyCart.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recycler.notifyDataSetChanged();
@@ -368,7 +371,6 @@ public class MyCart extends AppCompatActivity {
                     //mSwipeRefreshLayout.setRefreshing(false);
                     checkoutBtn.setVisibility(View.GONE);
                     CartAdapter recycler = new CartAdapter(MyCart.this,list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(MyCart.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -471,6 +473,20 @@ public class MyCart extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                // no-op
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                recyclerview.setAdapter(null);
+                layoutmanager = null;
+            }
+        });
+
         try { myLocationRef.removeEventListener(locationListener); } catch (Exception e){ }
 
         try { myCartRef.removeEventListener(cartListener); } catch (Exception e){ }

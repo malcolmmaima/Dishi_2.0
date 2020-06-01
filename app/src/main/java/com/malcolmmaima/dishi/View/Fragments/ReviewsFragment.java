@@ -79,6 +79,7 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     AppCompatImageView icon;
     ImageView selectedImage;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayoutManager layoutmanager;
 
     // instance for firebase storage and StorageReference
     FirebaseStorage storage;
@@ -127,6 +128,9 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         icon = v.findViewById(R.id.noPostsIcon);
         emptyTag = v.findViewById(R.id.empty_tag);
+
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -310,7 +314,6 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 icon.setVisibility(View.GONE);
                 recyclerview.setVisibility(View.VISIBLE);
                 ReviewAdapter recycler = new ReviewAdapter(getContext(), statusUpdates);
-                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                 recyclerview.setLayoutManager(layoutmanager);
                 recycler.notifyItemInserted(0);
                 recyclerview.setAdapter(recycler);
@@ -486,7 +489,6 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         Collections.reverse(statusUpdates);
                         recyclerview.setVisibility(View.VISIBLE);
                         ReviewAdapter recycler = new ReviewAdapter(getContext(), statusUpdates);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                         recyclerview.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
@@ -532,8 +534,20 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onDestroyView();
         if(v != null){
             v = null;
+            rootView = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 

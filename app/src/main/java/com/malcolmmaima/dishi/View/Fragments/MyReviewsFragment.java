@@ -74,6 +74,7 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
     View v;
+    LinearLayoutManager layoutmanager;
 
     public static MyReviewsFragment newInstance() {
         MyReviewsFragment fragment = new MyReviewsFragment();
@@ -97,6 +98,8 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
 
         icon = v.findViewById(R.id.noPostsIcon);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -151,7 +154,6 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
                         Collections.reverse(statusUpdates);
                         recyclerview.setVisibility(View.VISIBLE);
                         ReviewAdapter recycler = new ReviewAdapter(getContext(), statusUpdates);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                         recyclerview.setLayoutManager(layoutmanager);
 
                         recycler.notifyDataSetChanged();
@@ -199,7 +201,9 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
         if(v != null){
             v = null;
 
+            rootView = null;
             recyclerview.setAdapter(null);
+            layoutmanager = null;
         }
     }
 

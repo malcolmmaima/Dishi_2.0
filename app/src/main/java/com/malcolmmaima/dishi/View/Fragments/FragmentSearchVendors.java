@@ -52,6 +52,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
     UserModel myDetails;
     int searchCap;
     View view;
+    LinearLayoutManager layoutmanager;
 
     public static FragmentSearchVendors newInstance() {
         FragmentSearchVendors fragment = new FragmentSearchVendors();
@@ -107,6 +108,8 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
 
         recyclerview = view.findViewById(R.id.rview);
         emptyTag = view.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -221,7 +224,6 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                             //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                             //Collections.reverse(list);
                                                             RestaurantAdapter recycler = new RestaurantAdapter(getContext(), restaurantsList);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             //recyclerView.setItemAnimator(new SlideInLeftAnimator());
                                                             recycler.notifyDataSetChanged();
@@ -303,7 +305,6 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                             //Collections.sort(restaurantsList, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                             //Collections.reverse(list);
                                                             RestaurantAdapter recycler = new RestaurantAdapter(getContext(), restaurantsList);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recycler.notifyDataSetChanged();
@@ -385,7 +386,18 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
         if(view != null){
             view = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 }

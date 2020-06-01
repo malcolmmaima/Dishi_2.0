@@ -323,9 +323,23 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
         });
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        recyclerView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                // no-op
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                recyclerView.setAdapter(null);
+                layoutmanager = null;
+            }
+        });
         try {
             notifs.removeEventListener(notificationListener);
         } catch (Exception e){

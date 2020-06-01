@@ -47,6 +47,7 @@ public class DeviceLoginActivity extends AppCompatActivity implements SwipeRefre
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,9 @@ public class DeviceLoginActivity extends AppCompatActivity implements SwipeRefre
             recyclerview = findViewById(R.id.rview);
             emptyTag = findViewById(R.id.empty_tag);
 
+            layoutmanager = new LinearLayoutManager(DeviceLoginActivity.this);
+            recyclerview.setLayoutManager(layoutmanager);
+
             // SwipeRefreshLayout
             mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
             mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -147,7 +151,6 @@ public class DeviceLoginActivity extends AppCompatActivity implements SwipeRefre
                 if(!dataSnapshot.exists()){
                     mSwipeRefreshLayout.setRefreshing(false);
                     MyDeviceAdapter recycler = new MyDeviceAdapter(DeviceLoginActivity.this,list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(DeviceLoginActivity.this);
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -170,7 +173,6 @@ public class DeviceLoginActivity extends AppCompatActivity implements SwipeRefre
                         mSwipeRefreshLayout.setRefreshing(false);
                         Collections.reverse(list);
                         MyDeviceAdapter recycler = new MyDeviceAdapter(DeviceLoginActivity.this,list);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(DeviceLoginActivity.this);
                         recyclerview.setLayoutManager(layoutmanager);
                         recyclerview.setItemAnimator( new DefaultItemAnimator());
                         recycler.notifyDataSetChanged();
@@ -183,7 +185,6 @@ public class DeviceLoginActivity extends AppCompatActivity implements SwipeRefre
 
                         mSwipeRefreshLayout.setRefreshing(false);
                         MyDeviceAdapter recycler = new MyDeviceAdapter(DeviceLoginActivity.this,list);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(DeviceLoginActivity.this);
                         recyclerview.setLayoutManager(layoutmanager);
                         recyclerview.setItemAnimator( new DefaultItemAnimator());
                         recyclerview.setAdapter(recycler);
@@ -238,5 +239,13 @@ public class DeviceLoginActivity extends AppCompatActivity implements SwipeRefre
     @Override
     public void onRefresh() {
         fetchLoggedDevices();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        recyclerview.setAdapter(null);
+        layoutmanager = null;
     }
 }

@@ -49,6 +49,7 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     FirebaseUser user;
     FloatingActionButton addMenu;
     View v;
+    LinearLayoutManager layoutmanager;
 
     public static MenuFragment newInstance() {
         MenuFragment fragment = new MenuFragment();
@@ -77,6 +78,8 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
         addMenu = v.findViewById(R.id.button_add_menu);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -152,7 +155,6 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mSwipeRefreshLayout.setRefreshing(false);
                     Collections.reverse(list);
                     MenuAdapter recycler = new MenuAdapter(getContext(),list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recycler.notifyDataSetChanged();
@@ -166,7 +168,6 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mSwipeRefreshLayout.setRefreshing(false);
 
                     MenuAdapter recycler = new MenuAdapter(getContext(),list);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator( new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -192,7 +193,18 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
         }
     }
 }

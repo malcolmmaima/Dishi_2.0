@@ -43,6 +43,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
     FirebaseUser user;
     int searchCap;
     View view;
+    LinearLayoutManager layoutmanager;
 
     public static FragmentSearchUsers newInstance() {
         FragmentSearchUsers fragment = new FragmentSearchUsers();
@@ -67,6 +68,8 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
 
         recyclerview = view.findViewById(R.id.rview);
         emptyTag = view.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -108,7 +111,6 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
                     if(!dataSnapshot.exists()){
                         mSwipeRefreshLayout.setRefreshing(false);
                         FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFound);
-                        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                         recyclerview.setLayoutManager(layoutmanager);
                         recyclerview.setItemAnimator(new DefaultItemAnimator());
                         recyclerview.setAdapter(recycler);
@@ -129,7 +131,6 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
                                 mSwipeRefreshLayout.setRefreshing(false);
                                 //Collections.reverse(orders);
                                 FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFound);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recycler.notifyDataSetChanged();
@@ -138,7 +139,6 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
                             } else {
                                 mSwipeRefreshLayout.setRefreshing(false);
                                 FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(getContext(), usersFound);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recyclerview.setAdapter(recycler);
@@ -190,6 +190,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     recyclerview.setAdapter(null);
+                    layoutmanager = null;
                 }
             });
         }

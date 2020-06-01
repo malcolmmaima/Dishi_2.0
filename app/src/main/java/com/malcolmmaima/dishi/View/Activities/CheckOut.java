@@ -88,6 +88,7 @@ public class CheckOut extends AppCompatActivity {
     Boolean stopDialogShown, pauseOrder;
     int prodCount;
     ProgressBar progressBar;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,8 +220,7 @@ public class CheckOut extends AppCompatActivity {
                                     progressBar.setVisibility(View.GONE);
                                     orderBtn.setVisibility(View.VISIBLE);
                                     mAdapter = new ReceiptItemAdapter(CheckOut.this,myCartItems);
-                                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(CheckOut.this);
-                                    recyclerView.setLayoutManager(mLayoutManager);
+                                    recyclerView.setLayoutManager(layoutmanager);
                                     recyclerView.setItemAnimator(new DefaultItemAnimator());
                                     recyclerView.setAdapter(mAdapter);
                                 }
@@ -1035,6 +1035,9 @@ public class CheckOut extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerview);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
+
+        layoutmanager = new LinearLayoutManager(CheckOut.this);
+        recyclerView.setLayoutManager(layoutmanager);
     }
 
     public String[] Split(String timeStamp){
@@ -1042,5 +1045,13 @@ public class CheckOut extends AppCompatActivity {
         String[] arrSplit = timeStamp.split(":");
 
         return arrSplit;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        recyclerView.setAdapter(null);
+        layoutmanager = null;
     }
 }

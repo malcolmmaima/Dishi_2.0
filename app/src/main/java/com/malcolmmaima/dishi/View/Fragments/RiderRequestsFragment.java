@@ -54,6 +54,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
     AppCompatImageView icon;
     List <String> myRestaurants = new ArrayList<>();
     SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayoutManager layoutmanager;
 
     UserModel assignedCustomer;
     View v;
@@ -90,6 +91,8 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
         icon = v.findViewById(R.id.menuIcon);
         recyclerview = v.findViewById(R.id.rview);
         emptyTag = v.findViewById(R.id.empty_tag);
+        layoutmanager = new LinearLayoutManager(getContext());
+        recyclerview.setLayoutManager(layoutmanager);
 
         // SwipeRefreshLayout
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_container);
@@ -187,7 +190,6 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                     Log.d("RiderRequestFragment", " no ride requests");
                     mSwipeRefreshLayout.setRefreshing(false);
                     OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
-                    RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                     recyclerview.setLayoutManager(layoutmanager);
                     recyclerview.setItemAnimator(new DefaultItemAnimator());
                     recyclerview.setAdapter(recycler);
@@ -247,7 +249,6 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                                                             ArrayList<UserModel> listWithoutDuplicates = new ArrayList<>(hashSet);
 
                                                             OrdersAdapter recycler = new OrdersAdapter(getContext(), listWithoutDuplicates);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recycler.notifyDataSetChanged();
@@ -260,7 +261,6 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                                                             Log.d("RiderRequestFragment", " 0 found restaurant ride request: 3");
                                                             mSwipeRefreshLayout.setRefreshing(false);
                                                             OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
-                                                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getContext());
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
                                                             recyclerview.setAdapter(recycler);
@@ -309,7 +309,18 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
         if(v != null){
             v = null;
 
-            recyclerview.setAdapter(null);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
             try {
                 myRideOrderRequests.removeEventListener(myRideOrderRequestsChildListener);
             } catch (Exception e){

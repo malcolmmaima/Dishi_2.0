@@ -1420,6 +1420,24 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
     public void onDestroy() {
         super.onDestroy();
 
+
+        if(rootView != null){
+            rootView = null;
+
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                    layoutmanager = null;
+                }
+            });
+        }
+
         try { profileRef.removeEventListener(myListener); } catch (Exception e){ }
 
         try { profileFollowers.removeEventListener(profileFollowersListener); } catch (Exception e){ }

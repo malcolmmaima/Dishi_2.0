@@ -957,6 +957,11 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
     protected void onDestroy() {
         super.onDestroy();
 
+        if(rootView != null){
+            rootView = null;
+            list.setAdapter(null);
+        }
+
         try {
             myMessagedRef.removeEventListener(myMessagesListener);
             myBlockedUsers.removeEventListener(blockedUsersListener);

@@ -48,6 +48,7 @@ public class NewChat extends AppCompatActivity {
     String myPhone;
     FirebaseUser user;
     FirebaseAuth mAuth;
+    LinearLayoutManager layoutmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +102,9 @@ public class NewChat extends AppCompatActivity {
             searchPhone = findViewById(R.id.userSearch);
             recyclerview = findViewById(R.id.rview);
             emptyTag = findViewById(R.id.empty_tag);
+
+            layoutmanager = new LinearLayoutManager(NewChat.this);
+            recyclerview.setLayoutManager(layoutmanager);
 
             Toolbar topToolBar = findViewById(R.id.toolbar);
             setSupportActionBar(topToolBar);
@@ -205,7 +209,6 @@ public class NewChat extends AppCompatActivity {
                                 //Collections.reverse(orders);
 
                                 NewChatAdapter recycler = new NewChatAdapter(NewChat.this, usersFollowing);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(NewChat.this);
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recycler.notifyDataSetChanged();
@@ -214,7 +217,6 @@ public class NewChat extends AppCompatActivity {
                             } else {
                                 progressBar.setVisibility(View.GONE);
                                 NewChatAdapter recycler = new NewChatAdapter(NewChat.this, usersFollowing);
-                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(NewChat.this);
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recyclerview.setAdapter(recycler);
@@ -237,4 +239,11 @@ public class NewChat extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        recyclerview.setAdapter(null);
+        layoutmanager = null;
+    }
 }
