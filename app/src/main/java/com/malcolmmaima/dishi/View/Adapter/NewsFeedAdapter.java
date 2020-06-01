@@ -939,6 +939,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             }
         });
 
+        holder.sharePost.setVisibility(View.GONE); //TODO : develop share mechanism
         holder.sharePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
