@@ -343,7 +343,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     //got focus
-                    Log.d(TAG, "onFocusChange: keyboard open => "+hasFocus);
+                    //Log.d(TAG, "onFocusChange: keyboard open => "+hasFocus);
 
                     //Scroll to bottom, most recent chat on keyboard load
                     try {

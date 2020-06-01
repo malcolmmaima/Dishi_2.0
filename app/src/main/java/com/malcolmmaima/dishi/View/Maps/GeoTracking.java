@@ -429,7 +429,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("dishi", "GeoFireActivity: " + databaseError);
+                //Log.d("dishi", "GeoFireActivity: " + databaseError);
             }
         };
         restaurantLocationRef.child("longitude").addValueEventListener(restaurantLocationRefListener);
@@ -546,7 +546,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
         } catch (Exception e){
-            Log.d("dishi", "GeoFireActivity: "+ e);
+            //Log.d("dishi", "GeoFireActivity: "+ e);
         }
     }
 

@@ -148,7 +148,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                 public void onDataChange(@NonNull final DataSnapshot datasnapshot) {
                     List<UserModel> restaurantsList = new ArrayList<>();
                     for(final DataSnapshot restaurants : datasnapshot.getChildren()){
-                        Log.d("Restaurants", "found: "+restaurants.getKey());
+                        //Log.d("Restaurants", "found: "+restaurants.getKey());
                         /**
                          * Create new database reference for each restaurant and fetch user data
                          */
@@ -158,7 +158,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 final UserModel user = dataSnapshot.getValue(UserModel.class);
                                 user.setPhone(restaurants.getKey());
-                                Log.d("Restaurants", "name: "+user.getFirstname());
+                                //Log.d("Restaurants", "name: "+user.getFirstname());
 
                                 /**
                                  * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
@@ -209,13 +209,13 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                                     restaurantsList.add(user);
                                                                 }
 
-                                                                Log.d("Restaurants", "added: " + user.getFirstname());
+                                                                //Log.d("Restaurants", "added: " + user.getFirstname());
                                                             }
                                                         }
 
                                                         if (!restaurantsList.isEmpty()) {
                                                             mSwipeRefreshLayout.setRefreshing(false);
-                                                            Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
+                                                            //Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
                                                             recyclerview.setVisibility(VISIBLE);
                                                             /**
                                                              * https://howtodoinjava.com/sort/collections-sort/
@@ -290,13 +290,13 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                                     restaurantsList.add(user);
                                                                 }
 
-                                                                Log.d("Restaurants", "added: " + user.getFirstname());
+                                                                //Log.d("Restaurants", "added: " + user.getFirstname());
                                                             }
                                                         }
 
                                                         if (!restaurantsList.isEmpty()) {
                                                             mSwipeRefreshLayout.setRefreshing(false);
-                                                            Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
+                                                            //Log.d("Restaurants", "list: [" + restaurantsList.size() + "]");
                                                             recyclerview.setVisibility(VISIBLE);
                                                             /**
                                                              * https://howtodoinjava.com/sort/collections-sort/

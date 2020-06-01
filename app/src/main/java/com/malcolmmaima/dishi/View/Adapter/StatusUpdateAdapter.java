@@ -111,7 +111,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                         listdata.remove(position);
                         notifyItemRemoved(position);
                     } catch (Exception e){
-                        Log.d(TAG, "statusUpdate: error " + e.getMessage());
+                        //Log.d(TAG, "statusUpdate: error " + e.getMessage());
                     }
                 }
             }
@@ -151,7 +151,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
                         holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
                     } catch (Exception e){
-                        Log.d(TAG, "onDataChange: "+e.getMessage());
+                        //Log.d(TAG, "onDataChange: "+e.getMessage());
                     }
                 }
             }
@@ -221,7 +221,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+ e.getMessage());
+            //Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
 
@@ -563,7 +563,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                                             listdata.remove(position);
                                                             notifyItemRemoved(position);
                                                         } catch (Exception e){
-                                                            Log.d(TAG, "statusUpdate: error " + e.getMessage());
+                                                            //Log.d(TAG, "statusUpdate: error " + e.getMessage());
                                                         }
                                                     }
                                                 });
@@ -929,7 +929,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
                         holder.profileName.setText(getUser.getFirstname() + " " + getUser.getLastname());
                     } catch (Exception e){
-                        Log.d(TAG, "onDataChange: "+e.getMessage());
+                        //Log.d(TAG, "onDataChange: "+e.getMessage());
                     }
                 }
             }

@@ -298,7 +298,7 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                                         product.accountType = "1"; //this fragment belongs to account type 1
                                                                         list.add(product);
                                                                     } catch (Exception e){
-                                                                        Log.d("FavouriteFoodsFragment", "onDataChange: error " + e.getMessage());
+                                                                        //Log.d("FavouriteFoodsFragment", "onDataChange: error " + e.getMessage());
                                                                     }
 
                                                                     if (!list.isEmpty()) {

@@ -134,7 +134,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
             });
         }
         //////
-        Log.d(TAG, "onMapReady: map is ready");
+        //Log.d(TAG, "onMapReady: map is ready");
         mMap = googleMap;
 
         if (mLocationPermissionsGranted) {
@@ -185,7 +185,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onPlaceSelected(Place place) {
                 progressBar.setVisibility(View.INVISIBLE);
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                //Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                 latitude = place.getLatLng().latitude;
                 longitude = place.getLatLng().longitude;
                 placeName = place.getName();
@@ -205,7 +205,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         mGps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "onClick: clicked gps icon");
+                //Log.d(TAG, "onClick: clicked gps icon");
                 progressBar.setVisibility(View.VISIBLE);
                 getDeviceLocation();
             }
@@ -254,7 +254,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+        //Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
         if(!title.equals("My Location")){
@@ -268,14 +268,14 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void initMap(){
-        Log.d(TAG, "initMap: initializing map");
+        //Log.d(TAG, "initMap: initializing map");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(SearchLocation.this);
     }
 
     private void getLocationPermission(){
-        Log.d(TAG, "getLocationPermission: getting location permissions");
+        //Log.d(TAG, "getLocationPermission: getting location permissions");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
 
@@ -299,7 +299,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult: called.");
+        //Log.d(TAG, "onRequestPermissionsResult: called.");
         mLocationPermissionsGranted = false;
 
         switch(requestCode){
@@ -308,11 +308,11 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                     for(int i = 0; i < grantResults.length; i++){
                         if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
                             mLocationPermissionsGranted = false;
-                            Log.d(TAG, "onRequestPermissionsResult: permission failed");
+                            //Log.d(TAG, "onRequestPermissionsResult: permission failed");
                             return;
                         }
                     }
-                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+                    //Log.d(TAG, "onRequestPermissionsResult: permission granted");
                     mLocationPermissionsGranted = true;
                     //initialize our map
                     initMap();
@@ -327,7 +327,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
     private void getDeviceLocation(){
         progressBar.setVisibility(View.VISIBLE);
-        Log.d(TAG, "getDeviceLocation: getting the devices current location");
+        //Log.d(TAG, "getDeviceLocation: getting the devices current location");
 
         FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         latitude = 0.0;
@@ -342,7 +342,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if(task.isSuccessful()){
-                            Log.d(TAG, "onComplete: found location!");
+                            //Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
 
                             try {
@@ -361,7 +361,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                             }
 
                         }else{
-                            Log.d(TAG, "onComplete: current location is null");
+                            //Log.d(TAG, "onComplete: current location is null");
                             SafeToast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
                         }
                     }

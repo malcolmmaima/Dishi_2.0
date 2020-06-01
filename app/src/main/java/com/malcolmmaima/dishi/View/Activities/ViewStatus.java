@@ -451,7 +451,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
 
                             } catch (ParseException e) {
                                 e.printStackTrace();
-                                Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                //Log.d(TAG, "timeStamp: "+ e.getMessage());
                             }
 
                             if(viewPost.getStatus().equals("")){

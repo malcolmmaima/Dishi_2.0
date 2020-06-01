@@ -642,12 +642,12 @@ public class CheckOut extends AppCompatActivity {
                                             }
                                         });
 
-                                        Log.d(TAG, "10 minutes has passed cannot change order");
+                                        //Log.d(TAG, "10 minutes has passed cannot change order");
                                         //Log.d(TAG, "x: "+ Math.abs(timestamp2 - timestamp1)+" y: "+TimeUnit.MINUTES.toMillis(10));
                                     } else {
                                         //Below 10 minutes so we'll allow changing of order
 
-                                        Log.d(TAG, "10 minutes not up yet");
+                                        //Log.d(TAG, "10 minutes not up yet");
                                         GenerateRandomString randomString = new GenerateRandomString();
                                         String orderID_1 = randomString.getAlphaNumericString(3);
 
@@ -692,7 +692,7 @@ public class CheckOut extends AppCompatActivity {
                                             ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "Order changed");
+                                                    //Log.d(TAG, "Order changed");
                                                     ordersRef.child(myPhone).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -722,7 +722,7 @@ public class CheckOut extends AppCompatActivity {
                                                 }
                                             });
                                         } else {
-                                            Log.d(TAG, "Order changed");
+                                            //Log.d(TAG, "Order changed");
                                             ordersRef.child(myPhone).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -800,7 +800,7 @@ public class CheckOut extends AppCompatActivity {
 
                                 } catch (ParseException e) {
                                     e.printStackTrace();
-                                    Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                    //Log.d(TAG, "timeStamp: "+ e.getMessage());
                                 }
                             } else {
                                 //Log.d(TAG, "Order "+dataSnapshot.getKey()+" at "+product.getOwner()+" doesn't exist, add new");
@@ -849,14 +849,14 @@ public class CheckOut extends AppCompatActivity {
                                     ordersRef.child(myPhone).child("static_address").setValue(staticLocationModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "New Order added!");
+                                            //Log.d(TAG, "New Order added!");
                                             ordersRef.child(myPhone).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     for(DataSnapshot items : dataSnapshot.getChildren()){
                                                         //Log.d(TAG, "Remove cart item "+items.getKey());
                                                         myCartRef.child(items.getKey()).removeValue();
-                                                        Log.d(TAG, "Order complete");
+                                                        //Log.d(TAG, "Order complete");
                                                         try {
                                                             progressDialog.dismiss();
                                                         } catch (Exception er){
@@ -884,13 +884,13 @@ public class CheckOut extends AppCompatActivity {
                                     myCartRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "Remove all cart items");
+                                            //Log.d(TAG, "Remove all cart items");
                                             //We need to have a node that keeps track of our active orders to the different restaurants
                                             DatabaseReference myOrders = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
 
                                             //Post restaurant phone numbers which act as our primary key, keep track of our active orders
                                             for(int i = 0; i<list.size(); i++){
-                                                Log.d(TAG, "New order updated my orders active");
+                                                //Log.d(TAG, "New order updated my orders active");
                                                 myOrders.child(list.get(i).getOwner()).setValue("active");
 
                                                 if(i == list.size()-1){

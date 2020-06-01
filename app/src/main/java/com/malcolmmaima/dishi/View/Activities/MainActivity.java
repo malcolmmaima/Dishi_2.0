@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // 2 - Auto-retrieval. On some devices Google Play services can automatically
                 //     detect the incoming verification SMS and perform verificaiton without
                 //     user action.
-                Log.d("TAG", "onVerificationCompleted:" + credential);
+                //Log.d("TAG", "onVerificationCompleted:" + credential);
 
                 signInWithPhoneAuthCredential(credential);
             }
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // The SMS verification code has been sent to the provided phone number, we
                 // now need to ask the user to enter the code and then construct a credential
                 // by combining the code with a verification ID.
-                Log.d("TAG", "onCodeSent:" + verificationId);
+                //Log.d("TAG", "onCodeSent:" + verificationId);
                 progressDialog.dismiss();
                 starttimer();
                 codeed.setVisibility(View.VISIBLE);
@@ -649,7 +649,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                             progressDialog.setCancelable(false);
                                             progressDialog.show();
                                             // Sign in success, update UI with the signed-in user's information
-                                            Log.d("TAG", "signInWithCredential:success");
+                                            //Log.d("TAG", "signInWithCredential:success");
 
                                             mVerified = true;
                                             try {

@@ -222,7 +222,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
                         holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
                     } catch (Exception e){
-                        Log.d(TAG, "onDataChange: "+e.getMessage());
+                        //Log.d(TAG, "onDataChange: "+e.getMessage());
                     }
                 }
             }
@@ -292,7 +292,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+ e.getMessage());
+            //Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
         //set post details
@@ -939,7 +939,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             }
         });
 
-        holder.sharePost.setVisibility(View.GONE); //TODO : develop share mechanism
+
         holder.sharePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1009,7 +1009,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
                         holder.profileName.setText(getUser.getFirstname() + " " + getUser.getLastname());
                     } catch (Exception e){
-                        Log.d(TAG, "onDataChange: "+e.getMessage());
+                        //Log.d(TAG, "onDataChange: "+e.getMessage());
                     }
                 }
             }

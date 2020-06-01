@@ -187,7 +187,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
             public void onDataChange(@NonNull DataSnapshot restaurantPhone) {
 
                 if(!restaurantPhone.exists()){
-                    Log.d("RiderRequestFragment", " no ride requests");
+                    //Log.d("RiderRequestFragment", " no ride requests");
                     mSwipeRefreshLayout.setRefreshing(false);
                     OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
                     recyclerview.setLayoutManager(layoutmanager);
@@ -202,12 +202,12 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
 
                     for(DataSnapshot x : restaurantPhone.getChildren()){
                         myRestaurants.add(x.getKey()); //Add my restaurants to a list
-                        Log.d("RiderRequestFragment", " passed x loop: 1");
+                        //Log.d("RiderRequestFragment", " passed x loop: 1");
                     }
 
                     try {
                         for(int i=0; i<myRestaurants.size(); i++){
-                            Log.d("RiderRequestFragment", " looped thru restaurants: 2");
+                            //Log.d("RiderRequestFragment", " looped thru restaurants: 2");
                             AssignedOrders.clear(); //clear list
                             ordersRef[i] = FirebaseDatabase.getInstance().getReference("orders/"+myRestaurants.get(i));
 
@@ -216,14 +216,14 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                                     if(!dataSnapshot.exists()){
                                         mSwipeRefreshLayout.setRefreshing(false);
-                                        Log.d("RiderRequestFragment", dataSnapshot.getKey()
-                                                +" => order does not exist");
+                                        //Log.d("RiderRequestFragment", dataSnapshot.getKey()
+                                        //        +" => order does not exist");
                                     } else {
                                         for(final DataSnapshot orders : dataSnapshot.getChildren()){
 
                                             if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
                                                 //SafeToast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
-                                                Log.d("RiderRequestFragment", " been assigned order: 3");
+                                                //Log.d("RiderRequestFragment", " been assigned order: 3");
                                                 AssignedOrders.clear(); //clear list
                                                 myRestaurants.clear();
                                                 assignedCustomer = new UserModel();
@@ -243,7 +243,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                                                         AssignedOrders.add(assignedCustomer);
 
                                                         if (!AssignedOrders.isEmpty()) {
-                                                            Log.d("RiderRequestFragment", " found restaurant ride request: 3");
+                                                            //Log.d("RiderRequestFragment", " found restaurant ride request: 3");
                                                             mSwipeRefreshLayout.setRefreshing(false);
                                                             LinkedHashSet<UserModel> hashSet = new LinkedHashSet<>(AssignedOrders);
                                                             ArrayList<UserModel> listWithoutDuplicates = new ArrayList<>(hashSet);
@@ -258,7 +258,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                                                             myRestaurants.clear();
 
                                                         } else {
-                                                            Log.d("RiderRequestFragment", " 0 found restaurant ride request: 3");
+                                                            //Log.d("RiderRequestFragment", " 0 found restaurant ride request: 3");
                                                             mSwipeRefreshLayout.setRefreshing(false);
                                                             OrdersAdapter recycler = new OrdersAdapter(getContext(), AssignedOrders);
                                                             recyclerview.setLayoutManager(layoutmanager);

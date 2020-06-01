@@ -547,7 +547,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                                         } catch (ParseException e) {
                                             e.printStackTrace();
-                                            Log.d(TAG, "timeStamp: "+ e.getMessage());
+                                            //Log.d(TAG, "timeStamp: "+ e.getMessage());
                                         }
 
                                         second--;

@@ -363,7 +363,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                                 //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
                             } catch (ParseException e) {
                                 e.printStackTrace();
-                                Log.d(TAG, "timeStamp: "+e.getMessage());
+                                //Log.d(TAG, "timeStamp: "+e.getMessage());
                             }
 
                             if(viewPost.getStatus().equals("")){

@@ -258,7 +258,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
         });
 
 
-
+        holder.shareImageView.setVisibility(View.GONE); //TODO : develop share mechanism
         holder.shareImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

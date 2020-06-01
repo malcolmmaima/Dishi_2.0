@@ -128,7 +128,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                 UserModel user = dataSnapshot.getValue(UserModel.class);
 
                 if (user.getLiveStatus() == true) {
-                    Log.d(TAG, productDetailsModel.getOwner()+": liveStatus = true");
+                    //Log.d(TAG, productDetailsModel.getOwner()+": liveStatus = true");
 
                     if (user.getLocationType().equals("default")){
                         //if location type is default then fetch static location

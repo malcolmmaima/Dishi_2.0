@@ -222,7 +222,6 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void fetchFood() {
 
-        checkGPS();
         //Fetch restaurants
         menusRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -505,6 +504,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
         fetchFood();
+        checkGPS();
     }
 
     @Override

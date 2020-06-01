@@ -481,7 +481,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
 
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+ e.getMessage());
+            //Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
         /**

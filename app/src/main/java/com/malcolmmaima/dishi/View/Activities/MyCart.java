@@ -231,7 +231,7 @@ public class MyCart extends AppCompatActivity {
 
                                     //Compare other providers in the list with the first index
                                     if(!restaurantName.equals(list.get(i).getOwner())){
-                                        Log.d(TAG, restaurantName + " != " + list.get(i).getOwner());
+                                        //Log.d(TAG, restaurantName + " != " + list.get(i).getOwner());
                                         multipleRestaurants = true;
                                         /**
                                          * Prompt user they are about to order from multiple providers, this means an increase in delivery charges
@@ -284,7 +284,7 @@ public class MyCart extends AppCompatActivity {
 
                                     if(i == list.size()-1){
                                         if(multipleRestaurants == false){
-                                            Log.d(TAG, i + " == " + (list.size()-1));
+                                            //Log.d(TAG, i + " == " + (list.size()-1));
                                             //Slide to new activity
                                             Intent slideactivity = new Intent(MyCart.this, CheckOut.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

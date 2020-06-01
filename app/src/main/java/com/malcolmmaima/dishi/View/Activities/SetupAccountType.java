@@ -365,7 +365,7 @@ public class SetupAccountType extends AppCompatActivity {
      * Initialize the activity widgets
      */
     private void initWidgets(){
-        Log.d(TAG, "initWidgets: Initializing Widgets.");
+        //Log.d(TAG, "initWidgets: Initializing Widgets.");
         customer = findViewById(R.id.customerAccountCard);
         restaurant = findViewById(R.id.restaurantAccountCard);
         rider = findViewById(R.id.riderCard);

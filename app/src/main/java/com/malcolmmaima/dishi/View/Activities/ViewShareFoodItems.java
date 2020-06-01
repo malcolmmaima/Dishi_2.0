@@ -145,7 +145,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 accountType = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "accountType: "+ accountType);
+                //Log.d(TAG, "accountType: "+ accountType);
             }
 
             @Override

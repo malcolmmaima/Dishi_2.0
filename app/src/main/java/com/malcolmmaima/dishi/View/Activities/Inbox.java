@@ -193,7 +193,7 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
 
 
                                             } catch (Exception e){
-                                                Log.d("Inbox", "Error: "+ e.getMessage());
+                                                //Log.d("Inbox", "Error: "+ e.getMessage());
                                             }
                                         }
 

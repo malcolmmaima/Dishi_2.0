@@ -171,7 +171,7 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if(!dataSnapshot.exists()){
-                                    Log.d("UsersNode", restaurants.getKey()+" does not exist");
+                                    //Log.d("UsersNode", restaurants.getKey()+" does not exist");
                                 }
                                 else {
                                     final UserModel user = dataSnapshot.getValue(UserModel.class);

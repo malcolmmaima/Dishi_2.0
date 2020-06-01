@@ -191,7 +191,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+ e.getMessage());
+            //Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
 
         //Show follow button if type of notification is 'followedwall'

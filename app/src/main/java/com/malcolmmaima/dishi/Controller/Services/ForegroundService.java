@@ -134,7 +134,7 @@ public class ForegroundService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
-        Log.d("ForeGroundService", "ForegroundService: started");
+        //Log.d("ForeGroundService", "ForegroundService: started");
         manager = ((NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE));
 
 
@@ -222,7 +222,7 @@ public class ForegroundService extends Service {
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     //if node my_ride_requests/myPhone does not exist then it simply means i have no ride requests ata all
                                     if (!dataSnapshot.exists()) {
-                                        Log.d("RiderRequestsService", myPhone + ": no ride requests");
+                                        //Log.d("RiderRequestsService", myPhone + ": no ride requests");
                                         DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/" + myPhone);
                                         myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -249,7 +249,7 @@ public class ForegroundService extends Service {
                                             }
                                         });
                                     } else {
-                                        Log.d("RiderRequestsService", myPhone + ": active ride requests");
+                                        //Log.d("RiderRequestsService", myPhone + ": active ride requests");
                                         for (DataSnapshot restaurantRequest : dataSnapshot.getChildren()) {
                                             //SafeToast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
                                             for (DataSnapshot assignedCustomer : restaurantRequest.getChildren()) {
@@ -451,10 +451,10 @@ public class ForegroundService extends Service {
                                             //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
                                             ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
                                             List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-                                            Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
+                                            //Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
                                             ComponentName componentInfo = taskInfo.get(0).topActivity;
                                             componentInfo.getPackageName();
-                                            Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
+                                            //Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
 
                                             if(!taskInfo.get(0).topActivity.getClassName().equals("com.malcolmmaima.dishi.View.Activities.Chat")){
 
@@ -542,9 +542,9 @@ public class ForegroundService extends Service {
 
                 try {
                     if(dataSnapshot.getKey() == s){
-                        Log.d(TAG, dataSnapshot.getKey()+": exists ("+s+")");
+                        //Log.d(TAG, dataSnapshot.getKey()+": exists ("+s+")");
                     } else {
-                        Log.d(TAG, dataSnapshot.getKey()+": doesn't exists("+s+")");
+                        //Log.d(TAG, dataSnapshot.getKey()+": doesn't exists("+s+")");
                     }
                     NotificationModel newNotification = dataSnapshot.getValue(NotificationModel.class);
                     newNotification.key = dataSnapshot.getKey();

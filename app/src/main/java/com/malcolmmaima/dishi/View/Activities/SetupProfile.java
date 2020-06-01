@@ -91,7 +91,7 @@ public class SetupProfile extends AppCompatActivity {
         progressDialog = new ProgressDialog(SetupProfile.this);
         defaultProfile = "";
 
-        Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
+        //Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
         mAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference("users");
         DatabaseReference defaultsRef = FirebaseDatabase.getInstance().getReference("defaults");
@@ -363,7 +363,7 @@ public class SetupProfile extends AppCompatActivity {
      * Initialize the activity widgets
      */
     private void initWidgets(){
-        Log.d(TAG, "initWidgets: Initializing Widgets.");
+        //Log.d(TAG, "initWidgets: Initializing Widgets.");
         mEmail = findViewById(R.id.input_email);
         mFirstName = findViewById(R.id.input_first_name);
         mLastName = findViewById(R.id.input_surname);
@@ -384,7 +384,7 @@ public class SetupProfile extends AppCompatActivity {
      */
 
     private boolean CheckFieldValidation(){
-        Log.d(TAG, "checkInputs: checking inputs for null values.");
+        //Log.d(TAG, "checkInputs: checking inputs for null values.");
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
         final boolean[] valid = {true};

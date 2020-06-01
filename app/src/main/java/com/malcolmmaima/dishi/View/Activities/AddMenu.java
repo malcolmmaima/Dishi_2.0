@@ -619,7 +619,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetailsModel.setUploadDate(getDate());
                 productDetailsModel.setOutOfStock(false);
 
-                Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
+                //Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
                 menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -674,7 +674,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetailsModel.setStorageLocation(storageReference2nd.getPath());
                                         productDetailsModel.setUploadDate(getDate());
 
-                                        Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
+                                        //Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
                                         menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
@@ -768,7 +768,7 @@ public class AddMenu extends AppCompatActivity {
                 productDetailsModel.setStorageLocation("default");
                 productDetailsModel.setUploadDate(getDate());
 
-                Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
+                //Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
                 menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -837,7 +837,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetailsModel.setOwner(myPhone);
                                         productDetailsModel.setUploadDate(getDate());
 
-                                        Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
+                                        //Log.d("myimage", "onSuccess: product image: " + productDetailsModel.getImageURL());
 
                                         menusRef.child(key).setValue(productDetailsModel).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override

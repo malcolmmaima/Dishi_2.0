@@ -573,7 +573,7 @@ public class PersonalDetails extends AppCompatActivity {
     }
 
     private void intiWidgets() {
-        Log.d(TAG, "initWidgets: Initializing Widgets.");
+        //Log.d(TAG, "initWidgets: Initializing Widgets.");
         mEmail = findViewById(R.id.input_email);
         mFirstName = findViewById(R.id.input_first_name);
         mLastName = findViewById(R.id.input_surname);

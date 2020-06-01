@@ -39,7 +39,7 @@ public class AppLifecycleObserver implements LifecycleObserver {
     public void onEnterBackground() {
         //run the code we need
         lockApp(true);
-        Log.d(TAG, "onEnterBackground: true");
+        //Log.d(TAG, "onEnterBackground: true");
     }
 
 

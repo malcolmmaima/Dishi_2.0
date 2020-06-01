@@ -114,7 +114,7 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
                         holder.profileName.setText(commentUser[position].getFirstname() + " " + commentUser[position].getLastname());
                     }
                 } catch (Exception e){
-                    Log.d(TAG, "onDataChange: "+e.getMessage());
+                    //Log.d(TAG, "onDataChange: "+e.getMessage());
                 }
 
             }
@@ -291,7 +291,7 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
             //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+e.getMessage());
+            //Log.d(TAG, "timeStamp: "+e.getMessage());
         }
     }
 

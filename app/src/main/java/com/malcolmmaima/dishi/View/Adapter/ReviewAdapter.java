@@ -103,7 +103,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
                         listdata.remove(position);
                         notifyItemRemoved(position);
                     } catch (Exception e){
-                        Log.d(TAG, "statusUpdate: error " + e.getMessage());
+                        //Log.d(TAG, "statusUpdate: error " + e.getMessage());
                     }
                 }
             }
@@ -138,7 +138,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
 
                     holder.profileName.setText(postUser[position].getFirstname() + " " + postUser[position].getLastname());
                 } catch (Exception e){
-                    Log.d(TAG, "onDataChange: "+e.getMessage());
+                    //Log.d(TAG, "onDataChange: "+e.getMessage());
                 }
 
             }
@@ -212,7 +212,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
             //Toast.makeText(context, "ago: " + timeAgo.toRelative(dateEnd, dateStart), Toast.LENGTH_LONG).show();
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+e.getMessage());
+            //Log.d(TAG, "timeStamp: "+e.getMessage());
         }
 
         //set post details

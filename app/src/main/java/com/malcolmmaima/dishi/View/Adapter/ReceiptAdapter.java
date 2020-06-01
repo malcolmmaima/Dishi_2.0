@@ -159,7 +159,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
 
         } catch (ParseException e) {
             e.printStackTrace();
-            Log.d(TAG, "timeStamp: "+ e.getMessage());
+            //Log.d(TAG, "timeStamp: "+ e.getMessage());
         }
         /**
          * Click listener on our card

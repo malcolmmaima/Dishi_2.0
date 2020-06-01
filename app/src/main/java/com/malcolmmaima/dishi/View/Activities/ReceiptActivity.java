@@ -490,7 +490,7 @@ public class ReceiptActivity extends AppCompatActivity {
 
                     } catch (ParseException e) {
                         e.printStackTrace();
-                        Log.d(TAG, "timeStamp: "+ e.getMessage());
+                        //Log.d(TAG, "timeStamp: "+ e.getMessage());
                     }
 
                     //get the ordered items
