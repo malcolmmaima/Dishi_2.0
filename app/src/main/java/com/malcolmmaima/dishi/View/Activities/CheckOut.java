@@ -296,32 +296,39 @@ public class CheckOut extends AppCompatActivity {
                                                             if (dataSnapshot.exists()) {
                                                                 ProductDetailsModel vendorMenuItem = dataSnapshot.getValue(ProductDetailsModel.class);
                                                                 product.setOutOfStock(vendorMenuItem.getOutOfStock());
+
+                                                                computeDeliveryTotal();
                                                             } else {
                                                                 product.setOutOfStock(false);
+                                                                computeDeliveryTotal();
                                                             }
 
-                                                            //increment product count only if it's in stock.
-                                                            //product count helps us determine the delivery charge
-                                                            if (product.getOwner().equals(vendor) && product.getOutOfStock() == false) {
-                                                                prodCount = prodCount + product.getQuantity();
 
-                                                                if (prodCount > vendorUser.getDeliveryChargeLimit() && !vendors.contains(product.getOwner())) {
-                                                                    deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
-                                                                    deliveryChargeAmount.setText("Ksh " + Double.valueOf(df.format(deliveryAmount)));
-                                                                    deliveryFeeBreakdown.add(vendorUser.getFirstname()+" "+vendorUser.getLastname()+" (Ksh " + vendorUser.getDelivery_charge()+")");
-                                                                    //Log.d(TAG, vendorUser.getFirstname()+"("+prodCount+") => " + vendorUser.getDelivery_charge()+" (waive="+vendorUser.getDeliveryChargeLimit()+")");
-                                                                    vendors.add(vendor);
-                                                                    prodCount = 0;
-                                                                }
-
-                                                                totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
-                                                                totalBill.setText("Ksh " + Double.valueOf(df.format(totalBillAmount)));
-
-                                                            }
                                                         } catch (Exception e){
                                                             Log.e(TAG, "onDataChange: ", e);
                                                         }
 
+                                                    }
+
+                                                    private void computeDeliveryTotal() {
+                                                        //increment product count only if it's in stock.
+                                                        //product count helps us determine the delivery charge
+                                                        if (product.getOwner().equals(vendor) && product.getOutOfStock() == false) {
+                                                            prodCount = prodCount + product.getQuantity();
+
+                                                            if (prodCount > vendorUser.getDeliveryChargeLimit() && !vendors.contains(product.getOwner())) {
+                                                                deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                                                deliveryChargeAmount.setText("Ksh " + Double.valueOf(df.format(deliveryAmount)));
+                                                                deliveryFeeBreakdown.add(vendorUser.getFirstname()+" "+vendorUser.getLastname()+" (Ksh " + vendorUser.getDelivery_charge()+")");
+                                                                //Log.d(TAG, vendorUser.getFirstname()+"("+prodCount+") => " + vendorUser.getDelivery_charge()+" (waive="+vendorUser.getDeliveryChargeLimit()+")");
+                                                                vendors.add(vendor);
+                                                                prodCount = 0;
+                                                            }
+
+                                                            totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
+                                                            totalBill.setText("Ksh " + Double.valueOf(df.format(totalBillAmount)));
+
+                                                        }
                                                     }
 
                                                     @Override
