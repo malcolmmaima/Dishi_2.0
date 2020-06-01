@@ -4,6 +4,8 @@
 
     <string-array name="country">
         <item>+254</item>
+
+        <!-- Disabled for now
         <item>+265</item>
         <item>+250</item>
         <item>+27</item>
@@ -14,6 +16,6 @@
         <item>+90</item>
         <item>+44</item>
         <item>+1</item>
-        <item>+91</item>
+        <item>+91</item> -->
     </string-array>
 </resources>
