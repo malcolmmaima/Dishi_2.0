@@ -47,6 +47,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    View v;
 
 
     public static RiderRequestsFragment newInstance() {
@@ -63,7 +64,7 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_my_riders, container, false);
+        v = inflater.inflate(R.layout.fragment_my_riders, container, false);
 
         riders.clear();
 
@@ -195,4 +196,13 @@ public class MyRidersFragment extends Fragment implements SwipeRefreshLayout.OnR
         fetchRiders();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
+    }
 }

@@ -48,6 +48,7 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     FirebaseDatabase db;
     FirebaseUser user;
     FloatingActionButton addMenu;
+    View v;
 
     public static MenuFragment newInstance() {
         MenuFragment fragment = new MenuFragment();
@@ -63,7 +64,7 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_menu, container, false);
+        v = inflater.inflate(R.layout.fragment_menu, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -183,5 +184,15 @@ public class MenuFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
 }

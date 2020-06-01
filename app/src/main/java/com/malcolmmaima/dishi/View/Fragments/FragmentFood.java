@@ -72,6 +72,7 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener locationListener;
+    View v;
 
     int location_filter;
 
@@ -87,16 +88,11 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        myLocationRef.removeEventListener(locationListener);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_food, container, false);
+        v = inflater.inflate(R.layout.fragment_food, container, false);
 
         gpsDialogShown = false;
         location_filter = 0; // initialize distance filter
@@ -515,6 +511,28 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onDetach() {
         super.onDetach();
         myLocationRef.removeEventListener(locationListener);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+
+            try { myLocationRef.removeEventListener(locationListener); } catch (Exception e){}
+        }
     }
 
     @Override

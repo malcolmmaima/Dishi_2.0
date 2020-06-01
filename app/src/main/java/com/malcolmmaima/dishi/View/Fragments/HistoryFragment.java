@@ -60,6 +60,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener locationListener;
+    View v;
 
     public static HistoryFragment newInstance() {
         HistoryFragment fragment = new HistoryFragment();
@@ -72,16 +73,11 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        myLocationRef.removeEventListener(locationListener);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_history, container, false);
+        v = inflater.inflate(R.layout.fragment_history, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -448,9 +444,17 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        myLocationRef.removeEventListener(locationListener);
-        myCartRef.removeEventListener(cartListener);
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+
+            recyclerview.setAdapter(null);
+
+            try { myLocationRef.removeEventListener(locationListener); }catch (Exception e){}
+            try { myLocationRef.removeEventListener(locationListener); }catch (Exception e){}
+            try { myCartRef.removeEventListener(cartListener); }catch (Exception e){}
+        }
     }
 }

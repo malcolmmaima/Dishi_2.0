@@ -946,6 +946,19 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
             }
         });
 
+        holder.userUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(context, ViewStatus.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                slideactivity.putExtra("key", statusUpdateModel.key);
+                Bundle bndlanimation = ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                context.startActivity(slideactivity, bndlanimation);
+            }
+        });
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -471,12 +471,9 @@ public class MyCart extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            myLocationRef.removeEventListener(locationListener);
-            myCartRef.removeEventListener(cartListener);
-            myCartRef.removeEventListener(totalItemsListener);
-        } catch (Exception e){
+        try { myLocationRef.removeEventListener(locationListener); } catch (Exception e){ }
 
-        }
+        try { myCartRef.removeEventListener(cartListener); } catch (Exception e){ }
+        try { myCartRef.removeEventListener(totalItemsListener); } catch (Exception e){ }
     }
 }

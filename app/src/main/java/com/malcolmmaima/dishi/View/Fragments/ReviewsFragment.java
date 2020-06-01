@@ -84,6 +84,7 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     FirebaseStorage storage;
     StorageReference storageReference;
 
+    View v;
     private ProgressBar progressBar;
 
     // Uri indicates, where the image will be picked from
@@ -106,7 +107,7 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_reviews, container, false);
+        v = inflater.inflate(R.layout.fragment_reviews, container, false);
         rootView = v.findViewById(R.id.activity_main);
 
         phone = getArguments().getString("phone");
@@ -527,8 +528,13 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
 
     @Override

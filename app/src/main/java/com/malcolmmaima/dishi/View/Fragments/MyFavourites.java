@@ -38,6 +38,8 @@ public class MyFavourites extends Fragment {
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener cartListener;
+    View v;
+    ViewPager viewPager;
 
     public static MyFavourites newInstance() {
         MyFavourites fragment = new MyFavourites();
@@ -53,7 +55,7 @@ public class MyFavourites extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_my_favourites, container, false);
+        v = inflater.inflate(R.layout.fragment_my_favourites, container, false);
         progressDialog = new ProgressDialog(getContext());
         final FloatingActionButton fab = v.findViewById(R.id.fab);
 
@@ -65,7 +67,7 @@ public class MyFavourites extends Fragment {
         myCartRef = db.getReference("cart/"+myPhone);
 
         // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) v.findViewById(R.id.viewpager);
+        viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         setupViewPager(viewPager);
         // Set Tabs inside Toolbar
         TabLayout tabs = (TabLayout) v.findViewById(R.id.result_tabs);
@@ -152,9 +154,17 @@ public class MyFavourites extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //Dealing with memory leaks.
-        myCartRef.removeEventListener(cartListener);
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            viewPager.setAdapter(null);
+
+            try { myCartRef.removeEventListener(cartListener); } catch (Exception e){
+
+            }
+        }
     }
+
 }

@@ -48,6 +48,7 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
     DatabaseReference dbRef, receiptsRef;
     FirebaseDatabase db;
     FirebaseUser user;
+    View v;
 
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -70,7 +71,7 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_receipts, container, false);
+        v = inflater.inflate(R.layout.fragment_receipts, container, false);
 
         int permission = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -181,5 +182,15 @@ public class ReceiptsFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
 }

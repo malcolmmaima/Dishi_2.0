@@ -41,6 +41,7 @@ public class CustomerOrderFragment extends Fragment {
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener cartListener;
+    View v;
 
     public static CustomerOrderFragment newInstance() {
         CustomerOrderFragment fragment = new CustomerOrderFragment();
@@ -56,7 +57,7 @@ public class CustomerOrderFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_customer_order, container, false);
+        v = inflater.inflate(R.layout.fragment_customer_order, container, false);
         progressDialog = new ProgressDialog(getContext());
         final FloatingActionButton fab = v.findViewById(R.id.fab);
 
@@ -157,13 +158,32 @@ public class CustomerOrderFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //Dealing with memory leaks.
-        try {
-            myCartRef.removeEventListener(cartListener);
-        } catch (Exception e){
-            Log.e(TAG, "onDestroy: ", e);
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        if(v != null){
+            v = null;
+
+            /**
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            }); */
+
+            try {
+                myCartRef.removeEventListener(cartListener);
+            } catch (Exception e){
+                Log.e(TAG, "onDestroy: ", e);
+            }
         }
     }
+
+
 }

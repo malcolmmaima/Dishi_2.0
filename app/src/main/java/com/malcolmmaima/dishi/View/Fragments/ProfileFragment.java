@@ -125,6 +125,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private int mPosts = 5;
     private int defaultPosts = 5;
     StatusUpdateAdapter recycler;
+    View v;
 
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
@@ -140,7 +141,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        v = inflater.inflate(R.layout.fragment_user_profile, container, false);
         rootView = v.findViewById(R.id.activity_main);
         profilePhoto = v.findViewById(R.id.user_profile_photo);
         profileName = v.findViewById(R.id.user_profile_name);
@@ -842,13 +843,19 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        try { myRef.removeEventListener(myListener); } catch (Exception e){}
-        try { followersCounterRef.removeEventListener(followersCounterListener); } catch (Exception e){}
-        try { followingCounterref.removeEventListener(followingCounterListener); } catch (Exception e){}
-        //myPostUpdates.removeEventListener(postUodatesChildListener);
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+            try { myRef.removeEventListener(myListener); } catch (Exception e){}
+            try { followersCounterRef.removeEventListener(followersCounterListener); } catch (Exception e){}
+            try { followingCounterref.removeEventListener(followingCounterListener); } catch (Exception e){}
+            //myPostUpdates.removeEventListener(postUodatesChildListener);
+        }
     }
+
 
     @Override
     public void onRefresh() {

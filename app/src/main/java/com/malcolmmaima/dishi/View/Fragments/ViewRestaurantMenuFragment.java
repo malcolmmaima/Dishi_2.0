@@ -50,6 +50,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
     Double dist, distance;
     UserModel userModel;
     LiveLocationModel myLocation, restaurantLocation;
+    View v;
 
     public static ViewRestaurantMenuFragment newInstance() {
         ViewRestaurantMenuFragment fragment = new ViewRestaurantMenuFragment();
@@ -65,7 +66,7 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_view_restaurant_menu, container, false);
+        v = inflater.inflate(R.layout.fragment_view_restaurant_menu, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -183,14 +184,6 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
         fetchMenu();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        myRef.removeEventListener(myRefListener);
-        myLocationRef.removeEventListener(mylocationListener);
-        restaurantLocationRef.removeEventListener(restaurantLocationListener);
-    }
 
     private void fetchMenu() {
         menusRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -247,5 +240,18 @@ public class ViewRestaurantMenuFragment extends Fragment implements SwipeRefresh
 
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+            myRef.removeEventListener(myRefListener);
+            myLocationRef.removeEventListener(mylocationListener);
+            restaurantLocationRef.removeEventListener(restaurantLocationListener);
+        }
     }
 }

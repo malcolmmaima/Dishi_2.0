@@ -24,7 +24,7 @@ public class FragmentStats extends Fragment {
     DatabaseReference dbRef;
     FirebaseDatabase db;
     FirebaseUser user;
-
+    View v;
 
     public static FragmentStats newInstance() {
         FragmentStats fragment = new FragmentStats();
@@ -40,7 +40,7 @@ public class FragmentStats extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_stats, container, false);
+        v = inflater.inflate(R.layout.fragment_stats, container, false);
         progressDialog = new ProgressDialog(getContext());
 
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -52,4 +52,13 @@ public class FragmentStats extends Fragment {
         return  v;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            //recyclerview.setAdapter(null);
+        }
+    }
 }

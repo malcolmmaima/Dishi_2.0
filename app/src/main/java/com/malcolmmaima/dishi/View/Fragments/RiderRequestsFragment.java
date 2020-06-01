@@ -56,6 +56,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     UserModel assignedCustomer;
+    View v;
 
 
     public static RiderRequestsFragment newInstance() {
@@ -72,7 +73,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_rider, container, false);
+        v = inflater.inflate(R.layout.fragment_rider, container, false);
         progressDialog = new ProgressDialog(getContext());
 
         try {
@@ -160,15 +161,6 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        try {
-            myRideOrderRequests.removeEventListener(myRideOrderRequestsChildListener);
-        } catch (Exception e){
-
-        }
-    }
 
     @Override
     public void onRefresh() {
@@ -309,5 +301,20 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
             }
         };
         myRideOrderRequests.addListenerForSingleValueEvent(myRideOrderRequestsListener);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+            try {
+                myRideOrderRequests.removeEventListener(myRideOrderRequestsChildListener);
+            } catch (Exception e){
+
+            }
+        }
     }
 }

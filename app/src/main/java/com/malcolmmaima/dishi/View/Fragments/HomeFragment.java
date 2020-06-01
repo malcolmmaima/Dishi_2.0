@@ -82,6 +82,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private ProgressBar progressBar;
     View rootView;
     EmojIconActions emojIcon;
+    View v;
 
     // Uri indicates, where the image will be picked from
     private Uri filePath;
@@ -108,7 +109,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_home, container, false);
+        v = inflater.inflate(R.layout.fragment_home, container, false);
         rootView = v.findViewById(R.id.activity_main);
         progressDialog = new ProgressDialog(getContext());
 
@@ -657,5 +658,15 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
         loadNewsFeed();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
 }

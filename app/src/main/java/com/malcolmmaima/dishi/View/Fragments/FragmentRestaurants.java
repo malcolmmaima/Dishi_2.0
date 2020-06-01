@@ -73,6 +73,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
 
     SwipeRefreshLayout mSwipeRefreshLayout;
     int location_filter;
+    View v;
 
 
     public static FragmentRestaurants newInstance() {
@@ -89,7 +90,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_restaurants, container, false);
+        v = inflater.inflate(R.layout.fragment_restaurants, container, false);
         progressDialog = new ProgressDialog(getContext());
 
         location_filter = 0; // initialize distance filter
@@ -446,12 +447,28 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
 
-        //Patch... dealing with memory leaks (any listener that uses addValueEventListener must be removed onDestroy())
-        myLocationRef.removeEventListener(locationListener);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+
+            try {//Patch... dealing with memory leaks (any listener that uses addValueEventListener must be removed onDestroy())
+                myLocationRef.removeEventListener(locationListener); } catch (Exception e){}
+        }
     }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {

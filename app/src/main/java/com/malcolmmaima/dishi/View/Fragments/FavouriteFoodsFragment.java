@@ -52,6 +52,7 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
     FirebaseDatabase db;
     FirebaseUser user;
     ValueEventListener locationListener;
+    View v;
 
     public static FavouriteFoodsFragment newInstance() {
         FavouriteFoodsFragment fragment = new FavouriteFoodsFragment();
@@ -73,7 +74,7 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_favourite_foods, container, false);
+        v = inflater.inflate(R.layout.fragment_favourite_foods, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -383,13 +384,30 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+
+            try { myLocationRef.removeEventListener(locationListener); } catch (Exception e){}
+        }
+    }
+
+    @Override
     public void onRefresh() {
         fetchFood();
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        myLocationRef.removeEventListener(locationListener);
-    }
 }

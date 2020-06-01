@@ -603,6 +603,20 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
             }
         });
 
+        holder.userUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent slideactivity = new Intent(context, ViewReview.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                slideactivity.putExtra("author", statusUpdateModel.getAuthor());
+                slideactivity.putExtra("postedTo", statusUpdateModel.getPostedTo());
+                slideactivity.putExtra("key", statusUpdateModel.key);
+                Bundle bndlanimation =
+                        ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
+                context.startActivity(slideactivity, bndlanimation);
+            }
+        });
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -51,7 +51,7 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
     FirebaseDatabase db;
     FirebaseUser user;
     AppCompatImageView icon;
-
+    View v;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     public static FavouriteRestaurantsFragment newInstance() {
@@ -68,7 +68,7 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_favourite_restaurants, container, false);
+        v = inflater.inflate(R.layout.fragment_favourite_restaurants, container, false);
         progressDialog = new ProgressDialog(getContext());
 
         icon = v.findViewById(R.id.menuIcon);
@@ -354,10 +354,27 @@ public class FavouriteRestaurantsFragment extends Fragment implements SwipeRefre
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
 
-        //Patch... dealing with memory leaks (any listener that uses addValueEventListener must be removed onDestroy())
-        myLocationRef.removeEventListener(locationListener);
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+
+            try {
+            //Patch... dealing with memory leaks (any listener that uses addValueEventListener must be removed onDestroy())
+            myLocationRef.removeEventListener(locationListener); } catch (Exception e){}
+        }
     }
+
 }

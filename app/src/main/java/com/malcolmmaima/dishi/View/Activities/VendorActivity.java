@@ -93,6 +93,7 @@ public class VendorActivity extends AppCompatActivity
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_orders:
                     setTitle("Orders");
@@ -108,7 +109,6 @@ public class VendorActivity extends AppCompatActivity
                     break;
             }
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.flContent, selectedFragment);
             transaction.commit();
             return true;
@@ -718,6 +718,7 @@ public class VendorActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         try {
             myRef.removeEventListener(myRefListener);
             myNotificationsRef.removeEventListener(myNotificationsListener);

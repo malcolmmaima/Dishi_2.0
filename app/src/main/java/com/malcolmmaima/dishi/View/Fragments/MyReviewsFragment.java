@@ -73,6 +73,7 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    View v;
 
     public static MyReviewsFragment newInstance() {
         MyReviewsFragment fragment = new MyReviewsFragment();
@@ -88,7 +89,7 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_my_reviews, container, false);
+        v = inflater.inflate(R.layout.fragment_my_reviews, container, false);
         rootView = v.findViewById(R.id.activity_main);
 
         recyclerview = v.findViewById(R.id.rview);
@@ -193,9 +194,15 @@ public class MyReviewsFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
+
 
     @Override
     public void onRefresh() {

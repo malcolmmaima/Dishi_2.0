@@ -59,6 +59,7 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    View v;
 
     public static RestaurantOrdersFragment newInstance() {
         RestaurantOrdersFragment fragment = new RestaurantOrdersFragment();
@@ -74,7 +75,7 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_restaurant_orders, container, false);
+        v = inflater.inflate(R.layout.fragment_restaurant_orders, container, false);
 //        progressDialog = new ProgressDialog(getContext());
 
         orders.clear();
@@ -389,14 +390,19 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        try {
-            dbRef.removeEventListener(liveListener);
-            incomingOrders.removeEventListener(inComingOrdersListener);
-        } catch (Exception e){
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
 
+            recyclerview.setAdapter(null);
+            try {
+                dbRef.removeEventListener(liveListener);
+                incomingOrders.removeEventListener(inComingOrdersListener);
+            } catch (Exception e){
+
+            }
         }
-
     }
+
 }

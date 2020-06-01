@@ -46,6 +46,7 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
     ValueEventListener myRestaurantsRefListener, userDetailsListener;
     FirebaseDatabase db;
     FirebaseUser user;
+    View v;
 
 
     public static MyRestaurantsFragment newInstance() {
@@ -62,7 +63,7 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_my_restaurants, container, false);
+        v = inflater.inflate(R.layout.fragment_my_restaurants, container, false);
 
         riderRequests.clear();
 
@@ -190,5 +191,15 @@ public class MyRestaurantsFragment extends Fragment implements SwipeRefreshLayou
 
         myRestaurantsRef.addListenerForSingleValueEvent(myRestaurantsRefListener);
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
 }

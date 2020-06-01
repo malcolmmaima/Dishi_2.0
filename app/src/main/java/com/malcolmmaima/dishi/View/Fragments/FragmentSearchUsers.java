@@ -42,6 +42,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
     String searchValue, myPhone;
     FirebaseUser user;
     int searchCap;
+    View view;
 
     public static FragmentSearchUsers newInstance() {
         FragmentSearchUsers fragment = new FragmentSearchUsers();
@@ -53,7 +54,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_search_users, container, false);
+        view =  inflater.inflate(R.layout.fragment_search_users, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber();
@@ -172,5 +173,25 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onRefresh() {
         searchUsers(searchValue);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(view != null){
+            view = null;
+
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+        }
     }
 }

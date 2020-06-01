@@ -37,6 +37,7 @@ public class FragmentFollowing extends Fragment implements SwipeRefreshLayout.On
     RecyclerView recyclerview;
     MyTextView_Roboto_Regular emptyTag;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    View view;
 
     public FragmentFollowing() {
         // Required empty public constructor
@@ -47,7 +48,7 @@ public class FragmentFollowing extends Fragment implements SwipeRefreshLayout.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_following, container, false);
+        view =  inflater.inflate(R.layout.fragment_following, container, false);
 
         phone = getArguments().getString("phone");
 
@@ -144,5 +145,25 @@ public class FragmentFollowing extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onRefresh() {
         fetchFollowing();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(view != null){
+            view = null;
+
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+        }
     }
 }

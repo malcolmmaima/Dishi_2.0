@@ -57,6 +57,7 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     MyTextView_Roboto_Regular emptyTag;
     AppCompatImageView icon;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    View v;
 
 
     public MyOrdersFragment newInstance() {
@@ -70,7 +71,7 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View v = inflater.inflate(R.layout.fragment_my_orders, container, false);
+        v = inflater.inflate(R.layout.fragment_my_orders, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -245,13 +246,14 @@ public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(v != null){
+            v = null;
 
-        try {
-            myOrders.removeEventListener(myOrdersListener);
-        } catch (Exception e){
-
+            recyclerview.setAdapter(null);
+            try { myOrders.removeEventListener(myOrdersListener); } catch (Exception e){ }
         }
     }
+
 }

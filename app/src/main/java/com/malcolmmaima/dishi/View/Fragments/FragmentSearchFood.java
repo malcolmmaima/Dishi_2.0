@@ -53,6 +53,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
     ValueEventListener locationListener;
     DatabaseReference myLocationRef, myUserDetails;
     int searchCap;
+    View view;
 
     public static FragmentSearchFood newInstance() {
         FragmentSearchFood fragment = new FragmentSearchFood();
@@ -64,7 +65,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_search_food, container, false);
+        view =  inflater.inflate(R.layout.fragment_search_food, container, false);
 
         searchCap = 100;
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -379,12 +380,28 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        try {
-            myLocationRef.removeEventListener(locationListener);
-        } catch (Exception e){
-            Log.e(TAG, "onDestroy: ", e);
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(view != null){
+            view = null;
+
+            recyclerview.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no-op
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    recyclerview.setAdapter(null);
+                }
+            });
+            try {
+                myLocationRef.removeEventListener(locationListener);
+            } catch (Exception e){
+                Log.e(TAG, "onDestroy: ", e);
+            }
         }
     }
+
 }

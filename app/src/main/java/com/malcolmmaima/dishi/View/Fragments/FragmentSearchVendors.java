@@ -51,6 +51,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
     ValueEventListener locationListener;
     UserModel myDetails;
     int searchCap;
+    View view;
 
     public static FragmentSearchVendors newInstance() {
         FragmentSearchVendors fragment = new FragmentSearchVendors();
@@ -61,7 +62,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_search_vendors, container, false);
+        view = inflater.inflate(R.layout.fragment_search_vendors, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myPhone = user.getPhoneNumber();
@@ -376,5 +377,15 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
     @Override
     public void onRefresh() {
         searchVendors(searchValue);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(view != null){
+            view = null;
+
+            recyclerview.setAdapter(null);
+        }
     }
 }
