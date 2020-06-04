@@ -74,6 +74,7 @@ public class AddMenu extends AppCompatActivity {
     String Storage_Path = "Users";
 
     String key, phone;
+    ProductDetailsModel productDetailsModel;
 
     // Creating StorageReference and DatabaseReference object.
     StorageReference storageReference;
@@ -86,7 +87,6 @@ public class AddMenu extends AppCompatActivity {
 
     // Image request code for onActivityResult() .
     int Image_Request_Code = 7;
-    private String name, description, imageLink, imageLocation, price, url;
     private String defaultFood;
 
     @Override
@@ -305,44 +305,28 @@ public class AddMenu extends AppCompatActivity {
                 databaseReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        productName.setEnabled(true);
+                        productPrice.setEnabled(true);
+                        productDescription.setEnabled(true);
+                        save.setEnabled(true);
 
-                        for (DataSnapshot menuDetails : dataSnapshot.getChildren()){
-                            try {
-
-                                productName.setEnabled(true);
-                                productPrice.setEnabled(true);
-                                productDescription.setEnabled(true);
-                                save.setEnabled(true);
-
-                                if(menuDetails.getKey().equals("description")){
-                                    description = menuDetails.getValue(String.class);
-                                    productDescription.setText(description);
-                                }
-                                if(menuDetails.getKey().equals("imageURL")){
-                                    imageLink = menuDetails.getValue(String.class);
-
-                                    Picasso.with(AddMenu.this).load(imageLink).fit().centerCrop()
-                                            .placeholder(R.drawable.menu)
-                                            .error(R.drawable.menu)
-                                            .into(foodPic);
-
-                                }
-                                if(menuDetails.getKey().equals("name")){
-                                    name = menuDetails.getValue(String.class);
-                                    productName.setText(name);
-                                }
-                                if(menuDetails.getKey().equals("price")){
-                                    price = menuDetails.getValue(String.class);
-                                    productPrice.setText(price);
-                                }
-                                if(menuDetails.getKey().equals("storageLocation")){
-                                    imageLocation = menuDetails.getValue(String.class);
-                                }
-
-
-                            } catch (Exception e){
-
-                            }
+                        try { productDetailsModel = dataSnapshot.getValue(ProductDetailsModel.class); } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                        try { productDescription.setText(productDetailsModel.getDescription()); } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                        try { Picasso.with(AddMenu.this).load(productDetailsModel.getImageUrlBig()).fit().centerCrop()
+                                .placeholder(R.drawable.menu)
+                                .error(R.drawable.menu)
+                                .into(foodPic); } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                        try { productName.setText(productDetailsModel.getName()); } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
+                        }
+                        try { productPrice.setText(productDetailsModel.getPrice()); } catch (Exception e){
+                            Log.e(TAG, "onDataChange: ", e);
                         }
 
                     }
@@ -378,11 +362,11 @@ public class AddMenu extends AppCompatActivity {
 
                                 if(which == 2){
                                     //View current photo
-                                    if(!imageLink.equals("")){
+                                    if(productDetailsModel.getImageUrlBig() != null){
                                         Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                        slideactivity.putExtra("imageURL", imageLink);
+                                        slideactivity.putExtra("imageURL", productDetailsModel.getImageUrlBig());
                                         startActivity(slideactivity);
                                     }
 
@@ -457,11 +441,11 @@ public class AddMenu extends AppCompatActivity {
 
                                         if(which == 2){
                                             //View current photo
-                                            if(!imageLink.equals("")){
+                                            if(productDetailsModel.getImageUrlBig() != null){
                                                 Intent slideactivity = new Intent(AddMenu.this, ViewImage.class)
                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                                slideactivity.putExtra("imageURL", imageLink);
+                                                slideactivity.putExtra("imageURL", productDetailsModel.getImageUrlBig());
                                                 startActivity(slideactivity);
                                             }
 
@@ -613,9 +597,9 @@ public class AddMenu extends AppCompatActivity {
                 productDetailsModel.setName(name_);
                 productDetailsModel.setPrice(price_);
                 productDetailsModel.setDescription(description_);
-                productDetailsModel.setImageURL(imageLink);
+                productDetailsModel.setImageURL(productDetailsModel.getImageUrlBig());
                 productDetailsModel.setOwner(myPhone);
-                productDetailsModel.setStorageLocation(imageLocation);
+                productDetailsModel.setStorageLocation(productDetailsModel.getStorageLocation());
                 productDetailsModel.setUploadDate(getDate());
                 productDetailsModel.setOutOfStock(false);
 
@@ -659,12 +643,29 @@ public class AddMenu extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(Object o) {
+
+                                        //Delete previous images from storage
+                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(productDetailsModel.getImageURL());
+                                        StorageReference storageImgBig = storage.getReferenceFromUrl(productDetailsModel.getImageUrlBig());
+                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(productDetailsModel.getImageUrlMedium());
+                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(productDetailsModel.getImageUrlSmall());
+
+
+                                        //Delete images from storage
+                                        storageRefOriginal.delete();
+                                        storageImgBig.delete();
+                                        storageImgMedium.delete();
+                                        storageImgSmall.delete();
+
+                                        //new data
                                         GenerateThumbnails thumbnails = new GenerateThumbnails();
                                         ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
-                                        productDetailsModel.setName(name);
-                                        productDetailsModel.setPrice(price);
-                                        productDetailsModel.setDescription(description);
+                                        productDetailsModel.setName(productName.getText().toString().trim());
+                                        productDetailsModel.setPrice(productPrice.getText().toString().trim());
+                                        productDetailsModel.setOutOfStock(false);
+                                        productDetailsModel.setDescription(productDescription.getText().toString().trim());
                                         productDetailsModel.setImageURL(o.toString());
                                         productDetailsModel.setImageUrlSmall(thumbnails.GenerateSmall(o.toString()));
                                         productDetailsModel.setImageUrlMedium(thumbnails.GenerateMedium(o.toString()));
@@ -754,8 +755,6 @@ public class AddMenu extends AppCompatActivity {
                         });
             }
 
-
-
         }
         else { //New menu addition
 
@@ -770,6 +769,7 @@ public class AddMenu extends AppCompatActivity {
 
                 productDetailsModel.setName(name);
                 productDetailsModel.setPrice(price);
+                productDetailsModel.setOutOfStock(false);
                 productDetailsModel.setDescription(description);
                 productDetailsModel.setImageURL(defaultFood);
                 productDetailsModel.setOwner(myPhone);
@@ -837,6 +837,7 @@ public class AddMenu extends AppCompatActivity {
                                         productDetailsModel.setPrice(price);
                                         productDetailsModel.setDescription(description);
                                         productDetailsModel.setImageURL(o.toString());
+                                        productDetailsModel.setOutOfStock(false);
                                         productDetailsModel.setImageUrlSmall(thumbnails.GenerateSmall(o.toString()));
                                         productDetailsModel.setImageUrlMedium(thumbnails.GenerateMedium(o.toString()));
                                         productDetailsModel.setImageUrlBig(thumbnails.GenerateBig(o.toString()));

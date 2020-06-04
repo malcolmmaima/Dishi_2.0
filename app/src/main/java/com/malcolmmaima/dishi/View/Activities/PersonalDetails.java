@@ -64,6 +64,7 @@ public class PersonalDetails extends AppCompatActivity {
     private Button saveDetails;
     private String [] profilePicActions = {"Open Gallery","Open Camera", "View Photo"};
     ProgressDialog progressDialog;
+    UserModel myDetails;
 
     /**
      * Firebase
@@ -162,37 +163,37 @@ public class PersonalDetails extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         try {
-                            UserModel user = dataSnapshot.getValue(UserModel.class);
+                            myDetails = dataSnapshot.getValue(UserModel.class);
 
-                            if(user.getProfilePicBig() != null){
-                                imageURL = user.getProfilePicBig();
+                            if(myDetails.getProfilePicBig() != null){
+                                imageURL = myDetails.getProfilePicBig();
                             }
                             else {
-                                imageURL = user.getProfilePic();
+                                imageURL = myDetails.getProfilePic();
                             }
 
-                            email = user.getEmail();
-                            firstname = user.getFirstname();
-                            lastname = user.getLastname();
-                            bio = user.getBio();
+                            email = myDetails.getEmail();
+                            firstname = myDetails.getFirstname();
+                            lastname = myDetails.getLastname();
+                            bio = myDetails.getBio();
 
                             //Set username on drawer header
-                            mEmail.setText(""+user.getEmail());
-                            mFirstName.setText(""+user.getFirstname());
-                            mLastName.setText(""+user.getLastname());
-                            mBio.setText(""+user.getBio());
+                            mEmail.setText(""+myDetails.getEmail());
+                            mFirstName.setText(""+myDetails.getFirstname());
+                            mLastName.setText(""+myDetails.getLastname());
+                            mBio.setText(""+myDetails.getBio());
                             mPhone.setText(myPhone);
 
                             //set resized image
-                            if(user.getProfilePicSmall() != null){
-                                Picasso.with(PersonalDetails.this).load(user.getProfilePicSmall()).fit().centerCrop()
+                            if(myDetails.getProfilePicSmall() != null){
+                                Picasso.with(PersonalDetails.this).load(myDetails.getProfilePicSmall()).fit().centerCrop()
                                         .placeholder(R.drawable.default_profile)
                                         .error(R.drawable.default_profile)
                                         .into(profilePic);
                             }
 
                             else { //resized doesn't exist, set original unresized image
-                                Picasso.with(PersonalDetails.this).load(user.getProfilePic()).fit().centerCrop()
+                                Picasso.with(PersonalDetails.this).load(myDetails.getProfilePic()).fit().centerCrop()
                                         .placeholder(R.drawable.default_profile)
                                         .error(R.drawable.default_profile)
                                         .into(profilePic);
@@ -354,6 +355,7 @@ public class PersonalDetails extends AppCompatActivity {
                         mFirstName.setEnabled(true);
                         mLastName.setEnabled(true);
                         mBio.setEnabled(true);
+                        profilePic.setEnabled(true);
                     }
 
                     if(saveDetails.getTag().equals("save")){
@@ -362,6 +364,7 @@ public class PersonalDetails extends AppCompatActivity {
                         mFirstName.setEnabled(false);
                         mLastName.setEnabled(false);
                         mBio.setEnabled(false);
+                        profilePic.setEnabled(false);
 
                         progressDialog.setMessage("Saving...");
                         progressDialog.setCancelable(false);
@@ -383,6 +386,7 @@ public class PersonalDetails extends AppCompatActivity {
                                 mFirstName.setEnabled(false);
                                 mLastName.setEnabled(false);
                                 mBio.setEnabled(false);
+                                profilePic.setEnabled(false);
 
                                 Snackbar snackbar = Snackbar
                                         .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
@@ -486,6 +490,20 @@ public class PersonalDetails extends AppCompatActivity {
 
                                 @Override
                                 public void onSuccess(Object o) {
+                                    //Delete previous images from storage
+                                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                                    StorageReference storageRefOriginal = storage.getReferenceFromUrl(myDetails.getProfilePic());
+                                    StorageReference storageImgBig = storage.getReferenceFromUrl(myDetails.getProfilePicBig());
+                                    StorageReference storageImgMedium = storage.getReferenceFromUrl(myDetails.getProfilePicMedium());
+                                    StorageReference storageImgSmall = storage.getReferenceFromUrl(myDetails.getProfilePicSmall());
+
+
+                                    //Delete images from storage
+                                    storageRefOriginal.delete();
+                                    storageImgBig.delete();
+                                    storageImgMedium.delete();
+                                    storageImgSmall.delete();
+
                                     GenerateThumbnails thumbnails = new GenerateThumbnails();
                                     myRef.child("profilePicSmall").setValue(thumbnails.GenerateSmall(o.toString()));
                                     myRef.child("profilePicMedium").setValue(thumbnails.GenerateMedium(o.toString()));
@@ -591,6 +609,9 @@ public class PersonalDetails extends AppCompatActivity {
         //Phone Number
         mPhone.setFocusable(false);
         mPhone.setEnabled(false);
+
+        //profilepic
+        profilePic.setEnabled(false);
 
         //Button
         saveDetails.setEnabled(true);
