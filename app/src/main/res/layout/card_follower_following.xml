@@ -45,7 +45,7 @@
             android:text="User Name"
             android:id="@+id/username"
             android:layout_centerVertical="true"
-            android:layout_marginRight="110dp"
+            android:layout_marginRight="140dp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/profilePic"/>
 
@@ -54,16 +54,16 @@
             android:gravity="center"
             android:layout_centerInParent="true"
             android:id="@+id/followUnfollow"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_margin="10dp"
             android:layout_height="30dp"
-            android:background="@drawable/login_button"
-            android:fontFamily="sans-serif-medium"
+            style="@style/Widget.MaterialComponents.Button.Icon"
             android:text="follow"
             android:elevation="8dp"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorBackroundWhite"
-            android:textStyle="bold" />
+            android:textColor="@color/pureWhite"
+            android:textStyle="bold"
+            android:textSize="15sp"/>
 
     </RelativeLayout>
     <RelativeLayout

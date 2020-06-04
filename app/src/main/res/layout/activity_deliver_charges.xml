@@ -117,7 +117,8 @@
                     android:textColor="@color/colorBackroundWhite"
                     android:id="@+id/saveDetails"
                     android:padding="12dp"
-                    android:background="@drawable/login_button"
+                    android:textSize="15sp"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
                     />
             </LinearLayout>
 

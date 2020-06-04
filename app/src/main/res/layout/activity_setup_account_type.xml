@@ -187,7 +187,8 @@
         android:textColor="@color/colorBackroundWhite"
         android:id="@+id/btn_logout"
         android:padding="12dp"
-        android:background="@drawable/login_button"
+        android:textSize="15sp"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         />
     </LinearLayout>
 </RelativeLayout>

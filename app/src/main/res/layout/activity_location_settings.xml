@@ -152,12 +152,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/login_button"
+                android:textSize="15sp"
+                style="@style/Widget.MaterialComponents.Button.Icon"
                 android:fontFamily="sans-serif-medium"
                 android:text="SET LOCATION"
                 android:elevation="8dp"
                 android:layout_gravity="center_horizontal"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:textColor="@color/colorBackroundWhite"
                 android:textStyle="bold" />
 

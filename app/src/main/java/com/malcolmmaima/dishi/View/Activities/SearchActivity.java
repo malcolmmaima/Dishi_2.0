@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.LocationManager;
@@ -13,10 +14,14 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -229,6 +234,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             } catch (Exception e){
                 Log.e(TAG, "onCreate: ", e);
             }
+
             searchWord.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -247,10 +253,26 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                 }
             });
 
+            searchWord.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        searchWord.clearFocus();
+                        hideKeyboard(SearchActivity.this);
+                        word = searchWord.getText().toString().trim();
+                        searchDB(word);
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
             btnSearch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    word = searchWord.getText().toString();
+                    searchWord.clearFocus();
+                    hideKeyboard(SearchActivity.this);
+                    word = searchWord.getText().toString().trim();
                     searchDB(word);
                 }
             });
@@ -318,6 +340,18 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
     public String getSearchValue() {
         return searchWord.getText().toString().trim();
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        //https://stackoverflow.com/questions/1109022/close-hide-android-soft-keyboard
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void setupViewPager(ViewPager viewPager, String searchString)

@@ -77,7 +77,11 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                try {
+                    liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                } catch (Exception e){
+                    //Log.e(TAG, "onDataChange: ", e);
+                }
                 //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
