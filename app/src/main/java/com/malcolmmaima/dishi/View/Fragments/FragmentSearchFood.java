@@ -201,19 +201,22 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                             product.accountType = myDetails.getAccount_type();
 
                                                             if(foods.size() < searchCap){
-                                                                //Don't show my menu items in the search
-                                                                if (!myPhone.equals(product.getOwner())) {
-                                                                    if (product.getName().toLowerCase().contains(searchValue.toLowerCase())) {
-                                                                        foods.add(product);
-                                                                    } else if (searchValue.toLowerCase().contains(product.getName().toLowerCase())) {
-                                                                        foods.add(product);
-                                                                    }
-                                                                    //search if word is equal to user name object
-                                                                    else if (searchValue.toLowerCase() == product.getName().toLowerCase()) {
-                                                                        foods.add(product);
-                                                                    } else if (product.getName().toLowerCase().equals(searchValue.toLowerCase())) {
-                                                                        foods.add(product);
-                                                                    }
+//                                                                //Don't show my menu items in the search
+//                                                                if (!myPhone.equals(product.getOwner())) {
+//                                                                    //simply move the below code here
+//                                                                }
+
+                                                                String searchParams = product.getName()+" "+product.getDescription();
+                                                                if (searchParams.toLowerCase().contains(searchValue.toLowerCase())) {
+                                                                    foods.add(product);
+                                                                } else if (searchValue.toLowerCase().contains(product.getName().toLowerCase())) {
+                                                                    foods.add(product);
+                                                                }
+                                                                //search if word is equal to user name object
+                                                                else if (searchValue.toLowerCase() == searchParams) {
+                                                                    foods.add(product);
+                                                                } else if (searchParams.toLowerCase().equals(searchValue.toLowerCase())) {
+                                                                    foods.add(product);
                                                                 }
                                                             }
                                                         }
@@ -278,20 +281,22 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
 
                                                             if(foods.size() < searchCap){
                                                                 //Don't show my menu items in the search
-                                                                if(!myPhone.equals(product.getOwner())){
-                                                                    if (product.getName().toLowerCase().contains(searchValue.toLowerCase())) {
-                                                                        foods.add(product);
-                                                                    }
-                                                                    else if(searchValue.toLowerCase().contains(product.getName().toLowerCase())){
-                                                                        foods.add(product);
-                                                                    }
-                                                                    //search if word is equal to user name object
-                                                                    else if(searchValue.toLowerCase() == product.getName().toLowerCase()){
-                                                                        foods.add(product);
-                                                                    }
-                                                                    else if(product.getName().toLowerCase().equals(searchValue.toLowerCase())) {
-                                                                        foods.add(product);
-                                                                    }
+//                                                                if(!myPhone.equals(product.getOwner())){
+//
+//                                                                }
+                                                                String searchParams = product.getName()+" "+product.getDescription();
+                                                                if (searchParams.toLowerCase().contains(searchValue.toLowerCase())) {
+                                                                    foods.add(product);
+                                                                }
+                                                                else if(searchValue.toLowerCase().contains(searchParams.toLowerCase())){
+                                                                    foods.add(product);
+                                                                }
+                                                                //search if word is equal to user name object
+                                                                else if(searchValue.toLowerCase() == searchParams.toLowerCase()){
+                                                                    foods.add(product);
+                                                                }
+                                                                else if(searchParams.toLowerCase().equals(searchValue.toLowerCase())) {
+                                                                    foods.add(product);
                                                                 }
                                                             }
 

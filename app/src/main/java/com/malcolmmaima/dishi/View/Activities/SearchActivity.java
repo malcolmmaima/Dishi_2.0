@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -66,6 +67,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     private FirebaseAuth mAuth;
     DatabaseReference databaseReference, myUserDetails, myRef;
     FirebaseUser user;
+    Button btnSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +177,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             }
 
             searchWord = findViewById(R.id.edtSearch);
+            btnSearch = findViewById(R.id.btnSearch);
 
             Toolbar topToolBar = findViewById(R.id.toolbar);
             setSupportActionBar(topToolBar);
@@ -239,7 +242,15 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    word = editable.toString().trim();
+//                    word = editable.toString().trim();
+//                    searchDB(word);
+                }
+            });
+
+            btnSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    word = searchWord.getText().toString();
                     searchDB(word);
                 }
             });

@@ -67,7 +67,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
     Context context;
     List<StatusUpdateModel> listdata;
-    long DURATION = 200;
+    long DURATION = 250;
     String TAG = "NewsFeedAdapter";
     int index;
     String stringToBeInserted;

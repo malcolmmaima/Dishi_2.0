@@ -68,7 +68,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
 
     Context context;
     List<StatusUpdateModel> listdata;
-    long DURATION = 200;
+    long DURATION = 250;
     String TAG = "StatusAdapter";
     HashTagHelper mTextHashTagHelper;
     int mode = 0;
