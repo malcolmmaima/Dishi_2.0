@@ -33,6 +33,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
@@ -553,6 +555,22 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
                                         //set three option buttons
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
+
+                                                //delete image from storage if exists in post
+                                                if(statusUpdateModel.getImageShare() != null){
+                                                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                    StorageReference storageRefOriginal = storage.getReferenceFromUrl(statusUpdateModel.getImageShare());
+                                                    StorageReference storageImgBig = storage.getReferenceFromUrl(statusUpdateModel.getImageShareBig());
+                                                    StorageReference storageImgMedium = storage.getReferenceFromUrl(statusUpdateModel.getImageShareMedium());
+                                                    StorageReference storageImgSmall = storage.getReferenceFromUrl(statusUpdateModel.getImageShareSmall());
+
+                                                    //Delete images from storage
+                                                    storageRefOriginal.delete();
+                                                    storageImgBig.delete();
+                                                    storageImgMedium.delete();
+                                                    storageImgSmall.delete();
+                                                }
+
                                                 DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);
                                                 postDetails.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
