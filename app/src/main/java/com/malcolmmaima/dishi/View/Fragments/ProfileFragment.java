@@ -335,6 +335,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                         Intent slideactivity = new Intent(getContext(), SearchActivity.class)
                                                 .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                         slideactivity.putExtra("searchString", searchHashTag);
+                                        slideactivity.putExtra("goToFragment", 3);
                                         startActivity(slideactivity);
                                     }
                                 });

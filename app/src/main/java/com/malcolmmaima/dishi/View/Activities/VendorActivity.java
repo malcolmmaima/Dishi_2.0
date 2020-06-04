@@ -683,6 +683,7 @@ public class VendorActivity extends AppCompatActivity
             case R.id.search:
                 Intent searchActivity = new Intent(VendorActivity.this, SearchActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                searchActivity.putExtra("goToFragment", 3);
                 startActivity(searchActivity, bndlanimation);
                 return(true);
 

@@ -403,6 +403,7 @@ public class ViewProduct extends AppCompatActivity {
                                 Intent slideactivity = new Intent(ViewProduct.this, SearchActivity.class)
                                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                 slideactivity.putExtra("searchString", searchHashTag);
+                                slideactivity.putExtra("goToFragment", 1);
                                 startActivity(slideactivity);
                             }
                         });

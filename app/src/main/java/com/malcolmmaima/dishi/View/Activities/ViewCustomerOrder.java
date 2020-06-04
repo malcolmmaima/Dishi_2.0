@@ -583,6 +583,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                             Intent slideactivity = new Intent(ViewCustomerOrder.this, SearchActivity.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                             slideactivity.putExtra("searchString", searchHashTag);
+                                            slideactivity.putExtra("goToFragment", 1);
                                             startActivity(slideactivity);
                                         }
                                     });

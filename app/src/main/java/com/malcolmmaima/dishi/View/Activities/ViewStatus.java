@@ -476,6 +476,7 @@ public class ViewStatus extends AppCompatActivity implements SwipeRefreshLayout.
                                                 Intent slideactivity = new Intent(ViewStatus.this, SearchActivity.class)
                                                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                                 slideactivity.putExtra("searchString", searchHashTag);
+                                                slideactivity.putExtra("goToFragment", 3);
                                                 startActivity(slideactivity);
                                             }
                                         });

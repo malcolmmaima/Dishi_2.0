@@ -675,6 +675,7 @@ public class CustomerActivity extends AppCompatActivity
             case R.id.search:
                 Intent searchActivity = new Intent(CustomerActivity.this, SearchActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                searchActivity.putExtra("goToFragment", 3);
                 startActivity(searchActivity, bndlanimation);
                 return(true);
 

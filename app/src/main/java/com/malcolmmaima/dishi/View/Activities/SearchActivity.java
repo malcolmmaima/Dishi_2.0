@@ -79,7 +79,8 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         } else {
 
             checkGPS();
-            currentFrag = 0; //allows us to remain in the current fragment when we search
+
+            currentFrag = getIntent().getIntExtra("goToFragment", 0); //allows us to remain in the current fragment when we search
             //Hide keyboard on activity load
             this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -220,8 +221,8 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             try {
                 word = getIntent().getStringExtra("searchString");
                 searchWord.setText(word);
-                viewPager.setCurrentItem(3,false);
-                tabLayout.getTabAt(3).select();
+                viewPager.setCurrentItem(currentFrag,false);
+                tabLayout.getTabAt(currentFrag).select();
             } catch (Exception e){
                 Log.e(TAG, "onCreate: ", e);
             }

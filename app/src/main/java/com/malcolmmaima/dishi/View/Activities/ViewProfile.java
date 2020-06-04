@@ -581,6 +581,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                                             Intent slideactivity = new Intent(ViewProfile.this, SearchActivity.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                             slideactivity.putExtra("searchString", searchHashTag);
+                                            slideactivity.putExtra("goToFragment", 0);
                                             startActivity(slideactivity);
                                         }
                                     });

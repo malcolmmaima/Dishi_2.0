@@ -150,6 +150,7 @@ public class MyChatAdapter extends BaseAdapter {
                                 Intent slideactivity = new Intent(convertView.getContext(), SearchActivity.class)
                                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                 slideactivity.putExtra("searchString", searchHashTag);
+                                slideactivity.putExtra("goToFragment", 3);
                                 convertView.getContext().startActivity(slideactivity);
                             }
                         });

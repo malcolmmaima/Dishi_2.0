@@ -240,6 +240,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> 
                             Intent slideactivity = new Intent(context, SearchActivity.class)
                                     .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             slideactivity.putExtra("searchString", searchHashTag);
+                            slideactivity.putExtra("goToFragment", 3);
                             context.startActivity(slideactivity);
                         }
                     });

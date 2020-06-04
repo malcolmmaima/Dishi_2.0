@@ -106,6 +106,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
                             Intent slideactivity = new Intent(context, SearchActivity.class)
                                     .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             slideactivity.putExtra("searchString", searchHashTag);
+                            slideactivity.putExtra("goToFragment", 1);
                             context.startActivity(slideactivity);
                         }
                     });
