@@ -634,8 +634,7 @@ public class AddMenu extends AppCompatActivity {
                         snackbar.show();
 
                     }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
+                }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 // Write failed
@@ -736,12 +735,21 @@ public class AddMenu extends AppCompatActivity {
                         })
 
                         // On progress change upload time.
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        .addOnProgressListener(
+                        new OnProgressListener<UploadTask.TaskSnapshot>() {
+
+                            // Progress Listener for loading
+                            // percentage on the dialog box
                             @Override
-                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            public void onProgress(
+                                    UploadTask.TaskSnapshot taskSnapshot)
+                            {
+                                double progress
+                                        = (100.0
+                                        * taskSnapshot.getBytesTransferred()
+                                        / taskSnapshot.getTotalByteCount());
 
-                                // will implement progress bar later on
-
+                                progressDialog.setMessage("Adding ("+(int)progress+"%)");
                             }
                         });
             }
@@ -784,19 +792,18 @@ public class AddMenu extends AppCompatActivity {
                         snackbar.show();
 
                     }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                // Write failed
-                                progressDialog.dismiss();
-                                Snackbar snackbar = Snackbar
-                                        .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Write failed
+                        progressDialog.dismiss();
+                        Snackbar snackbar = Snackbar
+                                .make((RelativeLayout) findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
 
-                                snackbar.show();
-                                //SafeToast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
+                        snackbar.show();
+                        //SafeToast.makeText(AddMenu.this, "Failed: " + e.toString() + ". Try again!", Toast.LENGTH_LONG).show();
                             }
-                        });
+                });
 
                 productName.setText("");
                 productPrice.setText("");
@@ -905,14 +912,23 @@ public class AddMenu extends AppCompatActivity {
                         })
 
                         // On progress change upload time.
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        .addOnProgressListener(
+                                new OnProgressListener<UploadTask.TaskSnapshot>() {
 
-                                // will implement progress bar later on
+                                    // Progress Listener for loading
+                                    // percentage on the dialog box
+                                    @Override
+                                    public void onProgress(
+                                            UploadTask.TaskSnapshot taskSnapshot)
+                                    {
+                                        double progress
+                                                = (100.0
+                                                * taskSnapshot.getBytesTransferred()
+                                                / taskSnapshot.getTotalByteCount());
 
-                            }
-                        });
+                                        progressDialog.setMessage("Adding ("+(int)progress+"%)");
+                                    }
+                                });
             }
 
         }
