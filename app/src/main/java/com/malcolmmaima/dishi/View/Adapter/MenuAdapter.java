@@ -22,12 +22,15 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
@@ -280,17 +283,48 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
                             //set three option buttons
                             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    String key = listdata.remove(getAdapterPosition()).getKey();
+                                    String key = listdata.get(getAdapterPosition()).getKey();
 
-                                    menuRef.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            try {
-                                                notifyItemRemoved(getAdapterPosition());
-                                                Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
-                                            } catch (Exception e){}
-                                        }
-                                    });
+                                    try {
+
+                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageURL());
+                                        StorageReference storageImgBig = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlBig());
+                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlMedium());
+                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlSmall());
+
+
+                                        //Delete images from storage
+                                        storageImgBig.delete();
+                                        storageImgMedium.delete();
+                                        storageImgSmall.delete();
+                                        storageRefOriginal.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // File deleted successfully
+                                                menuRef.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        try {
+                                                            listdata.remove(getAdapterPosition());
+                                                            notifyItemRemoved(getAdapterPosition());
+                                                            Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
+                                                        } catch (Exception e) {
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                // Uh-oh, an error occurred!
+                                                Log.e(TAG, "onFailure: " + exception);
+                                            }
+                                        });
+
+                                    } catch (Exception e){
+                                        Log.e(TAG, "onClick: ", e);
+                                    }
 
                                 }
                             })//setPositiveButton
