@@ -33,7 +33,6 @@ import com.malcolmmaima.dishi.R;
 
 import com.malcolmmaima.dishi.Controller.Utils.PreferenceManager;
 
-import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class SplashActivity extends AppCompatActivity {
@@ -48,10 +47,14 @@ public class SplashActivity extends AppCompatActivity {
         /**
          * onStart check to see if ForegroundService is already running, if not then start
          */
-        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+        try {
+            Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
 
-        if(serviceRunning != true){
-            startNotificationService();
+            if (serviceRunning != true) {
+                startNotificationService();
+            }
+        } catch (Exception e){
+
         }
 
     }
@@ -60,10 +63,14 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+        try {
+            Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
 
-        if(serviceRunning != true){
-            startNotificationService();
+            if (serviceRunning != true) {
+                startNotificationService();
+            }
+        } catch (Exception e){
+
         }
 
         loadSplash();
@@ -76,12 +83,13 @@ public class SplashActivity extends AppCompatActivity {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-        Fabric.with(this, new Crashlytics());
+        //Fabric.with(this, new Crashlytics());
 
 
         // Checking for first time launch
         PreferenceManager prefManager = new PreferenceManager(this);
         if (!prefManager.isFirstTimeLaunch()) {
+
             if (mAuth.getInstance().getCurrentUser() == null || mAuth.getInstance().getCurrentUser().getPhoneNumber() == null) {
                 progressBar.setVisibility(View.GONE);
                 //User is not signed in, send them back to verification page

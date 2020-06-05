@@ -1203,10 +1203,14 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
          * Add or subtract price of selected/unselected product
          */
         if(isChecked){
-            total[0] = total[0] + adapterTotal;
-            totalAmount = Double.valueOf(total[0] + deliveryCharge);
-            subTotal.setText("Ksh " + total[0]);
-            totalBill.setText("Ksh " + totalAmount);
+            try {
+                total[0] = total[0] + adapterTotal;
+                totalAmount = Double.valueOf(total[0] + deliveryCharge);
+                subTotal.setText("Ksh " + total[0]);
+                totalBill.setText("Ksh " + totalAmount);
+            } catch (Exception e){
+
+            }
 
             if(confirmOrder.getTag().toString().equals("end")){
                 confirmOrder.setTag("confirm");

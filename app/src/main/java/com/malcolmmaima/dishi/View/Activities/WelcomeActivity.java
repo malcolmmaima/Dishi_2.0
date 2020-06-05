@@ -1,5 +1,6 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,9 +16,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
 import com.malcolmmaima.dishi.Controller.Utils.PreferenceManager;
 import com.malcolmmaima.dishi.R;
 
@@ -33,6 +36,19 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /**
+         * onStart check to see if ForegroundService is already running, if not then start
+         */
+        try {
+            Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+            if (serviceRunning != true) {
+                startNotificationService();
+            }
+        } catch (Exception e){
+
+        }
 
         // Checking for first time launch - before calling setContentView()
         prefManager = new PreferenceManager(this);
@@ -91,6 +107,28 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void startNotificationService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        serviceIntent.putExtra("title", "Dishi");
+        serviceIntent.putExtra("message", "Welcome to Dishi");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            ContextCompat.startForegroundService(this, serviceIntent);
+
+        }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void addBottomDots(int currentPage) {

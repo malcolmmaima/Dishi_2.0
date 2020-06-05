@@ -90,10 +90,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         /**
          * onStart check to see if ForegroundService is already running, if not then start
          */
-        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
 
-        if(serviceRunning != true){
-            startNotificationService();
+        try {
+            Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+
+            if (serviceRunning != true) {
+                startNotificationService();
+            }
+        } catch(Exception e){
+
         }
 
     }
@@ -113,10 +118,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getSupportActionBar().setTitle("Dishi");
-        Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
+        try {
+            Boolean serviceRunning = isMyServiceRunning(ForegroundService.class);
 
-        if(serviceRunning != true){
-            startNotificationService();
+            if (serviceRunning != true) {
+                startNotificationService();
+            }
+        } catch (Exception e){
+
         }
 
         DeviceName.init(this);
@@ -126,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         progressDialog = new ProgressDialog(MainActivity.this);
 
         checkConnection();
+
+        mAuth = FirebaseAuth.getInstance();
 
         if(mAuth.getInstance().getCurrentUser() != null){
 
@@ -152,8 +163,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Apply the adapter to the spinner
         countryCode.setAdapter(adapter);
         countryCode.setOnItemSelectedListener(MainActivity.this);
-
-        mAuth = FirebaseAuth.getInstance();
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 

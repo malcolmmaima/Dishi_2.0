@@ -190,8 +190,13 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                try {
+                    liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                    //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+
+                } catch (Exception e){
+
+                }
             }
 
             @Override
@@ -237,196 +242,196 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                     userData.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            final UserModel user = dataSnapshot.getValue(UserModel.class);
-//                            SafeToast.makeText(getContext(), "Name: " + user.getFirstname()
-//                                    + "\nliveStatus: " + user.getLiveStatus()
-//                                    + "\nlocationType: " + user.getLocationType(), Toast.LENGTH_SHORT).show();
+                            if(dataSnapshot.exists()){
+                                final UserModel user = dataSnapshot.getValue(UserModel.class);
 
-                            /**
-                             * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
-                             */
+                                /**
+                                 * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
+                                 */
 
-                            try {
-                                if (user.getLiveStatus() == true) {
+                                try {
+                                    if (user.getLiveStatus() == true) {
 
-                                    /**
-                                     * Now check "locationType" so as to decide which location node to fetch, live or static
-                                     */
-                                    if (user.getLocationType().equals("default")) {
-                                        //if location type is default then fetch static location
-                                        DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey() + "/my_location");
+                                        /**
+                                         * Now check "locationType" so as to decide which location node to fetch, live or static
+                                         */
+                                        if (user.getLocationType().equals("default")) {
+                                            //if location type is default then fetch static location
+                                            DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey() + "/my_location");
 
-                                        defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                try {
-                                                    StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
+                                                    try {
+                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
 
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                                    Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                            liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
+                                                        /**
+                                                         * Now lets compute distance of each restaurant with customer location
+                                                         */
+                                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                    /**
-                                                     * if distance meets parameters set fetch menu
-                                                     */
+                                                        /**
+                                                         * if distance meets parameters set fetch menu
+                                                         */
 
-                                                    if (dist < location_filter) {
-                                                        //Fetch menu items of restaurants that have passed distance parameter
+                                                        if (dist < location_filter) {
+                                                            //Fetch menu items of restaurants that have passed distance parameter
 
-                                                        for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
-                                                            product.setKey(menu.getKey());
-                                                            product.setDistance(dist);
-                                                            product.accountType = "1"; //This fragment belongs to account type 1 (customer)
+                                                            for (DataSnapshot menu : restaurants.getChildren()) {
+                                                                //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                                ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
+                                                                product.setKey(menu.getKey());
+                                                                product.setDistance(dist);
+                                                                product.accountType = "1"; //This fragment belongs to account type 1 (customer)
 
-                                                            if(list.size() < 120){ //put a cap of 100 items
-                                                                list.add(product);
+                                                                if(list.size() < 120){ //put a cap of 100 items
+                                                                    list.add(product);
+                                                                }
                                                             }
                                                         }
+
+                                                        if (!list.isEmpty()) {
+                                                            /**
+                                                             * https://howtodoinjava.com/sort/collections-sort/
+                                                             * We want to sort from nearest to furthest location
+                                                             */
+                                                            Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                            //Collections.reverse(list);
+                                                            ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                            recyclerview.setLayoutManager(layoutmanager);
+                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                            recycler.notifyDataSetChanged();
+                                                            recyclerview.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.INVISIBLE);
+                                                            icon.setVisibility(View.INVISIBLE);
+                                                        } else {
+
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+
+                                                            ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                            recyclerview.setLayoutManager(layoutmanager);
+                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                            recyclerview.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.VISIBLE);
+                                                            icon.setVisibility(View.VISIBLE);
+
+                                                        }
+                                                    } catch (Exception e){
+                                                        Log.e("FragmentFood", "onDataChange: ", e);
                                                     }
 
-                                                    if (!list.isEmpty()) {
-                                                        /**
-                                                         * https://howtodoinjava.com/sort/collections-sort/
-                                                         * We want to sort from nearest to furthest location
-                                                         */
-                                                        Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-                                                        //Collections.reverse(list);
-                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recycler.notifyDataSetChanged();
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.INVISIBLE);
-                                                        icon.setVisibility(View.INVISIBLE);
-                                                    } else {
-
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-
-                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.VISIBLE);
-                                                        icon.setVisibility(View.VISIBLE);
-
-                                                    }
-                                                } catch (Exception e){
-                                                    Log.e("FragmentFood", "onDataChange: ", e);
                                                 }
 
-                                            }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                }
+                                            });
+                                        }
+                                        /**
+                                         * If location type is live then track restaurant live location instead of static location
+                                         */
+                                        else if (user.getLocationType().equals("live")) {
+                                            DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurants.getKey());
 
-                                            }
-                                        });
-                                    }
-                                    /**
-                                     * If location type is live then track restaurant live location instead of static location
-                                     */
-                                    else if (user.getLocationType().equals("live")) {
-                                        DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurants.getKey());
-
-                                        restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
+                                            restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
 //                                            SafeToast.makeText(getContext(), restaurants.getKey() + ": "
 //                                                    + restLiveLoc.getLatitude() + ","
 //                                                    + restLiveLoc.getLongitude(), Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * Now lets compute distance of each restaurant with customer location
-                                                 */
-                                                try {
-                                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                                    Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                            liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
-
-                                                    //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
                                                     /**
-                                                     * if distance meets parameters set then fetch menu
+                                                     * Now lets compute distance of each restaurant with customer location
                                                      */
+                                                    try {
+                                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                    if (dist < location_filter) {
-                                                        //Fetch menu items of restaurants that have passed distance parameter
+                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
-                                                        for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
-                                                            ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
-                                                            product.setKey(menu.getKey());
-                                                            product.setDistance(dist);
-                                                            product.accountType = "1"; //this fragment belongs to account type 1
-                                                            if(list.size() < 120){
-                                                                list.add(product);
+                                                        /**
+                                                         * if distance meets parameters set then fetch menu
+                                                         */
+
+                                                        if (dist < location_filter) {
+                                                            //Fetch menu items of restaurants that have passed distance parameter
+
+                                                            for (DataSnapshot menu : restaurants.getChildren()) {
+                                                                //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                                ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
+                                                                product.setKey(menu.getKey());
+                                                                product.setDistance(dist);
+                                                                product.accountType = "1"; //this fragment belongs to account type 1
+                                                                if(list.size() < 120){
+                                                                    list.add(product);
+                                                                }
                                                             }
                                                         }
+
+                                                        if (!list.isEmpty()) {
+                                                            /**
+                                                             * https://howtodoinjava.com/sort/collections-sort/
+                                                             * We want to sort from nearest to furthest location
+                                                             */
+                                                            Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                            //Collections.reverse(list);
+                                                            ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                            recyclerview.setLayoutManager(layoutmanager);
+                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                            recycler.notifyDataSetChanged();
+                                                            recyclerview.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.INVISIBLE);
+                                                            icon.setVisibility(View.INVISIBLE);
+                                                        } else {
+
+                                                            mSwipeRefreshLayout.setRefreshing(false);
+
+                                                            ProductAdapter recycler = new ProductAdapter(getContext(), list);
+                                                            recyclerview.setLayoutManager(layoutmanager);
+                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                            recyclerview.setAdapter(recycler);
+                                                            emptyTag.setVisibility(View.VISIBLE);
+                                                            icon.setVisibility(View.VISIBLE);
+
+                                                        }
+                                                    } catch (Exception e){
+
                                                     }
 
-                                                    if (!list.isEmpty()) {
-                                                        /**
-                                                         * https://howtodoinjava.com/sort/collections-sort/
-                                                         * We want to sort from nearest to furthest location
-                                                         */
-                                                        Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-                                                        //Collections.reverse(list);
-                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recycler.notifyDataSetChanged();
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.INVISIBLE);
-                                                        icon.setVisibility(View.INVISIBLE);
-                                                    } else {
-
-                                                        mSwipeRefreshLayout.setRefreshing(false);
-
-                                                        ProductAdapter recycler = new ProductAdapter(getContext(), list);
-                                                        recyclerview.setLayoutManager(layoutmanager);
-                                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                        recyclerview.setAdapter(recycler);
-                                                        emptyTag.setVisibility(View.VISIBLE);
-                                                        icon.setVisibility(View.VISIBLE);
-
-                                                    }
-                                                } catch (Exception e){
 
                                                 }
 
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                            }
+                                                }
+                                            });
+                                        }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
+                                        /**
+                                         * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
+                                         * and "live" which tracks the restaurant's live location under "location/phone"
+                                         */
+                                        else {
+                                            SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                        }
                                     }
 
-                                    /**
-                                     * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
-                                     * and "live" which tracks the restaurant's live location under "location/phone"
-                                     */
-                                    else {
-                                        SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
-                                    }
+                                } catch (Exception e){
+
                                 }
-
-                            } catch (Exception e){
-
                             }
+
                         }
 
                         @Override
