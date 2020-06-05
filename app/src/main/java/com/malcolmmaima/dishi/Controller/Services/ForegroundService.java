@@ -2009,8 +2009,11 @@ public class ForegroundService extends Service {
         String receiptID = newReceipt.getOrderID();
         if (receiptID.length() > 3) {
             temp = receiptID.substring(receiptID.length() - 2); //We'll use this as the notification's unique ID
+            if(temp.equals(1)){
+                temp = String.valueOf(new Random().nextInt());
+            }
         }
-        int notifId = Integer.parseInt(temp); //new Random().nextInt();
+        int notifId = Integer.parseInt(temp);
 
         Class targetActivity = ReceiptActivity.class;
         Notification.Builder builder = null;

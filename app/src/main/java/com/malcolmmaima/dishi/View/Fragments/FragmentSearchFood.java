@@ -80,8 +80,11 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                try {
+                    liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                } catch (Exception e){
+
+                }
             }
 
             @Override
@@ -96,8 +99,12 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
         myUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                myDetails = dataSnapshot.getValue(UserModel.class);
-                myDetails.setPhone(dataSnapshot.getKey());
+                try {
+                    myDetails = dataSnapshot.getValue(UserModel.class);
+                    myDetails.setPhone(dataSnapshot.getKey());
+                } catch (Exception e){
+
+                }
             }
 
             @Override

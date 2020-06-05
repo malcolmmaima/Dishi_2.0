@@ -167,134 +167,139 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                     customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
-                            address = dataSnapshot.child("address").getValue(String.class);
-                            initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
-                            orderID = dataSnapshot.child("orderID").getValue(String.class);
+                            try {
+                                paymentMethod = dataSnapshot.child("paymentMethod").getValue(String.class);
+                                address = dataSnapshot.child("address").getValue(String.class);
+                                initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+                                orderID = dataSnapshot.child("orderID").getValue(String.class);
 
-                            String message = "Order has been delivered?";
-                            if(address.equals("pick")){
-                                message = "Have you picked your order?";
-                            } else {
-                                message = "Order has been delivered?";
-                            }
-                            final AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
-                                    .setMessage(message)
-                                    //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
-                                    .setCancelable(false)
-                                    //set three option buttons
-                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                            DatabaseReference riderReceiptRef = FirebaseDatabase.getInstance().getReference("receipts/"+riderPhone);
-                                            DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+restaurantPhone);
-                                            DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/"+myPhone);
-                                            ReceiptModel receipt = new ReceiptModel();
-                                            String nodeKey = receiptsRef.push().getKey();
-                                            GetCurrentDate currentDate = new GetCurrentDate();
-                                            customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    for (DataSnapshot items : dataSnapshot.child("items").getChildren()) {
-                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                        //prod.setKey(items.getKey());
+                                String message = "Order has been delivered?";
+                                if (address.equals("pick")) {
+                                    message = "Have you picked your order?";
+                                } else {
+                                    message = "Order has been delivered?";
+                                }
+                                final AlertDialog finish = new AlertDialog.Builder(GeoTracking.this)
+                                        .setMessage(message)
+                                        //.setIcon(R.drawable.ic_done_black_48dp) //will replace icon with name of existing icon from project
+                                        .setCancelable(false)
+                                        //set three option buttons
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                DatabaseReference riderReceiptRef = FirebaseDatabase.getInstance().getReference("receipts/" + riderPhone);
+                                                DatabaseReference vendorReceiptsRef = FirebaseDatabase.getInstance().getReference("receipts/" + restaurantPhone);
+                                                DatabaseReference receiptsRef = FirebaseDatabase.getInstance().getReference("receipts/" + myPhone);
+                                                ReceiptModel receipt = new ReceiptModel();
+                                                String nodeKey = receiptsRef.push().getKey();
+                                                GetCurrentDate currentDate = new GetCurrentDate();
+                                                customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for (DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+                                                            ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                            //prod.setKey(items.getKey());
 
-                                                        if(prod.getConfirmed() == true){
+                                                            if (prod.getConfirmed() == true) {
 
-                                                            if(riderPhone != null){
-                                                                riderReceiptRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
+                                                                if (riderPhone != null) {
+                                                                    riderReceiptRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
+                                                                }
+                                                                receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
+                                                                vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
                                                             }
-                                                            receiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
-                                                            vendorReceiptsRef.child(nodeKey).child("items").child(items.getKey()).setValue(prod);
                                                         }
                                                     }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
+                                                receipt.setDeliveredOn(currentDate.getDate());
+                                                receipt.setInitiatedOn(initiatedTime);
+                                                receipt.setOrderID(orderID);
+                                                receipt.setPaymentMethod(paymentMethod);
+                                                receipt.setRestaurant(restaurantPhone);
+                                                receipt.setCustomer(myPhone);
+                                                receipt.setSeen(false);
+
+                                                if (riderPhone != null) {
+                                                    riderReceiptRef.child(nodeKey).setValue(receipt);
                                                 }
+                                                vendorReceiptsRef.child(nodeKey).setValue(receipt);
+                                                receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                for (final DataSnapshot items : dataSnapshot.child("items").getChildren()) {
+                                                                    try {
+                                                                        //We need to capture the rider phone before the node is removed. this will allow us to
+                                                                        //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
+                                                                        //which would mean in turn we are unable to update the rider status
+                                                                        tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
+                                                                    } catch (Exception e) {
+                                                                    }
+                                                                    try {
+                                                                        ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
+                                                                        prod.setKey(items.getKey());
 
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                        /**
+                                                                         * Move order items to history node
+                                                                         */
+                                                                        myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onSuccess(Void aVoid) {
 
-                                                }
-                                            });
+                                                                                        myOrders.child(restaurantPhone).removeValue();
+                                                                                        DatabaseReference rider = FirebaseDatabase.getInstance().getReference
+                                                                                                ("my_ride_requests/" + riderPhone + "/" + restaurantPhone + "/" + myPhone);
 
-                                            receipt.setDeliveredOn(currentDate.getDate());
-                                            receipt.setInitiatedOn(initiatedTime);
-                                            receipt.setOrderID(orderID);
-                                            receipt.setPaymentMethod(paymentMethod);
-                                            receipt.setRestaurant(restaurantPhone);
-                                            receipt.setCustomer(myPhone);
-                                            receipt.setSeen(false);
+                                                                                        rider.removeValue();
 
-                                            if(riderPhone != null){
-                                                riderReceiptRef.child(nodeKey).setValue(receipt);
-                                            }
-                                            vendorReceiptsRef.child(nodeKey).setValue(receipt);
-                                            receiptsRef.child(nodeKey).setValue(receipt).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    customerOrderItems.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            for(final DataSnapshot items : dataSnapshot.child("items").getChildren()){
-                                                                try {
-                                                                    //We need to capture the rider phone before the node is removed. this will allow us to
-                                                                    //update rider status below on deletion. noticed the rider phone was being deleted with the order complete
-                                                                    //which would mean in turn we are unable to update the rider status
-                                                                    tempRiderPhoneHolder[0] = dataSnapshot.child("rider").getValue(String.class);
-                                                                } catch (Exception e){}
-                                                                try {
-                                                                    ProductDetailsModel prod = items.getValue(ProductDetailsModel.class);
-                                                                    prod.setKey(items.getKey());
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        });
+                                                                    } catch (Exception e) {
 
-                                                                    /**
-                                                                     * Move order items to history node
-                                                                     */
-                                                                    myOrdersHistory.child(items.getKey()).setValue(prod).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            customerOrderItems.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                @Override
-                                                                                public void onSuccess(Void aVoid) {
-
-                                                                                    myOrders.child(restaurantPhone).removeValue();
-                                                                                    DatabaseReference rider = FirebaseDatabase.getInstance().getReference
-                                                                                            ("my_ride_requests/"+riderPhone+"/"+restaurantPhone+"/"+myPhone);
-
-                                                                                    rider.removeValue();
-
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    });
-                                                                } catch (Exception e){
-
+                                                                    }
                                                                 }
                                                             }
-                                                        }
 
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                        }
-                                                    });
-                                                }
-                                            });
+                                                            }
+                                                        });
+                                                    }
+                                                });
 
-                                        }
-                                    })//setPositiveButton
+                                            }
+                                        })//setPositiveButton
 
-                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
-                                    })
+                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        })
 
-                                    .create();
-                            finish.show();
+                                        .create();
+                                finish.show();
+                            } catch(Exception e){
+
+                            }
                         }
 
                         @Override
@@ -418,12 +423,16 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         restaurantLocationRefListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                restaurantLong = dataSnapshot.getValue(Double.class);
-                //SafeToast.makeText(GeoFireActivity.this, "nduthiLng: " + nduthiLat, Toast.LENGTH_LONG).show();
                 try {
-                    track();
+                    restaurantLong = dataSnapshot.getValue(Double.class);
+                    //SafeToast.makeText(GeoFireActivity.this, "nduthiLng: " + nduthiLat, Toast.LENGTH_LONG).show();
+                    try {
+                        track();
+                    } catch (Exception e) {
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
                 } catch (Exception e){
-                    Log.e(TAG, "onDataChange: ", e);
+
                 }
             }
 
@@ -596,59 +605,62 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                             riderLocationListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
-                                    riderLocation = location.getValue(LiveLocationModel.class);
+
+                                    try {
+                                        riderLocation = location.getValue(LiveLocationModel.class);
 //                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
-                                    /**
-                                     * Delivery location (Live or static)
-                                     */
+                                        /**
+                                         * Delivery location (Live or static)
+                                         */
 
-                                    deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
-                                    deliveryLocationListener = new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if(dataSnapshot.child("static_address").exists()){
-                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
+                                        deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/" + restaurantPhone + "/" + customerPhone);
+                                        deliveryLocationListener = new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.child("static_address").exists()) {
+                                                    staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
 //                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * Track order movement
-                                                 */
-                                                try {
-                                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
-                                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
-                                                            trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
-                                                } catch (Exception e){
+                                                    /**
+                                                     * Track order movement
+                                                     */
+                                                    try {
+                                                        trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
+                                                        animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
+                                                                trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                                    } catch (Exception e) {
 
-                                                }
-                                            }
-
-                                            else {
-                                                //myLat and myLong variables
+                                                    }
+                                                } else {
+                                                    //myLat and myLong variables
 //                                                SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * Track order movement
-                                                 */
-                                                try {
-                                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
-                                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
-                                                            trackOrderLatLng, loggedInUserLoc);
-                                                } catch (Exception e){
+                                                    /**
+                                                     * Track order movement
+                                                     */
+                                                    try {
+                                                        trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
+                                                        animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
+                                                                trackOrderLatLng, loggedInUserLoc);
+                                                    } catch (Exception e) {
 
+                                                    }
                                                 }
                                             }
-                                        }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                        }
-                                    };
-                                    deliveryLocationRef.addValueEventListener(deliveryLocationListener);
+                                            }
+                                        };
+                                        deliveryLocationRef.addValueEventListener(deliveryLocationListener);
+                                    } catch (Exception e){
+
+                                    }
 
                                 }
 
@@ -993,17 +1005,21 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
-                                                staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
+                                                try {
+                                                    staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
 //                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
-                                                /**
-                                                 * Track order movement
-                                                 */
-                                                try {
-                                                    trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
-                                                    animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
-                                                            trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                                    /**
+                                                     * Track order movement
+                                                     */
+                                                    try {
+                                                        trackOrderLatLng = new LatLng(riderLocation.getLatitude(), riderLocation.getLongitude());
+                                                        animateTracking(riderLocation.getLatitude(), riderLocation.getLongitude(),
+                                                                trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                                    } catch (Exception e) {
+
+                                                    }
                                                 } catch (Exception e){
 
                                                 }
@@ -1063,16 +1079,21 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      * Static address exists
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
-                                        staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-                                        //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
-                                        /**
-                                         * Track order movement
-                                         */
                                         try {
-                                            trackOrderLatLng = new LatLng(restaurantLat, restaurantLong);
-                                            animateTracking(restaurantLat, restaurantLong,
-                                                    trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                            staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
+                                            //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
+
+                                            /**
+                                             * Track order movement
+                                             */
+                                            try {
+                                                trackOrderLatLng = new LatLng(restaurantLat, restaurantLong);
+                                                animateTracking(restaurantLat, restaurantLong,
+                                                        trackOrderLatLng, new LatLng(staticDeliveryLocation.getLatitude(), staticDeliveryLocation.getLongitude()));
+                                            } catch (Exception e) {
+
+                                            }
                                         } catch (Exception e){
 
                                         }

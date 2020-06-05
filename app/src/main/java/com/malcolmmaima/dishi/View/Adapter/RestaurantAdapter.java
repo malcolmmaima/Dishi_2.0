@@ -117,14 +117,18 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
         myFavourites.child(restaurantDetails.getPhone()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String phone = dataSnapshot.getValue(String.class);
                 try {
-                    if (phone.equals("fav")) {
-                        holder.likeImageView.setTag(R.drawable.ic_liked);
-                        holder.likeImageView.setImageResource(R.drawable.ic_liked);
-                    } else {
-                        holder.likeImageView.setTag(R.drawable.ic_like);
-                        holder.likeImageView.setImageResource(R.drawable.ic_like);
+                    String phone = dataSnapshot.getValue(String.class);
+                    try {
+                        if (phone.equals("fav")) {
+                            holder.likeImageView.setTag(R.drawable.ic_liked);
+                            holder.likeImageView.setImageResource(R.drawable.ic_liked);
+                        } else {
+                            holder.likeImageView.setTag(R.drawable.ic_like);
+                            holder.likeImageView.setImageResource(R.drawable.ic_like);
+                        }
+                    } catch (Exception e) {
+
                     }
                 } catch (Exception e){
 

@@ -182,8 +182,11 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                try {
+                    liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                } catch (Exception e){
+
+                }
             }
 
             @Override
@@ -239,183 +242,184 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         userData.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                final UserModel user = dataSnapshot.getValue(UserModel.class);
-//                            SafeToast.makeText(getContext(), "Name: " + user.getFirstname()
-//                                    + "\nliveStatus: " + user.getLiveStatus()
-//                                    + "\nlocationType: " + user.getLocationType(), Toast.LENGTH_SHORT).show();
-
-                                /**
-                                 * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
-                                 */
-
                                 try {
-                                    if (user.getLiveStatus() == true) {
-                                        /**
-                                         * Now check "locationType" so as to decide which location node to fetch, live or static
-                                         */
-                                        if (user.getLocationType().equals("default")) {
+                                    final UserModel user = dataSnapshot.getValue(UserModel.class);
 
-                                            //if location type is default then fetch static location
-                                            DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + products.child("owner").getValue() + "/my_location");
+                                    /**
+                                     * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
+                                     */
 
-                                            defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        if (user.getLiveStatus() == true) {
+                                            /**
+                                             * Now check "locationType" so as to decide which location node to fetch, live or static
+                                             */
+                                            if (user.getLocationType().equals("default")) {
 
-                                                    try {
-                                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
+                                                //if location type is default then fetch static location
+                                                DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + products.child("owner").getValue() + "/my_location");
 
-                                                        /**
-                                                         * Now lets compute distance of each restaurant with customer location
-                                                         */
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                                liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
+                                                defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        try {
+                                                            StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
 
-                                                        ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
-                                                        //product.setKey(products.getKey());
-                                                        product.setDistance(dist);
-                                                        product.accountType = "1"; //This fragment belongs to account type 1 (customer)
-                                                        list.add(product);
-
-                                                        if (!list.isEmpty()) {
-                                                            clearAll.setVisibility(View.VISIBLE);
-                                                            clearAll.setText("CLEAR ALL (" + list.size() + ")");
                                                             /**
-                                                             * https://howtodoinjava.com/sort/collections-sort/
-                                                             * We want to sort from nearest to furthest location
+                                                             * Now lets compute distance of each restaurant with customer location
                                                              */
-                                                            //Sort by distance to restaurant offering the particular food item... from closest to furthest
-                                                            //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            mSwipeRefreshLayout.setRefreshing(false);
-                                                            //Collections.reverse(list); //Filter by order it appears in db.. collect then reverse
+                                                            CalculateDistance calculateDistance = new CalculateDistance();
+                                                            Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                    liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                            try {
-                                                                //filter by time ordered ... from most recent to oldest
-                                                                Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
-                                                            } catch (Exception e) {
+                                                            //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+
+                                                            ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
+                                                            //product.setKey(products.getKey());
+                                                            product.setDistance(dist);
+                                                            product.accountType = "1"; //This fragment belongs to account type 1 (customer)
+                                                            list.add(product);
+
+                                                            if (!list.isEmpty()) {
+                                                                clearAll.setVisibility(View.VISIBLE);
+                                                                clearAll.setText("CLEAR ALL (" + list.size() + ")");
+                                                                /**
+                                                                 * https://howtodoinjava.com/sort/collections-sort/
+                                                                 * We want to sort from nearest to furthest location
+                                                                 */
+                                                                //Sort by distance to restaurant offering the particular food item... from closest to furthest
+                                                                //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                                //Collections.reverse(list); //Filter by order it appears in db.. collect then reverse
+
+                                                                try {
+                                                                    //filter by time ordered ... from most recent to oldest
+                                                                    Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
+                                                                } catch (Exception e) {
+                                                                }
+                                                                ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
+                                                                recyclerview.setLayoutManager(layoutmanager);
+                                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                recycler.notifyDataSetChanged();
+                                                                recyclerview.setAdapter(recycler);
+                                                                emptyTag.setVisibility(View.INVISIBLE);
+                                                                icon.setVisibility(View.INVISIBLE);
+                                                            } else {
+
+                                                                clearAll.setVisibility(View.GONE);
+                                                                mSwipeRefreshLayout.setRefreshing(false);
+
+                                                                ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
+                                                                recyclerview.setLayoutManager(layoutmanager);
+                                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                recyclerview.setAdapter(recycler);
+                                                                emptyTag.setVisibility(View.VISIBLE);
+                                                                icon.setVisibility(View.VISIBLE);
+
                                                             }
-                                                            ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            recyclerview.setLayoutManager(layoutmanager);
-                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                            recycler.notifyDataSetChanged();
-                                                            recyclerview.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.INVISIBLE);
-                                                            icon.setVisibility(View.INVISIBLE);
-                                                        } else {
+                                                        } catch (Exception e) {
+                                                            Log.e("HistoryFragment", "onDataChange: ", e);
+                                                        }
 
-                                                            clearAll.setVisibility(View.GONE);
-                                                            mSwipeRefreshLayout.setRefreshing(false);
+                                                    }
 
-                                                            ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            recyclerview.setLayoutManager(layoutmanager);
-                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                            recyclerview.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.VISIBLE);
-                                                            icon.setVisibility(View.VISIBLE);
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                            /**
+                                             * If location type is live then track restaurant live location instead of static location
+                                             */
+                                            else if (user.getLocationType().equals("live")) {
+                                                DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + products.child("owner").getValue());
+
+                                                restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                        try {
+                                                            LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
+
+                                                            /**
+                                                             * Now lets compute distance of each restaurant with customer location
+                                                             */
+                                                            try {
+                                                                CalculateDistance calculateDistance = new CalculateDistance();
+                                                                Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
+                                                                        liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+
+                                                                ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
+                                                                //product.setKey(products.getKey());
+                                                                product.setDistance(dist);
+                                                                product.accountType = "1"; //this fragment belongs to account type 1
+                                                                list.add(product);
+
+                                                                if (!list.isEmpty()) {
+                                                                    clearAll.setVisibility(View.VISIBLE);
+                                                                    clearAll.setText("CLEAR ALL (" + list.size() + ")");
+                                                                    /**
+                                                                     * https://howtodoinjava.com/sort/collections-sort/
+                                                                     * We want to sort from nearest to furthest location
+                                                                     */
+                                                                    //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
+                                                                    mSwipeRefreshLayout.setRefreshing(false);
+                                                                    //Collections.reverse(list);
+
+                                                                    try {
+                                                                        Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
+                                                                    } catch (Exception e) {
+                                                                    }
+                                                                    ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
+                                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                    recycler.notifyDataSetChanged();
+                                                                    recyclerview.setAdapter(recycler);
+                                                                    emptyTag.setVisibility(View.INVISIBLE);
+                                                                    icon.setVisibility(View.INVISIBLE);
+                                                                } else {
+                                                                    clearAll.setVisibility(View.GONE);
+                                                                    mSwipeRefreshLayout.setRefreshing(false);
+
+                                                                    ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
+                                                                    recyclerview.setLayoutManager(layoutmanager);
+                                                                    recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                                    recyclerview.setAdapter(recycler);
+                                                                    emptyTag.setVisibility(View.VISIBLE);
+                                                                    icon.setVisibility(View.VISIBLE);
+
+                                                                }
+                                                            } catch (Exception e) {
+                                                                Log.e(TAG, "onDataChange: ", e);
+                                                            }
+
+                                                        } catch (Exception e) {
 
                                                         }
-                                                    } catch (Exception e){
-                                                        Log.e("HistoryFragment", "onDataChange: ", e);
-                                                    }
-
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-                                        /**
-                                         * If location type is live then track restaurant live location instead of static location
-                                         */
-                                        else if (user.getLocationType().equals("live")) {
-                                            DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + products.child("owner").getValue());
-
-                                            restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                    try {
-                                                    LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
-
-                                                    /**
-                                                     * Now lets compute distance of each restaurant with customer location
-                                                     */
-                                                    try {
-                                                        CalculateDistance calculateDistance = new CalculateDistance();
-                                                        Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
-                                                                liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
-
-                                                        ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
-                                                        //product.setKey(products.getKey());
-                                                        product.setDistance(dist);
-                                                        product.accountType = "1"; //this fragment belongs to account type 1
-                                                        list.add(product);
-
-                                                        if (!list.isEmpty()) {
-                                                            clearAll.setVisibility(View.VISIBLE);
-                                                            clearAll.setText("CLEAR ALL (" + list.size() + ")");
-                                                            /**
-                                                             * https://howtodoinjava.com/sort/collections-sort/
-                                                             * We want to sort from nearest to furthest location
-                                                             */
-                                                            //Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
-                                                            mSwipeRefreshLayout.setRefreshing(false);
-                                                            //Collections.reverse(list);
-
-                                                            try {
-                                                                Collections.sort(list, (item1, item2) -> (item2.getUploadDate().compareTo(item1.getUploadDate())));
-                                                            } catch (Exception e) {
-                                                            }
-                                                            ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            recyclerview.setLayoutManager(layoutmanager);
-                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                            recycler.notifyDataSetChanged();
-                                                            recyclerview.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.INVISIBLE);
-                                                            icon.setVisibility(View.INVISIBLE);
-                                                        } else {
-                                                            clearAll.setVisibility(View.GONE);
-                                                            mSwipeRefreshLayout.setRefreshing(false);
-
-                                                            ProductHistoryAdapter recycler = new ProductHistoryAdapter(getContext(), list);
-                                                            recyclerview.setLayoutManager(layoutmanager);
-                                                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                                            recyclerview.setAdapter(recycler);
-                                                            emptyTag.setVisibility(View.VISIBLE);
-                                                            icon.setVisibility(View.VISIBLE);
-
-                                                        }
-                                                    } catch (Exception e){
-                                                        Log.e(TAG, "onDataChange: ", e);
-                                                    }
-
-                                                    } catch (Exception e){
 
                                                     }
 
-                                                }
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    }
+                                                });
+                                            }
 
-                                                }
-                                            });
+                                            /**
+                                             * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
+                                             * and "live" which tracks the restaurant's live location under "location/phone"
+                                             */
+                                            else {
+                                                SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                            }
                                         }
 
-                                        /**
-                                         * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
-                                         * and "live" which tracks the restaurant's live location under "location/phone"
-                                         */
-                                        else {
-                                            SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
-                                        }
+                                    } catch (Exception e) {
+
                                     }
-
                                 } catch (Exception e){
 
                                 }

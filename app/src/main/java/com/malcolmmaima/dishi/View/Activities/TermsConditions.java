@@ -79,7 +79,7 @@ public class TermsConditions extends AppCompatActivity implements SwipeRefreshLa
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             try {
-                String manualLink = "https://firebasestorage.googleapis.com/v0/b/dishi-food.appspot.com/o/defaults%2FTerms%20and%20Conditions.html?alt=media&token=7db437c1-7e78-4c0e-b064-49e4c05b9988";
+                String manualLink = "https://firebasestorage.googleapis.com/v0/b/dishi-food.appspot.com/o/defaults%2FTerms%20and%20Conditions.html?alt=media&token=4c60b0e6-8ec7-405e-b47a-688739f1cdb1";
                 mSwipeRefreshLayout.setRefreshing(false);
                 termsConditions.loadUrl(manualLink);
             } catch (Exception e){

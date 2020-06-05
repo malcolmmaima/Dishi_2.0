@@ -96,8 +96,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocationModel[0] = dataSnapshot.getValue(LiveLocationModel.class);
-                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                try {
+                    liveLocationModel[0] = dataSnapshot.getValue(LiveLocationModel.class);
+                } catch (Exception e){
+
+                }
+
             }
 
             @Override
@@ -125,81 +129,81 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
         userData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserModel user = dataSnapshot.getValue(UserModel.class);
+                try {
+                    UserModel user = dataSnapshot.getValue(UserModel.class);
 
-                if (user.getLiveStatus() == true) {
-                    //Log.d(TAG, productDetailsModel.getOwner()+": liveStatus = true");
+                    if (user.getLiveStatus() == true) {
+                        //Log.d(TAG, productDetailsModel.getOwner()+": liveStatus = true");
 
-                    if (user.getLocationType().equals("default")){
-                        //if location type is default then fetch static location
-                        DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + productDetailsModel.getOwner() + "/my_location");
-                        defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                try {
-                                    StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
+                        if (user.getLocationType().equals("default")) {
+                            //if location type is default then fetch static location
+                            DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + productDetailsModel.getOwner() + "/my_location");
+                            defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
 
-                                    /**
-                                     * Now lets compute distance of each restaurant with customer location
-                                     */
-                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                    Double dist = calculateDistance.distance(liveLocationModel[0].getLatitude(),
-                                            liveLocationModel[0].getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
+                                        /**
+                                         * Now lets compute distance of each restaurant with customer location
+                                         */
+                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                        Double dist = calculateDistance.distance(liveLocationModel[0].getLatitude(),
+                                                liveLocationModel[0].getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                    productDetailsModel.setDistance(dist);
-                                    if (dist < 1.0) {
-                                        holder.distanceAway.setText(dist * 1000 + "m away");
-                                    } else {
-                                        holder.distanceAway.setText(dist + "km away");
+                                        productDetailsModel.setDistance(dist);
+                                        if (dist < 1.0) {
+                                            holder.distanceAway.setText(dist * 1000 + "m away");
+                                        } else {
+                                            holder.distanceAway.setText(dist + "km away");
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "onDataChange: ", e);
                                     }
-                                } catch (Exception e){
-                                    Log.e(TAG, "onDataChange: ", e);
+
                                 }
 
-                            }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-
-                    else if (user.getLocationType().equals("live")) {
-                        DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + productDetailsModel.getOwner());
-                        restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                try {
-                                    LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
-                                    CalculateDistance calculateDistance = new CalculateDistance();
-                                    Double dist = calculateDistance.distance(liveLocationModel[0].getLatitude(),
-                                            liveLocationModel[0].getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
-
-                                    productDetailsModel.setDistance(dist);
-
-                                    if (dist < 1.0) {
-                                        holder.distanceAway.setText(dist * 1000 + "m away");
-                                    } else {
-                                        holder.distanceAway.setText(dist + "km away");
-                                    }
-                                } catch (Exception e){
-                                    Log.e(TAG, "onDataChange: ", e);
                                 }
-                            }
+                            });
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                        } else if (user.getLocationType().equals("live")) {
+                            DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + productDetailsModel.getOwner());
+                            restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                            }
-                        });
+                                    try {
+                                        LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
+                                        CalculateDistance calculateDistance = new CalculateDistance();
+                                        Double dist = calculateDistance.distance(liveLocationModel[0].getLatitude(),
+                                                liveLocationModel[0].getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
+                                        productDetailsModel.setDistance(dist);
+
+                                        if (dist < 1.0) {
+                                            holder.distanceAway.setText(dist * 1000 + "m away");
+                                        } else {
+                                            holder.distanceAway.setText(dist + "km away");
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "onDataChange: ", e);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }
                     }
+                } catch (Exception e){
+
                 }
-
-
             }
 
             @Override

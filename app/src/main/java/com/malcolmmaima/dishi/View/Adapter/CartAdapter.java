@@ -113,17 +113,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyHolder>{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    ProductDetailsModel menuProduct = dataSnapshot.getValue(ProductDetailsModel.class);
                     try {
-                        if(menuProduct.getOutOfStock() == true){
-                            productDetailsModel.setOutOfStock(true);
-                            holder.checkBox.setVisibility(View.VISIBLE);
-                            holder.checkBox.setChecked(true);
-                            holder.outOfStock.setVisibility(View.VISIBLE);
-                        } else {
-                            productDetailsModel.setOutOfStock(false);
-                            holder.checkBox.setVisibility(View.GONE);
-                            holder.outOfStock.setVisibility(View.GONE);
+                        ProductDetailsModel menuProduct = dataSnapshot.getValue(ProductDetailsModel.class);
+                        try {
+                            if (menuProduct.getOutOfStock() == true) {
+                                productDetailsModel.setOutOfStock(true);
+                                holder.checkBox.setVisibility(View.VISIBLE);
+                                holder.checkBox.setChecked(true);
+                                holder.outOfStock.setVisibility(View.VISIBLE);
+                            } else {
+                                productDetailsModel.setOutOfStock(false);
+                                holder.checkBox.setVisibility(View.GONE);
+                                holder.outOfStock.setVisibility(View.GONE);
+                            }
+                        } catch (Exception e) {
+
                         }
                     } catch (Exception e){
 

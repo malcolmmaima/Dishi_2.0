@@ -102,24 +102,32 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
-                        myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+                        try {
+                            myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(ViewMapLocation.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
+                                        if (locked == true) {
+                                            Intent slideactivity = new Intent(ViewMapLocation.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    } catch (Exception e){
+
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        });
+                                }
+                            });
+                        } catch (Exception e){
+
+                        }
                     }
                 }
 
@@ -363,13 +371,17 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
                         myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                try {
+                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                if(locked == true){
-                                    Intent slideactivity = new Intent(ViewMapLocation.this, SecurityPin.class)
-                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    slideactivity.putExtra("pinType", "resume");
-                                    startActivity(slideactivity);
+                                    if (locked == true) {
+                                        Intent slideactivity = new Intent(ViewMapLocation.this, SecurityPin.class)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        slideactivity.putExtra("pinType", "resume");
+                                        startActivity(slideactivity);
+                                    }
+                                } catch (Exception e){
+
                                 }
                             }
 
