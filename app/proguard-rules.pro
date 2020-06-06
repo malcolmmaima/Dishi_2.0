@@ -18,10 +18,11 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
--renamesourcefileattribute SourceFile
+# -renamesourcefileattribute SourceFile
 
 #Do not obfuscate my Models
 -keep class com.malcolmmaima.dishi.Model.** { *; }
 
 -keepattributes Signature
 -keepattributes *Annotation*
+-keep public class * extends java.lang.Exceptionp
