@@ -285,9 +285,13 @@ public class VendorActivity extends AppCompatActivity
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 notificationIcon.setBackgroundResource(R.drawable.ic_notifications_white_48dp);
                 for(DataSnapshot notifs : dataSnapshot.getChildren()){
-                    NotificationModel allnotifications = notifs.getValue(NotificationModel.class);
-                    if(allnotifications.getSeen() == false){
-                        notificationIcon.setBackgroundResource(R.drawable.active_notification_64dp);
+                    try {
+                        NotificationModel allnotifications = notifs.getValue(NotificationModel.class);
+                        if (allnotifications.getSeen() == false) {
+                            notificationIcon.setBackgroundResource(R.drawable.active_notification_64dp);
+                        }
+                    } catch (Exception e){
+
                     }
                 }
             }
@@ -437,15 +441,19 @@ public class VendorActivity extends AppCompatActivity
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                    if(locked == true){
-                                        Intent slideactivity = new Intent(VendorActivity.this, SecurityPin.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        slideactivity.putExtra("pinType", "resume");
-                                        startActivity(slideactivity);
-                                    } else {
-                                        //loadActivity(); //redundant
+                                        if (locked == true) {
+                                            Intent slideactivity = new Intent(VendorActivity.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        } else {
+                                            //loadActivity(); //redundant
+                                        }
+                                    } catch (Exception e){
+
                                     }
                                 }
 

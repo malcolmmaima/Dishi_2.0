@@ -160,9 +160,8 @@ public class ForegroundService extends Service {
         myUserDetailsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    myUserDetails = dataSnapshot.getValue(UserModel.class);
-
                     try {
+                        myUserDetails = dataSnapshot.getValue(UserModel.class);
                         if (myUserDetails.getAccount_type().equals("1") && myUserDetails.getVerified().equals("true")) {
                             //Check notification settings
                             if (myUserDetails.getOrderNotification() == true && customerNotifications == false) {
@@ -226,7 +225,7 @@ public class ForegroundService extends Service {
                                         DatabaseReference myrestaurants = FirebaseDatabase.getInstance().getReference("my_restaurants/" + myPhone);
                                         myrestaurants.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
-                                            public void onDataChange(@NonNull DataSnapshot vendors) {
+                                                    public void onDataChange(@NonNull DataSnapshot vendors) {
 
                                                     for (DataSnapshot restaurants : vendors.getChildren()) {
                                                         if(vendors.child(restaurants.getKey()).exists()){
@@ -434,41 +433,44 @@ public class ForegroundService extends Service {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if(dataSnapshot.exists()){
-                                            UserModel incomingUser = dataSnapshot.getValue(UserModel.class);
+                                            try {
+                                                UserModel incomingUser = dataSnapshot.getValue(UserModel.class);
 
+                                                //compose our notification and send
+                                                String title = incomingUser.getFirstname() + " " + incomingUser.getLastname();
+                                                String msg;
+                                                if (unreadCounter[0] != 1) {
+                                                    msg = unreadCounter[0] + " new messages";
 
-                                            //compose our notification and send
-                                            String title = incomingUser.getFirstname()+" "+incomingUser.getLastname();
-                                            String msg;
-                                            if(unreadCounter[0] != 1){
-                                                msg = unreadCounter[0] + " new messages";
-
-                                            } else {
-                                                msg = messages.getMessage();
-                                            }
-
-                                            //We want to check if user is currently in Chat activity, no need to send notification if
-                                            //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
-                                            ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-                                            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-                                            //Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
-                                            ComponentName componentInfo = taskInfo.get(0).topActivity;
-                                            componentInfo.getPackageName();
-                                            //Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
-
-                                            if(!taskInfo.get(0).topActivity.getClassName().equals("com.malcolmmaima.dishi.View.Activities.Chat")){
-
-                                                //TODO find a way to get data from Chat activity and compare to new notification data.
-                                                //If i am actively in chat don't fire up notification
-
-                                                try {
-                                                    //second check if chat notification is on or off
-                                                    if (myUserDetails.getChatNotification() == true) {
-                                                        sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
-                                                    }
-                                                } catch (Exception e){
-                                                    Log.e(TAG, "onDataChange: ", e);
+                                                } else {
+                                                    msg = messages.getMessage();
                                                 }
+
+                                                //We want to check if user is currently in Chat activity, no need to send notification if
+                                                //im actively in Chat refer to: https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
+                                                ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+                                                List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+                                                //Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
+                                                ComponentName componentInfo = taskInfo.get(0).topActivity;
+                                                componentInfo.getPackageName();
+                                                //Log.d("topActivity", "Component info ::" +componentInfo.getPackageName());
+
+                                                if (!taskInfo.get(0).topActivity.getClassName().equals("com.malcolmmaima.dishi.View.Activities.Chat")) {
+
+                                                    //TODO find a way to get data from Chat activity and compare to new notification data.
+                                                    //If i am actively in chat don't fire up notification
+
+                                                    try {
+                                                        //second check if chat notification is on or off
+                                                        if (myUserDetails.getChatNotification() == true) {
+                                                            sendChatNotification(notifId, "newUnreadMsg", title, msg, Chat.class, messages.getSender(), messages.getReciever());
+                                                        }
+                                                    } catch (Exception e) {
+                                                        Log.e(TAG, "onDataChange: ", e);
+                                                    }
+                                                }
+                                            } catch (Exception e){
+
                                             }
                                         }
                                     }
@@ -627,36 +629,45 @@ public class ForegroundService extends Service {
                         customerDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                UserModel customer = dataSnapshot.getValue(UserModel.class);
+                                try {
+                                    UserModel customer = dataSnapshot.getValue(UserModel.class);
 
-                                DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/"+restaurants.getKey());
-                                restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+                                    DatabaseReference restaurantDetails = FirebaseDatabase.getInstance().getReference("users/" + restaurants.getKey());
+                                    restaurantDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                        //compose our notification and send
-                                        String title = restaurant.getFirstname()+" "+restaurant.getLastname();
-                                        String message = "Deliver to "+customer.getFirstname()+" "+customer.getLastname();
-                                        String customerPhone = customers.getKey();
-                                        if (customerPhone.length() > 4) {
-                                            lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
-                                        }
-                                        int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
-                                        try {
-                                            if (myUserDetails.getOrderNotification() == true) {
-                                                sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                            try {
+                                                UserModel restaurant = dataSnapshot.getValue(UserModel.class);
+
+                                                //compose our notification and send
+                                                String title = restaurant.getFirstname() + " " + restaurant.getLastname();
+                                                String message = "Deliver to " + customer.getFirstname() + " " + customer.getLastname();
+                                                String customerPhone = customers.getKey();
+                                                if (customerPhone.length() > 4) {
+                                                    lastFourDigits = customerPhone.substring(customerPhone.length() - 4); //We'll use this as the notification's unique ID
+                                                }
+                                                int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
+                                                try {
+                                                    if (myUserDetails.getOrderNotification() == true) {
+                                                        sendRiderOrderNotification(notifId, "newRideRequest", title, message, RiderActivity.class, customerPhone, restaurants.getKey());
+                                                    }
+                                                } catch (Exception e) {
+                                                    Log.e(TAG, "onDataChange: ", e);
+                                                }
+                                            } catch (Exception e){
+
                                             }
-                                        } catch (Exception e){
-                                            Log.e(TAG, "onDataChange: ", e);
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                    }
-                                });
+                                        }
+                                    });
+                                } catch (Exception e){
+
+                                }
                             }
 
                             @Override
@@ -722,28 +733,32 @@ public class ForegroundService extends Service {
                 vendorDetails.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        UserModel vendor = dataSnapshot.getValue(UserModel.class);
-
-                        //compose our notification and send
-                        String title = vendor.getFirstname()+" "+vendor.getLastname();
-                        String message = "Wants to add you as a rider. Check your vendors to accept";
-
-                        String vendorPhone = dataSnapshot.getKey();
-                        if (vendorPhone.length() > 4) {
-                            lastFourDigits = vendorPhone.substring(vendorPhone.length() - 4); //We'll use this as the notification's unique ID
-                        }
-                        int notifId = Integer.parseInt(lastFourDigits+5); //new Random().nextInt();
                         try {
-                            if (myUserDetails.getOrderNotification() == true) {
+                            UserModel vendor = dataSnapshot.getValue(UserModel.class);
 
-                                Boolean accepted = newVendor.getValue(Boolean.class);
+                            //compose our notification and send
+                            String title = vendor.getFirstname() + " " + vendor.getLastname();
+                            String message = "Wants to add you as a rider. Check your vendors to accept";
 
-                                if(accepted == false){
-                                    sendVendorRequestNotification(notifId, "newRiderRequest", title, message, RiderActivity.class);
+                            String vendorPhone = dataSnapshot.getKey();
+                            if (vendorPhone.length() > 4) {
+                                lastFourDigits = vendorPhone.substring(vendorPhone.length() - 4); //We'll use this as the notification's unique ID
+                            }
+                            int notifId = Integer.parseInt(lastFourDigits + 5); //new Random().nextInt();
+                            try {
+                                if (myUserDetails.getOrderNotification() == true) {
+
+                                    Boolean accepted = newVendor.getValue(Boolean.class);
+
+                                    if (accepted == false) {
+                                        sendVendorRequestNotification(notifId, "newRiderRequest", title, message, RiderActivity.class);
+                                    }
                                 }
+                            } catch (Exception e) {
+                                Log.e(TAG, "onDataChange: ", e);
                             }
                         } catch (Exception e){
-                            Log.e(TAG, "onDataChange: ", e);
+
                         }
                     }
 
@@ -975,43 +990,107 @@ public class ForegroundService extends Service {
                 customerNotifications = true;
                 if(dataSnapshot.exists()){
                     for(DataSnapshot providers : dataSnapshot.getChildren()){
-                        final String provider = providers.getKey();
-                        activeRestaurantOrders.add(provider);
-                        DatabaseReference activeRestaurantRef_ = FirebaseDatabase.getInstance().getReference("orders/"+provider+ "/" + myPhone);
-                        activeRestaurantRef_.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                try {
-                                    Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
-                                    Integer paid = dataSnapshot.child("paid").getValue(Integer.class);
-                                    /**
-                                     * Now the challenge i'm facing with notifications is duplication of notifications
-                                     * from a single trigger. To curb that i've decided to use the last 4 digits of the
-                                     * restaurant's phone number as the notification id that way no duplicates. Not sure how
-                                     * effective this is in the long runs as the app scales but meeh, you'll figure it out
-                                     */
-                                    if (provider.length() > 4)
-                                    {
+                        try {
+                            final String provider = providers.getKey();
+                            activeRestaurantOrders.add(provider);
+                            DatabaseReference activeRestaurantRef_ = FirebaseDatabase.getInstance().getReference("orders/" + provider + "/" + myPhone);
+                            activeRestaurantRef_.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    try {
+                                        Boolean complete = dataSnapshot.child("completed").getValue(Boolean.class);
+                                        Integer paid = dataSnapshot.child("paid").getValue(Integer.class);
+                                        /**
+                                         * Now the challenge i'm facing with notifications is duplication of notifications
+                                         * from a single trigger. To curb that i've decided to use the last 4 digits of the
+                                         * restaurant's phone number as the notification id that way no duplicates. Not sure how
+                                         * effective this is in the long runs as the app scales but meeh, you'll figure it out
+                                         */
+                                        if (provider.length() > 4) {
+                                            lastFourDigits = provider.substring(provider.length() - 4);
+                                        }
+                                        int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
+
+                                        if (complete == true && paid == 4) {
+                                            //Lets get the restaurant's name that will be passed in the notification intent
+                                            databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    try {
+                                                        restaurants.add(provider);
+                                                        restaurantName = dataSnapshot.child("firstname").getValue(String.class);
+                                                        lastName = dataSnapshot.child("lastname").getValue(String.class);
+                                                        String title = "Order Delivered";
+                                                        String message = restaurantName + " " + lastName + " order delivered!";
+                                                        try {
+                                                            if (myUserDetails.getOrderNotification() == true) {
+                                                                sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e(TAG, "onDataChange: ", e);
+                                                        }
+                                                    } catch (Exception e) {
+
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+
+                                        }
+
+                                    } catch (Exception e) {
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("orders/" + provider + "/" + myPhone + "/items");
+                            itemsRef.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (provider.length() > 4) {
                                         lastFourDigits = provider.substring(provider.length() - 4);
                                     }
-                                    int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
+                                    int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
-                                    if (complete == true && paid == 4) {
-                                        //Lets get the restaurant's name that will be passed in the notification intent
-                                        databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                    for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                                        DatabaseReference item = FirebaseDatabase.getInstance().getReference("orders/" + provider + "/" + myPhone + "/items/" + snap.getKey());
+                                        item.addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                restaurants.add(provider);
-                                                restaurantName = dataSnapshot.child("firstname").getValue(String.class);
-                                                lastName = dataSnapshot.child("lastname").getValue(String.class);
-                                                String title = "Order Delivered";
-                                                String message = restaurantName + " " + lastName + " order delivered!";
                                                 try {
-                                                    if (myUserDetails.getOrderNotification() == true) {
-                                                        sendOrderNotification(notifId, "orderDelivered", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                    ProductDetailsModel prod = snap.getValue(ProductDetailsModel.class);
+
+                                                    if (prod.getConfirmed() == true) {
+                                                        databaseReference.child("users").child(prod.getOwner()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                restaurantName = dataSnapshot.child("firstname").getValue(String.class);
+                                                                lastName = dataSnapshot.child("lastname").getValue(String.class);
+
+                                                                String title = "Order Confirmed";
+                                                                String message = restaurantName + " " + lastName + " confirmed order items";
+                                                                sendOrderNotification(notifId + 1, "orderConfirmed", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
                                                     }
-                                                } catch (Exception e){
-                                                    Log.e(TAG, "onDataChange: ", e);
+                                                } catch (Exception e) {
+
+
                                                 }
                                             }
 
@@ -1020,69 +1099,17 @@ public class ForegroundService extends Service {
 
                                             }
                                         });
-
                                     }
-
-                                } catch (Exception e){}
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("orders/"+provider+ "/"+myPhone+"/items");
-                        itemsRef.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (provider.length() > 4)
-                                {
-                                    lastFourDigits = provider.substring(provider.length() - 4);
                                 }
-                                int notifId =  Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                for(DataSnapshot snap : dataSnapshot.getChildren()){
-                                    DatabaseReference item = FirebaseDatabase.getInstance().getReference("orders/"+provider+ "/"+myPhone+"/items/"+snap.getKey());
-                                    item.addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            ProductDetailsModel prod = snap.getValue(ProductDetailsModel.class);
-
-                                            if(prod.getConfirmed() == true){
-                                                databaseReference.child("users").child(prod.getOwner()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        restaurantName = dataSnapshot.child("firstname").getValue(String.class);
-                                                        lastName = dataSnapshot.child("lastname").getValue(String.class);
-
-                                                        String title = "Order Confirmed";
-                                                        String message = restaurantName + " " + lastName +" confirmed order items";
-                                                        sendOrderNotification(notifId+1, "orderConfirmed", title, message, ViewMyOrders.class, provider, restaurantName + " " + lastName);
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
                                 }
-                            }
+                            });
+                        } catch (Exception e){
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
+                        }
                     }
                 }
             }

@@ -723,18 +723,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                         @Override
                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                             if(dataSnapshot.exists()){
-                                                                                MyDeviceModel myDevice = dataSnapshot.getValue(MyDeviceModel.class);
-                                                                                if(myDevice.getBlocked() == true){
-                                                                                    //Load DeviceBlocked activity
-                                                                                    Intent slideactivity = new Intent(MainActivity.this, DeviceBlocked.class)
-                                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                                    Bundle bndlanimation =
-                                                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                                                    getApplicationContext().startActivity(slideactivity, bndlanimation);
-                                                                                }
-                                                                                else {
-                                                                                    //proceed
-                                                                                    loadAccount();
+                                                                                try {
+                                                                                    MyDeviceModel myDevice = dataSnapshot.getValue(MyDeviceModel.class);
+                                                                                    if (myDevice.getBlocked() == true) {
+                                                                                        //Load DeviceBlocked activity
+                                                                                        Intent slideactivity = new Intent(MainActivity.this, DeviceBlocked.class)
+                                                                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                        Bundle bndlanimation =
+                                                                                                ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                                        getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                                                                    } else {
+                                                                                        //proceed
+                                                                                        loadAccount();
+                                                                                    }
+                                                                                } catch (Exception e){
+
                                                                                 }
                                                                             } else {
                                                                                 loadAccount();

@@ -14,11 +14,14 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
 
-# Preserve annotations, line numbers, and source file names
--keepattributes *Annotation*,SourceFile,LineNumberTable
+#Do not obfuscate my Models
+-keep class com.malcolmmaima.dishi.Model.** { *; }
+
+-keepattributes Signature
+-keepattributes *Annotation*

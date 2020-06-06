@@ -33,6 +33,7 @@ import com.malcolmmaima.dishi.R;
 
 import com.malcolmmaima.dishi.Controller.Utils.PreferenceManager;
 
+import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.services.common.SafeToast;
 
 public class SplashActivity extends AppCompatActivity {
@@ -83,8 +84,7 @@ public class SplashActivity extends AppCompatActivity {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-        //Fabric.with(this, new Crashlytics());
-
+        Fabric.with(this, new Crashlytics());
 
         // Checking for first time launch
         PreferenceManager prefManager = new PreferenceManager(this);
@@ -204,18 +204,21 @@ public class SplashActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if(dataSnapshot.exists()){
-                                                        MyDeviceModel myDevice = dataSnapshot.getValue(MyDeviceModel.class);
-                                                        if(myDevice.getBlocked() == true){
-                                                            //Load DeviceBlocked activity
-                                                            Intent slideactivity = new Intent(SplashActivity.this, DeviceBlocked.class)
-                                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                            Bundle bndlanimation =
-                                                                    ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation,R.anim.animation2).toBundle();
-                                                            getApplicationContext().startActivity(slideactivity, bndlanimation);
-                                                        }
-                                                        else {
-                                                            //proceed
-                                                            loadAccount();
+                                                        try {
+                                                            MyDeviceModel myDevice = dataSnapshot.getValue(MyDeviceModel.class);
+                                                            if (myDevice.getBlocked() == true) {
+                                                                //Load DeviceBlocked activity
+                                                                Intent slideactivity = new Intent(SplashActivity.this, DeviceBlocked.class)
+                                                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                Bundle bndlanimation =
+                                                                        ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                getApplicationContext().startActivity(slideactivity, bndlanimation);
+                                                            } else {
+                                                                //proceed
+                                                                loadAccount();
+                                                            }
+                                                        } catch (Exception e){
+
                                                         }
                                                     } else {
                                                         loadAccount();
