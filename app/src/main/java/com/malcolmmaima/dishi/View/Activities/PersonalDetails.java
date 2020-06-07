@@ -43,6 +43,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.malcolmmaima.dishi.Controller.Utils.GenerateThumbnails;
@@ -353,6 +354,8 @@ public class PersonalDetails extends AppCompatActivity {
             saveDetails.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    //If data hasn't changed
+                    dataStatus();
 
                     if(saveDetails.getTag().equals("edit")){
                         mEmail.setEnabled(true);
@@ -370,41 +373,9 @@ public class PersonalDetails extends AppCompatActivity {
                         mBio.setEnabled(false);
                         profilePic.setEnabled(false);
 
-                        progressDialog.setMessage("Saving...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
-
-                        saveprofilePhoto();
-
-                        //Save data to specific nodes
-                        myRef.child("email").setValue(mEmail.getText().toString().trim());
-                        myRef.child("firstname").setValue(mFirstName.getText().toString().trim());
-                        myRef.child("lastname").setValue(mLastName.getText().toString().trim());
-                        myRef.child("bio").setValue(mBio.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                saveDetails.setTag("edit");
-                                saveDetails.setText("EDIT");
-
-                                mEmail.setEnabled(false);
-                                mFirstName.setEnabled(false);
-                                mLastName.setEnabled(false);
-                                mBio.setEnabled(false);
-                                profilePic.setEnabled(false);
-
-                                Snackbar snackbar = Snackbar
-                                        .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
-
-                                snackbar.show();
-
-                                if(progressDialog.isShowing()){
-                                    progressDialog.dismiss();
-                                }
-                            }
-                        });
+                        saveprofileDetails();
                     }
-                    //If data hasn't changed
-                    dataStatus();
+
 
                 }
             });
@@ -472,8 +443,8 @@ public class PersonalDetails extends AppCompatActivity {
         }
     }
 
-    public void saveprofilePhoto() {
-        progressDialog.setTitle("Uploading...");
+    public void saveprofileDetails() {
+        progressDialog.setTitle("Saving...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
@@ -495,18 +466,40 @@ public class PersonalDetails extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Object o) {
                                     //Delete previous images from storage
-                                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                                    StorageReference storageRefOriginal = storage.getReferenceFromUrl(myDetails.getProfilePic());
-                                    StorageReference storageImgBig = storage.getReferenceFromUrl(myDetails.getProfilePicBig());
-                                    StorageReference storageImgMedium = storage.getReferenceFromUrl(myDetails.getProfilePicMedium());
-                                    StorageReference storageImgSmall = storage.getReferenceFromUrl(myDetails.getProfilePicSmall());
+                                    try {
+                                        DatabaseReference defaultProfileRef = FirebaseDatabase.getInstance().getReference("defaults/profilePic");
+                                        defaultProfileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                try {
+                                                    String defaultPic = dataSnapshot.getValue(String.class);
+                                                    if (!defaultPic.equals(myDetails.getProfilePic())) {
+                                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(myDetails.getProfilePic());
+                                                        StorageReference storageImgBig = storage.getReferenceFromUrl(myDetails.getProfilePicBig());
+                                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(myDetails.getProfilePicMedium());
+                                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(myDetails.getProfilePicSmall());
 
 
-                                    //Delete images from storage
-                                    storageRefOriginal.delete();
-                                    storageImgBig.delete();
-                                    storageImgMedium.delete();
-                                    storageImgSmall.delete();
+                                                        //Delete images from storage
+                                                        storageRefOriginal.delete();
+                                                        storageImgBig.delete();
+                                                        storageImgMedium.delete();
+                                                        storageImgSmall.delete();
+                                                    }
+                                                } catch (Exception e){
+
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    } catch (Exception e){
+
+                                    }
 
                                     GenerateThumbnails thumbnails = new GenerateThumbnails();
                                     myRef.child("profilePicSmall").setValue(thumbnails.GenerateSmall(o.toString()));
@@ -522,6 +515,8 @@ public class PersonalDetails extends AppCompatActivity {
                                             }
                                         }
                                     });
+
+                                    saveTextData();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -538,8 +533,59 @@ public class PersonalDetails extends AppCompatActivity {
                                 }
                             });
                         }
-                    });
+
+                    })// On progress change upload time.
+                    .addOnProgressListener(
+                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+
+                                // Progress Listener for loading
+                                // percentage on the dialog box
+                                @Override
+                                public void onProgress(
+                                        UploadTask.TaskSnapshot taskSnapshot)
+                                {
+                                    double progress
+                                            = (100.0
+                                            * taskSnapshot.getBytesTransferred()
+                                            / taskSnapshot.getTotalByteCount());
+
+                                    progressDialog.setMessage("Uploading ("+(int)progress+"%)");
+                                }
+                            });;
         }
+
+        else {
+            saveTextData();
+        }
+    }
+
+    private void saveTextData() {
+        //Save data to specific nodes
+        myRef.child("email").setValue(mEmail.getText().toString().trim());
+        myRef.child("firstname").setValue(mFirstName.getText().toString().trim());
+        myRef.child("lastname").setValue(mLastName.getText().toString().trim());
+        myRef.child("bio").setValue(mBio.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                saveDetails.setTag("edit");
+                saveDetails.setText("EDIT");
+
+                mEmail.setEnabled(false);
+                mFirstName.setEnabled(false);
+                mLastName.setEnabled(false);
+                mBio.setEnabled(false);
+                profilePic.setEnabled(false);
+
+                Snackbar snackbar = Snackbar
+                        .make(findViewById(R.id.parentlayout), "Saved", Snackbar.LENGTH_LONG);
+
+                snackbar.show();
+
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
+            }
+        });
     }
 
     // Creating Method to get the selected image file Extension from File Path URI.

@@ -24,7 +24,7 @@
 
     <TextView
         android:id="@+id/version"
-        android:text="Version 1.0 Alpha"
+        android:text="Version 1.0 Beta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

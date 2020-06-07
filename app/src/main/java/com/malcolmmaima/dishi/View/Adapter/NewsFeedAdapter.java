@@ -591,17 +591,21 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
 
                                                 //delete image from storage if exists in post
                                                 if(statusUpdateModel.getImageShare() != null){
-                                                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                                                    StorageReference storageRefOriginal = storage.getReferenceFromUrl(statusUpdateModel.getImageShare());
-                                                    StorageReference storageImgBig = storage.getReferenceFromUrl(statusUpdateModel.getImageShareBig());
-                                                    StorageReference storageImgMedium = storage.getReferenceFromUrl(statusUpdateModel.getImageShareMedium());
-                                                    StorageReference storageImgSmall = storage.getReferenceFromUrl(statusUpdateModel.getImageShareSmall());
+                                                    try {
+                                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(statusUpdateModel.getImageShare());
+                                                        StorageReference storageImgBig = storage.getReferenceFromUrl(statusUpdateModel.getImageShareBig());
+                                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(statusUpdateModel.getImageShareMedium());
+                                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(statusUpdateModel.getImageShareSmall());
 
-                                                    //Delete images from storage
-                                                    storageRefOriginal.delete();
-                                                    storageImgBig.delete();
-                                                    storageImgMedium.delete();
-                                                    storageImgSmall.delete();
+                                                        //Delete images from storage
+                                                        storageRefOriginal.delete();
+                                                        storageImgBig.delete();
+                                                        storageImgMedium.delete();
+                                                        storageImgSmall.delete();
+                                                    } catch (Exception e){
+
+                                                    }
                                                 }
 
                                                 DatabaseReference postDetails = FirebaseDatabase.getInstance().getReference("posts/"+statusUpdateModel.getPostedTo()+"/"+statusUpdateModel.key);

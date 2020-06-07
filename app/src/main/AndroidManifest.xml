@@ -19,8 +19,8 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
-        android:versionCode="3"
-        android:versionName="1.0.3"
+        android:versionCode="4"
+        android:versionName="1.0.4"
         android:theme="@style/AppTheme">
         <activity android:name=".View.Activities.TermsConditions"></activity>
         <activity android:name=".View.Activities.ContactSupport" />

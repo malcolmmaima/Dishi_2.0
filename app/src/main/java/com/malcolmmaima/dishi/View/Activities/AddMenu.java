@@ -644,19 +644,37 @@ public class AddMenu extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Object o) {
 
-                                        //Delete previous images from storage
-                                        FirebaseStorage storage = FirebaseStorage.getInstance();
-                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(productDetailsModel.getImageURL());
-                                        StorageReference storageImgBig = storage.getReferenceFromUrl(productDetailsModel.getImageUrlBig());
-                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(productDetailsModel.getImageUrlMedium());
-                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(productDetailsModel.getImageUrlSmall());
+                                        DatabaseReference defaultFoodPicRef = FirebaseDatabase.getInstance().getReference("defaults/foodPic");
+                                        defaultFoodPicRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                String defaultFoodPic = dataSnapshot.getValue(String.class);
+                                                if(!defaultFoodPic.equals(productDetailsModel.getImageURL())){
+                                                    try {
+                                                        //Delete previous images from storage
+                                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(productDetailsModel.getImageURL());
+                                                        StorageReference storageImgBig = storage.getReferenceFromUrl(productDetailsModel.getImageUrlBig());
+                                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(productDetailsModel.getImageUrlMedium());
+                                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(productDetailsModel.getImageUrlSmall());
 
 
-                                        //Delete images from storage
-                                        storageRefOriginal.delete();
-                                        storageImgBig.delete();
-                                        storageImgMedium.delete();
-                                        storageImgSmall.delete();
+                                                        //Delete images from storage
+                                                        storageRefOriginal.delete();
+                                                        storageImgBig.delete();
+                                                        storageImgMedium.delete();
+                                                        storageImgSmall.delete();
+                                                    } catch (Exception e){
+
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
 
                                         //new data
                                         GenerateThumbnails thumbnails = new GenerateThumbnails();

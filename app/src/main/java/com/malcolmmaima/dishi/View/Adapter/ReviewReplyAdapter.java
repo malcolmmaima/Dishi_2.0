@@ -338,17 +338,21 @@ public class ReviewReplyAdapter extends RecyclerView.Adapter<ReviewReplyAdapter.
 
                                         //delete image from storage if exists in post
                                         if(listdata.get(getAdapterPosition()).getImageShare() != null){
-                                            FirebaseStorage storage = FirebaseStorage.getInstance();
-                                            StorageReference storageRefOriginal = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShare());
-                                            StorageReference storageImgBig = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShareBig());
-                                            StorageReference storageImgMedium = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShareMedium());
-                                            StorageReference storageImgSmall = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShareSmall());
+                                            try {
+                                                FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                StorageReference storageRefOriginal = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShare());
+                                                StorageReference storageImgBig = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShareBig());
+                                                StorageReference storageImgMedium = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShareMedium());
+                                                StorageReference storageImgSmall = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageShareSmall());
 
-                                            //Delete images from storage
-                                            storageRefOriginal.delete();
-                                            storageImgBig.delete();
-                                            storageImgMedium.delete();
-                                            storageImgSmall.delete();
+                                                //Delete images from storage
+                                                storageRefOriginal.delete();
+                                                storageImgBig.delete();
+                                                storageImgMedium.delete();
+                                                storageImgSmall.delete();
+                                            } catch (Exception e){
+
+                                            }
                                         }
 
                                         postRef.child(listdata.get(getAdapterPosition()).getCommentKey()).child("comments").child(listdata.get(getAdapterPosition()).key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {

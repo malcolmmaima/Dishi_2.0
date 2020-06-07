@@ -27,8 +27,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
@@ -287,39 +290,56 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyHolder>{
                                     String key = listdata.get(getAdapterPosition()).getKey();
 
                                     try {
-
-                                        FirebaseStorage storage = FirebaseStorage.getInstance();
-                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageURL());
-                                        StorageReference storageImgBig = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlBig());
-                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlMedium());
-                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlSmall());
-
-
-                                        //Delete images from storage
-                                        storageImgBig.delete();
-                                        storageImgMedium.delete();
-                                        storageImgSmall.delete();
-                                        storageRefOriginal.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        DatabaseReference defaultFoodPicRef = FirebaseDatabase.getInstance().getReference("defaults/foodPic");
+                                        defaultFoodPicRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
-                                            public void onSuccess(Void aVoid) {
-                                                // File deleted successfully
-                                                menuRef.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        try {
-                                                            listdata.remove(getAdapterPosition());
-                                                            notifyItemRemoved(getAdapterPosition());
-                                                            Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
-                                                        } catch (Exception e) {
-                                                        }
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                String defaultFoodPic = dataSnapshot.getValue(String.class);
+                                                if(!defaultFoodPic.equals(listdata.get(getAdapterPosition()).getImageURL())){
+                                                    try {
+                                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                        StorageReference storageRefOriginal = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageURL());
+                                                        StorageReference storageImgBig = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlBig());
+                                                        StorageReference storageImgMedium = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlMedium());
+                                                        StorageReference storageImgSmall = storage.getReferenceFromUrl(listdata.get(getAdapterPosition()).getImageUrlSmall());
+
+
+                                                        //Delete images from storage
+                                                        storageImgBig.delete();
+                                                        storageImgMedium.delete();
+                                                        storageImgSmall.delete();
+                                                        storageRefOriginal.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                // File deleted successfully
+                                                                menuRef.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        try {
+                                                                            listdata.remove(getAdapterPosition());
+                                                                            notifyItemRemoved(getAdapterPosition());
+                                                                            Snackbar.make(v.getRootView(), "Deleted", Snackbar.LENGTH_LONG).show();
+                                                                        } catch (Exception e) {
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception exception) {
+                                                                // Uh-oh, an error occurred!
+                                                                Log.e(TAG, "onFailure: " + exception);
+                                                            }
+                                                        });
+                                                    } catch (Exception e){
+
                                                     }
-                                                });
+                                                }
                                             }
-                                        }).addOnFailureListener(new OnFailureListener() {
+
                                             @Override
-                                            public void onFailure(@NonNull Exception exception) {
-                                                // Uh-oh, an error occurred!
-                                                Log.e(TAG, "onFailure: " + exception);
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                             }
                                         });
 
