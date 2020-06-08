@@ -300,9 +300,9 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                              * https://howtodoinjava.com/sort/collections-sort/
                                                              * We want to sort from nearest to furthest location
                                                              */
+                                                            Collections.reverse(list);
                                                             Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                             mSwipeRefreshLayout.setRefreshing(false);
-                                                            //Collections.reverse(list);
                                                             ProductAdapter recycler = new ProductAdapter(getContext(), list);
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());
@@ -382,9 +382,9 @@ public class FragmentFood extends Fragment implements SwipeRefreshLayout.OnRefre
                                                              * https://howtodoinjava.com/sort/collections-sort/
                                                              * We want to sort from nearest to furthest location
                                                              */
+                                                            Collections.reverse(list);
                                                             Collections.sort(list, (bo1, bo2) -> (bo1.getDistance() > bo2.getDistance() ? 1 : -1));
                                                             mSwipeRefreshLayout.setRefreshing(false);
-                                                            //Collections.reverse(list);
                                                             ProductAdapter recycler = new ProductAdapter(getContext(), list);
                                                             recyclerview.setLayoutManager(layoutmanager);
                                                             recyclerview.setItemAnimator(new DefaultItemAnimator());

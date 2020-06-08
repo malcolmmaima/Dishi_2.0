@@ -63,7 +63,7 @@ public class PersonalDetails extends AppCompatActivity {
     private EditText mEmail, mFirstName, mLastName, mBio, mPhone;
     CircleImageView profilePic;
     private Button saveDetails;
-    private String [] profilePicActions = {"Open Gallery","Open Camera", "View Photo"};
+    private String [] profilePicActions = {"Open Gallery","Open Camera", "View Photo", "Remove Photo"};
     ProgressDialog progressDialog;
     UserModel myDetails;
 
@@ -340,6 +340,87 @@ public class PersonalDetails extends AppCompatActivity {
                                 } catch (Exception e){
                                     Log.e(TAG, "onClick: ", e);
                                 }
+                            }
+
+                            if(which == 3){
+                                android.app.AlertDialog confirmDialog = new android.app.AlertDialog.Builder(PersonalDetails.this)
+                                        .setMessage("Are you sure?")
+                                        .setCancelable(false)
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                DatabaseReference defaultProfileRef = FirebaseDatabase.getInstance().getReference("defaults/profilePic");
+                                                defaultProfileRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        try {
+                                                            String defaultProfilePic = dataSnapshot.getValue(String.class);
+
+                                                            if (!myDetails.getProfilePic().equals(defaultProfilePic)) {
+                                                                myRef.child("profilePic").setValue(defaultProfilePic).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        try {
+
+                                                                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                                                                            StorageReference storageRefOriginal = storage.getReferenceFromUrl(myDetails.getProfilePic());
+                                                                            StorageReference storageImgBig = storage.getReferenceFromUrl(myDetails.getProfilePicBig());
+                                                                            StorageReference storageImgMedium = storage.getReferenceFromUrl(myDetails.getProfilePicMedium());
+                                                                            StorageReference storageImgSmall = storage.getReferenceFromUrl(myDetails.getProfilePicSmall());
+
+
+                                                                            //Delete previous images from storage
+                                                                            storageRefOriginal.delete();
+                                                                            storageImgBig.delete();
+                                                                            storageImgMedium.delete();
+                                                                            storageImgSmall.delete();
+
+                                                                            myRef.child("profilePicBig").removeValue();
+                                                                            myRef.child("profilePicMedium").removeValue();
+                                                                            myRef.child("profilePicSmall").removeValue();
+
+                                                                            try {
+                                                                                Picasso.with(PersonalDetails.this).load(defaultProfilePic).fit().centerCrop()
+                                                                                        .placeholder(R.drawable.default_profile)
+                                                                                        .error(R.drawable.default_profile)
+                                                                                        .into(profilePic);
+                                                                            } catch (Exception e) {
+                                                                            }
+
+                                                                        } catch (Exception e) {
+
+                                                                        }
+
+                                                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Removed", Snackbar.LENGTH_LONG);
+                                                                        snackbar.show();
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "Something went wrong", Snackbar.LENGTH_LONG);
+                                                                        snackbar.show();
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout), "You do not have a profile picture set", Snackbar.LENGTH_LONG);
+                                                                snackbar.show();
+                                                            }
+                                                        } catch (Exception e){}
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        }).create();
+                                confirmDialog.show();
                             }
                         }
                     });

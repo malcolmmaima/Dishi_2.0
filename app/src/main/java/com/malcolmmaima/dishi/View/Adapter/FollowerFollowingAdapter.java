@@ -84,7 +84,7 @@ public class FollowerFollowingAdapter extends RecyclerView.Adapter<FollowerFollo
         /**
          * Adapter animation
          */
-        //setAnimation(holder.itemView, position);
+        setAnimation(holder.itemView, position);
 
         /**
          * Set widget values
