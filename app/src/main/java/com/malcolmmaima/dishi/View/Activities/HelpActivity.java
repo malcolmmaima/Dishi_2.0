@@ -9,9 +9,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,11 +28,12 @@ import io.fabric.sdk.android.services.common.SafeToast;
 public class HelpActivity extends AppCompatActivity {
     String TAG = "HelpActivity";
     String myPhone;
-    DatabaseReference myRef;
+    DatabaseReference myRef, supportRef;
     FirebaseAuth mAuth;
     FirebaseUser user;
     String helpType;
-    RelativeLayout resetPin, privacyPolicy, dishiFaq, contactSupport;
+    RelativeLayout resetPin, privacyPolicy, dishiFaq, contactSupport, supportDash;
+    View supportDashBorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +53,17 @@ public class HelpActivity extends AppCompatActivity {
         privacyPolicy = findViewById(R.id.privacyPolicy);
         dishiFaq = findViewById(R.id.dishiFaq);
         contactSupport = findViewById(R.id.contactSupport);
+        supportDashBorder = findViewById(R.id.supportDashBorder);
+        supportDashBorder.setVisibility(View.GONE);
+        supportDash = findViewById(R.id.supportDash);
+        supportDash.setVisibility(View.GONE);
+        supportDash.setEnabled(false);
 
         try {
             helpType = getIntent().getStringExtra("type");
         } catch (Exception e){
             Log.e(TAG, "onCreate: ", e);
         }
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        myPhone = user.getPhoneNumber(); //Current logged in user phone number
 
         //Set fb database reference
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
@@ -69,6 +75,7 @@ public class HelpActivity extends AppCompatActivity {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();
             myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+            supportRef = FirebaseDatabase.getInstance().getReference("support/"+myPhone);
 
             if(helpType != null){
                 if(helpType.equals("reset")){
@@ -117,6 +124,34 @@ public class HelpActivity extends AppCompatActivity {
                     });
                 }
             }
+
+            //allow support accounts to deal with user issues (Support dashboard)
+            supportRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        try {
+                            Boolean approved = dataSnapshot.getValue(Boolean.class);
+                            if (approved == true) {
+                                supportDashBorder.setVisibility(View.VISIBLE);
+                                supportDash.setVisibility(View.VISIBLE);
+                                supportDash.setEnabled(true);
+                            } else {
+                                supportDashBorder.setVisibility(View.GONE);
+                                supportDash.setVisibility(View.GONE);
+                                supportDash.setEnabled(false);
+                            }
+                        } catch (Exception e){
+
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
 
         //Back button on toolbar
@@ -164,6 +199,50 @@ public class HelpActivity extends AppCompatActivity {
                 Bundle bndlanimation =
                         ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
                 startActivity(slideactivity, bndlanimation);
+            }
+        });
+
+        supportDash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //allow support accounts to deal with user issues (Support dashboard)
+                supportRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()){
+                            try {
+                                Boolean approved = dataSnapshot.getValue(Boolean.class);
+                                if (approved == true) {
+                                    Intent slideactivity = new Intent(HelpActivity.this, SupportPin.class);
+                                    Bundle bndlanimation =
+                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                    startActivity(slideactivity, bndlanimation);
+
+                                } else {
+                                    supportDashBorder.setVisibility(View.GONE);
+                                    supportDash.setVisibility(View.GONE);
+                                    supportDash.setEnabled(false);
+                                    Snackbar snackbar = Snackbar
+                                            .make((LinearLayout) findViewById(R.id.parentlayout), "You're not approved to do this", Snackbar.LENGTH_LONG);
+
+                                    snackbar.show();
+                                }
+                            } catch (Exception e){
+
+                            }
+                        } else {
+                            Snackbar snackbar = Snackbar
+                                    .make((LinearLayout) findViewById(R.id.parentlayout), "You're not approved to do this", Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
