@@ -121,7 +121,7 @@ public class FragmentSearchUsers extends Fragment implements SwipeRefreshLayout.
                             userFound.setPhone(user_.getKey());
 
                             String name = userFound.getFirstname()+" "+userFound.getLastname();
-                            if(name.toLowerCase().contains(s.toLowerCase()) && !myPhone.equals(userFound.getPhone())){
+                            if(name.toLowerCase().contains(s.toLowerCase()) && !myPhone.equals(userFound.getPhone()) && userFound.getFirstname() != null){
                                 if(usersFound.size() < searchCap){
                                     usersFound.add(userFound);
                                 }
