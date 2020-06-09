@@ -197,27 +197,26 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                             }
                                         }
 
-                                        chatlist.add(contactDm);
-
-                                        if(!chatlist.isEmpty()){
-                                            try {
-                                                Collections.sort(chatlist, (chat1, chat2) -> (chat2.timeStamp.compareTo(chat1.timeStamp)));
-                                            } catch (Exception e){}
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                            adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                            chatList.setAdapter(adapter);
-                                            emptyTag.setVisibility(View.GONE);
-                                            icon.setVisibility(View.GONE);
-                                        }
-
-                                        else {
-                                            mSwipeRefreshLayout.setRefreshing(false);
-                                            adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
-                                            chatList.setAdapter(adapter);
-                                            emptyTag.setVisibility(View.VISIBLE);
-                                            icon.setVisibility(View.VISIBLE);
-                                        }
-
+                                        try {
+                                            chatlist.add(contactDm);
+                                            if (!chatlist.isEmpty()) {
+                                                try {
+                                                    Collections.sort(chatlist, (chat1, chat2) -> (chat2.timeStamp.compareTo(chat1.timeStamp)));
+                                                } catch (Exception e) {
+                                                }
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                                chatList.setAdapter(adapter);
+                                                emptyTag.setVisibility(View.GONE);
+                                                icon.setVisibility(View.GONE);
+                                            } else {
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                                adapter = new ChatListAdapter(Inbox.this, chatlist, getApplicationContext());
+                                                chatList.setAdapter(adapter);
+                                                emptyTag.setVisibility(View.VISIBLE);
+                                                icon.setVisibility(View.VISIBLE);
+                                            }
+                                        } catch (Exception e){ }
                                     }
 
                                     @Override
@@ -225,9 +224,6 @@ public class Inbox extends AppCompatActivity implements SwipeRefreshLayout.OnRef
                                         // Handle possible errors.
                                     }
                                 });
-
-
-
 
                             }
 
