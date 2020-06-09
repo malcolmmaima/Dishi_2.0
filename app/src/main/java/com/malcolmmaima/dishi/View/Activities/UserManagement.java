@@ -27,6 +27,7 @@ import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Adapter.FollowerFollowingAdapter;
+import com.malcolmmaima.dishi.View.Adapter.UserManageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +157,7 @@ public class UserManagement extends AppCompatActivity implements SwipeRefreshLay
                             UserModel userFound = user_.getValue(UserModel.class);
                             userFound.setPhone(user_.getKey());
 
-                            String name = userFound.getFirstname()+" "+userFound.getLastname();
+                            String name = userFound.getFirstname()+" "+userFound.getLastname()+" "+userFound.getPhone();
                             if(name.toLowerCase().contains(s.toLowerCase()) && !myPhone.equals(userFound.getPhone()) && userFound.getFirstname() != null){
                                 if(usersFound.size() < searchCap){
                                     usersFound.add(userFound);
@@ -166,7 +167,7 @@ public class UserManagement extends AppCompatActivity implements SwipeRefreshLay
                             if (!usersFound.isEmpty()) {
                                 mSwipeRefreshLayout.setRefreshing(false);
                                 //Collections.reverse(orders);
-                                FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(UserManagement.this, usersFound);
+                                UserManageAdapter recycler = new UserManageAdapter(UserManagement.this, usersFound);
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recycler.notifyDataSetChanged();
@@ -174,7 +175,7 @@ public class UserManagement extends AppCompatActivity implements SwipeRefreshLay
                                 emptyTag.setVisibility(View.GONE);
                             } else {
                                 mSwipeRefreshLayout.setRefreshing(false);
-                                FollowerFollowingAdapter recycler = new FollowerFollowingAdapter(UserManagement.this, usersFound);
+                                UserManageAdapter recycler = new UserManageAdapter(UserManagement.this, usersFound);
                                 recyclerview.setLayoutManager(layoutmanager);
                                 recyclerview.setItemAnimator(new DefaultItemAnimator());
                                 recyclerview.setAdapter(recycler);
