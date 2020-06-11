@@ -704,12 +704,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                         public void onSuccess(Void aVoid) {
                                                                             //First time signup
                                                                         }
-                                                                    })
-                                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                                @Override
-                                                                                public void onFailure(@NonNull Exception e) {
-                                                                                    // Write failed
-                                                                                    SafeToast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
+                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            // Write failed
+                                                                            SafeToast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
 
                                                                                 }
                                                                             });
@@ -926,9 +925,52 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                             }
                                                         }
+                                                        else {
+                                                            /**
+                                                             * Always log logged in devices for security purposes
+                                                             */
+                                                            DatabaseReference myDevicesRef = FirebaseDatabase.getInstance().getReference("mydevices/"+myPhone);
+                                                            //get device id
+                                                            try {
+                                                                final String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                                                                        Settings.Secure.ANDROID_ID);
+
+                                                                GetCurrentDate currentDate = new GetCurrentDate();
+
+                                                                MyDeviceModel myDevice = new MyDeviceModel();
+                                                                myDevice.setDeviceModel(DeviceName.getDeviceName());
+                                                                myDevice.setIpAddress(getLocalIpAddress());
+                                                                myDevice.setLastLogin(currentDate.getDate());
+                                                                myDevice.setBlocked(false);
+                                                                myDevicesRef.child(android_id).setValue(myDevice);
+                                                            } catch (Exception e){
+
+                                                            }
+
+                                                            dbRef.child("account_type").setValue("0");
+                                                            dbRef.child("verified").setValue("false").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    //First time signup
+                                                                    Intent slideactivity = new Intent(MainActivity.this, SetupProfile.class)
+                                                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                    Bundle bndlanimation =
+                                                                            ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.animation, R.anim.animation2).toBundle();
+                                                                    startActivity(slideactivity, bndlanimation);
+                                                                }
+                                                            }).addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    // Write failed
+                                                                    SafeToast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
+
+                                                                }
+                                                            });
+                                                        }
                                                     }
                                                     @Override
                                                     public void onCancelled(DatabaseError databaseError) {
+
                                                     }
                                                 });
                                             }
