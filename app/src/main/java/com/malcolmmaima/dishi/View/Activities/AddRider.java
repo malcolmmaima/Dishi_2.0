@@ -196,13 +196,17 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
                     myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+                            try {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                            if(locked == true){
-                                Intent slideactivity = new Intent(AddRider.this, SecurityPin.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                slideactivity.putExtra("pinType", "resume");
-                                startActivity(slideactivity);
+                                if(locked == true){
+                                    Intent slideactivity = new Intent(AddRider.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            } catch (Exception e){
+
                             }
                         }
 
@@ -226,38 +230,42 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot user : dataSnapshot.getChildren()){
-                    String accountType = user.child("account_type").getValue(String.class);
-                    if(accountType.equals("3")){
-                        UserModel riderUser = user.getValue(UserModel.class);
+                    try {
+                        String accountType = user.child("account_type").getValue(String.class);
+                        if (accountType.equals("3")) {
+                            UserModel riderUser = user.getValue(UserModel.class);
 
-                        /**
-                         * Compare search parameter with value returned from db
-                         */
-                        if(phone.equals(user.getKey())){
-                            riderUser.setPhone(user.getKey());
-                            riders.add(riderUser);
+                            /**
+                             * Compare search parameter with value returned from db
+                             */
+                            if (phone.equals(user.getKey())) {
+                                riderUser.setPhone(user.getKey());
+                                riders.add(riderUser);
+                            }
+
+                            if (!riders.isEmpty()) {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                //Collections.reverse(orders);
+                                AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders, AddRider.this);
+                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
+                                recyclerview.setLayoutManager(layoutmanager);
+                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                recycler.notifyDataSetChanged();
+                                recyclerview.setAdapter(recycler);
+                                emptyTag.setVisibility(View.INVISIBLE);
+                            } else {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders, AddRider.this);
+                                RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
+                                recyclerview.setLayoutManager(layoutmanager);
+                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                recyclerview.setAdapter(recycler);
+                                emptyTag.setVisibility(View.VISIBLE);
+
+                            }
                         }
+                    } catch (Exception e){
 
-                        if (!riders.isEmpty()) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            //Collections.reverse(orders);
-                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders, AddRider.this);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
-                            recyclerview.setLayoutManager(layoutmanager);
-                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                            recycler.notifyDataSetChanged();
-                            recyclerview.setAdapter(recycler);
-                            emptyTag.setVisibility(View.INVISIBLE);
-                        } else {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            AddRiderAdapter recycler = new AddRiderAdapter(AddRider.this, riders, AddRider.this);
-                            RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(AddRider.this);
-                            recyclerview.setLayoutManager(layoutmanager);
-                            recyclerview.setItemAnimator(new DefaultItemAnimator());
-                            recyclerview.setAdapter(recycler);
-                            emptyTag.setVisibility(View.VISIBLE);
-
-                        }
                     }
                 }
             }

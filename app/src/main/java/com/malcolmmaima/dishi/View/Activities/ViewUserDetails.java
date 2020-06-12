@@ -41,8 +41,12 @@ public class ViewUserDetails extends AppCompatActivity {
                     finish();
                     Toast.makeText(ViewUserDetails.this, "User does not exist!", Toast.LENGTH_LONG).show();
                 } else {
-                    UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                    setTitle(userModel.getFirstname()+" "+userModel.getLastname());
+                    try {
+                        UserModel userModel = dataSnapshot.getValue(UserModel.class);
+                        setTitle(userModel.getFirstname() + " " + userModel.getLastname());
+                    } catch (Exception e){
+
+                    }
                 }
 
             }
