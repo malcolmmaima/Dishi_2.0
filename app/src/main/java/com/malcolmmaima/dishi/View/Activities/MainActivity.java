@@ -637,7 +637,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull final Task<AuthResult> task) {
-
                         try {
                             if (task.isSuccessful()) {
                                 startNotificationService();
@@ -974,9 +973,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                     }
                                                 });
                                             }
-                                        } catch (Exception e){
-
-                                        }
+                                        } catch (Exception e){ }
                                     }
 
                                     @Override
@@ -984,8 +981,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                     }
                                 });
-
-
 
                             } else {
                                 // Sign in failed, display a message and update the UI
@@ -1002,9 +997,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     snackbar.show();
                                 }
                             }
-                        } catch (Exception e){
-
-                        }
+                        } catch (Exception e){ }
                     }
                 });
     }
@@ -1062,8 +1055,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }, 0, 1000);
     }
 
-    private void resendVerificationCode(String phoneNumber,
-                                        PhoneAuthProvider.ForceResendingToken token) {
+    private void resendVerificationCode(String phoneNumber, PhoneAuthProvider.ForceResendingToken token) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phoneNumber,        // Phone number to verify
                 60,                 // Timeout duration

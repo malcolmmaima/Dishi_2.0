@@ -20,8 +20,8 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:versionCode="5"
-        android:versionName="1.0.5">
+        android:versionCode="6"
+        android:versionName="1.0.6">
         <activity android:name=".View.Activities.ViewUserDetails"></activity>
         <activity android:name=".View.Activities.UserManagement" />
         <activity android:name=".View.Activities.SupportDashboard" />
