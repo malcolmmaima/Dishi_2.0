@@ -40,7 +40,7 @@ jobs:
           path: domain/build/test-results
       - run:
           name: Run Data Module Unit Tests
-          command: ./gradlew :data:testDebugUnitTest
+          command: ./gradlew :app:testDebugUnitTest
       - store_artifacts:
           path: data/build/reports
       - store_test_results:
