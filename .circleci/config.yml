@@ -26,7 +26,7 @@ jobs:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           name: Run Dishi_2.0 Module Unit Tests
-          command: ./gradlew :testDebugUnitTest
+          command: ./gradlew :app:testDebugUnitTest
       - store_artifacts:
           path: /build/reports
       - store_test_results:
