@@ -5,7 +5,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/Dishi_2.0
+    working_directory: ~/
     docker:
       - image: circleci/android:api-29
     environment:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "Dishi_2.0/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "/build.gradle" }}
 #      - run:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
@@ -23,14 +23,14 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "Dishi_2.0/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "/build.gradle" }}
       - run:
           name: Run Dishi_2.0 Module Unit Tests
-          command: ./gradlew :Dishi_2.0:testDebugUnitTest
+          command: ./gradlew :testDebugUnitTest
       - store_artifacts:
-          path: Dishi_2.0/build/reports
+          path: /build/reports
       - store_test_results:
-          path: Dishi_2.0/build/test-results
+          path: /build/test-results
       - run:
           name: Run Domain Module Unit Tests
           command: ./gradlew :domain:test
@@ -49,4 +49,4 @@ jobs:
           name: Run Lint Test
           command: ./gradlew lint
       - store_artifacts:
-          path: Dishi_2.0/build/reports
+          path: /build/reports
