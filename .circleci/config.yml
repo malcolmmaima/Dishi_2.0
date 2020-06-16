@@ -33,7 +33,7 @@ jobs:
           path: /build/test-results
       - run:
           name: Run Domain Module Unit Tests
-          command: ./gradlew :domain:test
+          command: ./gradlew :app:test
       - store_artifacts:
           path: domain/build/reports
       - store_test_results:
