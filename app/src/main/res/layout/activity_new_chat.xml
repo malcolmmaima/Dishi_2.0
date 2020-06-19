@@ -22,6 +22,16 @@
         app:view_borderWidth="2dp"
         app:view_borderColor="@color/colorPrimaryDark">
 
+        <EditText
+            android:layout_marginRight="5dp"
+            android:id="@+id/userSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="Search"
+            />
+
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -32,32 +42,11 @@
         <LinearLayout
             android:id="@+id/Customer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
             android:clipChildren="false"
             android:orientation="vertical" >
 
-            <TextView
-                android:text="To:"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="5dp"
-                android:textSize="20sp"
-                android:fontFamily="sans-serif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <EditText
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="35dp"
-                android:layout_marginTop="-35dp"
-                android:layout_marginBottom="15dp"
-                android:id="@+id/userSearch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:hint="Search"
-                />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
