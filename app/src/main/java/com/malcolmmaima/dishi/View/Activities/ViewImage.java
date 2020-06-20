@@ -59,14 +59,16 @@ public class ViewImage extends AppCompatActivity {
                             myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Boolean locked = dataSnapshot.getValue(Boolean.class);
+                                    try {
+                                        Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                                    if(locked == true){
-                                        Intent slideactivity = new Intent(ViewImage.this, SecurityPin.class)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        slideactivity.putExtra("pinType", "resume");
-                                        startActivity(slideactivity);
-                                    }
+                                        if(locked == true){
+                                            Intent slideactivity = new Intent(ViewImage.this, SecurityPin.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            slideactivity.putExtra("pinType", "resume");
+                                            startActivity(slideactivity);
+                                        }
+                                    } catch(Exception e){ }
                                 }
 
                                 @Override
@@ -115,10 +117,6 @@ public class ViewImage extends AppCompatActivity {
                                 loading.setVisibility(View.INVISIBLE);
                                 Snackbar snackbar = Snackbar.make(findViewById(R.id.parentLayout), "Something went wrong", Snackbar.LENGTH_LONG);
                                 snackbar.show();
-
-                                if (snackbar.isShown()) {
-                                    finish();
-                                }
                             }
                         });
             } catch (Exception e){}
@@ -142,14 +140,16 @@ public class ViewImage extends AppCompatActivity {
                     myRef.child("appLocked").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Boolean locked = dataSnapshot.getValue(Boolean.class);
+                            try {
+                                Boolean locked = dataSnapshot.getValue(Boolean.class);
 
-                            if(locked == true){
-                                Intent slideactivity = new Intent(ViewImage.this, SecurityPin.class)
-                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                slideactivity.putExtra("pinType", "resume");
-                                startActivity(slideactivity);
-                            }
+                                if (locked == true) {
+                                    Intent slideactivity = new Intent(ViewImage.this, SecurityPin.class)
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    slideactivity.putExtra("pinType", "resume");
+                                    startActivity(slideactivity);
+                                }
+                            } catch (Exception e){ }
                         }
 
                         @Override
