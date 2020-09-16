@@ -23,7 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.R;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class DeliverCharges extends AppCompatActivity {
 
@@ -43,7 +43,7 @@ public class DeliverCharges extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -145,7 +145,7 @@ public class DeliverCharges extends AppCompatActivity {
                                 myRef.child("deliveryChargeLimit").setValue(deliveryWaiverFee).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        SafeToast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(DeliverCharges.this, "Saved", Toast.LENGTH_LONG).show();
                                         finish();
                                     }
                                 });

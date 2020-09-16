@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "ViewShareFoodItems";
@@ -84,7 +84,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             receiptKey = getIntent().getStringExtra("receiptKey");
             authorPhone = getIntent().getStringExtra("author");
@@ -161,7 +161,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
                 list = new ArrayList<>();
                 if(!dataSnapshot.exists()){
                     finish();
-                    SafeToast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
                 } else {
                     for(DataSnapshot items : dataSnapshot.getChildren()){
                         ProductDetailsModel product = items.getValue(ProductDetailsModel.class);
@@ -201,7 +201,7 @@ public class ViewShareFoodItems extends AppCompatActivity implements SwipeRefres
                                     recyclerview.setAdapter(recycler);
                                 } else {
                                     finish();
-                                    SafeToast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ViewShareFoodItems.this, "Items no longer exist!", Toast.LENGTH_LONG).show();
                                 }
 
                             }

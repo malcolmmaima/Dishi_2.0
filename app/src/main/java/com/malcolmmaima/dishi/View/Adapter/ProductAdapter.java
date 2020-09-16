@@ -55,7 +55,7 @@ import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder>{
@@ -381,7 +381,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                                                             Snackbar.make(view.getRootView(), "Added", Snackbar.LENGTH_LONG).show();
                                                         }
                                                     });
-                                                    //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
                                                 }
                                             });
 
@@ -513,7 +513,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                     context.startActivity(slideactivity, bndlanimation);
-                    SafeToast.makeText(context, "Please add multiple from here", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Please add multiple from here", Toast.LENGTH_LONG).show();
                 } else {
                     DatabaseReference menuExistRef = FirebaseDatabase.getInstance()
                             .getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getKey());
@@ -522,7 +522,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyHolder
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(!dataSnapshot.exists()){ //Does not exist!
 
-                                SafeToast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
                             }
 
                             else {

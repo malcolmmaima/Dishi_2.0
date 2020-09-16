@@ -157,7 +157,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void launchHomeScreen() {
         prefManager.setFirstTimeLaunch(false);
         //User is not signed in, send them to verification page
-        //SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
         startActivity(new Intent(WelcomeActivity.this, MainActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
 

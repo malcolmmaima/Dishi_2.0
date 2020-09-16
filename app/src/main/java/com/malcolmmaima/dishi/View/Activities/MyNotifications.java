@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class MyNotifications extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -65,7 +65,7 @@ public class MyNotifications extends AppCompatActivity implements SwipeRefreshLa
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             user = FirebaseAuth.getInstance().getCurrentUser();

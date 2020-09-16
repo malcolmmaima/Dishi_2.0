@@ -71,10 +71,7 @@ import java.util.UUID;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
-
 import static android.app.Activity.RESULT_OK;
-import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
 public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "ProfileFragment";
@@ -488,7 +485,7 @@ public class ProfileFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 else if(myStatusUpdate.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
-                    SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
                     myStatusUpdate.setEnabled(true);
                     imageUpload.setEnabled(true);
                     postBtn.setEnabled(true);

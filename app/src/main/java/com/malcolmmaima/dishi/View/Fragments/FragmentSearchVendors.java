@@ -34,8 +34,6 @@ import com.malcolmmaima.dishi.View.Adapter.RestaurantAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -82,7 +80,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                 } catch (Exception e){
                     //Log.e(TAG, "onDataChange: ", e);
                 }
-                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -191,7 +189,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         String restaurantName = user.getFirstname() + " " + user.getLastname();
                                                         if (!myPhone.equals(user.getPhone())) {
@@ -273,7 +271,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         String restaurantName = user.getFirstname() + " " + user.getLastname();
                                                         if (!myPhone.equals(user.getPhone())) {
@@ -339,7 +337,7 @@ public class FragmentSearchVendors extends Fragment implements SwipeRefreshLayou
                                          * and "live" which tracks the restaurant's live location under "location/phone"
                                          */
                                         else {
-                                            SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
                                         }
                                     }
 

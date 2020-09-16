@@ -50,9 +50,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
-
 public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder>{
 
     String TAG = "ReceiptAdapter";
@@ -231,7 +228,7 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.MyHolder
                                                         } catch (Exception e){
                                                             Log.e(TAG, "error ", e);
                                                         }
-                                                        SafeToast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
                                             }

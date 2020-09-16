@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "HistoryFragment";
@@ -273,7 +273,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                                             Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                     liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                             ProductDetailsModel product = products.getValue(ProductDetailsModel.class);
                                                             //product.setKey(products.getKey());
@@ -413,7 +413,7 @@ public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                              * and "live" which tracks the restaurant's live location under "location/phone"
                                              */
                                             else {
-                                                SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
                                             }
                                         }
 

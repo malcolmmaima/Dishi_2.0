@@ -55,7 +55,6 @@ import java.util.UUID;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
 
 import static android.app.Activity.RESULT_OK;
 

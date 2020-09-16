@@ -35,8 +35,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHolder>{
     Context context;
     List<UserModel> listdata;
@@ -71,7 +69,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.MyHold
                 if(!dataSnapshot.exists()){
 
                     try {
-                        SafeToast.makeText(context, orderDetails.getFirstname() +" "+ orderDetails.getLastname() + " order complete!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, orderDetails.getFirstname() +" "+ orderDetails.getLastname() + " order complete!", Toast.LENGTH_LONG).show();
                         listdata.remove(holder.getAdapterPosition());
                         notifyItemRemoved(holder.getAdapterPosition());
                     } catch (Exception e){}

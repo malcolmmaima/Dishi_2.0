@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "FavouriteFoodsFragment";
     List<ProductDetailsModel> list;
@@ -106,8 +104,12 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
         locationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                try {
+                    liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
+                    //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                } catch (Exception e){
+
+                }
             }
 
             @Override
@@ -191,10 +193,10 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
                                                             ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
@@ -280,9 +282,9 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
                                                         for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
 
                                                             //Since 'my_food_favourites' stores only the key reference and restaurant phone of the item liked, let's go to menu node
                                                             //Of that particular restaurant and fetch the item details then add to list
@@ -356,7 +358,7 @@ public class FavouriteFoodsFragment extends Fragment implements SwipeRefreshLayo
                                          * and "live" which tracks the restaurant's live location under "location/phone"
                                          */
                                         else {
-                                            SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
                                         }
                                     }
 

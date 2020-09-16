@@ -59,10 +59,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-
-import io.fabric.sdk.android.services.common.SafeToast;
-
-
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHolder> {
 
     Context context;
@@ -1114,13 +1110,13 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyHold
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
             android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setText(text);
-            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
 
         } else {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
             clipboard.setPrimaryClip(clip);
-            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
         }
     }
 

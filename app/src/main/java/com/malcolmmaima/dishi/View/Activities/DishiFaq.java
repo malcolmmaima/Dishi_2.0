@@ -13,8 +13,6 @@ import android.widget.Toast;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.R;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class DishiFaq extends AppCompatActivity {
 
     String TAG = "DishiFaq";
@@ -44,7 +42,7 @@ public class DishiFaq extends AppCompatActivity {
                     emailIntent.putExtra(Intent.EXTRA_TEXT, "Hi Dishi, ...");
                     startActivity(Intent.createChooser(emailIntent, "Send email..."));
                 } catch (Exception e){
-                    SafeToast.makeText(DishiFaq.this, "Something went wrong, email us at dishifoodapp@gmail.com", Toast.LENGTH_LONG).show();
+                    Toast.makeText(DishiFaq.this, "Something went wrong, email us at dishifoodapp@gmail.com", Toast.LENGTH_LONG).show();
                     Log.e(TAG, "onClick: ", e);
                 }
             }

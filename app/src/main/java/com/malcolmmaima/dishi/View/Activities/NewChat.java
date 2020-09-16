@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class NewChat extends AppCompatActivity {
 
@@ -58,7 +58,7 @@ public class NewChat extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             //Hide keyboard on activity load
             this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);

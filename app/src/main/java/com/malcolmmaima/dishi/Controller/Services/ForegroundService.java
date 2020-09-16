@@ -229,7 +229,7 @@ public class ForegroundService extends Service {
 
                                                     for (DataSnapshot restaurants : vendors.getChildren()) {
                                                         if(vendors.child(restaurants.getKey()).exists()){
-                                                            //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
                                                             DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/" + restaurants.getKey() + "/" + myPhone);
                                                             restaurantRidersRef.setValue("inactive");
                                                         }
@@ -250,7 +250,7 @@ public class ForegroundService extends Service {
                                     } else {
                                         //Log.d("RiderRequestsService", myPhone + ": active ride requests");
                                         for (DataSnapshot restaurantRequest : dataSnapshot.getChildren()) {
-                                            //SafeToast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(getContext(), "restaurant: " + restaurantRequest.getKey(), Toast.LENGTH_SHORT).show();
                                             for (DataSnapshot assignedCustomer : restaurantRequest.getChildren()) {
                                                 /**
                                                  * we just need 1 'accepted' order request to keep rider status active otherwise if none then inactive
@@ -261,7 +261,7 @@ public class ForegroundService extends Service {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                             for (DataSnapshot restaurants : dataSnapshot.getChildren()) {
-                                                                //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                                //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
                                                                 DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/" + restaurants.getKey() + "/" + myPhone);
                                                                 restaurantRidersRef.setValue("active");
                                                             }
@@ -278,7 +278,7 @@ public class ForegroundService extends Service {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                             for (DataSnapshot restaurants : dataSnapshot.getChildren()) {
-                                                                //SafeToast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
+                                                                //Toast.makeText(getContext(), "restaurants: " + restaurants.getKey(), Toast.LENGTH_SHORT).show();
                                                                 DatabaseReference restaurantRidersRef = FirebaseDatabase.getInstance().getReference("my_riders/" + restaurants.getKey() + "/" + myPhone);
                                                                 restaurantRidersRef.setValue("inactive");
 
@@ -394,7 +394,7 @@ public class ForegroundService extends Service {
             myUserDetailsRef.addListenerForSingleValueEvent(myUserDetailsListener);
         } catch (Exception e){}
 
-        //SafeToast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),"Notification started", Toast.LENGTH_SHORT).show();
         return START_STICKY;
     }
 

@@ -30,7 +30,7 @@ import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ResetPin extends AppCompatActivity {
     String TAG = "ResetPin";
@@ -54,7 +54,7 @@ public class ResetPin extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             resetMyPin.setVisibility(View.VISIBLE);
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -89,11 +89,11 @@ public class ResetPin extends AppCompatActivity {
                                             FirebaseAuth.getInstance().signOut();
                                             startActivity(new Intent(ResetPin.this, SplashActivity.class)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                                            SafeToast.makeText(ResetPin.this, "Your PIN has been removed!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(ResetPin.this, "Your PIN has been removed!", Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 } else {
-                                    SafeToast.makeText(ResetPin.this, "Make sure to include country code!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ResetPin.this, "Make sure to include country code!", Toast.LENGTH_SHORT).show();
                                     Snackbar snackbar = Snackbar
                                             .make(findViewById(R.id.parentlayout), "Invalid details", Snackbar.LENGTH_LONG);
                                     snackbar.show();

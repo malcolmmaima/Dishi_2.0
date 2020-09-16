@@ -129,7 +129,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
 
                     @Override
                     public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                        //SafeToast.makeText(getContext(), "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Removed " + dataSnapshot.getKey(), Toast.LENGTH_SHORT).show();
                         fetchOrders();
                     }
 
@@ -157,7 +157,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
         try {
             for(int i=0; i<myRestaurants.size(); i++) {
                 ordersRef[i].removeEventListener(ordersRefListener[i]);
-                //SafeToast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "removed: ref[" + i + "]", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e){
             Log.e(TAG, "onDetach: ", e);
@@ -222,7 +222,7 @@ public class RiderRequestsFragment extends Fragment implements SwipeRefreshLayou
                                         for(final DataSnapshot orders : dataSnapshot.getChildren()){
 
                                             if(orders.child("rider").exists() && orders.child("rider").getValue().equals(myPhone)){
-                                                //SafeToast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(getContext(), "assigned: " + orders.getKey(), Toast.LENGTH_SHORT).show();
                                                 //Log.d("RiderRequestFragment", " been assigned order: 3");
                                                 AssignedOrders.clear(); //clear list
                                                 myRestaurants.clear();

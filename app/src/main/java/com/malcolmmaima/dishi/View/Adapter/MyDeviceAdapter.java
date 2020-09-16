@@ -52,7 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 
 public class MyDeviceAdapter extends RecyclerView.Adapter<MyDeviceAdapter.MyHolder>{

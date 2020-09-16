@@ -35,8 +35,6 @@ import com.malcolmmaima.dishi.View.Fragments.ViewRestaurantMenuFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class FollowersFollowing extends AppCompatActivity {
 
     String phone, target, myPhone;
@@ -63,7 +61,7 @@ public class FollowersFollowing extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } {
 
             user = FirebaseAuth.getInstance().getCurrentUser();

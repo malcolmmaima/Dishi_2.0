@@ -170,7 +170,7 @@ public class TrackingService extends Service {
                             //Save the location data to the database//
 
                             ref.setValue(location);
-//                            SafeToast.makeText(getApplicationContext(), "Location data: lat(" +
+//                            Toast.makeText(getApplicationContext(), "Location data: lat(" +
 //                                    location.getLatitude() + ") long(" + location.getLongitude() + ")", Toast.LENGTH_SHORT).show();
                         }
                     }

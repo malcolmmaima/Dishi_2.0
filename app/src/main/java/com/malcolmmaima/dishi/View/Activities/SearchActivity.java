@@ -50,8 +50,6 @@ import com.malcolmmaima.dishi.View.Fragments.FragmentSearchPosts;
 import com.malcolmmaima.dishi.View.Fragments.FragmentSearchUsers;
 import com.malcolmmaima.dishi.View.Fragments.FragmentSearchVendors;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class SearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     String TAG = "SearchActivity";
@@ -82,7 +80,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             checkGPS();
@@ -140,7 +138,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             mAuth = FirebaseAuth.getInstance();
             if(mAuth.getInstance().getCurrentUser() == null){
                 finish();
-                SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
             } else {
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber();
@@ -282,7 +280,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     private void checkGPS() {
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(SearchActivity.this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)

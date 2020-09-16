@@ -61,8 +61,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -330,13 +328,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                     @Override
                                                                     public void onFailure(@NonNull Exception e) {
                                                                         // Write failed
-                                                                        SafeToast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
 
                                                                     }
                                                                 });
                                                     }
 
-                                                    //SafeToast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                                    //Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
                                                     if(verified.equals("true")){
 
                                                         //A security feature, we want to confirm this device has not been blocked from accessing the account
@@ -408,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                             if(dataSnapshot.exists()){
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 slideactivity.putExtra("pinType", "login");
@@ -418,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                                                             else {
 
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
@@ -442,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                             if(dataSnapshot.exists()){
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 slideactivity.putExtra("pinType", "login");
@@ -451,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                             }
 
                                                                                             else {
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(MainActivity.this, VendorActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
@@ -475,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                             if(dataSnapshot.exists()){
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 slideactivity.putExtra("pinType", "login");
@@ -484,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                             }
 
                                                                                             else {
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
@@ -516,7 +514,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                         progressDialog.dismiss();
                                                                                     }
                                                                                     finish();
-                                                                                    SafeToast.makeText(MainActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
+                                                                                    Toast.makeText(MainActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
                                                                                 }
                                                                             } catch (Exception e){
                                                                                 Log.e(TAG, "onDataChange: ", e);
@@ -694,7 +692,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                         if(dataSnapshot.exists()){
                                                             try {
                                                                 String verified = dataSnapshot.getValue(String.class);
-                                                                //SafeToast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_SHORT).show();
+                                                                //Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_SHORT).show();
                                                                 if(verified == null) {
                                                                     verified = "false";
 
@@ -707,13 +705,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                         @Override
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             // Write failed
-                                                                            SafeToast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
 
                                                                                 }
                                                                             });
                                                                 }
 
-                                                                //SafeToast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                                                //Toast.makeText(MainActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
                                                                 if(verified.equals("true")){
 
                                                                     //A security feature, we want to confirm this device has not been blocked from accessing the account
@@ -768,7 +766,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                                                     try {
                                                                                         String account_type = dataSnapshot.getValue(String.class);
-                                                                                        //SafeToast.makeText(MainActivity.this, "accType: " + account_type, Toast.LENGTH_SHORT).show();
+                                                                                        //Toast.makeText(MainActivity.this, "accType: " + account_type, Toast.LENGTH_SHORT).show();
                                                                                         //User has not finished setting up account
                                                                                         if (account_type.equals("0")) {
                                                                                             Intent slideactivity = new Intent(MainActivity.this, SetupAccountType.class)
@@ -786,7 +784,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                                 @Override
                                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                                     if(dataSnapshot.exists()){
-                                                                                                        //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                        //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                         Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                         slideactivity.putExtra("pinType", "login");
@@ -795,7 +793,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                                     }
 
                                                                                                     else {
-                                                                                                        //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                        //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                         Intent slideactivity = new Intent(MainActivity.this, CustomerActivity.class)
                                                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                         Bundle bndlanimation =
@@ -817,7 +815,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                                 @Override
                                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                                     if(dataSnapshot.exists()){
-                                                                                                        //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                        //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                         Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                         slideactivity.putExtra("pinType", "login");
@@ -827,7 +825,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                                                                                     else {
                                                                                                         try {
-                                                                                                            //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                            //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                             Intent slideactivity = new Intent(MainActivity.this, VendorActivity.class)
                                                                                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                             Bundle bndlanimation =
@@ -852,7 +850,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                                 @Override
                                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                                     if(dataSnapshot.exists()){
-                                                                                                        //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                        //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                         Intent slideactivity = new Intent(MainActivity.this, SecurityPin.class)
                                                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                         slideactivity.putExtra("pinType", "login");
@@ -861,7 +859,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                                     }
 
                                                                                                     else {
-                                                                                                        //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                        //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                         Intent slideactivity = new Intent(MainActivity.this, RiderActivity.class)
                                                                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                         Bundle bndlanimation =
@@ -887,14 +885,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                                                 progressDialog.dismiss();
                                                                                             }
                                                                                             finish();
-                                                                                            SafeToast.makeText(MainActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
+                                                                                            Toast.makeText(MainActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
                                                                                         }
                                                                                     } catch(Exception e){
                                                                                         Log.e(TAG, "onDataChange: "+ e );
                                                                                     }
 
                                                                                     //Debugging purposes
-                                                                                    //SafeToast.makeText(SplashActivity.this, "Account type: " + account_type, Toast.LENGTH_LONG).show();
+                                                                                    //Toast.makeText(SplashActivity.this, "Account type: " + account_type, Toast.LENGTH_LONG).show();
                                                                                 }
 
                                                                                 @Override
@@ -961,7 +959,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                                 @Override
                                                                 public void onFailure(@NonNull Exception e) {
                                                                     // Write failed
-                                                                    SafeToast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(MainActivity.this, "error: " + e, Toast.LENGTH_SHORT).show();
 
                                                                 }
                                                             });
@@ -1102,9 +1100,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void checkConnection(){
         if(isOnline()){
-            //SafeToast.makeText(SplashActivity.this, "You are connected to Internet", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(SplashActivity.this, "You are connected to Internet", Toast.LENGTH_SHORT).show();
         }else{
-            SafeToast.makeText(MainActivity.this, "You are not connected to the Internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "You are not connected to the Internet", Toast.LENGTH_SHORT).show();
         }
     }
 }

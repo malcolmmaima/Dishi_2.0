@@ -71,7 +71,7 @@ import java.util.UUID;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 import static android.view.View.INVISIBLE;
 import static com.crashlytics.android.core.CrashlyticsCore.TAG;
@@ -124,7 +124,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -295,7 +295,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(!dataSnapshot.exists()){
                         finish();
-                        SafeToast.makeText(ViewReview.this, "Review no longer exists!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ViewReview.this, "Review no longer exists!", Toast.LENGTH_LONG).show();
                     } else {
                         try {
                             viewPost = dataSnapshot.getValue(StatusUpdateModel.class);
@@ -638,7 +638,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
 
                 else if(statusPost.getText().toString().equals("") && !selectedImage.isShown()){
                     mSwipeRefreshLayout.setRefreshing(false);
-                    SafeToast.makeText(ViewReview.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ViewReview.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
                 else {
@@ -827,7 +827,7 @@ public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number

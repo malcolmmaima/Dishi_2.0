@@ -26,7 +26,7 @@ import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class LocationSettings extends AppCompatActivity {
 
@@ -45,7 +45,7 @@ public class LocationSettings extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number

@@ -46,7 +46,7 @@ import com.malcolmmaima.dishi.R;
 
 import java.io.IOException;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class SetupProfile extends AppCompatActivity {
 
@@ -186,7 +186,7 @@ public class SetupProfile extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         mProgressBar.setVisibility(View.INVISIBLE);
-                                        //SafeToast.makeText(mContext, "Details saved!", Toast.LENGTH_LONG).show();
+                                        //Toast.makeText(mContext, "Details saved!", Toast.LENGTH_LONG).show();
                                         UploadImage();
                                         //Check if profile picture has been set
                                     }
@@ -445,7 +445,7 @@ public class SetupProfile extends AppCompatActivity {
                     })
                     .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            SafeToast.makeText(mContext, "Upload a profile picture!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Upload a profile picture!", Toast.LENGTH_SHORT).show();
                             valid[0] = false;
 
                         }
@@ -473,7 +473,7 @@ public class SetupProfile extends AppCompatActivity {
 
         if (mGender.getCheckedRadioButtonId() == -1){
 
-            SafeToast.makeText(SetupProfile.this, "You must select gender", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SetupProfile.this, "You must select gender", Toast.LENGTH_SHORT).show();
             valid[0] =false;
         }
 

@@ -22,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.R;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class TermsConditions extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     String TAG = "TermsConditions";

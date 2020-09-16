@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ViewMyOrders extends AppCompatActivity {
     String TAG = "ViewMyOrder";
@@ -99,7 +99,7 @@ public class ViewMyOrders extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             try {
                 user = FirebaseAuth.getInstance().getCurrentUser();
@@ -140,7 +140,7 @@ public class ViewMyOrders extends AppCompatActivity {
 
             } catch (Exception e){
                 Log.e(TAG, "onCreate: ", e);
-                SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -208,7 +208,7 @@ public class ViewMyOrders extends AppCompatActivity {
                             progressDialog.dismiss();
                         }
                     } catch (Exception e){}
-                    SafeToast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ViewMyOrders.this, "Order does not exist", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
                     try {
@@ -617,7 +617,7 @@ public class ViewMyOrders extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 finish();
-                                                SafeToast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(ViewMyOrders.this, "Order Cancelled!", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
@@ -656,7 +656,7 @@ public class ViewMyOrders extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             try {
@@ -695,7 +695,7 @@ public class ViewMyOrders extends AppCompatActivity {
                 });
                 loadMyOrders();
             } catch (Exception e){
-                SafeToast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
             }
         }
     }

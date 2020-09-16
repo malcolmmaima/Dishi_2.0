@@ -15,8 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
-import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,9 +30,6 @@ import com.malcolmmaima.dishi.Model.MyDeviceModel;
 import com.malcolmmaima.dishi.R;
 
 import com.malcolmmaima.dishi.Controller.Utils.PreferenceManager;
-
-import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.common.SafeToast;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -84,8 +79,6 @@ public class SplashActivity extends AppCompatActivity {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-        Fabric.with(this, new Crashlytics());
-
         // Checking for first time launch
         PreferenceManager prefManager = new PreferenceManager(this);
         if (!prefManager.isFirstTimeLaunch()) {
@@ -93,7 +86,7 @@ public class SplashActivity extends AppCompatActivity {
             if (mAuth.getInstance().getCurrentUser() == null || mAuth.getInstance().getCurrentUser().getPhoneNumber() == null) {
                 progressBar.setVisibility(View.GONE);
                 //User is not signed in, send them back to verification page
-                //SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(SplashActivity.this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
                 stopNotificationService();
@@ -140,7 +133,7 @@ public class SplashActivity extends AppCompatActivity {
                                                 //device id's do not match, prompt to logout atleast one device
                                                 if (!android_id.equals(fetchedId)) {
                                                     //Log out
-                                                    SafeToast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(SplashActivity.this, "You're logged in a different device!", Toast.LENGTH_LONG).show();
                                                     stopService(new Intent(SplashActivity.this, ForegroundService.class));
                                                     stopService(new Intent(SplashActivity.this, TrackingService.class));
                                                     FirebaseAuth.getInstance().signOut();
@@ -174,7 +167,7 @@ public class SplashActivity extends AppCompatActivity {
                                         try {
                                             String verified = dataSnapshot.getValue(String.class);
 
-                                            //SafeToast.makeText(SplashActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
+                                            //Toast.makeText(SplashActivity.this, "Verified: " + verified, Toast.LENGTH_LONG).show();
                                             if (verified == null) {
                                                 verified = "false";
 
@@ -192,7 +185,7 @@ public class SplashActivity extends AppCompatActivity {
                                                             public void onFailure(@NonNull Exception e) {
                                                                 // Write failed
                                                                 progressBar.setVisibility(View.GONE);
-                                                                SafeToast.makeText(SplashActivity.this, "Error!", Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(SplashActivity.this, "Error!", Toast.LENGTH_LONG).show();
                                                             }
                                                         });
 
@@ -235,13 +228,13 @@ public class SplashActivity extends AppCompatActivity {
                                                                     //String account_type = Integer.toString(acc_type);
 
                                                                     if (account_type == null) {
-                                                                        //SafeToast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
+                                                                        //Toast.makeText(SplashActivity.this, "account type null", Toast.LENGTH_SHORT).show();
                                                                         //Set account type to 0 if setting up no complete
                                                                         dbRef.child("account_type").setValue("0").addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                             @Override
                                                                             public void onSuccess(Void aVoid) {
 
-                                                                                //SafeToast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+                                                                                //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
 
                                                                                 Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -259,7 +252,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                         if (dataSnapshot.exists()) {
                                                                                             try {
                                                                                                 dbRef.child("appLocked").setValue(true);
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 slideactivity.putExtra("pinType", "login");
@@ -270,7 +263,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                             }
                                                                                         } else {
                                                                                             try {
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(SplashActivity.this, CustomerActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
@@ -299,7 +292,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                         if (dataSnapshot.exists()) {
                                                                                             try {
                                                                                                 dbRef.child("appLocked").setValue(true);
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 slideactivity.putExtra("pinType", "login");
@@ -310,7 +303,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                             }
                                                                                         } else {
                                                                                             try {
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(SplashActivity.this, VendorActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
@@ -338,7 +331,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                         if (dataSnapshot.exists()) {
                                                                                             try {
                                                                                                 dbRef.child("appLocked").setValue(true);
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(SplashActivity.this, SecurityPin.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 slideactivity.putExtra("pinType", "login");
@@ -349,7 +342,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                                             }
                                                                                         } else {
                                                                                             try {
-                                                                                                //SafeToast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
+                                                                                                //Toast.makeText(SplashActivity.this, "Customer Account", Toast.LENGTH_LONG).show();
                                                                                                 Intent slideactivity = new Intent(SplashActivity.this, RiderActivity.class)
                                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                                                                 Bundle bndlanimation =
@@ -372,7 +365,7 @@ public class SplashActivity extends AppCompatActivity {
 
                                                                         } else if (account_type.equals("0")) {
                                                                             try {
-                                                                                //SafeToast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
+                                                                                //Toast.makeText(SplashActivity.this, "You have not finished setting up your account!", Toast.LENGTH_LONG).show();
 
                                                                                 Intent slideactivity = new Intent(SplashActivity.this, SetupAccountType.class)
                                                                                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -394,7 +387,7 @@ public class SplashActivity extends AppCompatActivity {
                                                                             }
                                                                         } else { // Others
                                                                             finish();
-                                                                            SafeToast.makeText(SplashActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
+                                                                            Toast.makeText(SplashActivity.this, "Account type does not exist", Toast.LENGTH_LONG).show();
                                                                         }
                                                                     }
                                                                 } catch (Exception e) {

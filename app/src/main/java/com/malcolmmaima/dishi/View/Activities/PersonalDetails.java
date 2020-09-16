@@ -54,7 +54,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class PersonalDetails extends AppCompatActivity {
 
@@ -92,7 +92,7 @@ public class PersonalDetails extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             user = FirebaseAuth.getInstance().getCurrentUser();

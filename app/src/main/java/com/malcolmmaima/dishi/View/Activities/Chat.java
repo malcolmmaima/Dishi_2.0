@@ -60,7 +60,7 @@ import java.util.TimeZone;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class Chat extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
 
@@ -100,7 +100,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         } else {
             try {
                 user = FirebaseAuth.getInstance().getCurrentUser();
@@ -183,7 +183,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
 
         //You never know :-D ... you can't message yourself
         if(fromPhone.equals(toPhone)){
-            SafeToast.makeText(this, "not allowed!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "not allowed!", Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -459,7 +459,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                             Log.e(TAG, "onFailure: ", er);
                                         }
                                         emojiconEditText.setText(dm.getMessage());
-                                        SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
                                     }
                                 });
                             } else { //not blocked
@@ -473,7 +473,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
                                             Log.e(TAG, "onFailure: ", er);
                                         }
                                         emojiconEditText.setText(dm.getMessage());
-                                        SafeToast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(Chat.this, "Something went wrong...", Toast.LENGTH_LONG).show();
                                     }
                                 });
                             }
@@ -536,7 +536,7 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         } else {
             try {
                 user = FirebaseAuth.getInstance().getCurrentUser();
@@ -941,14 +941,14 @@ public class Chat extends AppCompatActivity implements AdapterView.OnItemClickLi
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
             android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setText(text);
-            SafeToast.makeText(Chat.this, "Copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Chat.this, "Copied!", Toast.LENGTH_SHORT).show();
             mode.finish();
 
         } else {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
             clipboard.setPrimaryClip(clip);
-            SafeToast.makeText(Chat.this, "Copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Chat.this, "Copied!", Toast.LENGTH_SHORT).show();
             mode.finish();
         }
     }

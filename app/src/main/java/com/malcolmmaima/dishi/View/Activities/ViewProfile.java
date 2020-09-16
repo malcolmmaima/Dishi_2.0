@@ -82,7 +82,7 @@ import java.util.List;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -148,7 +148,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();
@@ -554,7 +554,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                 //Does this user exist or nah
                 if(!dataSnapshot.exists()){
                     finish();
-                    SafeToast.makeText(ViewProfile.this, "User does not exist!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ViewProfile.this, "User does not exist!", Toast.LENGTH_LONG).show();
                 } else {
                     profileFollowers.child(myPhone).addValueEventListener(profileFollowersListener);
                     followersCounterRef.addValueEventListener(followersCounterListener);
@@ -831,7 +831,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
                     myStatusUpdate.setEnabled(true);
                     imageUpload.setEnabled(true);
                     postBtn.setEnabled(true);
-                    SafeToast.makeText(ViewProfile.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ViewProfile.this, "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
                 else {
@@ -950,7 +950,7 @@ public class ViewProfile extends AppCompatActivity implements SwipeRefreshLayout
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             loadProfile();
         }

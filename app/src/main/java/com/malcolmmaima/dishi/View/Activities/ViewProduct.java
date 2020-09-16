@@ -46,7 +46,7 @@ import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.text.DecimalFormat;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ViewProduct extends AppCompatActivity {
 
@@ -78,13 +78,13 @@ public class ViewProduct extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             mAuth = FirebaseAuth.getInstance();
             if(mAuth.getInstance().getCurrentUser() == null){
                 finish();
-                SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
             } else {
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber();
@@ -205,7 +205,7 @@ public class ViewProduct extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(!dataSnapshot.exists()){ //Does not exist!
                         finish();
-                        SafeToast.makeText(ViewProduct.this, "Item no longer exists", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ViewProduct.this, "Item no longer exists", Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -332,7 +332,7 @@ public class ViewProduct extends AppCompatActivity {
                                                     addToFavourites.setImageResource(R.drawable.ic_liked);
                                                 }
                                             });
-                                            //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
                                         }
                                     });
 
@@ -351,7 +351,7 @@ public class ViewProduct extends AppCompatActivity {
                                                     addToFavourites.setImageResource(R.drawable.ic_like);
                                                 }
                                             });
-                                            //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
                                         }
                                     });
 

@@ -41,8 +41,6 @@ import com.malcolmmaima.dishi.View.Activities.AboutActivity;
 import com.malcolmmaima.dishi.View.Activities.LocationSettings;
 import com.malcolmmaima.dishi.View.Activities.SecurityPin;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCallback {
     String TAG = "ViewMapLocation";
     private GoogleMap mMap;
@@ -82,7 +80,7 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             try {
@@ -268,7 +266,7 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
                                                 });
                                             }
                                         } catch (Exception e){
-                                            SafeToast.makeText(ViewMapLocation.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(ViewMapLocation.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                                             Log.e(TAG, "onDataChange: ", e);
                                         }
                                     }
@@ -299,7 +297,7 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
             public void onSuccess(Void aVoid) {
                 stopService(new Intent(ViewMapLocation.this, TrackingService.class));
                 finish();
-                SafeToast.makeText(ViewMapLocation.this, "Location data deleted!", Toast.LENGTH_LONG).show();
+                Toast.makeText(ViewMapLocation.this, "Location data deleted!", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -359,7 +357,7 @@ public class ViewMapLocation extends AppCompatActivity implements OnMapReadyCall
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();

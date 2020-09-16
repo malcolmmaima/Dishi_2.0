@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class CheckOut extends AppCompatActivity {
     String TAG = "CheckOutActivity";
@@ -709,7 +709,7 @@ public class CheckOut extends AppCompatActivity {
                                                                 if(pauseOrder == false){
                                                                     finish();
                                                                 }
-                                                                SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
 
                                                             }
                                                         }
@@ -737,7 +737,7 @@ public class CheckOut extends AppCompatActivity {
                                                         if(pauseOrder == false){
                                                             finish();
                                                         }
-                                                        SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                     }
                                                 }
 
@@ -772,7 +772,7 @@ public class CheckOut extends AppCompatActivity {
                                                             if(pauseOrder == false){
                                                                 finish();
                                                             }
-                                                            SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                         }
                                                     }
                                                 }
@@ -865,7 +865,7 @@ public class CheckOut extends AppCompatActivity {
                                                         if(pauseOrder == false){
                                                             finish();
                                                         }
-                                                        SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                     }
                                                 }
 
@@ -902,7 +902,7 @@ public class CheckOut extends AppCompatActivity {
                                                     if(pauseOrder == false){
                                                         finish();
                                                     }
-                                                    SafeToast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(CheckOut.this, "Order sent!", Toast.LENGTH_LONG).show();
                                                 }
                                             }
                                         }
@@ -1013,7 +1013,7 @@ public class CheckOut extends AppCompatActivity {
         startService(new Intent(this, TrackingService.class));
         //Notify the user that tracking has been enabled//
 
-        //SafeToast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
 
         //////////////////////////////////
     }

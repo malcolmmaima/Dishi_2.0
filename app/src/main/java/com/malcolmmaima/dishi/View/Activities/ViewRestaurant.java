@@ -46,7 +46,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ViewRestaurant extends AppCompatActivity {
 
@@ -87,7 +87,7 @@ public class ViewRestaurant extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -222,7 +222,7 @@ public class ViewRestaurant extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.exists()){
                     finish();
-                    SafeToast.makeText(ViewRestaurant.this, "Restaurant no longer exists!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ViewRestaurant.this, "Restaurant no longer exists!", Toast.LENGTH_LONG).show();
                 } else {
                     UserModel restaurantDetails = dataSnapshot.getValue(UserModel.class);
                     //restaurantDetails.phone = restaurantPhone;
@@ -476,7 +476,7 @@ public class ViewRestaurant extends AppCompatActivity {
         shareRest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SafeToast.makeText(ViewRestaurant.this, "Share!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewRestaurant.this, "Share!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -500,7 +500,7 @@ public class ViewRestaurant extends AppCompatActivity {
                                     //Add favourite to restaurant's node as well
                                 }
                             });
-                            //SafeToast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(context,restaurantDetails.getName()+" added to favourites",Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -519,7 +519,7 @@ public class ViewRestaurant extends AppCompatActivity {
                                     //remove favourite from restaurant's node as well
                                 }
                             });
-                            //SafeToast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(context,restaurantDetails.getName()+" removed from favourites",Toast.LENGTH_SHORT).show();
                         }
                     });
 

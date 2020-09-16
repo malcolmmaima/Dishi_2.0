@@ -53,10 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
-import static com.crashlytics.android.core.CrashlyticsCore.TAG;
-
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder> {
 
     Context context;
@@ -470,13 +466,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyHolder
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
             android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setText(text);
-            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
 
         } else {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
             clipboard.setPrimaryClip(clip);
-            SafeToast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show();
         }
     }
 

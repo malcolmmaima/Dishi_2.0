@@ -52,9 +52,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
-
 public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAdapter.MyHolder>{
 
     Context context;
@@ -245,7 +242,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                     Bundle bndlanimation =
                             ActivityOptions.makeCustomAnimation(context, R.anim.animation,R.anim.animation2).toBundle();
                     context.startActivity(slideactivity, bndlanimation);
-                    SafeToast.makeText(context, "Please add multiple from here", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Please add multiple from here", Toast.LENGTH_LONG).show();
                 } else {
                     DatabaseReference menuExistRef = FirebaseDatabase.getInstance()
                             .getReference("menus/"+ productDetailsModel.getOwner()+"/"+ productDetailsModel.getOriginalKey());
@@ -254,7 +251,7 @@ public class ProductHistoryAdapter extends RecyclerView.Adapter<ProductHistoryAd
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(!dataSnapshot.exists()){ //Does not exist!
 
-                                SafeToast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, "Item no longer exists", Toast.LENGTH_LONG).show();
                             }
 
                             else {

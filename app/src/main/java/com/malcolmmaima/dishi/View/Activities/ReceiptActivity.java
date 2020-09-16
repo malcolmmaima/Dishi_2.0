@@ -66,7 +66,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ReceiptActivity extends AppCompatActivity {
 
@@ -108,7 +108,7 @@ public class ReceiptActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();
@@ -160,7 +160,7 @@ public class ReceiptActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();
@@ -353,7 +353,7 @@ public class ReceiptActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.exists()){
                     finish();
-                    SafeToast.makeText(ReceiptActivity.this, "Receipt does not exist!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ReceiptActivity.this, "Receipt does not exist!", Toast.LENGTH_LONG).show();
                 } else {
 
                     DatabaseReference myUserDetails = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
@@ -580,7 +580,7 @@ public class ReceiptActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     finish();
-                                                    SafeToast.makeText(ReceiptActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(ReceiptActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
                                             //do something

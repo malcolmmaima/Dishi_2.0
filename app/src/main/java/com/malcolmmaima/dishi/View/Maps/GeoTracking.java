@@ -49,8 +49,6 @@ import com.malcolmmaima.dishi.R;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback {
 
     String TAG = "GeoTrackingActivity";
@@ -289,7 +287,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                                 customerOrderItems.child("completed").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        //SafeToast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(ViewMyOrders.this, "", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
                                             }
@@ -404,9 +402,10 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
         restaurantLocationRefListener =  new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                restaurantLat = dataSnapshot.getValue(Double.class);
-                //SafeToast.makeText(GeoFireActivity.this, "nduthiLat: " + nduthiLat, Toast.LENGTH_LONG).show();
                 try {
+                    restaurantLat = dataSnapshot.getValue(Double.class);
+                    //Toast.makeText(GeoFireActivity.this, "nduthiLat: " + nduthiLat, Toast.LENGTH_LONG).show();
+
                     track();
                 } catch (Exception e){
                     Log.e(TAG, "onDataChange: ", e);
@@ -425,7 +424,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     restaurantLong = dataSnapshot.getValue(Double.class);
-                    //SafeToast.makeText(GeoFireActivity.this, "nduthiLng: " + nduthiLat, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(GeoFireActivity.this, "nduthiLng: " + nduthiLat, Toast.LENGTH_LONG).show();
                     try {
                         track();
                     } catch (Exception e) {
@@ -465,7 +464,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                     }
                 }
 
-                //SafeToast.makeText(GeoFireActivity.this, "lat: "+ myLat + " long: " + myLong, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(GeoFireActivity.this, "lat: "+ myLat + " long: " + myLong, Toast.LENGTH_SHORT).show();
                 try {
                     track();
                 } catch (Exception e){
@@ -518,7 +517,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 // Write failed
-                                SafeToast.makeText(GeoTracking.this, "Error: " + e, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(GeoTracking.this, "Error: " + e, Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -596,7 +595,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          */
                         if(dataSnapshot.child("rider").exists()){
                             riderPhone = dataSnapshot.child("rider").getValue(String.class);
-                           //SafeToast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
+                           //Toast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
 
                             /**
                              * Rider node exists, get rider location co-ordinates
@@ -608,7 +607,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
                                     try {
                                         riderLocation = location.getValue(LiveLocationModel.class);
-//                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
+//                                    Toast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                         /**
@@ -621,7 +620,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 if (dataSnapshot.child("static_address").exists()) {
                                                     staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-//                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                                     /**
@@ -636,7 +635,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                                     }
                                                 } else {
                                                     //myLat and myLong variables
-//                                                SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                                Toast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                                     /**
@@ -678,12 +677,12 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          * Rider not set
                          */
                         else {
-                            //SafeToast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
                             /**
                              * Delivery location (Live or static)
                              */
 
-//                            SafeToast.makeText(GeoTracking.this, "rest: " + restaurantPhone, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(GeoTracking.this, "rest: " + restaurantPhone, Toast.LENGTH_SHORT).show();
                             deliveryLocationRef = FirebaseDatabase.getInstance().getReference("orders/"+restaurantPhone+"/"+customerPhone);
                             deliveryLocationListener = new ValueEventListener() {
                                 @Override
@@ -693,7 +692,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
                                         staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-                                        //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**
                                          * Track order movement
@@ -712,7 +711,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     else {
                                         //myLat and myLong variables
-//                                        SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                        Toast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                         /**
@@ -755,7 +754,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
             } catch (Exception e){
                 Log.e(TAG, "track: ", e);
-                SafeToast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
                 confirmOrd.setEnabled(false);
                 callNduthi.setEnabled(false);
             }
@@ -790,7 +789,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          */
                         if(dataSnapshot.child("rider").exists()){
                             riderPhone = dataSnapshot.child("rider").getValue(String.class);
-//                            SafeToast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
 
                             /**
                              * Rider node exists, get rider location co-ordinates
@@ -800,7 +799,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
                                     riderLocation = location.getValue(LiveLocationModel.class);
-//                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
+//                                    Toast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                     /**
@@ -813,7 +812,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if(dataSnapshot.child("static_address").exists()){
                                                 staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-//                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
@@ -830,7 +829,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
                                             else {
                                                 //myLat and myLong variables
-//                                                SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                                Toast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
@@ -869,7 +868,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          * Rider not set
                          */
                         else {
-                            //SafeToast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
                             /**
                              * Delivery location (Live or static)
                              */
@@ -883,7 +882,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     if(dataSnapshot.child("static_address").exists()){
                                         staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-                                        //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                         /**
                                          * Track order movement
@@ -902,7 +901,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     else {
                                         //myLat and myLong variables
-//                                        SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                        Toast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                         /**
@@ -946,7 +945,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
 
             } catch (Exception e){
-                SafeToast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
                 confirmOrd.setEnabled(false);
                 callNduthi.setEnabled(false);
             }
@@ -979,11 +978,11 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          */
                         if(dataSnapshot.child("rider").exists()){
                             riderPhone = dataSnapshot.child("rider").getValue(String.class);
-//                            SafeToast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(GeoTracking.this, "Rider assigned: " + riderPhone, Toast.LENGTH_LONG).show();
 
                             if(!riderPhone.equals(myPhone)){
                                 finish();
-                                SafeToast.makeText(GeoTracking.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(GeoTracking.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
                             }
                             /**
                              * Rider node exists, get rider location co-ordinates
@@ -993,7 +992,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot location) {
                                     riderLocation = location.getValue(LiveLocationModel.class);
-//                                    SafeToast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
+//                                    Toast.makeText(GeoTracking.this, "rider live: ("+riderLocation.getLatitude()
 //                                            + ","+riderLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                     /**
@@ -1007,7 +1006,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                             if(dataSnapshot.child("static_address").exists()){
                                                 try {
                                                     staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-//                                                SafeToast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
+//                                                Toast.makeText(GeoTracking.this, "delivery static("+ staticDeliveryLocation.getLatitude()
 //                                                        + ","+staticDeliveryLocation.getLongitude()+")", Toast.LENGTH_SHORT).show();
 
                                                     /**
@@ -1027,7 +1026,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
                                             else {
                                                 //myLat and myLong variables
-//                                                SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                                Toast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                        +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                                 /**
@@ -1066,7 +1065,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                          * Rider not set
                          */
                         else {
-                            //SafeToast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(GeoTracking.this, "rider: false", Toast.LENGTH_SHORT).show();
                             /**
                              * Delivery location (Live or static)
                              */
@@ -1082,7 +1081,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
                                         try {
                                             staticDeliveryLocation = dataSnapshot.child("static_address").getValue(StaticLocationModel.class);
-                                            //SafeToast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(GeoTracking.this, "Static address: true", Toast.LENGTH_SHORT).show();
 
                                             /**
                                              * Track order movement
@@ -1104,7 +1103,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
                                      */
                                     else {
                                         //myLat and myLong variables
-//                                        SafeToast.makeText(GeoTracking.this, "delivery live("+myLat
+//                                        Toast.makeText(GeoTracking.this, "delivery live("+myLat
 //                                                +","+myLong+")", Toast.LENGTH_SHORT).show();
 
                                         /**
@@ -1147,7 +1146,7 @@ public class GeoTracking extends AppCompatActivity implements OnMapReadyCallback
 
 
             } catch (Exception e){
-                SafeToast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GeoTracking.this, "err: " + e.toString(), Toast.LENGTH_SHORT).show();
                 confirmOrd.setEnabled(false);
                 callNduthi.setEnabled(false);
             }

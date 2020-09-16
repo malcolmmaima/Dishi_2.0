@@ -29,7 +29,7 @@ import com.malcolmmaima.dishi.View.Adapter.BlockedUserAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -76,7 +76,7 @@ public class MyBlockedAccounts extends AppCompatActivity implements SwipeRefresh
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();

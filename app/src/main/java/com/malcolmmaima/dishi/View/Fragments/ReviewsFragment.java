@@ -55,7 +55,7 @@ import java.util.UUID;
 
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 import static android.app.Activity.RESULT_OK;
 
@@ -217,7 +217,7 @@ public class ReviewsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     myReview.setEnabled(true);
                     imageUpload.setEnabled(true);
                     postBtn.setEnabled(true);
-                    SafeToast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Cannot be empty!", Toast.LENGTH_SHORT).show();
                 }
 
                 else {

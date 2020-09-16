@@ -134,9 +134,7 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="b20f2baf5be47e548a898eee05dfdd7e98acd63c" />
+
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />

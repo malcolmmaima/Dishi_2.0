@@ -71,7 +71,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class CustomerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -173,7 +173,7 @@ public class CustomerActivity extends AppCompatActivity
 
         } else {
             finish();
-            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -238,7 +238,7 @@ public class CustomerActivity extends AppCompatActivity
 
         } else {
             finish();
-            SafeToast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -297,7 +297,7 @@ public class CustomerActivity extends AppCompatActivity
                     UserModel user = dataSnapshot.getValue(UserModel.class);
 
                     if(!user.getAccount_type().equals("1")){ //Consider this our watchman :-D
-                        SafeToast.makeText(CustomerActivity.this, "Not allowed!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(CustomerActivity.this, "Not allowed!", Toast.LENGTH_LONG).show();
                         finish();
                     }
 
@@ -399,7 +399,7 @@ public class CustomerActivity extends AppCompatActivity
 
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
@@ -555,7 +555,7 @@ public class CustomerActivity extends AppCompatActivity
         startService(new Intent(this, TrackingService.class));
         //Notify the user that tracking has been enabled//
 
-        //SafeToast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
 
         //////////////////////////////////
     }
@@ -625,7 +625,7 @@ public class CustomerActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int whichButton) {
                             myRef.child("appLocked").setValue(true);
                             //Log out
-                            //SafeToast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(MyAccountRestaurant.this, "Logout", Toast.LENGTH_LONG).show();
 
                             stopService(new Intent(CustomerActivity.this, ForegroundService.class));
                             stopService(new Intent(CustomerActivity.this, TrackingService.class));

@@ -36,7 +36,7 @@ import com.malcolmmaima.dishi.View.Adapter.AddRiderAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class AddRider extends AppCompatActivity implements OnRiderSelected {
 
@@ -62,7 +62,7 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
         //User is logged in
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -154,7 +154,7 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
                     try {
                         if (dataSnapshot.getKey().equals(searchPhone.getText().toString().trim())) {
                             finish();
-                            SafeToast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(AddRider.this, "Rider accepted request, refresh!", Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e){
 
@@ -287,7 +287,7 @@ public class AddRider extends AppCompatActivity implements OnRiderSelected {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    SafeToast.makeText(AddRider.this, "Request sent to rider", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddRider.this, "Request sent to rider", Toast.LENGTH_LONG).show();
                     finish();
                 }
             }

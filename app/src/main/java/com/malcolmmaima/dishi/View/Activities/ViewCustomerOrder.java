@@ -64,8 +64,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class ViewCustomerOrder extends AppCompatActivity implements OnOrderChecked {
     String TAG = "ViewCustomerOrder";
     List<ProductDetailsModel> list;
@@ -109,7 +107,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             paymentDialogShown = false;
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -160,7 +158,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber(); //Current logged in user phone number
@@ -406,7 +404,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                        //SafeToast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(ViewCustomerOrder.this, "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
                         /**
                          * Compute distance between customer and restaurant
@@ -416,7 +414,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                 liveLocationModel.getLongitude(), deliveryLocation.getLatitude(), deliveryLocation.getLongitude(), "K");
 
-                        SafeToast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewCustomerOrder.this, "Distance: " + dist, Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
 
                     }
@@ -442,7 +440,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                 if(!dataSnapshot.exists()){
                     finish();
-                    SafeToast.makeText(ViewCustomerOrder.this, "Order Complete!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ViewCustomerOrder.this, "Order Complete!", Toast.LENGTH_LONG).show();
                 } else {
                     total[0] = 0;
 
@@ -727,7 +725,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                     if(accType.equals("2")){
                         try {
-                            //SafeToast.makeText(ViewCustomerOrder.this, "rider: "+ riderPhone, Toast.LENGTH_LONG).show();
+                            //Toast.makeText(ViewCustomerOrder.this, "rider: "+ riderPhone, Toast.LENGTH_LONG).show();
                             riderStatus = FirebaseDatabase.getInstance().getReference("my_ride_requests/" + riderPhone + "/" + myPhone + "/" + phone);
                         } catch (Exception e){
 
@@ -742,7 +740,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                          */
                         if(!myPhone.equals(dataSnapshot.getValue())){
                             finish();
-                            SafeToast.makeText(ViewCustomerOrder.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ViewCustomerOrder.this, "Order assigned to different rider!", Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -750,7 +748,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dtSnapshot) {
                             String riderOrderStatus = dtSnapshot.getValue(String.class);
-                            //SafeToast.makeText(ViewCustomerOrder.this, "status: " + riderOrderStatus, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ViewCustomerOrder.this, "status: " + riderOrderStatus, Toast.LENGTH_SHORT).show();
                             if(riderOrderStatus == null && riderPhone == null){
                                 Snackbar.make(findViewById(R.id.parentlayout), "Error, rider does not exist!", Snackbar.LENGTH_LONG).show();
                                 riderName.setText("Rider does not exist");
@@ -1409,7 +1407,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                                                     builder.show();
                                                                 } catch (Exception e){
                                                                     Log.e(TAG, "onClick: ", e);
-                                                                    SafeToast.makeText(ViewCustomerOrder.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(ViewCustomerOrder.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             }
                                                         })//setPositiveButton
@@ -1440,7 +1438,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     //Do nothing
-                                    //SafeToast.makeText(ViewCustomerOrder.this, "Default rider is your account", Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(ViewCustomerOrder.this, "Default rider is your account", Toast.LENGTH_LONG).show();
                                 }
                             })
 
@@ -1450,7 +1448,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
 
                 else {
                     //
-                    SafeToast.makeText(this, "You must confirm at-least one item", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "You must confirm at-least one item", Toast.LENGTH_LONG).show();
                 }
             }
 

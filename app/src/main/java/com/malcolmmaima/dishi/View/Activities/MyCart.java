@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class MyCart extends AppCompatActivity {
 
@@ -71,7 +71,7 @@ public class MyCart extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -146,7 +146,7 @@ public class MyCart extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                    //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -412,7 +412,7 @@ public class MyCart extends AppCompatActivity {
                         //Compare other providers in the list with the first index
 
                         if (!restaurantName.equals(list.get(i).getOwner())) {
-                            //SafeToast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MyCart.this, restaurantName + " != " + list.get(i).getOwner(), Toast.LENGTH_SHORT).show();
                             multipleRestaurants = true;
                         } else {
                             multipleRestaurants = false;

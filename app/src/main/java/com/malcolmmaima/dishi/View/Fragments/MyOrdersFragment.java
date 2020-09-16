@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class MyOrdersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 

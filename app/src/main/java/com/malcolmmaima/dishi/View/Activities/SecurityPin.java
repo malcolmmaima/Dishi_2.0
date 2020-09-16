@@ -28,7 +28,7 @@ import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
 import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.R;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class SecurityPin extends AppCompatActivity {
     FirebaseUser user;
@@ -62,7 +62,7 @@ public class SecurityPin extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             pinType = getIntent().getStringExtra("pinType");
@@ -333,7 +333,7 @@ public class SecurityPin extends AppCompatActivity {
                                         progressBar.setVisibility(View.GONE);
                                         title1.setText("Enter your new preferred");
                                         title2.setText("four digit security PIN");
-                                        SafeToast.makeText(SecurityPin.this, "ENTER NEW PIN!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(SecurityPin.this, "ENTER NEW PIN!", Toast.LENGTH_LONG).show();
                                         disableEnableButtons(true);
                                         resetPinEnter(false);
                                         reset = false;
@@ -357,7 +357,7 @@ public class SecurityPin extends AppCompatActivity {
                                     progressBar.setVisibility(View.GONE);
                                     title1.setText("Enter your preferred");
                                     title2.setText("four digit security PIN");
-                                    SafeToast.makeText(SecurityPin.this, "RE-ENTER PIN!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SecurityPin.this, "RE-ENTER PIN!", Toast.LENGTH_LONG).show();
                                     disableEnableButtons(true);
                                     resetPinEnter(true);
                                 }
@@ -407,7 +407,7 @@ public class SecurityPin extends AppCompatActivity {
                                 myRef.child("appLocked").setValue(true);
                                 pinCombo = new int[4];
                                 resetPinEnter(false);
-                                SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -434,7 +434,7 @@ public class SecurityPin extends AppCompatActivity {
                                 locked = true;
                                 pinCombo = new int[4];
                                 resetPinEnter(false);
-                                SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -458,12 +458,12 @@ public class SecurityPin extends AppCompatActivity {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             finish();
-                                            SafeToast.makeText(SecurityPin.this, "PIN removed!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(SecurityPin.this, "PIN removed!", Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 } else {
                                     finish();
-                                    SafeToast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SecurityPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
                                 }
                             } catch (Exception e){
                                 Log.e(TAG, "onDataChange: ", e);
@@ -497,13 +497,13 @@ public class SecurityPin extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
                                 myRef.child("pendingPin").removeValue();
                                 finish();
-                                SafeToast.makeText(SecurityPin.this, "PIN SET", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SecurityPin.this, "PIN SET", Toast.LENGTH_LONG).show();
                             }
                         });
                     } else {
                         progressBar.setVisibility(View.GONE);
                         disableEnableButtons(true);
-                        SafeToast.makeText(SecurityPin.this, "PIN MISMATCH", Toast.LENGTH_LONG).show();
+                        Toast.makeText(SecurityPin.this, "PIN MISMATCH", Toast.LENGTH_LONG).show();
                         resetPinEnter(false);
                     }
                 }

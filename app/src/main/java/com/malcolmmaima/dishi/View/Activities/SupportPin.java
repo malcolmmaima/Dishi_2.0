@@ -28,7 +28,7 @@ import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
 import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.R;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class SupportPin extends AppCompatActivity {
     FirebaseUser user;
@@ -56,7 +56,7 @@ public class SupportPin extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -199,7 +199,7 @@ public class SupportPin extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                             pinCombo = new int[4];
                             resetPinEnter(false);
-                            SafeToast.makeText(SupportPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SupportPin.this, "WRONG PIN!", Toast.LENGTH_LONG).show();
                         }
                     }
 

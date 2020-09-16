@@ -34,7 +34,7 @@ import com.malcolmmaima.dishi.View.Adapter.ProductAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -167,7 +167,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 final UserModel user = dataSnapshot.getValue(UserModel.class);
-//                            SafeToast.makeText(getContext(), "Name: " + user.getFirstname()
+//                            Toast.makeText(getContext(), "Name: " + user.getFirstname()
 //                                    + "\nliveStatus: " + user.getLiveStatus()
 //                                    + "\nlocationType: " + user.getLocationType(), Toast.LENGTH_SHORT).show();
 
@@ -198,10 +198,10 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
                                                             ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
@@ -277,10 +277,10 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         for (DataSnapshot menu : restaurants.getChildren()) {
-                                                            //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
                                                             ProductDetailsModel product = menu.getValue(ProductDetailsModel.class);
                                                             product.setKey(menu.getKey());
                                                             product.setDistance(dist);
@@ -347,7 +347,7 @@ public class FragmentSearchFood extends Fragment implements SwipeRefreshLayout.O
                                          * and "live" which tracks the restaurant's live location under "location/phone"
                                          */
                                         else {
-                                            SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
                                         }
                                     }
 

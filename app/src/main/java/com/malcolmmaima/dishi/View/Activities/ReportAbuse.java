@@ -31,7 +31,7 @@ import com.malcolmmaima.dishi.Model.AbuseReportModel;
 import com.malcolmmaima.dishi.R;
 
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 public class ReportAbuse extends AppCompatActivity {
     RelativeLayout option1, option2, option3, option4;
@@ -53,13 +53,13 @@ public class ReportAbuse extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
 
             mAuth = FirebaseAuth.getInstance();
             if(mAuth.getInstance().getCurrentUser() == null){
                 finish();
-                SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
             } else {
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 myPhone = user.getPhoneNumber();

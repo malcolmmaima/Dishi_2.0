@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.fabric.sdk.android.services.common.SafeToast;
+
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -146,14 +146,14 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                     public void onSuccess(Void aVoid) {
                         location_filter = progress;
                         distanceShow.setText("("+progress+"km)");
-                        //SafeToast.makeText(getContext(), "filter posted", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "filter posted", Toast.LENGTH_SHORT).show();
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Write failed
-                        SafeToast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -193,7 +193,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     liveLocationModel = dataSnapshot.getValue(LiveLocationModel.class);
-                    //SafeToast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "myLocation: " + liveLocation.getLatitude() + "," + liveLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                 } catch (Exception e){
 
                 }
@@ -274,7 +274,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                         Double dist = calculateDistance.distance(liveLocationModel.getLatitude(),
                                                                 liveLocationModel.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
 
-                                                        //SafeToast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
 
                                                         /**
                                                          * if distance meets parameters set fetch menu
@@ -289,7 +289,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                                             }
 
 //                                                    for (DataSnapshot menu : restaurants.getChildren()) {
-//                                                        //SafeToast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
+//                                                        //Toast.makeText(getContext(), restaurants.getKey()+": "+ menu.getKey(), Toast.LENGTH_SHORT).show();
 //                                                        ProductDetails product = menu.getValue(ProductDetails.class);
 //                                                        product.setKey(menu.getKey());
 //                                                        product.setDistance(dist);
@@ -412,7 +412,7 @@ public class FragmentRestaurants extends Fragment implements SwipeRefreshLayout.
                                          * and "live" which tracks the restaurant's live location under "location/phone"
                                          */
                                         else {
-                                            SafeToast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
                                         }
                                     }
 

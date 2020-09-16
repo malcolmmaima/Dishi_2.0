@@ -39,8 +39,6 @@ import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.ViewMapLocation;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
 public class AccountSettings extends AppCompatActivity {
 
     String TAG = "AccountSettings";
@@ -79,7 +77,7 @@ public class AccountSettings extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if(mAuth.getInstance().getCurrentUser() == null){
             finish();
-            SafeToast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
         } else {
             user = FirebaseAuth.getInstance().getCurrentUser();
             myPhone = user.getPhoneNumber();

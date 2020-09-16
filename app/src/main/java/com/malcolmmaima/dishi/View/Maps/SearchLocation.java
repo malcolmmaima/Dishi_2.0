@@ -55,9 +55,6 @@ import com.malcolmmaima.dishi.R;
 
 import java.util.Arrays;
 
-import io.fabric.sdk.android.services.common.SafeToast;
-
-import static io.fabric.sdk.android.services.concurrency.AsyncTask.init;
 
 public class SearchLocation extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
@@ -85,7 +82,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //SafeToast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Please turn on GPS", Toast.LENGTH_LONG).show();
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(SearchLocation.this)
@@ -148,7 +145,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            init();
+            initMap();
         }
     }
 
@@ -191,14 +188,14 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 placeName = place.getName();
 
                 moveCamera(place.getLatLng(),DEFAULT_ZOOM, place.getName());
-                //SafeToast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(Status status) {
                 progressBar.setVisibility(View.INVISIBLE);
                 Log.i(TAG, "An error occurred: " + status);
-                //SafeToast.makeText(SearchLocation.this, "Error: " + status, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SearchLocation.this, "Error: " + status, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -226,7 +223,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 }
 
                 else {
-                    SafeToast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.INVISIBLE);
                     finish();
                 }
@@ -362,7 +359,7 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
 
                         }else{
                             //Log.d(TAG, "onComplete: current location is null");
-                            SafeToast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
