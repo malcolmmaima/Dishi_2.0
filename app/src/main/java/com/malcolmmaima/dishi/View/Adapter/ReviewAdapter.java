@@ -56,9 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-
-import static com.crashlytics.android.core.CrashlyticsCore.TAG;
-
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.MyHolder> {
 

@@ -74,7 +74,6 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 
 
 import static android.view.View.INVISIBLE;
-import static com.crashlytics.android.core.CrashlyticsCore.TAG;
 
 public class ViewReview extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
