@@ -2,6 +2,9 @@ package com.malcolmmaima.dishi.View.Activities;
 
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,6 +40,9 @@ public class SplashActivity extends AppCompatActivity {
     String TAG = "SplashActivity";
     String myPhone;
     ProgressBar progressBar;
+
+    NotificationChannel channel;
+    public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
     @Override
     protected void onStart() {
@@ -89,7 +96,7 @@ public class SplashActivity extends AppCompatActivity {
                 //Toast.makeText(this, "Not logged in!", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(SplashActivity.this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));//Load Main Activity and clear activity stack
-                stopNotificationService();
+                //stopNotificationService(); //commented out... bugfix.. crashing in api 26+
 
             } else { //Are logged in
                 //get device id
@@ -454,10 +461,12 @@ public class SplashActivity extends AppCompatActivity {
         serviceIntent.putExtra("message", "Welcome to Dishi");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent);
+            //ContextCompat.startForegroundService(this, serviceIntent);
         } else {
             ContextCompat.startForegroundService(this, serviceIntent);
 
         }
+
     }
 
     public void stopNotificationService() {

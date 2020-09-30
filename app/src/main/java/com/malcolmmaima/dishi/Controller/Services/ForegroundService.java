@@ -134,7 +134,9 @@ public class ForegroundService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
-        //Log.d("ForeGroundService", "ForegroundService: started");
+
+        Log.d("ForeGroundService", "ForegroundService: started");
+
         manager = ((NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -2098,7 +2100,6 @@ public class ForegroundService extends Service {
         deleteCache(this);
 
         unreadCounter[0] = 0;
-
         stopService(new Intent(ForegroundService.this, TrackingService.class));
         restaurants.clear(); //Clear the tracker used in our send notification function
 
