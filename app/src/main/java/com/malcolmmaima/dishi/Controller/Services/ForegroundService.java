@@ -137,7 +137,6 @@ public class ForegroundService extends Service {
         //Log.d("ForeGroundService", "ForegroundService: started");
         manager = ((NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE));
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             manager.createNotificationChannel(channel);
         }

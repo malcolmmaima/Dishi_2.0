@@ -1,5 +1,12 @@
 package com.malcolmmaima.dishi.View.Maps;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -11,16 +18,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,44 +43,154 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.malcolmmaima.dishi.R;
 
 import java.util.Arrays;
+import java.util.List;
 
+public class SearchLocation extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-public class SearchLocation extends AppCompatActivity implements OnMapReadyCallback,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
-
-    private static String TAG = SearchLocation.class.getSimpleName();
-    String myPhone, placeName;
-    private FirebaseAuth mAuth;
-    Double latitude, longitude;
-    ImageView mGps;
-
-    private Boolean mLocationPermissionsGranted = false;
+    String TAG = "SearchLocation";
     private GoogleMap mMap;
+
+    ImageView mGps;
+    EditText editText;
+    Button btnSave;
+    private ProgressBar progressBar;
+
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private Boolean mLocationPermissionsGranted = false;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    Double latX, lngY;
+    String namePlace;
+
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private ProgressBar progressBar;
-    AppCompatButton button_save;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search_location);
+
+        editText = findViewById(R.id.edit_text);
+        btnSave = findViewById(R.id.btn_save);
+        mGps = findViewById(R.id.ic_gps);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
+        //Initialize Places
+        Places.initialize(getApplicationContext(), "AIzaSyB-54-K6Kz2vo-e-CNgl4AfzINyKgDa-ac");
+
+        //Set EditText non focusable
+        editText.setFocusable(false);
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Initialize places filed list
+                List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS
+                        , Place.Field.LAT_LNG, Place.Field.NAME);
+
+                //Create intent
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
+                        fieldList).build(SearchLocation.this);
+
+                //Start activity result
+                startActivityForResult(intent, 100);
+            }
+        });
+
+        mGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: clicked gps icon");
+                progressBar.setVisibility(View.VISIBLE);
+                getDeviceLocation();
+            }
+        });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
+                if(checkValidation()){
+                    //Send values back to activity that initiated the request
+                    setResult(Activity.RESULT_OK,
+                            new Intent().putExtra("latitude", latX)
+                                    .putExtra("longitude", lngY)
+                                    .putExtra("place", namePlace));
+                    finish();
+                }
+
+                else {
+                    Toast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
+                    progressBar.setVisibility(View.INVISIBLE);
+                    finish();
+                }
+            }
+        });
+
+        getLocationPermission();
+        getDeviceLocation();
+
+        if (mLocationPermissionsGranted) {
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        }
+    }
+
+    private boolean checkValidation() {
+        boolean valid = true;
+
+        if(latX == 0.0){
+            valid = false;
+        }
+
+        if(lngY == 0.0){
+            valid = false;
+        }
+
+        if(namePlace.equals("")){
+            valid = false;
+        }
+
+        return valid;
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        getDeviceLocation();
+
+        checkGPS();
         //////
+        Log.d(TAG, "onMapReady: map is ready");
+
+        mMap = googleMap;
+
+        initMap();
+    }
+
+    private void initMap(){
+        Log.d(TAG, "initMap: initializing map");
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    private void checkGPS() {
         //Check whether GPS tracking is enabled
 
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -130,149 +243,83 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
                 }
             });
         }
-        //////
-        //Log.d(TAG, "onMapReady: map is ready");
-        mMap = googleMap;
-
-        if (mLocationPermissionsGranted) {
-            getDeviceLocation();
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-            initMap();
-        }
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_location);
-        String apiKey = getString(R.string.google_maps_key);
-        mGps = findViewById(R.id.ic_gps);
-        progressBar = findViewById(R.id.progressBar);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         progressBar.setVisibility(View.INVISIBLE);
-        button_save = findViewById(R.id.btn_save);
+        if(requestCode == 100 && resultCode == RESULT_OK){
+            //if success
+            Place place = Autocomplete.getPlaceFromIntent(data);
 
-        getLocationPermission();
+            //Set address on editText
+            editText.setText(place.getAddress());
 
-        latitude = 0.0;
-        longitude = 0.0;
-        placeName = "";
+            latX = place.getLatLng().latitude;
+            lngY = place.getLatLng().longitude;
+            namePlace = place.getAddress();
 
-        /**
-         * Initialize Places
-         */
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), apiKey);
+            moveCamera(new LatLng(place.getLatLng().latitude, place.getLatLng().longitude), DEFAULT_ZOOM,
+                    place.getAddress());
+        } else if(resultCode == AutocompleteActivity.RESULT_ERROR){
+            //if error initialize status
+            Status status = Autocomplete.getStatusFromIntent(data);
+
+            //Display toast
+            Toast.makeText(this, status.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "onActivityResult: " + status.getStatusMessage());
         }
-
-        // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG, Place.Field.ID, Place.Field.NAME));
-
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                progressBar.setVisibility(View.INVISIBLE);
-                //Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-                latitude = place.getLatLng().latitude;
-                longitude = place.getLatLng().longitude;
-                placeName = place.getName();
-
-                moveCamera(place.getLatLng(),DEFAULT_ZOOM, place.getName());
-                //Toast.makeText(SearchLocation.this, "latlng: " + place.getLatLng() + " name: " + place.getName(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(Status status) {
-                progressBar.setVisibility(View.INVISIBLE);
-                Log.i(TAG, "An error occurred: " + status);
-                //Toast.makeText(SearchLocation.this, "Error: " + status, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mGps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Log.d(TAG, "onClick: clicked gps icon");
-                progressBar.setVisibility(View.VISIBLE);
-                getDeviceLocation();
-            }
-        });
-        
-        button_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkValidation()){
-                    progressBar.setVisibility(View.VISIBLE);
-
-                    //Send values back to activity that initiated the request
-                    setResult(Activity.RESULT_OK,
-                            new Intent().putExtra("latitude", latitude)
-                                    .putExtra("longitude", longitude)
-                                    .putExtra("place", placeName));
-                    finish();
-                }
-
-                else {
-                    Toast.makeText(SearchLocation.this, "Location not set", Toast.LENGTH_LONG).show();
-                    progressBar.setVisibility(View.INVISIBLE);
-                    finish();
-                }
-            }
-        });
-
     }
 
-    private boolean checkValidation() {
-        boolean valid = true;
+    private void getDeviceLocation(){
+        Log.d(TAG, "getDeviceLocation: getting the devices current location");
 
-        if(latitude == 0.0){
-            valid = false;
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        latX = 0.0;
+        lngY = 0.0;
+
+        try{
+            if(mLocationPermissionsGranted){
+
+                final Task location = mFusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if(task.isSuccessful()){
+                            Log.d(TAG, "onComplete: found location!");
+                            Location currentLocation = (Location) task.getResult();
+
+                            try {
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                        DEFAULT_ZOOM,
+                                        "My Location");
+
+                                progressBar.setVisibility(View.INVISIBLE);
+
+                                latX = currentLocation.getLatitude();
+                                lngY = currentLocation.getLongitude();
+                                namePlace =  "My current Location";
+
+                            } catch (Exception e){
+                                Log.e(TAG, "onComplete: ", e);
+                            }
+
+                        }else{
+                            Log.d(TAG, "onComplete: current location is null");
+                            Toast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }catch (SecurityException e){
+            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage() );
         }
-
-        if(longitude == 0.0){
-            valid = false;
-        }
-
-        if(placeName.equals("")){
-            valid = false;
-        }
-
-        return valid;
-    }
-
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        //Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-
-        if(!title.equals("My Location")){
-            MarkerOptions options = new MarkerOptions()
-                    .position(latLng)
-                    .title(title);
-            mMap.addMarker(options);
-        }
-
-        hideSoftKeyboard();
-    }
-
-    private void initMap(){
-        //Log.d(TAG, "initMap: initializing map");
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-        mapFragment.getMapAsync(SearchLocation.this);
     }
 
     private void getLocationPermission(){
-        //Log.d(TAG, "getLocationPermission: getting location permissions");
+        Log.d(TAG, "getLocationPermission: getting location permissions");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
 
@@ -294,79 +341,22 @@ public class SearchLocation extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //Log.d(TAG, "onRequestPermissionsResult: called.");
-        mLocationPermissionsGranted = false;
+    private void moveCamera(LatLng latLng, float zoom, String title){
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        switch(requestCode){
-            case LOCATION_PERMISSION_REQUEST_CODE:{
-                if(grantResults.length > 0){
-                    for(int i = 0; i < grantResults.length; i++){
-                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
-                            mLocationPermissionsGranted = false;
-                            //Log.d(TAG, "onRequestPermissionsResult: permission failed");
-                            return;
-                        }
-                    }
-                    //Log.d(TAG, "onRequestPermissionsResult: permission granted");
-                    mLocationPermissionsGranted = true;
-                    //initialize our map
-                    initMap();
-                }
-            }
+        if(!title.equals("My Location")){
+            MarkerOptions options = new MarkerOptions()
+                    .position(latLng)
+                    .title(title);
+            mMap.addMarker(options);
         }
+
+        hideSoftKeyboard();
     }
 
     private void hideSoftKeyboard(){
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    }
-
-    private void getDeviceLocation(){
-        progressBar.setVisibility(View.VISIBLE);
-        //Log.d(TAG, "getDeviceLocation: getting the devices current location");
-
-        FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        latitude = 0.0;
-        longitude = 0.0;
-        placeName = "";
-
-        try{
-            if(mLocationPermissionsGranted){
-
-                final Task location = mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if(task.isSuccessful()){
-                            //Log.d(TAG, "onComplete: found location!");
-                            Location currentLocation = (Location) task.getResult();
-
-                            try {
-                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                        DEFAULT_ZOOM,
-                                        "My Location");
-
-                                progressBar.setVisibility(View.INVISIBLE);
-
-                                latitude = currentLocation.getLatitude();
-                                longitude = currentLocation.getLongitude();
-                                placeName =  "My current location";
-
-                            } catch (Exception e){
-
-                            }
-
-                        }else{
-                            //Log.d(TAG, "onComplete: current location is null");
-                            Toast.makeText(SearchLocation.this, "unable to get current location", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        }catch (SecurityException e){
-            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage() );
-        }
     }
 
     @Override
