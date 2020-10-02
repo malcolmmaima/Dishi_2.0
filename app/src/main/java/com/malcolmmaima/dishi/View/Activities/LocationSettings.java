@@ -31,7 +31,7 @@ import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
-import com.malcolmmaima.dishi.ViewLocation;
+import com.malcolmmaima.dishi.View.Maps.ViewLocation;
 
 public class LocationSettings extends AppCompatActivity {
 

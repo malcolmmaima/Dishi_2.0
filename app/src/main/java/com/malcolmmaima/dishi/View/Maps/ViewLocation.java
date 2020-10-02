@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi;
+package com.malcolmmaima.dishi.View.Maps;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.malcolmmaima.dishi.R;
 
 public class ViewLocation extends AppCompatActivity implements OnMapReadyCallback {
 
