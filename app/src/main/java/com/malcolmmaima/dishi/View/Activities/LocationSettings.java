@@ -9,9 +9,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -26,19 +28,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
 import com.malcolmmaima.dishi.Controller.Services.TrackingService;
+import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
-
-
+import com.malcolmmaima.dishi.ViewLocation;
 
 public class LocationSettings extends AppCompatActivity {
 
+    String TAG = "LocationSettings";
     String myPhone;
     private DatabaseReference myRef;
     Switch defaultLocSwitch, liveLocSwitch;
     Button setLocation;
     Double lat, lng;
     FirebaseAuth mAuth;
+    ImageButton viewLocationBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,7 +200,48 @@ public class LocationSettings extends AppCompatActivity {
                     requestLocation();
                 }
             });
+
+            viewLocationBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewMap();
+                }
+            });
         }
+    }
+
+    private void viewMap() {
+        DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
+        locationRef.child("my_location").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    try {
+                        StaticLocationModel currentLocation = snapshot.getValue(StaticLocationModel.class);
+
+                        Intent slideactivity = new Intent(LocationSettings.this, ViewLocation.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        slideactivity.putExtra("latitude", currentLocation.getLatitude());
+                        slideactivity.putExtra("longitude", currentLocation.getLongitude());
+                        slideactivity.putExtra("address", currentLocation.getPlace());
+                        startActivity(slideactivity);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                        Toast.makeText(LocationSettings.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                else {
+                    Toast.makeText(LocationSettings.this, "No location data!", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -310,5 +355,6 @@ public class LocationSettings extends AppCompatActivity {
         defaultLocSwitch = findViewById(R.id.defaultLocSwitch);
         liveLocSwitch = findViewById(R.id.liveLocSwitch);
         setLocation = findViewById(R.id.setLocation);
+        viewLocationBtn = findViewById(R.id.viewLocationBtn);
     }
 }

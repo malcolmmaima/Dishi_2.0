@@ -162,6 +162,16 @@
                 android:textColor="@color/colorBackroundWhite"
                 android:textStyle="bold" />
 
+            <ImageButton
+                android:id="@+id/viewLocationBtn"
+                app:srcCompat="@drawable/ic_location"
+                android:layout_gravity="end"
+                android:layout_marginTop="-45dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
