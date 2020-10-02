@@ -28,6 +28,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
 import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
+import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
+import com.malcolmmaima.dishi.Controller.Utils.SplitTimeString;
+import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
 import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -36,7 +39,12 @@ import com.malcolmmaima.dishi.View.Activities.ViewCustomerOrder;
 import com.malcolmmaima.dishi.View.Activities.ViewImage;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     Context context;
@@ -50,6 +58,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
     UserModel restaurant;
     ChildEventListener myRideOrderRequestsChildListener;
     DatabaseReference myRideOrderRequests;
+    Timer timer;
 
     public OrdersAdapter(Context context, List<UserModel> listdata) {
         this.listdata = listdata;
@@ -320,6 +329,73 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
         }
 
+        /**
+         * Show time ordered
+         */
+        //Get today's date
+        SplitTimeString splitTime = new SplitTimeString();
+        GetCurrentDate currentDate = new GetCurrentDate();
+        String currDate = currentDate.getDate();
+
+        //Get dates
+        String dtEnd = currDate;
+        String dtStart = orderDetails.timeStamp;
+
+        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+        //Format both current date and date status update was posted
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
+        try {
+
+            //Convert String date values to Date values
+            Date dateStart;
+            Date dateEnd;
+
+            //Date dateStart = format.parse(dtStart);
+            String[] timeS = splitTime.Split(orderDetails.timeStamp);
+            String[] timeT = splitTime.Split(currDate);
+
+            /**
+             * timeS[0] = date
+             * timeS[1] = hr
+             * timeS[2] = min
+             * timeS[3] = seconds
+             * timeS[4] = timezone
+             */
+
+            //post timeStamp
+            if(!timeS[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                timeS[4] = "GMT+03:00";
+
+                //2020-04-27:20:37:32:GMT+03:00
+                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                dateStart = format.parse(dtStart);
+            } else {
+                dateStart = format.parse(dtStart);
+            }
+
+            //my device current date
+            if(!timeT[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                timeT[4] = "GMT+03:00";
+
+                //2020-04-27:20:37:32:GMT+03:00
+                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                dateEnd = format.parse(dtEnd);
+            } else {
+                dateEnd = format.parse(dtEnd);
+            }
+
+            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+            //Now compute timeAgo duration
+            TimeAgo timeAgo = new TimeAgo();
+
+            holder.timeOrdered.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            //Log.d(TAG, "timeStamp: "+ e.getMessage());
+            holder.timeOrdered.setText("Ordered ...");
+        }
+
     }
 
     private void computeDistance(MyHolder holder, Double x1, Double y1, Double x2, Double y2) {
@@ -363,8 +439,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
     class MyHolder extends RecyclerView.ViewHolder{
         MyTextView_Roboto_Medium customerName, orderQty;
-        MyTextView_Roboto_Regular distanceAway, restaurantName;
-        ImageView profilePic, restaurantIcon, distanceAwayIcon;
+        MyTextView_Roboto_Regular distanceAway, restaurantName, timeOrdered;
+        ImageView profilePic, restaurantIcon, distanceAwayIcon, timeOrededIcon;
         CardView cardView;
 
         public MyHolder(View itemView) {
@@ -377,6 +453,8 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
             restaurantIcon = itemView.findViewById(R.id.restaurantTag);
             distanceAwayIcon = itemView.findViewById(R.id.locationTag);
             restaurantName = itemView.findViewById(R.id.restaurantName);
+            timeOrdered = itemView.findViewById(R.id.timeOrdered);
+            timeOrededIcon = itemView.findViewById(R.id.timeOrededIcon);
 
 //
 

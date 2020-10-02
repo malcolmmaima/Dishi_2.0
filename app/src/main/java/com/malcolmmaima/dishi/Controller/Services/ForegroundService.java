@@ -99,14 +99,17 @@ public class ForegroundService extends Service {
         if (Build.VERSION.SDK_INT >= 26) {
             channel = new NotificationChannel(CHANNEL_ID,
                     "Dishi",
-                    NotificationManager.IMPORTANCE_HIGH);
+                    NotificationManager.IMPORTANCE_MIN);
 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("Dishi")
-                    .setContentText("Welcome to Dishi").build();
-
+                    //.setContentTitle("Dishi")
+                    // .setContentText("Welcome to Dishi")
+                    .setOnlyAlertOnce(true)
+                    .setAutoCancel(true)
+                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                   .build();
             startForeground(1, notification);
         }
 

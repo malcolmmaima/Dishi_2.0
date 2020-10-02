@@ -50,7 +50,7 @@
             android:text="Customer Name"
             android:id="@+id/customerName"
             android:layout_marginTop="1dp"
-
+            android:layout_marginLeft="5dp"
             android:layout_marginBottom="5dp"
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
@@ -77,6 +77,7 @@
             android:id="@+id/restaurantTag"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
             android:scaleType="centerCrop"
             android:background="@drawable/online_store"
             />
@@ -89,7 +90,6 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:text="loading..."
-            android:layout_marginLeft="-8dp"
             android:layout_marginRight="5dp"/>
 
         <ImageButton
@@ -99,6 +99,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
             android:scaleType="centerCrop"
             android:background="@drawable/location_pin"
             android:layout_marginRight="10dp"
@@ -113,7 +114,30 @@
             android:textSize="15sp"
             android:layout_marginTop="5dp"
             android:text=" 0 m away"
-            android:layout_marginLeft="-10dp"
+            android:layout_marginRight="5dp"/>
+
+        <ImageButton
+            android:layout_below="@id/locationTag"
+            android:layout_toRightOf="@id/profilePic"
+            android:id="@+id/timeOrededIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/clock_64dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            android:id="@+id/timeOrdered"
+            android:layout_below="@id/locationTag"
+            android:layout_toRightOf="@id/timeOrededIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_marginTop="5dp"
+            android:text="..."
             android:layout_marginRight="5dp"/>
 
 

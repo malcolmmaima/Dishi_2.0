@@ -301,8 +301,8 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                      * get items count
                      */
 
-                    final DatabaseReference itemCountRef =
-                            FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+userOrders.getKey()+"/items");
+                    final DatabaseReference itemExtraDetails =
+                            FirebaseDatabase.getInstance().getReference("orders/"+myPhone+"/"+userOrders.getKey());
 
                     /**
                      * Assign user details to model and set item count value as well
@@ -315,7 +315,7 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                             /**
                              * get item count value then user details to model
                              */
-                            itemCountRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            itemExtraDetails.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     mSwipeRefreshLayout.setRefreshing(false);
@@ -324,28 +324,43 @@ public class RestaurantOrdersFragment extends Fragment implements SwipeRefreshLa
                                     customer.itemCount = dataSnapshot.getChildrenCount();
                                     customer.setAccount_type("2");
                                     customer.restaurantPhone = myPhone;
-                                    //orders.add(customer);
-                                    orders.add(customer);
 
-                                    if (!orders.isEmpty()) {
-                                        //Collections.reverse(orders);
-                                        OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
-                                        recyclerview.setLayoutManager(layoutmanager);
-                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                        recycler.notifyDataSetChanged();
-                                        recyclerview.setAdapter(recycler);
-                                        emptyTag.setVisibility(View.INVISIBLE);
-                                        icon.setVisibility(View.INVISIBLE);
-                                    } else {
+                                    //get time order was initiated
+                                    itemExtraDetails.child("initiatedOn").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            customer.timeStamp = snapshot.getValue(String.class);
+
+                                            orders.add(customer);
+
+                                            if (!orders.isEmpty()) {
+                                                //Collections.reverse(orders);
+                                                OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
+                                                recyclerview.setLayoutManager(layoutmanager);
+                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                recycler.notifyDataSetChanged();
+                                                recyclerview.setAdapter(recycler);
+                                                emptyTag.setVisibility(View.INVISIBLE);
+                                                icon.setVisibility(View.INVISIBLE);
+                                            } else {
 //                                        progressDialog.dismiss();
-                                        OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
-                                        recyclerview.setLayoutManager(layoutmanager);
-                                        recyclerview.setItemAnimator(new DefaultItemAnimator());
-                                        recyclerview.setAdapter(recycler);
-                                        emptyTag.setVisibility(View.VISIBLE);
-                                        icon.setVisibility(View.VISIBLE);
+                                                OrdersAdapter recycler = new OrdersAdapter(getContext(), orders);
+                                                recyclerview.setLayoutManager(layoutmanager);
+                                                recyclerview.setItemAnimator(new DefaultItemAnimator());
+                                                recyclerview.setAdapter(recycler);
+                                                emptyTag.setVisibility(View.VISIBLE);
+                                                icon.setVisibility(View.VISIBLE);
 
-                                    }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+
 
                                 }
 

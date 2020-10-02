@@ -86,7 +86,9 @@ public class SearchLocation extends FragmentActivity implements OnMapReadyCallba
         progressBar.setVisibility(View.VISIBLE);
 
         //Initialize Places
-        Places.initialize(getApplicationContext(), "AIzaSyB-54-K6Kz2vo-e-CNgl4AfzINyKgDa-ac");
+
+        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+
 
         //Set EditText non focusable
         editText.setFocusable(false);
