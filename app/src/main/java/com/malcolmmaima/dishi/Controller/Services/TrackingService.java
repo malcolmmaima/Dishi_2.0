@@ -11,8 +11,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Activities.LocationSettings;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -46,9 +48,23 @@ public class TrackingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        buildNotification();
+        Boolean serviceRunning = isMyServiceRunning(TrackingService.class);
+        if(serviceRunning != true){
+            buildNotification();
+        }
+
         mAuth = FirebaseAuth.getInstance();
         requestLocationUpdates();
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 //Create the persistent notification//

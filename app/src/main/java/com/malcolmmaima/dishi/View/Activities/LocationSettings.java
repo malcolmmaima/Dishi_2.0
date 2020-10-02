@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.malcolmmaima.dishi.Controller.Services.ForegroundService;
 import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Maps.SearchLocation;
@@ -111,7 +114,11 @@ public class LocationSettings extends AppCompatActivity {
                         if(locationType.equals("live")){
                             liveLocSwitch.setChecked(true);
                             defaultLocSwitch.setChecked(false);
-                            startService(new Intent(LocationSettings.this, TrackingService.class));
+                            Boolean serviceRunning = isMyServiceRunning(TrackingService.class);
+                            if(serviceRunning != true){
+                                startService(new Intent(LocationSettings.this, TrackingService.class));
+                            }
+
                         }
 
                         if(locationType.equals("default")){
@@ -148,7 +155,10 @@ public class LocationSettings extends AppCompatActivity {
                         liveLocSwitch.setChecked(true);
                         myRef.child("locationType").setValue("live");
                         setLocation.setVisibility(View.GONE);
-                        startService(new Intent(LocationSettings.this, TrackingService.class));
+                        Boolean serviceRunning = isMyServiceRunning(TrackingService.class);
+                        if(serviceRunning != true){
+                            startService(new Intent(LocationSettings.this, TrackingService.class));
+                        }
                     }
 
 
@@ -164,7 +174,10 @@ public class LocationSettings extends AppCompatActivity {
                         defaultLocSwitch.setChecked(false);
                         myRef.child("locationType").setValue("live");
                         setLocation.setVisibility(View.GONE);
-                        startService(new Intent(LocationSettings.this, TrackingService.class));
+                        Boolean serviceRunning = isMyServiceRunning(TrackingService.class);
+                        if(serviceRunning != true){
+                            startService(new Intent(LocationSettings.this, TrackingService.class));
+                        }
                     }
 
                     else {
@@ -184,6 +197,16 @@ public class LocationSettings extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
