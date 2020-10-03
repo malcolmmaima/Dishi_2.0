@@ -36,7 +36,7 @@ import androidx.core.content.ContextCompat;
 
 public class TrackingService extends Service {
 
-    private static final String TAG = TrackingService.class.getSimpleName();
+    private static final String TAG = "TrackingService";
     FirebaseAuth mAuth;
     Boolean stopTracking = false;
 

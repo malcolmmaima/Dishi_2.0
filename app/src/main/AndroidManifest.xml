@@ -20,8 +20,8 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:versionCode="7"
-        android:versionName="1.0.7">
+        android:versionCode="8"
+        android:versionName="1.0.8">
         <activity android:name=".View.Maps.ViewLocation"></activity>
         <activity android:name=".View.Activities.ViewUserDetails" />
         <activity android:name=".View.Activities.UserManagement" />

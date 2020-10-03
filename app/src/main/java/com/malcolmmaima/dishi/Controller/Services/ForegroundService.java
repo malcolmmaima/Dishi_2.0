@@ -106,9 +106,7 @@ public class ForegroundService extends Service {
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     //.setContentTitle("Dishi")
                     // .setContentText("Welcome to Dishi")
-                    .setOnlyAlertOnce(true)
                     .setAutoCancel(true)
-                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                    .build();
             startForeground(1, notification);
         }
@@ -1015,7 +1013,7 @@ public class ForegroundService extends Service {
                                         }
                                         int notifId = Integer.parseInt(lastFourDigits); //new Random().nextInt();
 
-                                        if (complete == true && paid == 4) {
+                                        if (complete == true || paid == 4) {
                                             //Lets get the restaurant's name that will be passed in the notification intent
                                             databaseReference.child("users").child(provider).addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
@@ -1272,7 +1270,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
-                            .setOnlyAlertOnce(true)
+                            //.setOnlyAlertOnce(true)
                             .setContentText(message);
                 } else {
                     builder = new Notification.Builder(this)
@@ -1281,7 +1279,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
-                            .setOnlyAlertOnce(true)
+                            //.setOnlyAlertOnce(true)
                             .setPriority(Notification.PRIORITY_MAX)
                             .setContentText(message);
                 }
@@ -1361,7 +1359,7 @@ public class ForegroundService extends Service {
                             .setContentTitle(title)
                             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
                             .setSound(soundUri)
-                            .setOnlyAlertOnce(true)
+                            //.setOnlyAlertOnce(true)
                             .setContentText(message)
                             .setStyle(new Notification.BigTextStyle() //https://developer.android.com/training/notify-user/expanded
                                     .bigText(message));
