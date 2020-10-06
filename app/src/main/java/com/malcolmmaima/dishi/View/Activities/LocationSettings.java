@@ -158,6 +158,7 @@ public class LocationSettings extends AppCompatActivity {
                         liveLocSwitch.setChecked(true);
                         myRef.child("locationType").setValue("live");
                         setLocation.setVisibility(View.GONE);
+                        viewLocationBtn.setVisibility(View.GONE);
                         Boolean serviceRunning = isMyServiceRunning(TrackingService.class);
                         if(serviceRunning != true){
                             startService(new Intent(LocationSettings.this, TrackingService.class));
@@ -177,6 +178,7 @@ public class LocationSettings extends AppCompatActivity {
                         defaultLocSwitch.setChecked(false);
                         myRef.child("locationType").setValue("live");
                         setLocation.setVisibility(View.GONE);
+                        viewLocationBtn.setVisibility(View.GONE);
                         Boolean serviceRunning = isMyServiceRunning(TrackingService.class);
                         if(serviceRunning != true){
                             startService(new Intent(LocationSettings.this, TrackingService.class));
@@ -334,11 +336,13 @@ public class LocationSettings extends AppCompatActivity {
                     //my location data exists
                     setLocation.setVisibility(View.VISIBLE);
                     setLocation.setText("CHANGE LOCATION");
+                    viewLocationBtn.setVisibility(View.VISIBLE);
                 }
 
                 else {
                     //User has not set static business location
                     setLocation.setVisibility(View.VISIBLE);
+                    viewLocationBtn.setVisibility(View.VISIBLE);
                     setLocation.setText("SET LOCATION");
                 }
             }
