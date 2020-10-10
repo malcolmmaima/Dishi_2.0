@@ -1,4 +1,4 @@
-package com.malcolmmaima.dishi.Model.WP;
+package com.malcolmmaima.dishi.Model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

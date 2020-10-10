@@ -1,12 +1,15 @@
 package com.malcolmmaima.dishi.View.Activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +20,9 @@ import com.malcolmmaima.dishi.View.Fragments.ExploreFragment;
 
 public class WPPostDetails extends AppCompatActivity {
     WebView webView;
+    String TAG = "WPPostDetails";
+    ProgressDialog progressDialog ;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,9 +31,12 @@ public class WPPostDetails extends AppCompatActivity {
         //title = (TextView) findViewById(R.id.title);
         webView = (WebView) findViewById(R.id.postwebview);
         Intent i = getIntent();
-        int position = i.getExtras().getInt("itemPosition");
+        String url = i.getExtras().getString("url");
+        String blogTitle = i.getExtras().getString("title");
 
-        Log.e("WpPostDetails ", "  title is " + ExploreFragment.mListPost.get(position).getTitle().getRendered());
+        progressDialog = new ProgressDialog(WPPostDetails.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
 
         Toolbar topToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(topToolBar);
@@ -35,7 +44,11 @@ public class WPPostDetails extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        setTitle(ExploreFragment.mListPost.get(position).getTitle().getRendered());
+        try {
+            setTitle(blogTitle);
+        } catch (Exception e){
+            setTitle("Blog");
+        }
 
         //Back button on toolbar
         topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -45,10 +58,36 @@ public class WPPostDetails extends AppCompatActivity {
             }
         });
 
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(ExploreFragment.mListPost.get(position).getLink());
-        // to open webview inside app -- otherwise It will open url in device browser
-        webView.setWebViewClient(new WebViewClient());
+        try {
+            webView.getSettings().setJavaScriptEnabled(true);
+            // to open webview inside app -- otherwise It will open url in device browser
+
+            webView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    view.loadUrl(url);
+                    return true;
+                }
+
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                    Toast.makeText(WPPostDetails.this, "Error:" + description, Toast.LENGTH_SHORT).show();
+
+                }
+            });
+            webView.loadUrl(url);
+        } catch (Exception e){
+            finish();
+            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "onCreate: ", e);
+        }
 
     }
 }

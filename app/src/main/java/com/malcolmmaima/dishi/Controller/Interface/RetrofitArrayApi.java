@@ -1,6 +1,6 @@
 package com.malcolmmaima.dishi.Controller.Interface;
 
-import com.malcolmmaima.dishi.Model.WP.WPPost;
+import com.malcolmmaima.dishi.Model.WPPost;
 
 import java.util.List;
 

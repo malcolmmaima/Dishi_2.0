@@ -2,6 +2,7 @@ package com.malcolmmaima.dishi.View.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.malcolmmaima.dishi.Model.ExplorePostsModel;
 import com.malcolmmaima.dishi.View.Activities.WPPostDetails;
 import com.malcolmmaima.dishi.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class ExplorePostAdapter extends RecyclerView.Adapter {
 
+    String TAG = "ExplorePostAdapter";
     private ArrayList<ExplorePostsModel> dataset;
     private Context mContext;
     public ExplorePostAdapter(ArrayList<ExplorePostsModel> mlist, Context context) {
@@ -26,7 +29,6 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
     }
 
     public static class ImageTypeViewHolder extends RecyclerView.ViewHolder{
-
 
         TextView title, subtitle;
         ImageView imageView;
@@ -40,7 +42,7 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from( parent.getContext()).inflate(R.layout.postdetails, parent, false);
+        final View view = LayoutInflater.from( parent.getContext()).inflate(R.layout.postdetails, parent, false);
         return new ImageTypeViewHolder(view) ;
     }
 
@@ -51,11 +53,22 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
         ( (ImageTypeViewHolder) holder).title.setText( object.title );
         ( (ImageTypeViewHolder) holder).subtitle.setText( object.subtitle );
 
+        try {
+            Log.d(TAG, "onBindViewHolder: " + object.Image);
+            Picasso.with(mContext).load(object.Image).fit().centerCrop()
+                    .placeholder(R.drawable.blog_post)
+                    .error(R.drawable.blog_post)
+                    .into(((ImageTypeViewHolder) holder).imageView);
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ", e);
+        }
+
         ( (ImageTypeViewHolder) holder).title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, WPPostDetails.class);
-                intent.putExtra("itemPosition", position);
+                intent.putExtra("title", object.title);
+                intent.putExtra("url", dataset.get(position).url);
                 mContext.startActivity(intent);
             }
         });
@@ -63,7 +76,8 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, WPPostDetails.class);
-                intent.putExtra("itemPosition", position);
+                intent.putExtra("title", object.title);
+                intent.putExtra("url", dataset.get(position).url);
                 mContext.startActivity(intent);
             }
         });
@@ -71,7 +85,8 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, WPPostDetails.class);
-                intent.putExtra("itemPosition", position);
+                intent.putExtra("title", object.title);
+                intent.putExtra("url", dataset.get(position).url);
                 mContext.startActivity(intent);
             }
         });
