@@ -99,6 +99,7 @@
         <activity android:name=".View.Activities.ViewProduct" />
         <activity android:name=".View.Activities.ViewImage" />
         <activity android:name=".View.Activities.PersonalDetails" />
+        <activity android:name=".View.Activities.WPPostDetails" />
         <activity android:name=".View.Activities.AddMenu" />
         <activity android:name=".View.Activities.SetupAccountType" />
         <activity android:name=".View.Activities.SplashActivity">

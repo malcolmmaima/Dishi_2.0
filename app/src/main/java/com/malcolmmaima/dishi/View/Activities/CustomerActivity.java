@@ -40,6 +40,7 @@ import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
 import com.malcolmmaima.dishi.View.Fragments.CustomerOrderFragment;
+import com.malcolmmaima.dishi.View.Fragments.ExploreFragment;
 import com.malcolmmaima.dishi.View.Fragments.HistoryFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyFavourites;
@@ -603,6 +604,11 @@ public class CustomerActivity extends AppCompatActivity
         else if (id == R.id.menu5) {
             setTitle("History");
             fragmentClass[0] = HistoryFragment.class;
+        }
+
+        else if (id == R.id.menu6) {
+            setTitle("Explore");
+            fragmentClass[0] = ExploreFragment.class;
         }
 
         else if (id == R.id.nav_settings) {

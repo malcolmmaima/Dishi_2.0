@@ -28,11 +28,16 @@
             android:icon="@drawable/clock_64dp"
             android:title="History" />
 
-        <!--
         <item
             android:id="@+id/menu6"
+            android:icon="@drawable/search"
+            android:title="Explore" />
+
+        <!--
+        <item
+            android:id="@+id/menu7"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Menu 4" />
+            android:title="Menu 7" />
         -->
     </group>
 
