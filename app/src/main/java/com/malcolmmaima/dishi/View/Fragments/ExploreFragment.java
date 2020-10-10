@@ -32,6 +32,7 @@ import com.malcolmmaima.dishi.View.Adapter.ExplorePostAdapter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -222,7 +223,7 @@ public class ExploreFragment extends Fragment implements SwipeRefreshLayout.OnRe
                                 }
                                 list.add(new ExplorePostsModel(ExplorePostsModel.IMAGE_TYPE, response.body().get(i).getTitle().getRendered(),
                                         tempdetails,
-                                        images[0], url.toString())); //response.body().get(i).getLinks().getWpFeaturedmedia().get(0).getHref()
+                                        images[0], url.toString(), response.body().get(i).getDate())); //response.body().get(i).getLinks().getWpFeaturedmedia().get(0).getHref()
                             } catch (Exception e){
                                 Log.e(TAG, "onResponse: ", e);
                             }
@@ -230,6 +231,11 @@ public class ExploreFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         }
                         if(!list.isEmpty()){
                             mSwipeRefreshLayout.setRefreshing(false);
+                            try {
+                                Collections.sort(list, (post1, post2) -> (post2.date.compareTo(post1.date)));
+                            } catch (Exception e){
+                                Log.e(TAG, "onResponse: ", e);
+                            }
                             ExplorePostAdapter recycler = new ExplorePostAdapter(list, getContext());
                             recyclerview.setLayoutManager(layoutmanager);
                             recyclerview.setItemAnimator( new DefaultItemAnimator());
