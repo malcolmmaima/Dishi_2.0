@@ -1,5 +1,7 @@
 package com.malcolmmaima.dishi.View.Adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -26,6 +28,8 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
     String TAG = "ExplorePostAdapter";
     private ArrayList<ExplorePostsModel> dataset;
     private Context mContext;
+    long DURATION = 200;
+
     public ExplorePostAdapter(ArrayList<ExplorePostsModel> mlist, Context context) {
         this.dataset = mlist;
         this.mContext = context;
@@ -52,7 +56,7 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         final ExplorePostsModel object = dataset.get(position);
-
+        setAnimation(holder.itemView, position);
         ((ImageTypeViewHolder) holder).subtitle.setText(object.subtitle);
         ( (ImageTypeViewHolder) holder).title.setText( object.title );
 
@@ -106,6 +110,26 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
         });
 
         /// dataset.get(position)
+    }
+
+    /**
+     * @lhttps://medium.com/better-programming/android-recyclerview-with-beautiful-animations-5e9b34dbb0fa
+     */
+    private void setAnimation(View itemView, int i) {
+        boolean on_attach = true;
+        if(!on_attach){
+            i = -1;
+        }
+        boolean isNotFirstItem = i == -1;
+        i++;
+        itemView.setAlpha(0.f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(itemView, "alpha", 0.f, 0.5f, 1.0f);
+        ObjectAnimator.ofFloat(itemView, "alpha", 0.f).start();
+        animator.setStartDelay(isNotFirstItem ? DURATION / 2 : (i * DURATION / 3));
+        animator.setDuration(500);
+        animatorSet.play(animator);
+        animator.start();
     }
 
     @Override

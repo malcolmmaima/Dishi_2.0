@@ -39,6 +39,7 @@ import com.malcolmmaima.dishi.Model.MessageModel;
 import com.malcolmmaima.dishi.Model.NotificationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
 import com.malcolmmaima.dishi.R;
+import com.malcolmmaima.dishi.View.Fragments.ExploreFragment;
 import com.malcolmmaima.dishi.View.Fragments.HomeFragment;
 import com.malcolmmaima.dishi.View.Fragments.MyRestaurantsFragment;
 import com.malcolmmaima.dishi.View.Fragments.ProfileFragment;
@@ -516,6 +517,11 @@ public class RiderActivity extends AppCompatActivity
         else if (id == R.id.menu2) {
             setTitle("Trip Receipts");
             fragmentClass[0] = ReceiptsFragment.class;
+        }
+
+        else if (id == R.id.menu6) {
+            setTitle("Explore");
+            fragmentClass[0] = ExploreFragment.class;
         }
 
         else if (id == R.id.nav_settings) {

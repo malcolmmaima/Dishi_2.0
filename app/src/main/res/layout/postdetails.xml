@@ -17,7 +17,7 @@
             android:layout_height="100dp"
             android:src="@drawable/blog_post"
             android:id="@+id/Icon"
-            android:layout_margin="5dp"
+            android:layout_margin="10dp"
             android:layout_weight="9"/>
 
         <LinearLayout

@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.malcolmmaima.dishi.R;
-import com.malcolmmaima.dishi.View.Fragments.ExploreFragment;
 
 public class WPPostDetails extends AppCompatActivity {
     WebView webView;
@@ -78,6 +77,7 @@ public class WPPostDetails extends AppCompatActivity {
 
                 @Override
                 public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                    finish();
                     Toast.makeText(WPPostDetails.this, "Error:" + description, Toast.LENGTH_SHORT).show();
 
                 }

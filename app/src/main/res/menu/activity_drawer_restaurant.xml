@@ -22,6 +22,12 @@
             android:id="@+id/menu4"
             android:icon="@drawable/ic_receipt_black_48dp"
             android:title="Receipts" />
+
+        <item
+            android:id="@+id/menu6"
+            android:icon="@drawable/search"
+            android:title="Explore" />
+
     </group>
 
     <item android:title="Account">
