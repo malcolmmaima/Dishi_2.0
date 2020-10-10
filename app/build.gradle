@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.2.4'
     implementation 'com.google.firebase:firebase-storage:19.2.0'
     implementation 'com.google.firebase:firebase-database:19.4.0'
+    implementation 'org.jsoup:jsoup:1.11.1'
 
     implementation 'me.relex:circleindicator:1.2.2@aar'
     implementation 'com.github.mukeshsolanki:android-otpview-pinview:1.0.4'

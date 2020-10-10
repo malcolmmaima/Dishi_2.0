@@ -16,6 +16,9 @@ import com.malcolmmaima.dishi.View.Activities.WPPostDetails;
 import com.malcolmmaima.dishi.R;
 import com.squareup.picasso.Picasso;
 
+import org.jsoup.Jsoup;
+import org.jsoup.examples.HtmlToPlainText;
+
 import java.util.ArrayList;
 
 public class ExplorePostAdapter extends RecyclerView.Adapter {
@@ -50,8 +53,19 @@ public class ExplorePostAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         final ExplorePostsModel object = dataset.get(position);
 
+        ((ImageTypeViewHolder) holder).subtitle.setText(object.subtitle);
         ( (ImageTypeViewHolder) holder).title.setText( object.title );
-        ( (ImageTypeViewHolder) holder).subtitle.setText( object.subtitle );
+
+        //Strip any raw html
+        try {
+            String plainSubtitle = new HtmlToPlainText().getPlainText(Jsoup.parse(object.subtitle));
+            String plainTitle = new HtmlToPlainText().getPlainText(Jsoup.parse(object.title));
+
+            ((ImageTypeViewHolder) holder).subtitle.setText(plainSubtitle);
+            ( (ImageTypeViewHolder) holder).title.setText(plainTitle);
+        } catch (Exception e){
+            Log.e(TAG, "onBindViewHolder: ", e);
+        }
 
         try {
             Log.d(TAG, "onBindViewHolder: " + object.Image);
