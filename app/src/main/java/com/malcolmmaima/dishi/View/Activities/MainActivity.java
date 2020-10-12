@@ -187,19 +187,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Log.w("TAG", "onVerificationFailed", e);
                 fabbutton.setTag(getResources().getString(R.string.tag_send));
 
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
+
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+
                     Snackbar snackbar = Snackbar
                             .make((LinearLayout) findViewById(R.id.parentlayout), "Verification Failed !! Invalid verification Code", Snackbar.LENGTH_LONG);
 
                     snackbar.show();
                 }
                 else if (e instanceof FirebaseTooManyRequestsException) {
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+
                     Snackbar snackbar = Snackbar
                             .make((LinearLayout) findViewById(R.id.parentlayout), "Verification Failed !! Too many request. Try after some time. ", Snackbar.LENGTH_LONG);
 
@@ -207,11 +207,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
 
                 else if(e instanceof FirebaseNetworkException){
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+
                     Snackbar snackbar = Snackbar
                             .make((LinearLayout) findViewById(R.id.parentlayout), "Failed! Network error, try again!. ", Snackbar.LENGTH_LONG);
+
+                    snackbar.show();
+                }
+
+                else if(e instanceof FirebaseException){
+                    Snackbar snackbar = Snackbar
+                            .make((LinearLayout) findViewById(R.id.parentlayout), "Failed! Something went wrong, try again later!. ", Snackbar.LENGTH_LONG);
 
                     snackbar.show();
                 }
@@ -997,7 +1002,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
                         } catch (Exception e){ }
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progressDialog.dismiss();
+                Snackbar snackbar = Snackbar
+                        .make((LinearLayout) findViewById(R.id.parentlayout), "Something went wrong! try again later!", Snackbar.LENGTH_LONG);
+
+                snackbar.show();
+            }
+        });
     }
 
     public void startNotificationService() {
