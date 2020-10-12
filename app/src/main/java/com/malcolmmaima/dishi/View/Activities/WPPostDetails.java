@@ -17,6 +17,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.malcolmmaima.dishi.R;
 
+import org.jsoup.Jsoup;
+import org.jsoup.examples.HtmlToPlainText;
+
 public class WPPostDetails extends AppCompatActivity {
     WebView webView;
     String TAG = "WPPostDetails";
@@ -44,7 +47,8 @@ public class WPPostDetails extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         try {
-            setTitle(blogTitle);
+            String plainTitle = new HtmlToPlainText().getPlainText(Jsoup.parse(blogTitle));
+            setTitle(plainTitle);
         } catch (Exception e){
             setTitle("Blog");
         }

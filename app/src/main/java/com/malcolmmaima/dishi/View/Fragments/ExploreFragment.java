@@ -176,8 +176,8 @@ public class ExploreFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 // String yourURL = yourURL.replace(BaseURL,"");
                 // Call<List<WPPost>>  call = service.getPostInfo( yourURL);
 
-                /// to get only 6 post from your blog
-                // http://domain/wp-json/wp/v2/posts?per_page=2
+                /// Maximum number of items to be returned in result set Default: 10
+                // http://domain/wp-json/wp/v2/posts?per_page=12
 
                 // to get any specific blog post, use id of post
                 //  http://domain/wp-json/wp/v2/posts/1179
@@ -262,16 +262,10 @@ public class ExploreFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                     @Override
                     public void onFailure(Call<List<WPPost>> call, Throwable t) {
-                        Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "onFailure: "+t);
 
                         mSwipeRefreshLayout.setRefreshing(false);
-                        ExplorePostAdapter recycler = new ExplorePostAdapter(list, getContext());
-                        recyclerview.setLayoutManager(layoutmanager);
-                        recyclerview.setItemAnimator( new DefaultItemAnimator());
-                        recyclerview.setAdapter(recycler);
-                        emptyTag.setVisibility(View.VISIBLE);
-                        icon.setVisibility(View.VISIBLE);
                     }
                 });
             }
