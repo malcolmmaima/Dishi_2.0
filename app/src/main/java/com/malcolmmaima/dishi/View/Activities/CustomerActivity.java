@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.os.Bundle;
 
@@ -57,6 +58,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -64,6 +66,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -78,11 +81,14 @@ public class CustomerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     String myPhone;
-    private DatabaseReference myRef, myNotificationsRef, myMessagesRef;
-    private ValueEventListener myRefListener, myNotificationsListener, myMessagesListener;
+    private DatabaseReference myRef, myNotificationsRef, myMessagesRef,
+            myOrdersRef, myCartCounterRef;
+    private ValueEventListener myRefListener, myNotificationsListener,
+            myMessagesListener, myOrdersListener, myCartCounterListener;
     private FirebaseAuth mAuth;
     private String TAG, imageURL, imageURLBig;
     Menu myMenu;
+    TextView myOrdersCounter, myCartCounter;
     private static final int PERMISSIONS_REQUEST = 100;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -131,6 +137,8 @@ public class CustomerActivity extends AppCompatActivity
                 //Set fb database reference
                 myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
                 myNotificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+                myOrdersRef = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+                myCartCounterRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
 
                 myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -193,6 +201,8 @@ public class CustomerActivity extends AppCompatActivity
                 //Set fb database reference
                 myRef = FirebaseDatabase.getInstance().getReference("users/" + myPhone);
                 myNotificationsRef = FirebaseDatabase.getInstance().getReference("notifications/"+myPhone);
+                myOrdersRef = FirebaseDatabase.getInstance().getReference("my_orders/"+myPhone);
+                myCartCounterRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
 
                 myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -288,6 +298,12 @@ public class CustomerActivity extends AppCompatActivity
         //Set header data
         navUsername.setText("");
 
+        myOrdersCounter = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().
+                findItem(R.id.menu1));
+
+        myCartCounter = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().
+                findItem(R.id.menu2));
+
         /**
          * Get logged in user details
          */
@@ -347,6 +363,7 @@ public class CustomerActivity extends AppCompatActivity
                         notificationIcon.setBackgroundResource(R.drawable.active_notification_64dp);
                     }
                 }
+
             }
 
             @Override
@@ -356,7 +373,81 @@ public class CustomerActivity extends AppCompatActivity
         };
         myNotificationsRef.addValueEventListener(myNotificationsListener);
 
+        /**
+         * Check my orders
+         */
+        myOrdersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    try {
+                        int orders = (int) snapshot.getChildrenCount();
+                        //Gravity property aligns the text
+                        myOrdersCounter.setGravity(Gravity.CENTER_VERTICAL);
+                        myOrdersCounter.setTypeface(null, Typeface.BOLD);
+                        myOrdersCounter.setTextColor(getResources().getColor(R.color.colorAccent));
+                        myOrdersCounter.setText(""+orders);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                }
 
+                else {
+                    try {
+                        myOrdersCounter.setGravity(Gravity.CENTER_VERTICAL);
+                        myOrdersCounter.setTypeface(null, Typeface.BOLD);
+                        myOrdersCounter.setTextColor(getResources().getColor(R.color.colorAccent));
+                        myOrdersCounter.setText("");
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        myOrdersRef.addValueEventListener(myOrdersListener);
+
+        /**
+         * Check my cart
+         */
+
+        myCartCounterListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    try {
+                        int cartItems = (int) snapshot.getChildrenCount();
+                        //Gravity property aligns the text
+                        myCartCounter.setGravity(Gravity.CENTER_VERTICAL);
+                        myCartCounter.setTypeface(null, Typeface.BOLD);
+                        myCartCounter.setTextColor(getResources().getColor(R.color.colorAccent));
+                        myCartCounter.setText(""+cartItems);
+                    } catch (Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                } else {
+                    try {
+                        myCartCounter.setGravity(Gravity.CENTER_VERTICAL);
+                        myCartCounter.setTypeface(null, Typeface.BOLD);
+                        myCartCounter.setTextColor(getResources().getColor(R.color.colorAccent));
+                        myCartCounter.setText("");
+                    } catch(Exception e){
+                        Log.e(TAG, "onDataChange: ", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        myCartCounterRef.addValueEventListener(myCartCounterListener);
 
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -673,6 +764,7 @@ public class CustomerActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_customer_account, menu);
         myMenu = menu;
         MenuItem item = menu.findItem(R.id.sendDM);
+
         checkNewMessage(item);
         return true;
     }
@@ -726,6 +818,8 @@ public class CustomerActivity extends AppCompatActivity
             myNotificationsRef.removeEventListener(myNotificationsListener);
             myRef.removeEventListener(myRefListener);
             myMessagesRef.removeEventListener(myMessagesListener);
+            myOrdersRef.removeEventListener(myOrdersListener);
+            myCartCounterRef.removeEventListener(myCartCounterListener);
         } catch (Exception e){
 
         }
