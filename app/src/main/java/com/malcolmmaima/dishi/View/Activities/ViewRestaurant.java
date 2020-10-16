@@ -251,7 +251,7 @@ public class ViewRestaurant extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     myLocation = dataSnapshot.getValue(LiveLocationModel.class);
-                    computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
+                    computeDistance(restaurantPhone);
                 } catch (Exception e){
 
                 }
@@ -270,7 +270,7 @@ public class ViewRestaurant extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
                     restaurantLocation = dataSnapshot.getValue(LiveLocationModel.class);
-                    computeDistance(myLocation.getLatitude(), myLocation.getLongitude(), restaurantLocation.getLatitude(), restaurantLocation.getLongitude(), "K");
+                    computeDistance(restaurantPhone);
                 }catch (Exception e){
 
                 }
@@ -333,122 +333,6 @@ public class ViewRestaurant extends AppCompatActivity {
         } else {
             distAway.setText(distanceAway + "km away");
         }
-
-        DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ restaurantPhone);
-        userData.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    final UserModel user = dataSnapshot.getValue(UserModel.class);
-                    user.setPhone(restaurantPhone);
-
-                    /**
-                     * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
-                     */
-
-                    try {
-                        if (user.getLiveStatus() == true) {
-
-                            /**
-                             * Now check "locationType" so as to decide which location node to fetch, live or static
-                             */
-                            if (user.getLocationType().equals("default")) {
-                                //if location type is default then fetch static location
-                                DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurantPhone + "/my_location");
-
-                                defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                        try {
-                                            StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
-
-                                            /**
-                                             * Now lets compute distance of each restaurant with customer location
-                                             */
-                                            CalculateDistance calculateDistance = new CalculateDistance();
-                                            Double dist = calculateDistance.distance(myLocation.getLatitude(),
-                                                    myLocation.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
-
-                                            //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
-
-                                            if(dist < 1.0){
-                                                distAway.setText(dist*1000 + "m away");
-                                            } else {
-                                                distAway.setText(dist + "km away");
-                                            }
-                                        } catch (Exception e) {
-                                            Log.e(TAG, "onDataChange: ", e);
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
-                            /**
-                             * If location type is live then track restaurant live location instead of static location
-                             */
-                            else if (user.getLocationType().equals("live")) {
-                                DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurantPhone);
-
-                                restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        try {
-
-                                            LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
-
-                                            /**
-                                             * Now lets compute distance of each restaurant with customer location
-                                             */
-
-                                            CalculateDistance calculateDistance = new CalculateDistance();
-                                            Double dist = calculateDistance.distance(myLocation.getLatitude(),
-                                                    myLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
-
-                                            if(dist < 1.0){
-                                                distAway.setText(dist*1000 + "m away");
-                                            } else {
-                                                distAway.setText(dist + "km away");
-                                            }
-                                        } catch (Exception e) {
-                                            Log.e(TAG, "onDataChange: ", e);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
-
-                            /**
-                             * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
-                             * and "live" which tracks the restaurant's live location under "location/phone"
-                             */
-                            else {
-                                //Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
-                            }
-                        }
-
-                    } catch (Exception e) {
-
-                    }
-                } catch (Exception e){
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         /**
          * Load image url onto imageview
@@ -592,6 +476,7 @@ public class ViewRestaurant extends AppCompatActivity {
             }
         });
 
+        shareRest.setVisibility(View.GONE);
         shareRest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -715,19 +600,122 @@ public class ViewRestaurant extends AppCompatActivity {
         return(super.onOptionsItemSelected(item));
     }
 
-    private void computeDistance(Double latitude, Double longitude, Double latitude1, Double longitude1, String k) {
-        CalculateDistance calculateDistance = new CalculateDistance();
-        dist = calculateDistance.distance(latitude, longitude, latitude1, longitude1, "K");
-        try {
-            if (dist < 1.0) {
-                distAway.setText(dist * 1000 + "m away");
-            } else {
-                distAway.setText(dist + "km away");
+    private void computeDistance(String restaurantPhone) {
+        DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ restaurantPhone);
+        userData.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    final UserModel user = dataSnapshot.getValue(UserModel.class);
+                    user.setPhone(restaurantPhone);
+
+                    /**
+                     * Check "liveStatus" of each restautant (must be true so as to allow menu to be fetched
+                     */
+
+                    try {
+                        if (user.getLiveStatus() == true) {
+
+                            /**
+                             * Now check "locationType" so as to decide which location node to fetch, live or static
+                             */
+                            if (user.getLocationType().equals("default")) {
+                                //if location type is default then fetch static location
+                                DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + restaurantPhone + "/my_location");
+
+                                defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                        try {
+                                            StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
+
+                                            /**
+                                             * Now lets compute distance of each restaurant with customer location
+                                             */
+                                            CalculateDistance calculateDistance = new CalculateDistance();
+                                            Double dist = calculateDistance.distance(myLocation.getLatitude(),
+                                                    myLocation.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
+
+                                            //Toast.makeText(getContext(), restaurants.getKey() + ": " + dist + "km", Toast.LENGTH_SHORT).show();
+
+                                            if(dist < 1.0){
+                                                distAway.setText(dist*1000 + "m away");
+                                            } else {
+                                                distAway.setText(dist + "km away");
+                                            }
+                                        } catch (Exception e) {
+                                            Log.e(TAG, "onDataChange: ", e);
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                            /**
+                             * If location type is live then track restaurant live location instead of static location
+                             */
+                            else if (user.getLocationType().equals("live")) {
+                                DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + restaurantPhone);
+
+                                restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+
+                                            LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
+
+                                            /**
+                                             * Now lets compute distance of each restaurant with customer location
+                                             */
+
+                                            CalculateDistance calculateDistance = new CalculateDistance();
+                                            Double dist = calculateDistance.distance(myLocation.getLatitude(),
+                                                    myLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+
+                                            if(dist < 1.0){
+                                                distAway.setText(dist*1000 + "m away");
+                                            } else {
+                                                distAway.setText(dist + "km away");
+                                            }
+                                        } catch (Exception e) {
+                                            Log.e(TAG, "onDataChange: ", e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+
+                            /**
+                             * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
+                             * and "live" which tracks the restaurant's live location under "location/phone"
+                             */
+                            else {
+                                //Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                    } catch (Exception e) {
+
+                    }
+                } catch (Exception e){
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        } catch (Exception e){
-
-        }
+        });
     }
 
     private void setupViewPager(ViewPager viewPager)

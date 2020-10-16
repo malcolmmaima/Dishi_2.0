@@ -37,10 +37,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium;
 import com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular;
+import com.malcolmmaima.dishi.Controller.Utils.CalculateDistance;
 import com.malcolmmaima.dishi.Controller.Utils.GenerateRandomString;
 import com.malcolmmaima.dishi.Controller.Utils.GetCurrentDate;
 import com.malcolmmaima.dishi.Controller.Services.TrackingService;
 import com.malcolmmaima.dishi.Controller.Utils.TimeAgo;
+import com.malcolmmaima.dishi.Model.LiveLocationModel;
 import com.malcolmmaima.dishi.Model.ProductDetailsModel;
 import com.malcolmmaima.dishi.Model.StaticLocationModel;
 import com.malcolmmaima.dishi.Model.UserModel;
@@ -77,7 +79,7 @@ public class CheckOut extends AppCompatActivity {
     Double lat, lng;
     String placeName, locationSet;
     AppCompatImageView paymentStatus, deliveryLocationStatus;
-    DatabaseReference myRef, myCartRef;
+    DatabaseReference myRef, myCartRef, myLocationRef;
     ProgressDialog progressDialog;
     ArrayList<ProductDetailsModel> myCartItems;
     List<String> deliveryFeeBreakdown;
@@ -89,6 +91,11 @@ public class CheckOut extends AppCompatActivity {
     int prodCount;
     ProgressBar progressBar;
     LinearLayoutManager layoutmanager;
+    int subTotalAmount;
+    DecimalFormat df;
+    Double orderDistance = 0.0;
+    ValueEventListener mylocationListener;
+    LiveLocationModel myLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +105,7 @@ public class CheckOut extends AppCompatActivity {
         myPhone = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(); //Current logged in user phone number
         myRef = FirebaseDatabase.getInstance().getReference("users/"+myPhone);
         myCartRef = FirebaseDatabase.getInstance().getReference("cart/"+myPhone);
+        myLocationRef = FirebaseDatabase.getInstance().getReference("location/"+myPhone);
 
         myRef.child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -156,10 +164,10 @@ public class CheckOut extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        DecimalFormat df = new DecimalFormat("#"); //#.##
+        df = new DecimalFormat("#"); //#.##
 
         //Initialize some values
-        int subTotalAmount = getIntent().getIntExtra("subTotal", 0);
+        subTotalAmount = getIntent().getIntExtra("subTotal", 0);
 
         totalBillAmount = Double.valueOf(subTotalAmount);
         SubTotal.setText("Ksh " + Double.valueOf(df.format(subTotalAmount)));
@@ -176,6 +184,140 @@ public class CheckOut extends AppCompatActivity {
 
         setTitle("Checkout");
 
+        computeOrder(0);
+
+        //Back button on toolbar
+        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); //Go back to previous activity
+            }
+        });
+
+        PaymentMethod.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
+                builder.setItems(paymentMethods, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0){
+                            selectedPaymentMethod = "mpesa";
+                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+
+//                            selectedPaymentMethod = ""; //will set to "mpesa" once implemented Mpesa
+//                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
+//
+//                            //Lets set to grey for now since we have not yet implemented Mpesa
+//                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
+                        }
+                        if(which == 1){
+                            selectedPaymentMethod = "cash";
+                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+                        }
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        DeliveryAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
+                builder.setItems(deliveryAddress, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0){
+                            computeOrder(0);
+                            locationSet = "live";
+                            startTrackerService();
+                            deliveryLocationStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+                        }
+                        if(which == 1){
+                            computeOrder(1);
+                            requestLocation();
+                        }
+
+                        if(which == 2){
+                            computeOrder(2);
+                            locationSet = "pick";
+                            deliveryLocationStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+                        }
+
+                        //Get my location coordinates
+                        mylocationListener = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(which == 0){
+                                    try {
+                                        myLocation = dataSnapshot.getValue(LiveLocationModel.class);
+                                    } catch (Exception e){
+
+                                    }
+                                }
+
+                                if(which == 1 && lat != 0.0 && lng != 0.0){
+                                    myLocation.setLatitude(lat);
+                                    myLocation.setLongitude(lng);
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        };
+                        myLocationRef.addValueEventListener(mylocationListener);
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        /**
+         * Delivery charge breakdown
+         */
+        DeliveryCharge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deliveryCharges();
+            }
+        });
+
+        deliveryChargeAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deliveryCharges();
+            }
+        });
+
+        /**
+         * Complete order
+         */
+        orderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //We need to perform a validation check before sending the order
+                if(!selectedPaymentMethod.equals("") && !locationSet.equals("")){
+                    sendOrder();
+                }
+
+                else{
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
+                            "Set Address and Payment method", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        });
+
+    }
+
+    private void computeOrder(int deliveryAddressType) {
+        deliveryAmount = 0.0; //reset to 0 then compute below
         myCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -310,19 +452,28 @@ public class CheckOut extends AppCompatActivity {
 
                                                     }
 
-                                                    private void computeDeliveryTotal() {
+                                                    public void computeDeliveryTotal() {
                                                         //increment product count only if it's in stock.
                                                         //product count helps us determine the delivery charge
                                                         if (product.getOwner().equals(vendor) && product.getOutOfStock() == false) {
                                                             prodCount = prodCount + product.getQuantity();
 
                                                             if (prodCount > vendorUser.getDeliveryChargeLimit() && !vendors.contains(product.getOwner())) {
-                                                                deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                                                //if customer selects option (2) to pick their order, remove delivery fee
+                                                                if(deliveryAddressType == 0 || deliveryAddressType == 1){
+                                                                    deliveryAmount = deliveryAmount + vendorUser.getDelivery_charge();
+                                                                } else {
+                                                                    deliveryAmount = 0.0;
+                                                                }
+
                                                                 deliveryChargeAmount.setText("Ksh " + Double.valueOf(df.format(deliveryAmount)));
                                                                 deliveryFeeBreakdown.add(vendorUser.getFirstname()+" "+vendorUser.getLastname()+" (Ksh " + vendorUser.getDelivery_charge()+")");
                                                                 //Log.d(TAG, vendorUser.getFirstname()+"("+prodCount+") => " + vendorUser.getDelivery_charge()+" (waive="+vendorUser.getDeliveryChargeLimit()+")");
                                                                 vendors.add(vendor);
                                                                 prodCount = 0;
+
+//                                                                Log.d(TAG, "computeDeliveryTotal: dist("+vendorUser.getPhone()+") => "+computeOrderDistance(vendorUser.getPhone())
+//                                                                        + " * chrg: "+vendorUser.getDelivery_charge());
                                                             }
 
                                                             totalBillAmount = subTotalAmount + deliveryAmount; //+ VAT
@@ -368,123 +519,127 @@ public class CheckOut extends AppCompatActivity {
 
             }
         });
+    }
 
-        //Back button on toolbar
-        topToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+    private double computeOrderDistance(String vendorPhone){
+
+        DatabaseReference userData = FirebaseDatabase.getInstance().getReference("users/"+ vendorPhone);
+        userData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                finish(); //Go back to previous activity
-            }
-        });
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    final UserModel user = dataSnapshot.getValue(UserModel.class);
+                    user.setPhone(vendorPhone);
 
-        PaymentMethod.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
-                builder.setItems(paymentMethods, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(which == 0){
-                            selectedPaymentMethod = "mpesa";
-                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+                    /**
+                     * Now check "locationType" so as to decide which location node to fetch, live or static
+                     */
+                    if (user.getLocationType().equals("default")) {
+                        //if location type is default then fetch static location
+                        DatabaseReference defaultLocation = FirebaseDatabase.getInstance().getReference("users/" + vendorPhone + "/my_location");
 
-//                            selectedPaymentMethod = ""; //will set to "mpesa" once implemented Mpesa
-//                            Snackbar.make(v.getRootView(), "In development", Snackbar.LENGTH_LONG).show();
-//
-//                            //Lets set to grey for now since we have not yet implemented Mpesa
-//                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.grey), android.graphics.PorterDuff.Mode.SRC_IN);
-                        }
-                        if(which == 1){
-                            selectedPaymentMethod = "cash";
-                            paymentStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
-                        }
+                        defaultLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                try {
+                                    StaticLocationModel staticLocationModel = dataSnapshot.getValue(StaticLocationModel.class);
+
+                                    /**
+                                     * Now lets compute distance of each restaurant with customer location
+                                     */
+                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                    Double dist = calculateDistance.distance(myLocation.getLatitude(),
+                                            myLocation.getLongitude(), staticLocationModel.getLatitude(), staticLocationModel.getLongitude(), "K");
+
+                                    orderDistance = dist;
+
+                                } catch (Exception e) {
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
-                });
-                builder.create();
-                builder.show();
-            }
-        });
+                    /**
+                     * If location type is live then track restaurant live location instead of static location
+                     */
+                    else if (user.getLocationType().equals("live")) {
+                        DatabaseReference restliveLocation = FirebaseDatabase.getInstance().getReference("location/" + vendorPhone);
 
-        DeliveryAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                        restliveLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                try {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
-                builder.setItems(deliveryAddress, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(which == 0){
-                            locationSet = "live";
-                            startTrackerService();
-                            deliveryLocationStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
-                        }
-                        if(which == 1){
-                            requestLocation();
-                        }
+                                    LiveLocationModel restLiveLoc = dataSnapshot.getValue(LiveLocationModel.class);
 
-                        if(which == 2){
-                            locationSet = "pick";
-                            deliveryLocationStatus.setColorFilter(ContextCompat.getColor(CheckOut.this, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
-                        }
+                                    /**
+                                     * Now lets compute distance of each restaurant with customer location
+                                     */
+
+                                    CalculateDistance calculateDistance = new CalculateDistance();
+                                    Double dist = calculateDistance.distance(myLocation.getLatitude(),
+                                            myLocation.getLongitude(), restLiveLoc.getLatitude(), restLiveLoc.getLongitude(), "K");
+
+                                    orderDistance = dist;
+                                } catch (Exception e) {
+                                    Log.e(TAG, "onDataChange: ", e);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
-                });
-                builder.create();
-                builder.show();
-            }
-        });
 
-        /**
-         * Delivery charge breakdown
-         */
-        DeliveryCharge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deliveryCharges();
-            }
-        });
+                    /**
+                     * available track options are "default" which tracks the restaurant's static location under "users/phone/my_location"
+                     * and "live" which tracks the restaurant's live location under "location/phone"
+                     */
+                    else {
+                        //Toast.makeText(getContext(), "Something went wrong, contact support!", Toast.LENGTH_LONG).show();
+                    }
 
-        deliveryChargeAmount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deliveryCharges();
-            }
-        });
+                } catch (Exception e){
 
-        /**
-         * Complete order
-         */
-        orderBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //We need to perform a validation check before sending the order
-                if(!selectedPaymentMethod.equals("") && !locationSet.equals("")){
-                    sendOrder();
-                }
-
-                else{
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.parentlayout),
-                            "Set Address and Payment method", Snackbar.LENGTH_LONG);
-                    snackbar.show();
                 }
             }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
         });
+
+        return orderDistance;
     }
 
     private void deliveryCharges() {
-        try {
-            if(deliveryFeeBreakdown.size() > 1){
-                String[] vendors = new String[deliveryFeeBreakdown.size()];
-                AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
-                builder.setTitle("Delivery Charge Breakdown");
-                builder.setItems(deliveryFeeBreakdown.toArray(vendors), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+        if(deliveryAmount > 0.0){
+            try {
+                if(deliveryFeeBreakdown.size() > 1){
+                    String[] vendors = new String[deliveryFeeBreakdown.size()];
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CheckOut.this);
+                    builder.setTitle("Delivery Charge Breakdown");
+                    builder.setItems(deliveryFeeBreakdown.toArray(vendors), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                });
-                builder.create();
-                builder.show();
+                        }
+                    });
+                    builder.create();
+                    builder.show();
+                }
+            } catch (Exception e){
+                Log.e(TAG, "deliveryCharges: ",e );
             }
-        } catch (Exception e){
-            Log.e(TAG, "deliveryCharges: ",e );
         }
     }
 
