@@ -362,33 +362,36 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
              * timeS[4] = timezone
              */
 
-            //post timeStamp
-            if(!timeS[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                timeS[4] = "GMT+03:00";
+            if(timeS.length != 0){
+                //post timeStamp
+                if(!timeS[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                    timeS[4] = "GMT+03:00";
 
-                //2020-04-27:20:37:32:GMT+03:00
-                dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
-                dateStart = format.parse(dtStart);
-            } else {
-                dateStart = format.parse(dtStart);
+                    //2020-04-27:20:37:32:GMT+03:00
+                    dtStart = timeS[0]+":"+timeS[1]+":"+timeS[2]+":"+timeS[3]+":"+timeS[4];
+                    dateStart = format.parse(dtStart);
+                } else {
+                    dateStart = format.parse(dtStart);
+                }
+
+                //my device current date
+                if(!timeT[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
+                    timeT[4] = "GMT+03:00";
+
+                    //2020-04-27:20:37:32:GMT+03:00
+                    dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
+                    dateEnd = format.parse(dtEnd);
+                } else {
+                    dateEnd = format.parse(dtEnd);
+                }
+
+                //https://memorynotfound.com/calculate-relative-time-time-ago-java/
+                //Now compute timeAgo duration
+                TimeAgo timeAgo = new TimeAgo();
+
+                holder.timeOrdered.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
             }
 
-            //my device current date
-            if(!timeT[4].equals("GMT+03:00")){ //Noticed some devices post timezone like so ... i'm going to optimize for EA first
-                timeT[4] = "GMT+03:00";
-
-                //2020-04-27:20:37:32:GMT+03:00
-                dtEnd = timeT[0]+":"+timeT[1]+":"+timeT[2]+":"+timeT[3]+":"+timeT[4];
-                dateEnd = format.parse(dtEnd);
-            } else {
-                dateEnd = format.parse(dtEnd);
-            }
-
-            //https://memorynotfound.com/calculate-relative-time-time-ago-java/
-            //Now compute timeAgo duration
-            TimeAgo timeAgo = new TimeAgo();
-
-            holder.timeOrdered.setText("Ordered "+timeAgo.toRelative(dateStart, dateEnd, 2));
 
         } catch (ParseException e) {
             e.printStackTrace();

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "770782711846-817d2t6ig1hs7tba8ect0m5ehn8ta88m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.malcolmmaima.dishi",
+            "certificate_hash": "bbeca221ae7a2d459d497dfdb12f1ca29ef3df5c"
+          }
+        },
+        {
           "client_id": "770782711846-8l1ltp7duorq0faqa0o4094ci4n81vpb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -31,6 +39,14 @@
           }
         },
         {
+          "client_id": "770782711846-9lpa13tibvi99rhd9l025h28os6tjp2s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.malcolmmaima.dishi",
+            "certificate_hash": "883a091735e47c114f24dedf642f9637083502e9"
+          }
+        },
+        {
           "client_id": "770782711846-jn3usqk14dcmch23mni5tnltb4om9avf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -44,14 +60,6 @@
           "android_info": {
             "package_name": "com.malcolmmaima.dishi",
             "certificate_hash": "efaf4e9b90f21d480447126ed169afac35db2cf0"
-          }
-        },
-        {
-          "client_id": "770782711846-9lpa13tibvi99rhd9l025h28os6tjp2s.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
-            "certificate_hash": "883a091735e47c114f24dedf642f9637083502e9"
           }
         },
         {

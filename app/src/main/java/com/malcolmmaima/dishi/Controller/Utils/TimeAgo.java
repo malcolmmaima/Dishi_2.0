@@ -52,12 +52,12 @@ public class TimeAgo {
     }
 
     public static String toRelative(Date start, Date end){
-        assert start.after(end);
+        //assert start.after(end);
         return toRelative(end.getTime() - start.getTime());
     }
 
     public static String toRelative(Date start, Date end, int level){
-        assert start.after(end);
+        //assert start.after(end);
         return toRelative(end.getTime() - start.getTime(), level);
     }
 }

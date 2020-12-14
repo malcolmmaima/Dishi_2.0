@@ -471,6 +471,8 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
                         Log.e(TAG, "onDataChange: ", e);
                     }
 
+                    initiatedTime = dataSnapshot.child("initiatedOn").getValue(String.class);
+
                     timer = new Timer();
                     timer.schedule(new TimerTask() {
 
@@ -1241,7 +1243,7 @@ public class ViewCustomerOrder extends AppCompatActivity implements OnOrderCheck
         item.setVisible(false);
 
         try {
-            if (address.equals("pick")) {
+            if (address != null && address.equals("pick")) {
                 item.setVisible(false);
             }
 

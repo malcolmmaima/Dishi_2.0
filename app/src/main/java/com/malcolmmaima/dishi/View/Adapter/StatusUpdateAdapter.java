@@ -60,10 +60,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-
-
-
 public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapter.MyHolder> {
 
     Context context;
@@ -219,7 +215,7 @@ public class StatusUpdateAdapter extends RecyclerView.Adapter<StatusUpdateAdapte
             //Now compute timeAgo duration
             TimeAgo timeAgo = new TimeAgo();
 
-            holder.timePosted.setText(timeAgo.toRelative(dateStart, dateEnd, 1));
+            holder.timePosted.setText(TimeAgo.toRelative(dateStart, dateEnd, 1));
 
         } catch (ParseException e) {
             e.printStackTrace();
