@@ -329,22 +329,22 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.MyHolder>{
 
         }
 
-        /**
-         * Show time ordered
-         */
-        //Get today's date
-        SplitTimeString splitTime = new SplitTimeString();
-        GetCurrentDate currentDate = new GetCurrentDate();
-        String currDate = currentDate.getDate();
-
-        //Get dates
-        String dtEnd = currDate;
-        String dtStart = orderDetails.timeStamp;
-
-        //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
-        //Format both current date and date status update was posted
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
         try {
+            /**
+             * Show time ordered
+             */
+            //Get today's date
+            SplitTimeString splitTime = new SplitTimeString();
+            GetCurrentDate currentDate = new GetCurrentDate();
+            String currDate = currentDate.getDate();
+
+            //Get dates
+            String dtEnd = currDate;
+            String dtStart = orderDetails.timeStamp;
+
+            //https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+            //Format both current date and date status update was posted
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss:Z");
 
             //Convert String date values to Date values
             Date dateStart;
