@@ -41,7 +41,7 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             android:layout_toRightOf="@id/profilePic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="#0"
@@ -82,7 +82,7 @@
             android:background="@drawable/online_store"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/restaurantName"
             android:layout_below="@id/customerName"
             android:layout_toRightOf="@id/locationTag"
@@ -105,7 +105,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/distanceAway"
             android:layout_below="@id/restaurantName"
             android:layout_toRightOf="@id/locationTag"
@@ -129,7 +129,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/timeOrdered"
             android:layout_below="@id/locationTag"
             android:layout_toRightOf="@id/timeOrededIcon"

@@ -16,7 +16,7 @@
         android:layout_weight="1.8"
         >
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#000"
@@ -32,7 +32,7 @@
         android:gravity="center"
         android:layout_weight="0.8">
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/quantity"
@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/price"

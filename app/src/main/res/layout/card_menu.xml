@@ -41,7 +41,7 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
@@ -53,7 +53,7 @@
             android:layout_toRightOf="@id/foodPic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ksh 0"
@@ -66,7 +66,7 @@
             android:layout_marginEnd="15dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Food Description"
@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/outOfStock"
             android:layout_below="@id/foodDescription"
             android:layout_toRightOf="@id/checkBox"

@@ -60,7 +60,7 @@
 
             </LinearLayout>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:id="@+id/subTotal"
                 android:layout_below="@id/lin"
                 android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
                     android:paddingBottom="20dp"
                     >
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/productName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
                         android:text="Product Name"
                         android:textStyle="bold"
                         />
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -118,7 +118,7 @@
                         android:textColor="@color/colorAccent"
                         android:layout_alignParentRight="true"
                         />
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Food Descriptiond"
@@ -149,7 +149,7 @@
                             android:scaleType="centerCrop"
                             android:background="@drawable/online_store"
                             />
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/restaurantName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
                             android:padding="5dp"
                             android:src="@drawable/ic_like" />
 
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:layout_marginTop="10dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -181,7 +181,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"/>
 
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/outOfStock"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -208,7 +208,7 @@
                             android:scaleType="centerCrop"
                             android:background="@drawable/location_pin"
                             />
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/distanceAway"
                             android:layout_below="@id/restaurantName"
                             android:layout_toRightOf="@id/locationTag"
@@ -242,7 +242,7 @@
                     app:backgroundTint="@color/colorPrimaryDark"
                     app:srcCompat="@drawable/ic_add_white_36dp" />
 
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                     android:id="@+id/itemCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

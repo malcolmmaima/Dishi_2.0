@@ -57,7 +57,7 @@
                 android:layout_height="80dp"
                 android:src="@drawable/order"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_gravity="center"
                 android:layout_marginTop="50dp"
                 android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
                 android:layout_height="80dp"
                 android:src="@drawable/shop"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_gravity="center"
                 android:layout_marginTop="50dp"
                 android:layout_width="wrap_content"
@@ -150,7 +150,7 @@
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/delivery_bike" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_gravity="center"
                 android:layout_marginTop="50dp"
                 android:layout_width="wrap_content"

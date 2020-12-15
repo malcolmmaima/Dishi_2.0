@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.malcolmmaima.dishi">
+    package="com.malcolmmaima.dishiapp">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,21 +20,21 @@
         android:roundIcon="@drawable/dishi_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:versionCode="11"
-        android:versionName="1.1.1">
-        <activity android:name=".View.Maps.ViewLocation"></activity>
-        <activity android:name=".View.Activities.ViewUserDetails" />
-        <activity android:name=".View.Activities.UserManagement" />
-        <activity android:name=".View.Activities.SupportDashboard" />
-        <activity android:name=".View.Activities.SupportPin" />
-        <activity android:name=".View.Activities.TermsConditions" />
-        <activity android:name=".View.Activities.ContactSupport" />
-        <activity android:name=".View.Activities.DishiFaq" />
-        <activity android:name=".View.Activities.PrivacyPolicy" />
-        <activity android:name=".View.Activities.ResetPin" />
-        <activity android:name=".View.Activities.SearchActivity" />
-        <activity android:name=".View.Activities.SettingsActivity" />
-        <activity android:name=".View.Activities.ViewShareFoodItems" />
+        android:versionCode="12"
+        android:versionName="1.1.2">
+        <activity android:name="com.malcolmmaima.dishiapp.View.Maps.ViewLocation"></activity>
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ViewUserDetails" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.UserManagement" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SupportDashboard" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SupportPin" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.TermsConditions" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ContactSupport" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.DishiFaq" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.PrivacyPolicy" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ResetPin" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SearchActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SettingsActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ViewShareFoodItems" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -44,87 +44,87 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity
-            android:name=".View.Maps.ViewMapLocation"
+            android:name="com.malcolmmaima.dishiapp.View.Maps.ViewMapLocation"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".View.Activities.DeviceBlocked" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.DeviceBlocked" />
         <activity
-            android:name=".View.Activities.SecurityPin"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.SecurityPin"
             android:launchMode="singleTask" />
-        <activity android:name=".View.Activities.DeviceLoginActivity" />
-        <activity android:name=".View.Activities.MyBlockedAccounts" />
-        <activity android:name=".View.Activities.HelpActivity" />
-        <activity android:name=".View.Activities.NotificationSettings" />
-        <activity android:name=".View.Activities.AccountSettings" />
-        <activity android:name=".View.Activities.DeleteDeactivate" />
-        <activity android:name=".View.Activities.AboutActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.DeviceLoginActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.MyBlockedAccounts" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.HelpActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.NotificationSettings" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.AccountSettings" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.DeleteDeactivate" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.AboutActivity" />
         <activity
-            android:name=".View.Activities.ReceiptActivity"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ReceiptActivity"
             android:launchMode="singleTask" />
-        <activity android:name=".View.Activities.ReportAbuse" />
-        <activity android:name=".View.Activities.MyNotifications" />
-        <activity android:name=".View.Activities.FollowersFollowing" />
-        <activity android:name=".View.Activities.NewChat" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ReportAbuse" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.MyNotifications" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.FollowersFollowing" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.NewChat" />
         <activity
-            android:name=".View.Activities.ViewReview"
-            android:launchMode="singleTask" />
-        <activity
-            android:name=".View.Activities.ViewStatus"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ViewReview"
             android:launchMode="singleTask" />
         <activity
-            android:name=".View.Activities.Chat"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ViewStatus"
+            android:launchMode="singleTask" />
+        <activity
+            android:name="com.malcolmmaima.dishiapp.View.Activities.Chat"
             android:launchMode="singleTop" />
-        <activity android:name=".View.Activities.Inbox" />
-        <activity android:name=".View.Activities.SystemMaintenance" />
-        <activity android:name=".View.Activities.BlockedAccount" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.Inbox" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SystemMaintenance" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.BlockedAccount" />
         <activity
-            android:name=".View.Activities.AddRider"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.AddRider"
             android:label="@string/title_activity_add_rider" />
         <activity
-            android:name=".View.Activities.ViewMyOrders"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ViewMyOrders"
             android:launchMode="singleTop" />
         <activity
-            android:name=".View.Activities.ViewCustomerOrder"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ViewCustomerOrder"
             android:launchMode="singleTop" />
         <activity
-            android:name=".View.Activities.ViewRestaurant"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ViewRestaurant"
             android:label="@string/title_activity_view_restaurants" />
         <activity
-            android:name=".View.Activities.ViewProfile"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.ViewProfile"
             android:launchMode="singleTask" />
-        <activity android:name=".View.Activities.CheckOut" />
-        <activity android:name=".View.Activities.DeliverCharges" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.CheckOut" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.DeliverCharges" />
         <activity
-            android:name=".View.Activities.MyCart"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.MyCart"
             android:label="@string/title_activity_my_cart" />
-        <activity android:name=".View.Activities.ViewProduct" />
-        <activity android:name=".View.Activities.ViewImage" />
-        <activity android:name=".View.Activities.PersonalDetails" />
-        <activity android:name=".View.Activities.WPPostDetails" />
-        <activity android:name=".View.Activities.AddMenu" />
-        <activity android:name=".View.Activities.SetupAccountType" />
-        <activity android:name=".View.Activities.SplashActivity">
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ViewProduct" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.ViewImage" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.PersonalDetails" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.WPPostDetails" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.AddMenu" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SetupAccountType" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.Activities.MainActivity" />
-        <activity android:name=".View.Activities.WelcomeActivity" />
-        <activity android:name=".View.Activities.SetupProfile" />
-        <activity android:name=".View.Activities.LocationSettings" />
-        <activity android:name=".View.Maps.GeoTracking" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.MainActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.WelcomeActivity" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.SetupProfile" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Activities.LocationSettings" />
+        <activity android:name="com.malcolmmaima.dishiapp.View.Maps.GeoTracking" />
         <activity
-            android:name=".View.Maps.SearchLocation"
+            android:name="com.malcolmmaima.dishiapp.View.Maps.SearchLocation"
             android:label="@string/autocompletefromfragment" />
         <activity
-            android:name=".View.Activities.RiderActivity"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.RiderActivity"
             android:label="@string/title_activity_rider" />
         <activity
-            android:name=".View.Activities.VendorActivity"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.VendorActivity"
             android:label="@string/title_activity_restaurant" />
         <activity
-            android:name=".View.Activities.CustomerActivity"
+            android:name="com.malcolmmaima.dishiapp.View.Activities.CustomerActivity"
             android:label="@string/title_activity_customer" />
 
         <meta-data
@@ -141,11 +141,11 @@
             android:value="false" />
 
         <service
-            android:name=".Controller.Services.TrackingService"
+            android:name="com.malcolmmaima.dishiapp.Controller.Services.TrackingService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Controller.Services.ForegroundService"
+            android:name="com.malcolmmaima.dishiapp.Controller.Services.ForegroundService"
             android:enabled="true"
             android:exported="true" />
     </application>

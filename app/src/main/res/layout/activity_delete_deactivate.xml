@@ -34,7 +34,7 @@
             android:paddingRight="15dp"
             android:orientation="vertical">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="In development"

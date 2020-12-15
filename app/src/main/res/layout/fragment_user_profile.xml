@@ -47,7 +47,7 @@
                     android:layout_below="@+id/user_profile_photo"
                     android:elevation="4dp">
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/user_profile_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Light
                         android:id="@+id/user_profile_short_bio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
                             android:gravity="center"
                             android:orientation="vertical">
 
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                                 android:id="@+id/following"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                                 android:textColor="@color/colorAccent"
                                 android:textSize="24sp" />
 
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                                 android:id="@+id/followingTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
                             android:gravity="center"
                             android:orientation="vertical">
 
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                                 android:id="@+id/followers"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
                                 android:textColor="@color/colorAccent"
                                 android:textSize="24sp" />
 
-                            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                                 android:id="@+id/followersTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -256,7 +256,7 @@
                     android:visibility="invisible"
                     android:src="@drawable/post_update"/>
 
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_below="@id/noPostsIcon"
                     android:id="@+id/empty_tag"
                     android:layout_width="wrap_content"

@@ -41,7 +41,7 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
@@ -53,7 +53,7 @@
             android:layout_toRightOf="@id/foodPic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ksh 0"
@@ -78,7 +78,7 @@
             android:text="&#8942;"
             android:textAppearance="?android:textAppearanceLarge" />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
@@ -105,7 +105,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/restaurantName"
             android:layout_below="@id/foodDescription"
             android:layout_toRightOf="@id/locationTag"
@@ -129,7 +129,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/distanceAway"
             android:layout_below="@id/restaurantName"
             android:layout_toRightOf="@id/locationTag"
@@ -150,7 +150,7 @@
             android:layout_marginLeft="-6dp"
             android:layout_marginRight="10dp"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/outOfStock"
             android:layout_below="@id/distanceAway"
             android:layout_toRightOf="@id/checkBox"

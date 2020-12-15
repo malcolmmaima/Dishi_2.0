@@ -21,7 +21,7 @@
             android:visibility="invisible"
             android:src="@drawable/menu"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/empty_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

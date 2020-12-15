@@ -21,7 +21,7 @@
 # -renamesourcefileattribute SourceFile
 
 #Do not obfuscate my Models
--keep class com.malcolmmaima.dishi.Model.** { *; }
+-keep class com.malcolmmaima.dishiapp.Model.** { *; }
 
 -keepattributes Signature
 -keepattributes *Annotation*

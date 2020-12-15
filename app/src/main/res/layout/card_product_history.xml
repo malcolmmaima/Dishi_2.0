@@ -41,7 +41,7 @@
             android:foregroundGravity="center_vertical"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimaryDark"
@@ -53,7 +53,7 @@
             android:layout_toRightOf="@id/foodPic"
             android:layout_toLeftOf="@+id/foodPrice"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ksh 0"
@@ -66,7 +66,7 @@
             android:layout_marginEnd="15dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
@@ -93,7 +93,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/restaurantName"
             android:layout_below="@id/foodDescription"
             android:layout_toRightOf="@id/locationTag"
@@ -117,7 +117,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/distanceAway"
             android:layout_below="@id/restaurantTag"
             android:layout_toRightOf="@id/locationTag"
@@ -141,7 +141,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/itemQuantity"
             android:layout_below="@id/locationTag"
             android:layout_toRightOf="@id/locationTag"
@@ -165,7 +165,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/confirmOrd"
             android:layout_below="@id/itemQuantity"
             android:layout_toRightOf="@id/locationTag"
@@ -189,7 +189,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/orderedOn"
             android:layout_below="@id/confirmOrd"
             android:layout_toRightOf="@id/locationTag"
@@ -210,7 +210,7 @@
             android:layout_marginLeft="-8dp"
             android:layout_marginRight="10dp"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/outOfStock"
             android:layout_below="@id/orderedOn"
             android:layout_toRightOf="@id/checkBox"

@@ -41,14 +41,14 @@
         android:background="@color/pureWhite"
         android:paddingTop="8dp"
         android:paddingRight="15dp">
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:id="@+id/contact_name"
             android:text="Contact Name"
             android:textSize="18dp"
             android:textColor="#000"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Light
             android:id="@+id/notificationTime"
             android:text="11:53 P.M."
             android:textSize="12dp"
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/message"
             android:layout_below="@+id/contact_name"
             android:textSize="15dp"

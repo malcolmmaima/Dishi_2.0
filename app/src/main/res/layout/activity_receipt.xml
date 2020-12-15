@@ -58,7 +58,7 @@
 
                 android:src="@drawable/ic_receipt_white_48dp"/>
         </LinearLayout>
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12dp"
@@ -73,13 +73,13 @@
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Bold
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Bold
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
                 android:text="Ksh"
                 android:textSize="50dp"/>
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:id="@+id/nameTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Dishi Vendor"
@@ -125,7 +125,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Phone"
@@ -134,7 +134,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="+2547000000"
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ordered"
@@ -157,7 +157,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1/1/2020 4:30PM"
@@ -171,7 +171,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delivered"
@@ -180,7 +180,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1/1/2020 4:50PM"
@@ -201,7 +201,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginTop="15dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12dp"
@@ -209,7 +209,7 @@
                 android:text="ITEM"
 
                 android:textColor="#b1b1b1"/>
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12dp"
@@ -218,7 +218,7 @@
                 android:text="QTY"
                 android:layout_marginLeft="50dp"
                 android:textColor="#b1b1b1"/>
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -245,7 +245,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="15dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Subtotal"
@@ -254,7 +254,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
@@ -268,7 +268,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delivery fee"
@@ -277,7 +277,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
@@ -292,7 +292,7 @@
             android:orientation="horizontal"
             android:layout_marginBottom="20dp"
             android:layout_marginTop="10dp">
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Total"
@@ -301,7 +301,7 @@
                 android:layout_weight="1"
                 android:textColor="#000"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ksh 0.00"

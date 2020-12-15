@@ -60,7 +60,7 @@
 
             </LinearLayout>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:id="@+id/subTotal"
                 android:layout_below="@id/lin"
                 android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
                     android:paddingBottom="20dp"
                     >
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/appTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                         android:textColor="@color/colorPrimary"
                         android:textStyle="bold"
                         />
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/appdescription"
@@ -144,7 +144,7 @@
 
     <TextView
         android:id="@+id/version"
-        android:text="Version 1.1.1"
+        android:text="Version 1.1.2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

@@ -38,7 +38,7 @@
             android:scaleType="fitXY"
             />
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
@@ -63,7 +63,7 @@
                 android:background="@drawable/ic_access_time_black_48dp"
                 android:layout_marginRight="3dp"/>
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Light
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Light
                 android:layout_gravity="start"
                 android:id="@+id/timePosted"
                 android:layout_width="wrap_content"
@@ -95,7 +95,7 @@
 
         </RelativeLayout>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="loading..."
@@ -146,7 +146,7 @@
                     android:backgroundTint="@color/lightgray"
                     android:src="@drawable/unliked" />
 
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
@@ -164,7 +164,7 @@
                     android:backgroundTint="@color/lightgray"
                     android:src="@drawable/comment" />
 
-                <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"

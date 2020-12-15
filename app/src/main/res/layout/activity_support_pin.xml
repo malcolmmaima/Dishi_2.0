@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".View.Activities.SupportPin">
 
-    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -16,7 +16,7 @@
         android:textColor="#ffffff"
         android:textSize="16dp" />
 
-    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
         android:id="@+id/title1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:textSize="12dp" />
 
 
-    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
         android:id="@+id/title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -111,7 +111,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -120,7 +120,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -139,7 +139,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -148,7 +148,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -176,7 +176,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -185,7 +185,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -205,7 +205,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -214,7 +214,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -234,7 +234,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -243,7 +243,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -272,7 +272,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -281,7 +281,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -301,7 +301,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -310,7 +310,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -330,7 +330,7 @@
             android:focusableInTouchMode="false"
             android:foreground="?android:attr/selectableItemBackground">
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="26dp"
@@ -339,7 +339,7 @@
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -363,7 +363,7 @@
         android:focusableInTouchMode="false"
         android:foreground="?android:attr/selectableItemBackground">
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"

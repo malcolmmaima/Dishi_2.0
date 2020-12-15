@@ -23,7 +23,7 @@
             android:visibility="gone"
             android:src="@drawable/newsfeed_big"/>
 
-        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
             android:id="@+id/empty_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

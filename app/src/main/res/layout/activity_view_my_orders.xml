@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+            <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                 android:id="@+id/myOrderID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                     android:padding="10dp"
                     >
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                         android:id="@+id/billTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
                         android:text="Total Bill:"
                         android:textStyle="bold"
                         />
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Medium
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Medium
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Ksh 0"
@@ -86,7 +86,7 @@
                         android:textColor="@color/colorAccent"
                         android:layout_alignParentRight="true"
                         />
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -99,7 +99,7 @@
                         android:layout_below="@id/billTitle"
                         android:textColor="#666"/>
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
@@ -111,7 +111,7 @@
                         android:textColor="#666"
                         />
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -124,7 +124,7 @@
                         android:layout_below="@id/productsSubtotal"
                         android:textColor="#666"/>
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -137,7 +137,7 @@
                         />
 
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -150,7 +150,7 @@
                         android:layout_below="@id/DeliveryCharge"
                         android:textColor="#666"/>
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -171,7 +171,7 @@
                         android:layout_height="wrap_content">
 
                         <!-- Might add more widgets here -->
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="15sp"
@@ -206,7 +206,7 @@
                             android:layout_marginLeft="5dp"
                             />
 
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/riderName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -233,7 +233,7 @@
                             android:layout_marginLeft="5dp"
                             />
 
-                        <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                        <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                             android:id="@+id/timeStamp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -278,7 +278,7 @@
                         android:src="@drawable/location_pin"
                         />
 
-                    <com.malcolmmaima.dishi.Controller.Fonts.MyTextView_Roboto_Regular
+                    <com.malcolmmaima.dishiapp.Controller.Fonts.MyTextView_Roboto_Regular
                         android:layout_toRightOf="@id/locationIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.malcolmmaima.dishi.View.Activities.MyCart">
+    tools:context="com.malcolmmaima.dishiapp.View.Activities.MyCart">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
