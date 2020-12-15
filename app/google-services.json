@@ -8,58 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:770782711846:android:912985cbb27c8d694816e7",
+        "mobilesdk_app_id": "1:770782711846:android:c8957bc032d2c6224816e7",
         "android_client_info": {
-          "package_name": "com.malcolmmaima.dishi"
+          "package_name": "com.malcolmmaima.dishiapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "770782711846-817d2t6ig1hs7tba8ect0m5ehn8ta88m.apps.googleusercontent.com",
+          "client_id": "770782711846-k4jba3687jrducsn4rnmraalgrjlsu1m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
+            "package_name": "com.malcolmmaima.dishiapp",
             "certificate_hash": "bbeca221ae7a2d459d497dfdb12f1ca29ef3df5c"
-          }
-        },
-        {
-          "client_id": "770782711846-8l1ltp7duorq0faqa0o4094ci4n81vpb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
-            "certificate_hash": "d1ac49a3c14a2f7701c71e8b532ad44c1012e0b5"
-          }
-        },
-        {
-          "client_id": "770782711846-8lk948j1g0en6k0s61a7a28t0ao3vdjd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
-            "certificate_hash": "be976b4157a00f7a11201e9e7d2defa552d655ae"
-          }
-        },
-        {
-          "client_id": "770782711846-9lpa13tibvi99rhd9l025h28os6tjp2s.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
-            "certificate_hash": "883a091735e47c114f24dedf642f9637083502e9"
-          }
-        },
-        {
-          "client_id": "770782711846-jn3usqk14dcmch23mni5tnltb4om9avf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
-            "certificate_hash": "1d5797ea03aacb87995db8a476771af0b376dae1"
-          }
-        },
-        {
-          "client_id": "770782711846-rq291vpfr24i2nh29qen94euu9vfs5bh.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.malcolmmaima.dishi",
-            "certificate_hash": "efaf4e9b90f21d480447126ed169afac35db2cf0"
           }
         },
         {
