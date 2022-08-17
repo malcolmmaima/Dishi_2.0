@@ -1,7 +1,7 @@
 # Dishi_2.0
 This is a realtime food ordering app running on a realtime firebase backend. Generate your own package.json from firebase console and have a go at it. live apk is also available for testing in the link below.
 
-http://dishi.undatechinnovations.co.ke/
+http://dishi.malcolmmaima.com/
 
 ## System Overview
 
