@@ -1,39 +1,39 @@
 # Dishi_2.0
 This is a realtime food ordering app running on a realtime firebase backend. Generate your own package.json from firebase console and have a go at it. live apk is also available for testing in the link below.
 
-http://dishi.malcolmmaima.com/
+https://malcolmmaima.com/dishi
 
 ## System Overview
 
 Dishi is a front-end client which talks to the Firebase Database. It implements Google Maps API for live tracking latitude/longitude coordinates of user’s device once logged in. The live tracking module is given high priority and given most attention in terms of avoiding bugs and interface deficiencies. User Authentication is done using Google’s phone number authentication where a special code is sent to the phone number entered before accessing the system, this bars spam accounts as each account is linked to a phone number.
 
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/dishi-main.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-27.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-26.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-1.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-3.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-4.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-5.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-6.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-7.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-8.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-9.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-10.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-11.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-12.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-13.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-14.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-15.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-16.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-17.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-18.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-19.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-20.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-21.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-22.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-23.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-24.png height="550"  ></a>
-<a href="url"><img src=https://dishi.malcolmmaima.com/wp-content/uploads/2020/12/showcase-mobile-25.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/dishi-main.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-27.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-26.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-1.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-3.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-4.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-5.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-6.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-7.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-8.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-9.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-10.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-11.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-12.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-13.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-14.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-15.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-16.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-17.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-18.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-19.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-20.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-21.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-22.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-23.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-24.png height="550"  ></a>
+<a href="url"><img src=https://malcolmmaima.com/dishi/wp-content/uploads/2020/12/showcase-mobile-25.png height="550"  ></a>
 
 ### Realtime Tracking => https://www.instagram.com/p/CFZF9VyBcKq/
 
